@@ -2461,7 +2461,7 @@ function GuardianScreen(_ref19) {
         fontWeight: 800,
         color: "white"
       }
-    }, p.name, " ", getTitle(p)), isSent && /*#__PURE__*/React.createElement("span", {
+    }, p.guardianType === "official" ? getTitle(p) : p.name + " " + getTitle(p)), isSent && /*#__PURE__*/React.createElement("span", {
       style: {
         fontSize: 10,
         fontWeight: 800,
