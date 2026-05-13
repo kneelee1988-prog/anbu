@@ -2453,448 +2453,145 @@ function GuardianScreen(_ref19) {
     }, 3000);
   };
   return /*#__PURE__*/React.createElement("div", {
-    style: {
-      fontFamily: "'Noto Sans KR',sans-serif",
-      background: "#f0f4f8",
-      minHeight: "100vh",
-      display: "flex",
-      justifyContent: "center"
-    }
+    style: { fontFamily: "'Noto Sans KR',sans-serif", background: "#f4f6fa", minHeight: "100vh", display: "flex", justifyContent: "center" }
   }, /*#__PURE__*/React.createElement("div", {
-    style: {
-      width: "100%",
-      maxWidth: 390,
-      paddingBottom: 32
-    }
-  }, /*#__PURE__*/React.createElement("div", {
-    style: {
-      padding: "14px 0 0"
-    }
-  }, /*#__PURE__*/React.createElement("div", {
-    style: {
-      background: "linear-gradient(135deg,#1e3a5f,#2d5a8e)",
-      padding: "16px 20px",
-      color: "white",
-      borderRadius: 20,
-      padding: "0 20px"
-    }
-  }, /*#__PURE__*/React.createElement("div", {
-    style: {
-      display: "flex",
-      alignItems: "center",
-      gap: 10,
-      marginBottom: 12
-    }
-  }, /*#__PURE__*/React.createElement("button", {
-    onClick: function onClick() {
-      return patients.length > 1 ? setSelectedId(null) : onBack();
+    style: { width: "100%", maxWidth: 390, paddingBottom: 40 }
+  },
+  /*#__PURE__*/React.createElement("div", { style: { padding: "16px 16px 0" } },
+    /*#__PURE__*/React.createElement("div", {
+      style: { background: "linear-gradient(150deg,#1a3358 0%,#2a5298 60%,#1e6f8e 100%)", borderRadius: 20, padding: "18px 20px 20px", color: "white", boxShadow: "0 8px 32px rgba(26,51,88,0.18)" }
     },
-    style: {
-      background: "rgba(255,255,255,0.15)",
-      border: "none",
-      borderRadius: 8,
-      padding: "4px 10px",
-      color: "white",
-      fontSize: 12,
-      cursor: "pointer",
-      fontWeight: 700
-    }
-  }, "\u2190 ", patients.length > 1 ? "환자 선택" : "역할 선택"), /*#__PURE__*/React.createElement("div", {
-    style: {
-      fontSize: 11,
-      opacity: 0.7
-    }
-  }, "\uC548\uBD80 \xB7 \uBCF4\uD638\uC790")), /*#__PURE__*/React.createElement("div", {
-    style: {
-      fontSize: 22,
-      fontWeight: 700,
-      marginBottom: 2
-    }
-  }, patient && patient.name, " ", getTitle(patient)), /*#__PURE__*/React.createElement("div", {
-    style: {
-      fontSize: 13,
-      opacity: 0.75,
-      marginBottom: 14
-    }
-  }, getWard(patient && patient.room), " \xB7 \uC8FC\uCE58\uC758 : ", getDoctorTitle(patient && patient.doctorId)), /*#__PURE__*/React.createElement("div", {
-    style: {
-      display: "flex",
-      gap: 8
-    }
-  }, [{
-    label: "입원일수",
-    value: (patient && patient.days) + "일째"
-  }, {
-    label: "의식수준",
-    value: r ? r.consciousness || "—" : "—"
-  }, {
-    label: "식사",
-    value: r ? r.meal_amount === "잘 드심" ? "양호" : r.meal_amount === "절반" ? "보통" : r.meal_amount ? "저하" : "—" : "—"
-  }, {
-    label: "기분",
-    value: r ? r.moods && r.moods.length > 0 ? r.moods[0] : "—" : "—"
-  }].map(function (item) {
-    return /*#__PURE__*/React.createElement("div", {
-      key: item.label,
-      style: {
-        flex: 1,
-        background: "rgba(255,255,255,0.12)",
-        borderRadius: 12,
-        padding: "10px 6px"
-      }
-    }, /*#__PURE__*/React.createElement("div", {
-      style: {
-        fontSize: 9,
-        opacity: 0.7,
-        marginBottom: 2
-      }
-    }, item.label), /*#__PURE__*/React.createElement("div", {
-      style: {
-        fontSize: 12,
-        fontWeight: 800
-      }
-    }, item.value));
-  })))), pending && /*#__PURE__*/React.createElement("div", {
-    style: {
-      margin: "10px 20px 0",
-      background: "#fffbeb",
-      border: "1px solid #fcd34d",
-      borderRadius: 14,
-      padding: "12px 16px",
-      fontSize: 13,
-      color: "#713f12",
-      fontWeight: 700,
-      display: "flex",
-      alignItems: "center",
-      gap: 8
-    }
-  }, /*#__PURE__*/React.createElement("span", null, "\uD83E\uDE7A"), /*#__PURE__*/React.createElement("span", null, "\uAC04\uD638\uC0AC \uC785\uB825 \uC644\uB8CC \xB7 \uC8FC\uCE58\uC758 \uAC80\uD1A0 \uD6C4 \uC804\uB2EC \uC608\uC815\uC774\uC5D0\uC694.")), !r && !pending && /*#__PURE__*/React.createElement("div", {
-    style: {
-      margin: "10px 20px 0",
-      background: "#eff6ff",
-      border: "1px solid #bfdbfe",
-      borderRadius: 14,
-      padding: "12px 16px",
-      fontSize: 13,
-      color: "#1e40af",
-      fontWeight: 700,
-      display: "flex",
-      alignItems: "center",
-      gap: 8
-    }
-  }, /*#__PURE__*/React.createElement("span", null, "\u23F3"), /*#__PURE__*/React.createElement("span", null, "\uC624\uB298 \uC0C1\uD0DC\uB294 \uC800\uB141 \uAC04\uD638\uC0AC \uC785\uB825 \uD6C4 \uD655\uC778\uD558\uC2E4 \uC218 \uC788\uC5B4\uC694.")), r && /*#__PURE__*/React.createElement("div", {
-    style: {
-      margin: "10px 20px 0",
-      background: "#f0fdf4",
-      border: "1px solid #86efac",
-      borderRadius: 14,
-      padding: "10px 16px",
-      fontSize: 12,
-      color: "#166534",
-      fontWeight: 700
-    }
-  }, "\u2705 ", r.updatedAt, " \uC785\uB825 \uC644\uB8CC \xB7 \uC8FC\uCE58\uC758 \uD655\uC778\uB428"), /*#__PURE__*/React.createElement("div", {
-    style: {
-      margin: "10px 20px 0",
-      display: "flex",
-      background: "white",
-      borderRadius: 14,
-      padding: 4,
-      gap: 3,
-      border: "1.5px solid #cbd5e1"
-    }
-  }, [["today", "오늘의 안부"], ["message", getTitle(patient) + " 한마디"]].map(function (_ref20) {
-    var _ref21 = _slicedToArray(_ref20, 2),
-      t = _ref21[0],
-      l = _ref21[1];
-    return /*#__PURE__*/React.createElement("button", {
-      key: t,
-      onClick: function onClick() {
-        return setTab(t);
-      },
-      style: {
-        flex: 1,
-        padding: "8px 8px",
-        borderRadius: 10,
-        border: "none",
-        cursor: "pointer",
-        fontSize: 13,
-        fontWeight: tab === t ? 800 : 600,
-        background: tab === t ? "#1e3a5f" : "transparent",
-        color: tab === t ? "white" : "#64748b"
-      }
-    }, l);
-  })), /*#__PURE__*/React.createElement("div", {
-    style: {
-      padding: "12px 20px 0"
-    }
-  }, tab === "today" && r && /*#__PURE__*/React.createElement(React.Fragment, null,
-  /*#__PURE__*/React.createElement("div", { style: { display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 6, marginBottom: 8 } },
-    [
-      { bg: "#1e3a5f", icon: "🧠", label: "의식수준", value: r.consciousness || "—", sub: null, vc: scoreColor(r.consciousness) },
-      { bg: "#0d5c56", icon: "🍚", label: "식사", value: r.meal_amount || "—", sub: r.meal_type, vc: scoreColor(r.meal_amount) },
-      { bg: "#2d6a9f", icon: "🌙", label: "수면", value: r.sleep_hours || "—", sub: r.sleep_wakeups ? "각성 " + r.sleep_wakeups : null, vc: "#334155" },
-      { bg: "#713f12", icon: "🚶", label: "활동", value: r.mobility || "—", sub: r.fall_risk ? "낙상 " + r.fall_risk : null, vc: "#334155" },
-      { bg: "#0369a1", icon: "💧", label: "소변", value: r.urine || "—", sub: null, vc: scoreColor(r.urine) },
-      { bg: "#6b21a8", icon: "🚽", label: "대변", value: r.bowel || "—", sub: null, vc: scoreColor(r.bowel) },
-      { bg: "#166534", icon: "😊", label: "기분", value: r.moods && r.moods.length > 0 ? r.moods[0] : "—", sub: r.moods && r.moods.length > 1 ? r.moods.slice(1).join(", ") : null, vc: r.moods && r.moods.includes("안정") ? "#166534" : "#7f1d1d" },
-      { bg: "#7c3aed", icon: "💊", label: "투약", value: r.medication ? (r.medication === "정상 투약" ? "✅ 정상" : "⚠️ 이상") : "—", sub: null, vc: r.medication === "정상 투약" ? "#166534" : "#ef4444" },
-      { bg: "#475569", icon: "🧴", label: "피부", value: r.skin || "—", sub: null, vc: scoreColor(r.skin) },
-      { bg: "#475569", icon: "🪥", label: "위생", value: r.hygiene || "—", sub: null, vc: scoreColor(r.hygiene) },
-      { bg: "#475569", icon: "🛏", label: "욕창", value: r.bedsore || "—", sub: null, vc: r.bedsore === "없음" ? "#166534" : "#ef4444" },
-      r.oriental !== null && r.oriental !== undefined ? { bg: "#115e59", icon: "🪡", label: "한방", value: r.oriental ? "시행" : "미시행", sub: null, vc: r.oriental ? "#0d5c56" : "#64748b" } : null
-    ].filter(Boolean).map(function(item, i) {
-      return /*#__PURE__*/React.createElement("div", {
-        key: i,
-        style: { background: "white", borderRadius: 12, border: "1.5px solid #cbd5e1", overflow: "hidden", aspectRatio: "1 / 1", display: "flex", flexDirection: "column" }
-      },
-        /*#__PURE__*/React.createElement("div", { style: { background: item.bg, padding: "12px 6px", fontSize: 12, fontWeight: 800, color: "white", textAlign: "center", flexShrink: 0, lineHeight: 1.3, display: "flex", alignItems: "center", justifyContent: "center", minHeight: "42%" } },
-          item.label
-        ),
-        /*#__PURE__*/React.createElement("div", { style: { flex: 1, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", padding: "4px 6px" } },
-          /*#__PURE__*/React.createElement("div", { style: { fontSize: 14, fontWeight: 800, color: item.vc, textAlign: "center", lineHeight: 1.3 } }, item.value),
-          item.sub && /*#__PURE__*/React.createElement("div", { style: { fontSize: 11, color: "#94a3b8", marginTop: 3, textAlign: "center" } }, item.sub)
-        )
-      );
-    })
-  ),
-  /*#__PURE__*/React.createElement("div", { style: { background: "white", borderRadius: 12, border: "1.5px solid #cbd5e1", overflow: "hidden", marginBottom: 8 } },
-    /*#__PURE__*/React.createElement("div", { style: { background: "#1e3a5f", padding: "10px 14px", fontSize: 13, fontWeight: 800, color: "white" } }, "\uD83E\uDDE9 \uC815\uC2E0 \uBC0F \uC774\uC0C1\uD589\uB3D9"),
-    /*#__PURE__*/React.createElement("div", { style: { padding: "12px 14px", display: "flex", flexWrap: "wrap", gap: 6 } },
-      (r.mental && r.mental.length > 0 ? r.mental : ["미입력"]).map(function(s) {
-        return /*#__PURE__*/React.createElement("span", { key: s, style: { fontSize: 14, fontWeight: 700, borderRadius: 20, padding: "4px 14px", background: s === "이상 없음" ? "#f0fdf4" : s === "미입력" ? "#f1f5f9" : "#fef2f2", color: s === "이상 없음" ? "#166534" : s === "미입력" ? "#aaa" : "#7f1d1d" } }, s);
-      })
+      /*#__PURE__*/React.createElement("div", { style: { display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 14 } },
+        /*#__PURE__*/React.createElement("button", {
+          onClick: function() { return patients.length > 1 ? setSelectedId(null) : onBack(); },
+          style: { background: "rgba(255,255,255,0.15)", border: "1px solid rgba(255,255,255,0.2)", borderRadius: 20, padding: "5px 14px", color: "white", fontSize: 12, cursor: "pointer", fontWeight: 600 }
+        }, "\u2190 ", patients.length > 1 ? "환자 선택" : "역할 선택"),
+        /*#__PURE__*/React.createElement("span", { style: { fontSize: 11, opacity: 0.6, letterSpacing: 1 } }, "안부 · 보호자")
+      ),
+      /*#__PURE__*/React.createElement("div", { style: { fontSize: 26, fontWeight: 900, marginBottom: 4, letterSpacing: -0.5 } }, patient && patient.name, " ", getTitle(patient)),
+      /*#__PURE__*/React.createElement("div", { style: { fontSize: 13, opacity: 0.7, marginBottom: 18, fontWeight: 500 } }, getWard(patient && patient.room), " · ", getDoctorTitle(patient && patient.doctorId)),
+      /*#__PURE__*/React.createElement("div", { style: { display: "flex", gap: 8 } },
+        [{label:"입원",value:(patient&&patient.days)+"일째"},{label:"의식",value:r?r.consciousness||"—":"—"},{label:"식사",value:r?r.meal_amount==="잘 드심"?"양호":r.meal_amount==="절반"?"보통":r.meal_amount?"저하":"—":"—"},{label:"기분",value:r?r.moods&&r.moods.length>0?r.moods[0]:"—":"—"}].map(function(item) {
+          return /*#__PURE__*/React.createElement("div", { key: item.label, style: { flex: 1, background: "rgba(255,255,255,0.12)", borderRadius: 12, padding: "10px 6px", textAlign: "center", border: "1px solid rgba(255,255,255,0.1)" } },
+            /*#__PURE__*/React.createElement("div", { style: { fontSize: 9, opacity: 0.65, marginBottom: 4, letterSpacing: 0.5 } }, item.label),
+            /*#__PURE__*/React.createElement("div", { style: { fontSize: 13, fontWeight: 800 } }, item.value)
+          );
+        })
+      )
     )
   ),
-  r.note && /*#__PURE__*/React.createElement("div", {
-    style: { background: "linear-gradient(135deg,#f0fdf4,#dcfce7)", borderRadius: 12, padding: "12px 14px", marginBottom: 8, border: "1px solid #86efac" }
-  }, /*#__PURE__*/React.createElement("div", { style: { fontSize: 13, fontWeight: 800, color: "#166534", marginBottom: 6 } }, "\uD83D\uDCDD \uAC04\uD638\uC0AC \uD2B9\uC774\uC0AC\uD56D"),
-    /*#__PURE__*/React.createElement("div", { style: { fontSize: 15, color: "#166534", lineHeight: 1.8, fontWeight: 600 } }, r.note)
+  pending && /*#__PURE__*/React.createElement("div", { style: { margin: "10px 16px 0", background: "#fffbeb", border: "1px solid #fcd34d", borderRadius: 14, padding: "12px 16px", fontSize: 13, color: "#92400e", fontWeight: 600, display: "flex", alignItems: "center", gap: 8 } },
+    /*#__PURE__*/React.createElement("span", null, "\uD83E\uDE7A"), /*#__PURE__*/React.createElement("span", null, "간호사 입력 완료 · 주치의 검토 후 전달 예정이에요.")
   ),
-  r.doctorComment && /*#__PURE__*/React.createElement("div", {
-    style: { background: "linear-gradient(135deg,#eff6ff,#dbeafe)", borderRadius: 12, padding: "12px 14px", marginBottom: 8, border: "1px solid #93c5fd" }
-  }, /*#__PURE__*/React.createElement("div", { style: { fontSize: 13, fontWeight: 800, color: "#1e40af", marginBottom: 6 } }, "\uD83D\uDC68\u200D\u2695\uFE0F \uC8FC\uCE58\uC758 \uCF54\uBA58\uD2B8 · ", r.doctorCommentDate),
-    /*#__PURE__*/React.createElement("div", { style: { fontSize: 15, color: "#1e3a5f", lineHeight: 1.8, fontWeight: 600 } }, r.doctorComment)
-  )), tab === "today" && !r && /*#__PURE__*/React.createElement("div", {
-    style: {
-      textAlign: "center",
-      padding: "40px 20px",
-      color: "#94a3b8"
-    }
-  }, /*#__PURE__*/React.createElement("div", {
-    style: {
-      fontSize: 40,
-      marginBottom: 12
-    }
-  }, "\u23F3"), /*#__PURE__*/React.createElement("div", {
-    style: {
-      fontSize: 14,
-      fontWeight: 600
-    }
-  }, "\uC544\uC9C1 \uC624\uB298 \uC0C1\uD0DC\uAC00 \uC785\uB825\uB418\uC9C0 \uC54A\uC558\uC5B4\uC694")), tab === "message" && /*#__PURE__*/React.createElement("div", {
-    style: {
-      background: "white",
-      borderRadius: 16,
-      padding: 20,
-      border: "1.5px solid #cbd5e1"
-    }
-  }, /*#__PURE__*/React.createElement("div", {
-    style: {
-      fontSize: 14,
-      fontWeight: 700,
-      color: "#1a1a1a",
-      marginBottom: 10
-    }
-  }, getTitle(patient), " \uD55C\uB9C8\uB514"), sent ? /*#__PURE__*/React.createElement("div", {
-    style: {
-      background: "#f0fdf4",
-      borderRadius: 12,
-      padding: 16,
-      textAlign: "center",
-      color: "#16a34a",
-      fontWeight: 600
-    }
-  }, "\u2705 \uBA54\uC2DC\uC9C0\uAC00 \uC804\uB2EC\uB410\uC5B4\uC694") : /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("textarea", {
-    value: msg,
-    onChange: function onChange(e) {
-      return setMsg(e.target.value);
-    },
-    placeholder: "\uC608) " + (patient && patient.gender === "\uC5EC" ? "\uC5B4\uBA38\uB2C8" : "\uC544\uBC84\uC9C0") + " \uC624\uB298 \uBC25 \uC798 \uB4DC\uC138\uC694 \uD83D\uDE0A",
-    style: {
-      width: "100%",
-      height: 120,
-      borderRadius: 12,
-      border: "2px solid #94a3b8",
-      padding: 12,
-      fontSize: 14,
-      color: "#333",
-      resize: "none",
-      outline: "none",
-      fontFamily: "inherit",
-      boxSizing: "border-box",
-      lineHeight: 1.6,
-      marginBottom: 10
-    }
-  }), /*#__PURE__*/React.createElement("div", {
-    style: {
-      background: "#f8fafc",
-      borderRadius: 12,
-      padding: "10px 12px",
-      marginBottom: 10
-    }
-  }, /*#__PURE__*/React.createElement("div", {
-    style: {
-      fontSize: 12,
-      fontWeight: 700,
-      color: "#475569",
-      marginBottom: 6
-    }
-  }, "\uD83D\uDCC5 \uBA74\uD68C \uC608\uC815\uC77C (\uC120\uD0DD)"),
-  /*#__PURE__*/React.createElement("div", {
-    style: { display: "flex", gap: 6, marginBottom: 6 }
-  },
-    [today.getMonth() + 1, today.getMonth() + 2 > 12 ? 1 : today.getMonth() + 2].map(function(m) {
-      return /*#__PURE__*/React.createElement("button", {
-        key: m,
-        onClick: function() { setVisitMonth(m); setVisitDay(""); setVisitDate(""); setVisitTime(""); },
-        style: {
-          padding: "4px 14px",
-          borderRadius: 8,
-          border: "1px solid #e2e8f0",
-          cursor: "pointer",
-          fontSize: 12,
-          fontWeight: 700,
-          background: visitMonth === m ? "#1e3a5f" : "white",
-          color: visitMonth === m ? "white" : "#334155"
-        }
-      }, m + "\uC6D4");
+  !r && !pending && /*#__PURE__*/React.createElement("div", { style: { margin: "10px 16px 0", background: "#eff6ff", border: "1px solid #bfdbfe", borderRadius: 14, padding: "12px 16px", fontSize: 13, color: "#1e40af", fontWeight: 600, display: "flex", alignItems: "center", gap: 8 } },
+    /*#__PURE__*/React.createElement("span", null, "\u23F3"), /*#__PURE__*/React.createElement("span", null, "오늘 상태는 저녁 간호사 입력 후 확인하실 수 있어요.")
+  ),
+  r && /*#__PURE__*/React.createElement("div", { style: { margin: "10px 16px 0", background: "#f0fdf4", border: "1px solid #86efac", borderRadius: 14, padding: "11px 16px", fontSize: 12, color: "#15803d", fontWeight: 600 } },
+    "\u2705 ", r.updatedAt, " 입력 완료 · 주치의 확인됨"
+  ),
+  /*#__PURE__*/React.createElement("div", { style: { margin: "10px 16px 0", background: "white", borderRadius: 14, padding: 4, display: "flex", gap: 3, border: "1px solid #e8ecf0", boxShadow: "0 1px 4px rgba(0,0,0,0.06)" } },
+    [["today","오늘의 안부"],["message", getTitle(patient)+" 한마디"]].map(function(_ref20) {
+      var _r2 = _slicedToArray(_ref20, 2), t = _r2[0], l = _r2[1];
+      return /*#__PURE__*/React.createElement("button", { key: t, onClick: function() { return setTab(t); }, style: { flex: 1, padding: "9px 8px", borderRadius: 11, border: "none", cursor: "pointer", fontSize: 13, fontWeight: tab===t?800:500, background: tab===t?"linear-gradient(135deg,#1a3358,#2a5298)":"transparent", color: tab===t?"white":"#64748b" } }, l);
     })
   ),
-  /*#__PURE__*/React.createElement("div", {
-    style: { display: "flex", gap: 4, flexWrap: "wrap", marginBottom: 6 }
-  },
-    Array.from({ length: 31 }, function(_, i) { return i + 1; }).map(function(d) {
-      var isSelected = visitDay === d && visitMonth;
-      return /*#__PURE__*/React.createElement("button", {
-        key: d,
-        onClick: function() {
-          if (!visitMonth) return;
-          var newDate = visitMonth + "\uC6D4 " + d + "\uC77C";
-          if (visitDay === d && visitMonth) { setVisitDay(""); setVisitDate(""); }
-          else { setVisitDay(d); setVisitDate(newDate); }
-          setVisitTime("");
-        },
-        style: {
-          width: 30,
-          height: 28,
-          borderRadius: 6,
-          border: "1px solid #e2e8f0",
-          cursor: visitMonth ? "pointer" : "default",
-          fontSize: 11,
-          fontWeight: 700,
-          background: isSelected ? "#1e3a5f" : "white",
-          color: isSelected ? "white" : visitMonth ? "#334155" : "#cbd5e1"
-        }
-      }, d);
-    })
-  ),
-  visitDate && /*#__PURE__*/React.createElement("div", {
-    style: { marginTop: 8, fontSize: 12, color: "#1e3a5f", fontWeight: 700 }
-  }, "\uD83D\uDCC5 \uBA74\uD68C \uC608\uC815: ", visitDate, " ", visitTime)),
-  /*#__PURE__*/React.createElement("div", {
-    style: { display: "grid", gridTemplateColumns: "1fr 1fr", gap: 5, marginTop: 4 }
-  }, [
-    { label: "9~10시", color: "#eff6ff", border: "#bfdbfe", text: "#1e40af" },
-    { label: "10~11시", color: "#f0fdf4", border: "#86efac", text: "#166534" },
-    { label: "점심시간", color: "#fffbeb", border: "#fcd34d", text: "#713f12" },
-    { label: "13~14시", color: "#fdf4ff", border: "#e9d5ff", text: "#6b21a8" },
-    { label: "14~15시", color: "#fff1f2", border: "#fecdd3", text: "#9f1239" },
-    { label: "15~16시", color: "#f0fdfa", border: "#99f6e4", text: "#115e59" },
-    { label: "16~17시", color: "#fff7ed", border: "#fed7aa", text: "#9a3412" }
-  ].map(function(t) {
-    var isSelected = visitTime === t.label;
-    return /*#__PURE__*/React.createElement("button", {
-      key: t.label,
-      onClick: function() { setVisitTime(visitTime === t.label ? "" : t.label); },
-      style: {
-        padding: "7px 4px",
-        borderRadius: 8,
-        border: "1.5px solid " + (isSelected ? t.text : t.border),
-        cursor: "pointer",
-        fontSize: 12,
-        fontWeight: 700,
-        background: isSelected ? t.text : t.color,
-        color: isSelected ? "white" : t.text,
-        textAlign: "center"
-      }
-    }, t.label);
-  })),
-  /*#__PURE__*/React.createElement("div", {
-    style: {
-      background: "#f0f7ff",
-      border: "1px solid #bfdbfe",
-      borderRadius: 10,
-      padding: "12px 14px",
-      marginBottom: 10
-    }
-  }, /*#__PURE__*/React.createElement("div", {
-    style: {
-      fontSize: 12,
-      color: "#1e40af",
-      lineHeight: 1.7,
-      marginBottom: 10
-    }
-  }, "\uC774 \uBA54\uC2DC\uC9C0\uB294 ", getTitle(patient), "\uAED8 \uC804\uB2EC\uB418\uB294 \uC6A9\uB3C4\uC785\uB2C8\uB2E4.", /*#__PURE__*/React.createElement("br", null), /*#__PURE__*/React.createElement("span", {
-    style: {
-      color: "#1d4ed8",
-      fontWeight: 700
-    }
-  }, "\uC774 \uACF3\uC5D0\uC11C\uB294 \uB2F5\uC7A5\uC774 \uC5B4\uB835\uC2B5\uB2C8\uB2E4.")), /*#__PURE__*/React.createElement("div", {
-    style: {
-      borderTop: "1px solid #bfdbfe",
-      paddingTop: 10,
-      display: "flex",
-      alignItems: "center",
-      justifyContent: "space-between"
-    }
-  }, /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("div", {
-    style: {
-      fontSize: 11,
-      color: "#1d4ed8",
-      fontWeight: 700,
-      marginBottom: 3
-    }
-  }, "\uAE34\uAE09 \uC2DC \uBCD1\uC6D0\uC73C\uB85C \uC5F0\uB77D\uC8FC\uC138\uC694"), /*#__PURE__*/React.createElement("div", {
-    style: {
-      fontSize: 15,
-      fontWeight: 800,
-      color: "#1e3a5f"
-    }
-  }, "041-574-1777")), /*#__PURE__*/React.createElement("a", {
-    href: "tel:041-574-1777",
-    style: {
-      background: "#1e3a5f",
-      color: "white",
-      borderRadius: 10,
-      padding: "9px 14px",
-      fontSize: 13,
-      fontWeight: 700,
-      textDecoration: "none"
-    }
-  }, "\uD83D\uDCDE \uC804\uD654\uD558\uAE30"))), /*#__PURE__*/React.createElement("button", {
-    onClick: handleSend,
-    style: {
-      width: "100%",
-      padding: 13,
-      borderRadius: 12,
-      border: "none",
-      background: (msg.trim() || visitDate) ? "#1e3a5f" : "#e2e8f0",
-      color: (msg.trim() || visitDate) ? "white" : "#aaa",
-      fontSize: 14,
-      fontWeight: 700,
-      cursor: (msg.trim() || visitDate) ? "pointer" : "default"
-    }
-  }, "\uC804\uB2EC\uD558\uAE30"))))));
+  /*#__PURE__*/React.createElement("div", { style: { padding: "12px 16px 0" } },
+    tab === "today" && r && /*#__PURE__*/React.createElement(React.Fragment, null,
+      /*#__PURE__*/React.createElement("div", { style: { display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 8, marginBottom: 10 } },
+        [
+          { bg: "linear-gradient(135deg,#1a3358,#2a5298)", label: "의식수준", value: r.consciousness||"—", sub: null, vc: scoreColor(r.consciousness) },
+          { bg: "linear-gradient(135deg,#065f46,#0d9488)", label: "식사", value: r.meal_amount||"—", sub: r.meal_type, vc: scoreColor(r.meal_amount) },
+          { bg: "linear-gradient(135deg,#1e3a6e,#3b6cb7)", label: "수면", value: r.sleep_hours||"—", sub: r.sleep_wakeups?"각성 "+r.sleep_wakeups:null, vc: "#334155" },
+          { bg: "linear-gradient(135deg,#78350f,#b45309)", label: "활동", value: r.mobility||"—", sub: r.fall_risk?"낙상 "+r.fall_risk:null, vc: "#334155" },
+          { bg: "linear-gradient(135deg,#0c4a6e,#0369a1)", label: "소변", value: r.urine||"—", sub: null, vc: scoreColor(r.urine) },
+          { bg: "linear-gradient(135deg,#4c1d95,#7c3aed)", label: "대변", value: r.bowel||"—", sub: null, vc: scoreColor(r.bowel) },
+          { bg: "linear-gradient(135deg,#14532d,#166534)", label: "기분", value: r.moods&&r.moods.length>0?r.moods[0]:"—", sub: r.moods&&r.moods.length>1?r.moods.slice(1).join(", "):null, vc: r.moods&&r.moods.includes("안정")?"#166534":"#7f1d1d" },
+          { bg: "linear-gradient(135deg,#4c1d95,#6d28d9)", label: "투약", value: r.medication?(r.medication==="정상 투약"?"정상":"이상"):"—", sub: null, vc: r.medication==="정상 투약"?"#166534":"#ef4444" },
+          { bg: "linear-gradient(135deg,#374151,#4b5563)", label: "피부", value: r.skin||"—", sub: null, vc: scoreColor(r.skin) },
+          { bg: "linear-gradient(135deg,#374151,#4b5563)", label: "위생", value: r.hygiene||"—", sub: null, vc: scoreColor(r.hygiene) },
+          { bg: "linear-gradient(135deg,#374151,#4b5563)", label: "욕창", value: r.bedsore||"—", sub: null, vc: r.bedsore==="없음"?"#166534":"#ef4444" },
+          r.oriental!==null&&r.oriental!==undefined?{ bg: "linear-gradient(135deg,#064e3b,#065f46)", label: "한방", value: r.oriental?"시행":"미시행", sub: null, vc: r.oriental?"#0d5c56":"#64748b" }:null
+        ].filter(Boolean).map(function(item, i) {
+          return /*#__PURE__*/React.createElement("div", { key: i, style: { background: "white", borderRadius: 12, border: "1px solid #e8ecf0", overflow: "hidden", boxShadow: "0 2px 8px rgba(0,0,0,0.05)", display: "flex", flexDirection: "column" } },
+            /*#__PURE__*/React.createElement("div", { style: { background: item.bg, padding: "10px 8px", fontSize: 11, fontWeight: 700, color: "white", textAlign: "center" } }, item.label),
+            /*#__PURE__*/React.createElement("div", { style: { flex: 1, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", padding: "14px 6px" } },
+              /*#__PURE__*/React.createElement("div", { style: { fontSize: 14, fontWeight: 800, color: item.vc, textAlign: "center", lineHeight: 1.3 } }, item.value),
+              item.sub && /*#__PURE__*/React.createElement("div", { style: { fontSize: 10, color: "#94a3b8", marginTop: 4, textAlign: "center" } }, item.sub)
+            )
+          );
+        })
+      ),
+      /*#__PURE__*/React.createElement("div", { style: { background: "white", borderRadius: 14, border: "1px solid #e8ecf0", overflow: "hidden", marginBottom: 10, boxShadow: "0 2px 8px rgba(0,0,0,0.05)" } },
+        /*#__PURE__*/React.createElement("div", { style: { background: "linear-gradient(135deg,#1a3358,#2a5298)", padding: "10px 14px", fontSize: 12, fontWeight: 700, color: "white" } }, "\uD83E\uDDE9 정신 및 이상행동"),
+        /*#__PURE__*/React.createElement("div", { style: { padding: "12px 14px", display: "flex", flexWrap: "wrap", gap: 6 } },
+          (r.mental&&r.mental.length>0?r.mental:["미입력"]).map(function(s) {
+            return /*#__PURE__*/React.createElement("span", { key: s, style: { fontSize: 13, fontWeight: 700, borderRadius: 20, padding: "4px 14px", background: s==="이상 없음"?"#f0fdf4":s==="미입력"?"#f1f5f9":"#fef2f2", color: s==="이상 없음"?"#166534":s==="미입력"?"#aaa":"#7f1d1d" } }, s);
+          })
+        )
+      ),
+      r.note && /*#__PURE__*/React.createElement("div", { style: { background: "white", borderRadius: 14, border: "1px solid #d1fae5", overflow: "hidden", marginBottom: 10, boxShadow: "0 2px 8px rgba(0,0,0,0.05)" } },
+        /*#__PURE__*/React.createElement("div", { style: { background: "linear-gradient(135deg,#065f46,#0d9488)", padding: "10px 14px", fontSize: 12, fontWeight: 700, color: "white" } }, "\uD83D\uDCDD 간호사 특이사항"),
+        /*#__PURE__*/React.createElement("div", { style: { padding: "14px", fontSize: 15, color: "#166534", lineHeight: 1.8, fontWeight: 600 } }, r.note)
+      ),
+      r.doctorComment && /*#__PURE__*/React.createElement("div", { style: { background: "white", borderRadius: 14, border: "1px solid #bfdbfe", overflow: "hidden", marginBottom: 10, boxShadow: "0 2px 8px rgba(0,0,0,0.05)" } },
+        /*#__PURE__*/React.createElement("div", { style: { background: "linear-gradient(135deg,#1e3a6e,#2563eb)", padding: "10px 14px", fontSize: 12, fontWeight: 700, color: "white" } }, "\uD83D\uDC68\u200D\u2695\uFE0F 주치의 코멘트 · ", r.doctorCommentDate),
+        /*#__PURE__*/React.createElement("div", { style: { padding: "14px", fontSize: 15, color: "#1e3a5f", lineHeight: 1.8, fontWeight: 600 } }, r.doctorComment)
+      )
+    ),
+    tab === "today" && !r && /*#__PURE__*/React.createElement("div", { style: { textAlign: "center", padding: "48px 20px", color: "#94a3b8" } },
+      /*#__PURE__*/React.createElement("div", { style: { fontSize: 44, marginBottom: 12 } }, "\u23F3"),
+      /*#__PURE__*/React.createElement("div", { style: { fontSize: 15, fontWeight: 600 } }, "아직 오늘 상태가 입력되지 않았어요")
+    ),
+    tab === "message" && /*#__PURE__*/React.createElement("div", { style: { background: "white", borderRadius: 16, padding: 20, border: "1px solid #e8ecf0", boxShadow: "0 2px 8px rgba(0,0,0,0.06)" } },
+      /*#__PURE__*/React.createElement("div", { style: { fontSize: 15, fontWeight: 800, color: "#1a3358", marginBottom: 14 } }, getTitle(patient), " 한마디"),
+      sent ? /*#__PURE__*/React.createElement("div", { style: { background: "#f0fdf4", borderRadius: 12, padding: 20, textAlign: "center", color: "#15803d", fontWeight: 700, fontSize: 15 } }, "\u2705 메시지가 전달됐어요") :
+      /*#__PURE__*/React.createElement(React.Fragment, null,
+        /*#__PURE__*/React.createElement("textarea", {
+          value: msg,
+          onChange: function(e) { return setMsg(e.target.value); },
+          placeholder: "예) "+(patient&&patient.gender==="여"?"어머니":"아버지")+" 오늘 밥 잘 드세요 \uD83D\uDE0A",
+          style: { width: "100%", height: 110, borderRadius: 12, border: "2px solid #e2e8f0", padding: "12px 14px", fontSize: 14, color: "#334155", resize: "none", outline: "none", fontFamily: "inherit", boxSizing: "border-box", lineHeight: 1.7, marginBottom: 12 }
+        }),
+        /*#__PURE__*/React.createElement("div", { style: { background: "#f8fafc", borderRadius: 12, padding: "12px 14px", marginBottom: 12, border: "1px solid #e8ecf0" } },
+          /*#__PURE__*/React.createElement("div", { style: { fontSize: 12, fontWeight: 700, color: "#475569", marginBottom: 8 } }, "\uD83D\uDCC5 면회 예정일 (선택)"),
+          /*#__PURE__*/React.createElement("div", { style: { display: "flex", gap: 6, marginBottom: 8 } },
+            [today.getMonth()+1, today.getMonth()+2>12?1:today.getMonth()+2].map(function(m) {
+              return /*#__PURE__*/React.createElement("button", { key: m, onClick: function() { setVisitMonth(m); setVisitDay(""); setVisitDate(""); setVisitTime(""); }, style: { padding: "5px 16px", borderRadius: 20, border: "1.5px solid "+(visitMonth===m?"#1a3358":"#e2e8f0"), cursor: "pointer", fontSize: 12, fontWeight: 700, background: visitMonth===m?"#1a3358":"white", color: visitMonth===m?"white":"#334155" } }, m+"월");
+            })
+          ),
+          /*#__PURE__*/React.createElement("div", { style: { display: "flex", gap: 4, flexWrap: "wrap", marginBottom: 8 } },
+            Array.from({length:31},function(_,i){return i+1;}).map(function(d) {
+              var isSel = visitDay===d&&visitMonth;
+              return /*#__PURE__*/React.createElement("button", { key: d, onClick: function() { if(!visitMonth)return; var nd=visitMonth+"월 "+d+"일"; if(visitDay===d&&visitMonth){setVisitDay("");setVisitDate("");}else{setVisitDay(d);setVisitDate(nd);}setVisitTime(""); }, style: { width: 32, height: 30, borderRadius: 8, border: "1.5px solid "+(isSel?"#1a3358":"#e2e8f0"), cursor: visitMonth?"pointer":"default", fontSize: 11, fontWeight: 700, background: isSel?"#1a3358":"white", color: isSel?"white":visitMonth?"#334155":"#cbd5e1" } }, d);
+            })
+          ),
+          /*#__PURE__*/React.createElement("div", { style: { display: "grid", gridTemplateColumns: "1fr 1fr", gap: 5 } },
+            [{label:"9~10시",bg:"#eff6ff",border:"#bfdbfe",text:"#1e40af"},{label:"10~11시",bg:"#f0fdf4",border:"#86efac",text:"#166534"},{label:"점심시간",bg:"#fffbeb",border:"#fcd34d",text:"#713f12"},{label:"13~14시",bg:"#fdf4ff",border:"#e9d5ff",text:"#6b21a8"},{label:"14~15시",bg:"#fff1f2",border:"#fecdd3",text:"#9f1239"},{label:"15~16시",bg:"#f0fdfa",border:"#99f6e4",text:"#115e59"},{label:"16~17시",bg:"#fff7ed",border:"#fed7aa",text:"#9a3412"}].map(function(t) {
+              var isSel = visitTime===t.label;
+              return /*#__PURE__*/React.createElement("button", { key: t.label, onClick: function(){setVisitTime(visitTime===t.label?"":t.label);}, style: { padding: "7px 4px", borderRadius: 8, border: "1.5px solid "+(isSel?t.text:t.border), cursor: "pointer", fontSize: 12, fontWeight: 700, background: isSel?t.text:t.bg, color: isSel?"white":t.text, textAlign: "center" } }, t.label);
+            })
+          ),
+          visitDate && /*#__PURE__*/React.createElement("div", { style: { marginTop: 10, fontSize: 12, color: "#1a3358", fontWeight: 700, background: "#eff6ff", borderRadius: 8, padding: "6px 10px" } }, "\uD83D\uDCC5 면회 예정: ", visitDate, visitTime?" · "+visitTime:"")
+        ),
+        /*#__PURE__*/React.createElement("div", { style: { background: "#f0f7ff", border: "1px solid #bfdbfe", borderRadius: 12, padding: "12px 14px", marginBottom: 12 } },
+          /*#__PURE__*/React.createElement("div", { style: { fontSize: 12, color: "#1e40af", lineHeight: 1.7, marginBottom: 10 } }, "이 메시지는 ", getTitle(patient), "께 전달되는 용도입니다.", /*#__PURE__*/React.createElement("br", null), /*#__PURE__*/React.createElement("span", { style: { fontWeight: 700 } }, "이곳에서는 답장이 어렵습니다.")),
+          /*#__PURE__*/React.createElement("div", { style: { borderTop: "1px solid #bfdbfe", paddingTop: 10, display: "flex", alignItems: "center", justifyContent: "space-between" } },
+            /*#__PURE__*/React.createElement("div", null,
+              /*#__PURE__*/React.createElement("div", { style: { fontSize: 11, color: "#1d4ed8", fontWeight: 700, marginBottom: 3 } }, "긴급 시 병원으로 연락주세요"),
+              /*#__PURE__*/React.createElement("div", { style: { fontSize: 16, fontWeight: 900, color: "#1a3358" } }, "041-574-1777")
+            ),
+            /*#__PURE__*/React.createElement("a", { href: "tel:041-574-1777", style: { background: "#1a3358", color: "white", borderRadius: 10, padding: "9px 16px", fontSize: 13, fontWeight: 700, textDecoration: "none" } }, "\uD83D\uDCDE 전화하기")
+          )
+        ),
+        /*#__PURE__*/React.createElement("button", {
+          onClick: handleSend,
+          style: { width: "100%", padding: 14, borderRadius: 12, border: "none", background: (msg.trim()||visitDate)?"linear-gradient(135deg,#1a3358,#2a5298)":"#e2e8f0", color: (msg.trim()||visitDate)?"white":"#aaa", fontSize: 14, fontWeight: 800, cursor: (msg.trim()||visitDate)?"pointer":"default" }
+        }, "전달하기")
+      )
+    )
+  )));
+}
+
 }
 
 // ── 간호사 환자등록 공용 컴포넌트 ────────────────────────────
