@@ -8,9 +8,127 @@
   <script crossorigin src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
   <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;600;700;800;900&display=swap" rel="stylesheet">
   <style>
+    :root {
+      --navy: #1B3A6B;
+      --navy-dark: #0F2447;
+      --blue: #2563EB;
+      --blue-light: #EFF6FF;
+      --emerald: #059669;
+      --emerald-light: #ECFDF5;
+      --amber: #92400E;
+      --amber-light: #FFFBEB;
+      --danger: #DC2626;
+      --danger-light: #FFF1F2;
+      --bg: #F1F5F9;
+      --surface: #FFFFFF;
+      --border: #CBD5E1;
+      --text-primary: #0F172A;
+      --text-secondary: #475569;
+      --text-muted: #94A3B8;
+    }
     * { margin: 0; padding: 0; box-sizing: border-box; }
-    body { font-family: 'Noto Sans KR', sans-serif; -webkit-font-smoothing: antialiased; }
+    body { font-family: 'Noto Sans KR', sans-serif; -webkit-font-smoothing: antialiased; background: var(--bg); }
     select option { color: #333; background: white; }
+    input::placeholder { color: rgba(255,255,255,0.4); }
+    button { font-family: 'Noto Sans KR', sans-serif; }
+    textarea { font-family: 'Noto Sans KR', sans-serif; }
+    
+    /* 공통 카드 스타일 */
+    .anbu-card {
+      background: white;
+      border-radius: 16px;
+      border: 1.5px solid #CBD5E1;
+      overflow: hidden;
+      margin-bottom: 10px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+    }
+    .anbu-card-header {
+      background: #1B3A6B;
+      padding: 7px 14px;
+      display: flex;
+      align-items: center;
+      gap: 7px;
+    }
+    .anbu-card-header span {
+      font-size: 12px;
+      font-weight: 800;
+      color: #EFF6FF;
+    }
+    .anbu-card-body {
+      padding: 10px 14px;
+    }
+    
+    /* 역할 선택 버튼 호버 */
+    .role-btn {
+      transition: transform 0.15s ease, background 0.15s ease;
+    }
+    .role-btn:hover {
+      transform: translateY(-1px);
+      background: rgba(255,255,255,0.13) !important;
+    }
+    .role-btn:active {
+      transform: translateY(0);
+    }
+    
+    /* 스크롤바 커스텀 */
+    ::-webkit-scrollbar { width: 4px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: #CBD5E1; border-radius: 99px; }
+    
+    /* 입력 포커스 */
+    input:focus, textarea:focus, select:focus {
+      outline: none;
+      border-color: #2563EB !important;
+      box-shadow: 0 0 0 3px rgba(37,99,235,0.15);
+    }
+    
+    /* 로딩 애니메이션 */
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.5; }
+    }
+    .loading-pulse { animation: pulse 1.5s ease-in-out infinite; }
+    
+    /* 페이드인 */
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(8px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .fade-in { animation: fadeIn 0.3s ease-out; }
+    
+    /* 온보딩 도트 전환 */
+    @keyframes dotExpand {
+      from { width: 8px; }
+      to { width: 24px; }
+    }
+    
+    /* 헤더 영역 공통 스타일 강화 */
+    .screen-header {
+      background: linear-gradient(135deg, #1B3A6B, #2563EB);
+      border-radius: 16px;
+      margin: 12px 16px 0;
+      color: white;
+      padding: 14px 20px;
+      box-shadow: 0 4px 12px rgba(27,58,107,0.25);
+    }
+    
+    /* 탭 컨테이너 */
+    .tab-container {
+      background: white;
+      border-radius: 14px;
+      padding: 4px;
+      display: flex;
+      gap: 3px;
+      border: 1.5px solid #CBD5E1;
+      margin: 10px 0 0;
+    }
+    
+    /* 상태 배지 */
+    .badge-success { background: #ECFDF5; color: #065F46; }
+    .badge-warning { background: #FFFBEB; color: #92400E; }
+    .badge-danger { background: #FFF1F2; color: #DC2626; }
+    .badge-info { background: #EFF6FF; color: #1B3A6B; }
+    .badge-neutral { background: #F1F5F9; color: #475569; }
   </style>
 </head>
 <body>
@@ -668,7 +786,7 @@ var Btn = function Btn(_ref3) {
     active = _ref3.active,
     onClick = _ref3.onClick,
     _ref3$color = _ref3.color,
-    color = _ref3$color === void 0 ? "#1e3a5f" : _ref3$color,
+    color = _ref3$color === void 0 ? "#1B3A6B" : _ref3$color,
     small = _ref3.small;
   return /*#__PURE__*/React.createElement("button", {
     onClick: onClick,
@@ -680,8 +798,8 @@ var Btn = function Btn(_ref3) {
       fontSize: small ? 12 : 13,
       fontWeight: 700,
       flexShrink: 0,
-      background: active ? color : "#f1f5f9",
-      color: active ? "white" : "#64748b"
+      background: active ? color : "#EEF2FF",
+      color: active ? "white" : "#475569"
     }
   }, label);
 };
@@ -720,7 +838,7 @@ var Sec = function Sec(_ref6) {
       fontSize: 12,
       fontWeight: 800,
       color: "white",
-      background: accent || "#1e3a5f",
+      background: accent || "#1B3A6B",
       borderRadius: "10px 10px 0 0",
       padding: "5px 14px"
     }
@@ -729,7 +847,7 @@ var Sec = function Sec(_ref6) {
       background: "white",
       borderRadius: "0 0 10px 10px",
       padding: "12px 14px",
-      border: "1.5px solid #cbd5e1",
+      border: "1.5px solid #CBD5E1",
       borderTop: "none"
     }
   }, children));
@@ -771,8 +889,9 @@ var Card = function Card(_ref8) {
       background: "white",
       borderRadius: 14,
       overflow: "hidden",
-      border: "1.5px solid #cbd5e1",
-      marginBottom: 10
+      border: "1.5px solid #CBD5E1",
+      marginBottom: 10,
+      boxShadow: "0 1px 4px rgba(0,0,0,0.05)"
     }
   }, /*#__PURE__*/React.createElement("div", {
     style: {
@@ -780,7 +899,7 @@ var Card = function Card(_ref8) {
       alignItems: "center",
       gap: 7,
       padding: "4px 12px",
-      background: accent || "#1e3a5f"
+      background: accent || "#1B3A6B"
     }
   }, /*#__PURE__*/React.createElement("span", {
     style: {
@@ -848,7 +967,7 @@ var SectionHeader = function SectionHeader(_ref9) {
   }));
 };
 var scoreColor = function scoreColor(v) {
-  return ["양호", "잘 드심", "명료", "안정", "없음", "정상", "이상 없음"].includes(v) ? "#166534" : ["보통", "절반", "졸림"].includes(v) ? "#713f12" : v ? "#7f1d1d" : "#333";
+  return ["양호", "잘 드심", "명료", "안정", "없음", "정상", "이상 없음"].includes(v) ? "#065F46" : ["보통", "절반", "졸림"].includes(v) ? "#92400E" : v ? "#7f1d1d" : "#333";
 };
 
 // ── 온보딩 화면 ──────────────────────────────────────────────
@@ -857,31 +976,31 @@ var SLIDES = [{
   title: "안부 (安否)",
   sub: "입원 환자와 가족을 매일 연결합니다",
   desc: "간호사가 입력하고, 의사가 검토하고, 보호자가 확인하는 케어 연속성 플랫폼",
-  color: "#1e3a5f"
+  color: "#1B3A6B"
 }, {
   icon: "👨‍👩‍👧",
   title: "보호자",
   sub: "매일 아침 어머니 상태를 확인하세요",
   desc: "식사·수면·활동·통증 등 오늘 상태가 매일 업데이트됩니다. 면회 일정도 앱으로 미리 알려주세요.",
-  color: "#2d6a9f"
+  color: "#2563EB"
 }, {
   icon: "👩‍⚕️",
   title: "간호사",
   sub: "저녁 라운딩 중 30초, 환자 상태를 기록하세요",
   desc: "버튼 터치 한 번으로 대부분 입력 완료. 기록하면 주치의 검토 후 보호자에게 자동 전달됩니다.",
-  color: "#0d5c56"
+  color: "#1B3A6B"
 }, {
   icon: "🩺",
   title: "의사",
   sub: "간호사 기록을 검토하고 코멘트를 남기세요",
   desc: "담당 환자만 골라서 확인하고, 이상 징후와 치료 상태를 변경할 수 있어요. 코멘트는 선생님 이름으로 보호자에게 전달됩니다.",
-  color: "#166534"
+  color: "#065F46"
 }, {
   icon: "💬",
   title: "보호자 한마디",
   sub: "면회 일정과 메시지를 한눈에",
   desc: "병동별·주치의별 필터로 원하는 메시지만 확인하세요. 면회 예정일은 날짜순으로 자동 정렬됩니다.",
-  color: "#713f12"
+  color: "#92400E"
 }];
 function OnboardingScreen(_ref0) {
   var onDone = _ref0.onDone;
@@ -1011,7 +1130,7 @@ function OnboardingScreen(_ref0) {
       marginTop: 14,
       background: "transparent",
       border: "none",
-      color: "rgba(255,255,255,0.4)",
+      color: "rgba(255,255,255,0.45)",
       fontSize: 13,
       cursor: "pointer"
     }
@@ -1202,11 +1321,11 @@ function LoginScreen(_ref1) {
     messages: "💬 보호자 한마디"
   };
   var bgColors = {
-    nurse: "linear-gradient(160deg,#052e16,#0d5c56)",
-    doctor: "linear-gradient(160deg,#0f172a,#1e3a5f)",
-    admin: "linear-gradient(160deg,#0f172a,#1e3a5f)",
-    guardian: "linear-gradient(160deg,#0f2744,#1a56db)",
-    messages: "linear-gradient(160deg,#0c1a2e,#0369a1)"
+    nurse: "linear-gradient(160deg,#0F172A,#1B3A6B)",
+    doctor: "linear-gradient(160deg,#0F172A,#1B3A6B)",
+    admin: "linear-gradient(160deg,#0F172A,#1B3A6B)",
+    guardian: "linear-gradient(160deg,#0F172A,#1B3A6B)",
+    messages: "linear-gradient(160deg,#0F172A,#1B3A6B)"
   };
   var handleKeyDown = function handleKeyDown(e) {
     if (e.key === "Enter") handleLogin();
@@ -1214,7 +1333,7 @@ function LoginScreen(_ref1) {
   return /*#__PURE__*/React.createElement("div", {
     style: {
       fontFamily: "'Noto Sans KR',sans-serif",
-      background: bgColors[loginType] || "linear-gradient(160deg,#0f172a,#1e3a5f)",
+      background: bgColors[loginType] || "linear-gradient(160deg,#0F172A,#1B3A6B)",
       minHeight: "100vh",
       display: "flex",
       justifyContent: "center",
@@ -1246,7 +1365,7 @@ function LoginScreen(_ref1) {
   }, titles[loginType]), /*#__PURE__*/React.createElement("div", {
     style: {
       fontSize: 13,
-      color: "rgba(255,255,255,0.5)",
+      color: "rgba(255,255,255,0.6)",
       marginBottom: 32
     }
   }, "\uC548\uBD80 \xB7 \uC785\uC6D0 \uD658\uC790 \uCF00\uC5B4 \uD50C\uB7AB\uD3FC"), loginType === "messages" && /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("div", {
@@ -1281,7 +1400,7 @@ function LoginScreen(_ref1) {
       fontSize: 12,
       fontWeight: 700,
       background: form.msgLoginType === "doctor" ? "rgba(255,255,255,0.1)" : "white",
-      color: form.msgLoginType === "doctor" ? "rgba(255,255,255,0.6)" : "#1e3a5f"
+      color: form.msgLoginType === "doctor" ? "rgba(255,255,255,0.6)" : "#1B3A6B"
     }
   }, "\uD83D\uDC69\u200D\u2695\uFE0F \uAC04\uD638\uC0AC"), /*#__PURE__*/React.createElement("button", {
     onClick: function onClick() {
@@ -1296,7 +1415,7 @@ function LoginScreen(_ref1) {
       fontSize: 12,
       fontWeight: 700,
       background: form.msgLoginType === "doctor" ? "white" : "rgba(255,255,255,0.1)",
-      color: form.msgLoginType === "doctor" ? "#1e3a5f" : "rgba(255,255,255,0.6)"
+      color: form.msgLoginType === "doctor" ? "#1B3A6B" : "rgba(255,255,255,0.6)"
     }
   }, "\uD83E\uDE7A \uC758\uC0AC")), form.msgLoginType !== "doctor" ? /*#__PURE__*/React.createElement("div", {
     style: {
@@ -1651,7 +1770,7 @@ function LoginScreen(_ref1) {
       borderRadius: 14,
       border: "none",
       background: loading ? "rgba(255,255,255,0.2)" : "white",
-      color: loading ? "rgba(255,255,255,0.5)" : "#1e3a5f",
+      color: loading ? "rgba(255,255,255,0.5)" : "#1B3A6B",
       fontSize: 15,
       fontWeight: 800,
       cursor: loading ? "default" : "pointer",
@@ -1814,12 +1933,12 @@ function AdminScreen(_ref11) {
     return r === "admin" ? "관리자" : r === "doctor" ? "의사" : r === "nurse" ? "간호사" : "보호자";
   };
   var roleColor = function roleColor(r) {
-    return r === "admin" ? "#7c3aed" : r === "doctor" ? "#1e40af" : r === "nurse" ? "#0d5c56" : "#713f12";
+    return r === "admin" ? "#7c3aed" : r === "doctor" ? "#1e40af" : r === "nurse" ? "#059669" : "#92400E";
   };
   return /*#__PURE__*/React.createElement("div", {
     style: {
       fontFamily: "'Noto Sans KR',sans-serif",
-      background: "#f0f4f8",
+      background: "#F1F5F9",
       minHeight: "100vh",
       display: "flex",
       justifyContent: "center"
@@ -1832,10 +1951,11 @@ function AdminScreen(_ref11) {
     }
   }, /*#__PURE__*/React.createElement("div", {
     style: {
-      background: "linear-gradient(135deg,#1e3a5f,#2d5a8e)",
+      background: "linear-gradient(135deg,#1B3A6B,#2563EB)",
       padding: "14px 20px",
       color: "white",
-      borderRadius: 16
+      borderRadius: 16,
+      boxShadow: "0 4px 12px rgba(27,58,107,0.2)"
       margin: "12px 16px 0"
     }
   }, /*#__PURE__*/React.createElement("div", {
@@ -1879,7 +1999,8 @@ function AdminScreen(_ref11) {
       borderRadius: 14,
       padding: 4,
       gap: 3,
-      border: "1.5px solid #cbd5e1"
+      border: "1.5px solid #CBD5E1",
+      boxShadow: "0 1px 3px rgba(0,0,0,0.05)"
     }
   }, [["users", "👥 직원 계정"], ["patients", "🏥 환자 현황"]].map(function (_ref15) {
     var _ref16 = _slicedToArray(_ref15, 2),
@@ -1898,8 +2019,8 @@ function AdminScreen(_ref11) {
         cursor: "pointer",
         fontSize: 13,
         fontWeight: tab === t ? 800 : 600,
-        background: tab === t ? "#1e3a5f" : "transparent",
-        color: tab === t ? "white" : "#64748b"
+        background: tab === t ? "#1B3A6B" : "transparent",
+        color: tab === t ? "white" : "#64748B"
       }
     }, l);
   })), /*#__PURE__*/React.createElement("div", {
@@ -1916,7 +2037,7 @@ function AdminScreen(_ref11) {
       padding: 12,
       borderRadius: 14,
       border: "none",
-      background: "#1e3a5f",
+      background: "#1B3A6B",
       color: "white",
       fontSize: 14,
       fontWeight: 800,
@@ -1928,14 +2049,14 @@ function AdminScreen(_ref11) {
       background: "white",
       borderRadius: 16,
       padding: 16,
-      border: "1.5px solid #cbd5e1",
+      border: "1.5px solid #CBD5E1",
       marginBottom: 14
     }
   }, /*#__PURE__*/React.createElement("div", {
     style: {
       fontSize: 13,
       fontWeight: 800,
-      color: "#1e3a5f",
+      color: "#1B3A6B",
       marginBottom: 12
     }
   }, "\uC2E0\uADDC \uC9C1\uC6D0 \uB4F1\uB85D"), /*#__PURE__*/React.createElement("div", {
@@ -2065,7 +2186,7 @@ function AdminScreen(_ref11) {
       padding: 10,
       borderRadius: 10,
       border: "none",
-      background: "#1e3a5f",
+      background: "#1B3A6B",
       color: "white",
       fontSize: 13,
       fontWeight: 700,
@@ -2174,7 +2295,7 @@ function AdminScreen(_ref11) {
         background: "white",
         borderRadius: 14,
         padding: "12px 14px",
-        border: "1.5px solid #cbd5e1"
+        border: "1.5px solid #CBD5E1"
       }
     }, /*#__PURE__*/React.createElement("div", {
       style: {
@@ -2198,8 +2319,8 @@ function AdminScreen(_ref11) {
       style: {
         fontSize: 10,
         fontWeight: 700,
-        background: "#f0fdf4",
-        color: "#16a34a",
+        background: "#ECFDF5",
+        color: "#059669",
         borderRadius: 20,
         padding: "1px 7px"
       }
@@ -2207,8 +2328,8 @@ function AdminScreen(_ref11) {
       style: {
         fontSize: 10,
         fontWeight: 700,
-        background: "#fef2f2",
-        color: "#ef4444",
+        background: "#FFF1F2",
+        color: "#DC2626",
         borderRadius: 20,
         padding: "1px 7px"
       }
@@ -2227,7 +2348,7 @@ function RoleSelect(_ref17) {
   return /*#__PURE__*/React.createElement("div", {
     style: {
       fontFamily: "'Noto Sans KR',sans-serif",
-      background: "linear-gradient(160deg,#0f172a,#1e3a5f)",
+      background: "linear-gradient(160deg,#0F172A,#1B3A6B)",
       minHeight: "100vh",
       display: "flex",
       justifyContent: "center",
@@ -2269,31 +2390,31 @@ function RoleSelect(_ref17) {
     icon: "👨‍👩‍👧",
     label: "보호자",
     sub: "어머니 오늘 상태 확인",
-    color: "#1e3a5f"
+    color: "#1B3A6B"
   }, {
     type: "nurse",
     icon: "👩‍⚕️",
     label: "간호사",
     sub: "환자 상태 입력",
-    color: "#0d5c56"
+    color: "#1B3A6B"
   }, {
     type: "doctor",
     icon: "🩺",
     label: "의사",
     sub: "담당 환자 현황 확인",
-    color: "#1e3a5f"
+    color: "#1B3A6B"
   }, {
     type: "messages",
     icon: "💬",
     label: "보호자 한마디",
     sub: "면회 일정 및 메시지 확인",
-    color: "#0d5c56"
+    color: "#1B3A6B"
   }, {
     type: "admin",
     icon: "👑",
     label: "관리자",
     sub: "직원 계정 및 환자 관리",
-    color: "#1e3a5f"
+    color: "#1B3A6B"
   }].map(function (_ref18) {
     var type = _ref18.type,
       icon = _ref18.icon,
@@ -2306,8 +2427,8 @@ function RoleSelect(_ref17) {
         return onSelect(type);
       },
       style: {
-        background: "rgba(255,255,255,0.08)",
-        border: "1.5px solid rgba(255,255,255,0.12)",
+        background: "rgba(255,255,255,0.09)",
+        border: "1.5px solid rgba(255,255,255,0.15)",
         borderRadius: 16,
         padding: "16px 20px",
         display: "flex",
@@ -2321,7 +2442,7 @@ function RoleSelect(_ref17) {
         width: 46,
         height: 46,
         borderRadius: 14,
-        background: color || "#1e3a5f",
+        background: color || "#1B3A6B",
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
@@ -2349,11 +2470,12 @@ function RoleSelect(_ref17) {
     }, "\u203A"));
   })), /*#__PURE__*/React.createElement("div", {
     style: {
-      marginTop: 28,
+      marginTop: 32,
       fontSize: 11,
-      color: "rgba(255,255,255,0.3)"
+      color: "rgba(255,255,255,0.35)",
+      letterSpacing: 1
     }
-  }, "\uBC84\uC804 1.0")));
+  }, "v 1.0  ·  \uC548\uBD80")));
 }
 
 // ── 보호자 화면 ───────────────────────────────────────────────
@@ -2418,7 +2540,7 @@ function GuardianScreen(_ref19) {
   return /*#__PURE__*/React.createElement("div", {
     style: {
       fontFamily: "'Noto Sans KR',sans-serif",
-      background: "#f0f4f8",
+      background: "#F1F5F9",
       minHeight: "100vh",
       display: "flex",
       justifyContent: "center"
@@ -2435,10 +2557,11 @@ function GuardianScreen(_ref19) {
     }
   }, /*#__PURE__*/React.createElement("div", {
     style: {
-      background: "linear-gradient(135deg,#1e3a5f,#2d5a8e)",
+      background: "linear-gradient(135deg,#1B3A6B,#2563EB)",
       padding: "16px 0",
       color: "white",
-      borderRadius: 16
+      borderRadius: 16,
+      boxShadow: "0 4px 12px rgba(27,58,107,0.2)"
       margin: "12px 16px 0"
     }
   }, /*#__PURE__*/React.createElement("div", {
@@ -2524,12 +2647,12 @@ function GuardianScreen(_ref19) {
   })))), pending && /*#__PURE__*/React.createElement("div", {
     style: {
       margin: "10px 0 0",
-      background: "#fffbeb",
-      border: "1px solid #fcd34d",
+      background: "#FFFBEB",
+      border: "1px solid #FCD34D",
       borderRadius: 14,
       padding: "12px 20px",
       fontSize: 13,
-      color: "#713f12",
+      color: "#92400E",
       fontWeight: 700,
       display: "flex",
       alignItems: "center",
@@ -2543,7 +2666,7 @@ function GuardianScreen(_ref19) {
       borderRadius: 14,
       padding: "12px 20px",
       fontSize: 13,
-      color: "#1e40af",
+      color: "#1B3A6B",
       fontWeight: 700,
       display: "flex",
       alignItems: "center",
@@ -2552,12 +2675,12 @@ function GuardianScreen(_ref19) {
   }, /*#__PURE__*/React.createElement("span", null, "\u23F3"), /*#__PURE__*/React.createElement("span", null, "\uC624\uB298 \uC0C1\uD0DC\uB294 \uC800\uB141 \uAC04\uD638\uC0AC \uC785\uB825 \uD6C4 \uD655\uC778\uD558\uC2E4 \uC218 \uC788\uC5B4\uC694.")), r && /*#__PURE__*/React.createElement("div", {
     style: {
       margin: "10px 0 0",
-      background: "#f0fdf4",
-      border: "1px solid #86efac",
+      background: "#ECFDF5",
+      border: "1px solid #6EE7B7",
       borderRadius: 14,
       padding: "10px 20px",
       fontSize: 12,
-      color: "#166534",
+      color: "#065F46",
       fontWeight: 700
     }
   }, "\u2705 ", r.updatedAt, " \uC785\uB825 \uC644\uB8CC \xB7 \uC8FC\uCE58\uC758 \uD655\uC778\uB428"), /*#__PURE__*/React.createElement("div", {
@@ -2568,7 +2691,8 @@ function GuardianScreen(_ref19) {
       borderRadius: 14,
       padding: 4,
       gap: 3,
-      border: "1.5px solid #cbd5e1"
+      border: "1.5px solid #CBD5E1",
+      boxShadow: "0 1px 3px rgba(0,0,0,0.05)"
     }
   }, [["today", "오늘"], ["message", getTitle(patient) + " 한마디"]].map(function (_ref20) {
     var _ref21 = _slicedToArray(_ref20, 2),
@@ -2587,8 +2711,8 @@ function GuardianScreen(_ref19) {
         cursor: "pointer",
         fontSize: 13,
         fontWeight: tab === t ? 800 : 600,
-        background: tab === t ? "#1e3a5f" : "transparent",
-        color: tab === t ? "white" : "#64748b"
+        background: tab === t ? "#1B3A6B" : "transparent",
+        color: tab === t ? "white" : "#64748B"
       }
     }, l);
   })), /*#__PURE__*/React.createElement("div", {
@@ -2635,7 +2759,7 @@ function GuardianScreen(_ref19) {
   }), /*#__PURE__*/React.createElement(Row, {
     label: "\uB099\uC0C1 \uC704\uD5D8",
     value: r.fall_risk,
-    vc: r.fall_risk === "매우 높음" ? "#ef4444" : "#713f12"
+    vc: r.fall_risk === "매우 높음" ? "#ef4444" : "#92400E"
   }), r.programs && r.programs.length > 0 && /*#__PURE__*/React.createElement(Row, {
     label: "\uD504\uB85C\uADF8\uB7A8",
     value: r.programs.join(", ")
@@ -2673,7 +2797,7 @@ function GuardianScreen(_ref19) {
     style: {
       fontSize: 14,
       fontWeight: 700,
-      color: r.medication === "정상 투약" ? "#166534" : "#ef4444"
+      color: r.medication === "정상 투약" ? "#065F46" : "#ef4444"
     }
   }, r.medication))), /*#__PURE__*/React.createElement(Card, {
     icon: "\uD83D\uDE0A",
@@ -2681,7 +2805,7 @@ function GuardianScreen(_ref19) {
   }, /*#__PURE__*/React.createElement(Row, {
     label: "\uAE30\uBD84",
     value: r.moods && r.moods.join(", "),
-    vc: r.moods && r.moods.includes("안정") ? "#166534" : "#7f1d1d"
+    vc: r.moods && r.moods.includes("안정") ? "#065F46" : "#7f1d1d"
   })), /*#__PURE__*/React.createElement(Card, {
     icon: "\uD83E\uDDE9",
     title: "\uC815\uC2E0 \uBC0F \uC774\uC0C1\uD589\uB3D9 \uC0C1\uD0DC"
@@ -2700,7 +2824,7 @@ function GuardianScreen(_ref19) {
         borderRadius: 20,
         padding: "2px 10px",
         background: s === "이상 없음" ? "#f0fdf4" : s === "미입력" ? "#f1f5f9" : "#fef2f2",
-        color: s === "이상 없음" ? "#166534" : s === "미입력" ? "#aaa" : "#7f1d1d"
+        color: s === "이상 없음" ? "#065F46" : s === "미입력" ? "#aaa" : "#7f1d1d"
       }
     }, s);
   }))), /*#__PURE__*/React.createElement(Card, {
@@ -2717,54 +2841,54 @@ function GuardianScreen(_ref19) {
   }), /*#__PURE__*/React.createElement(Row, {
     label: "\uC695\uCC3D",
     value: r.bedsore,
-    vc: r.bedsore === "없음" ? "#166534" : "#ef4444"
+    vc: r.bedsore === "없음" ? "#065F46" : "#ef4444"
   })), r.oriental !== null && r.oriental !== undefined && /*#__PURE__*/React.createElement(Card, {
     icon: "\uD83E\uDEA1",
     title: "\uD55C\uBC29 \uCE58\uB8CC"
   }, /*#__PURE__*/React.createElement(Row, {
     label: "\uC2DC\uD589 \uC5EC\uBD80",
     value: r.oriental ? "시행" : "미시행",
-    vc: r.oriental ? "#0d5c56" : "#64748b"
+    vc: r.oriental ? "#059669" : "#64748b"
   })), r.note && /*#__PURE__*/React.createElement("div", {
     style: {
-      background: "linear-gradient(135deg,#f0fdf4,#dcfce7)",
+      background: "linear-gradient(135deg,#ECFDF5,#D1FAE5)",
       borderRadius: 14,
       padding: "12px 14px",
       marginBottom: 10,
-      border: "1px solid #86efac"
+      border: "1px solid #6EE7B7"
     }
   }, /*#__PURE__*/React.createElement("div", {
     style: {
       fontSize: 12,
       fontWeight: 800,
-      color: "#166534",
+      color: "#065F46",
       marginBottom: 6
     }
   }, "\uD83D\uDCDD \uAC04\uD638\uC0AC \uD2B9\uC774\uC0AC\uD56D"), /*#__PURE__*/React.createElement("div", {
     style: {
       fontSize: 13,
-      color: "#166534",
+      color: "#065F46",
       lineHeight: 1.7
     }
   }, r.note)), r.doctorComment && /*#__PURE__*/React.createElement("div", {
     style: {
-      background: "linear-gradient(135deg,#eff6ff,#dbeafe)",
+      background: "linear-gradient(135deg,#EFF6FF,#DBEAFE)",
       borderRadius: 14,
       padding: "12px 14px",
       marginBottom: 10,
-      border: "1px solid #93c5fd"
+      border: "1px solid #93C5FD"
     }
   }, /*#__PURE__*/React.createElement("div", {
     style: {
       fontSize: 12,
       fontWeight: 800,
-      color: "#1e40af",
+      color: "#1B3A6B",
       marginBottom: 6
     }
   }, "\uD83D\uDC68\u200D\u2695\uFE0F \uC8FC\uCE58\uC758 \uCF54\uBA58\uD2B8 \xB7 ", r.doctorCommentDate), /*#__PURE__*/React.createElement("div", {
     style: {
       fontSize: 13,
-      color: "#1e3a5f",
+      color: "#1B3A6B",
       lineHeight: 1.7,
       fontWeight: 600
     }
@@ -2789,7 +2913,7 @@ function GuardianScreen(_ref19) {
       background: "white",
       borderRadius: 16,
       padding: 20,
-      border: "1.5px solid #cbd5e1"
+      border: "1.5px solid #CBD5E1"
     }
   }, /*#__PURE__*/React.createElement("div", {
     style: {
@@ -2809,13 +2933,13 @@ function GuardianScreen(_ref19) {
   }, /*#__PURE__*/React.createElement("div", {
     style: {
       fontSize: 12,
-      color: "#1e40af",
+      color: "#1B3A6B",
       lineHeight: 1.7,
       marginBottom: 10
     }
   }, "\uC774 \uBA54\uC2DC\uC9C0\uB294 ", getTitle(patient), "\uAED8 \uC804\uB2EC\uB418\uB294 \uC6A9\uB3C4\uC785\uB2C8\uB2E4.", /*#__PURE__*/React.createElement("br", null), /*#__PURE__*/React.createElement("span", {
     style: {
-      color: "#1d4ed8",
+      color: "#2563EB",
       fontWeight: 700
     }
   }, "\uC774 \uACF3\uC5D0\uC11C\uB294 \uB2F5\uC7A5\uC774 \uC5B4\uB835\uC2B5\uB2C8\uB2E4.")), /*#__PURE__*/React.createElement("div", {
@@ -2829,7 +2953,7 @@ function GuardianScreen(_ref19) {
   }, /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("div", {
     style: {
       fontSize: 11,
-      color: "#1d4ed8",
+      color: "#2563EB",
       fontWeight: 700,
       marginBottom: 3
     }
@@ -2837,12 +2961,12 @@ function GuardianScreen(_ref19) {
     style: {
       fontSize: 15,
       fontWeight: 800,
-      color: "#1e3a5f"
+      color: "#1B3A6B"
     }
   }, "041-574-1777")), /*#__PURE__*/React.createElement("a", {
     href: "tel:041-574-1777",
     style: {
-      background: "#1e3a5f",
+      background: "#1B3A6B",
       color: "white",
       borderRadius: 10,
       padding: "9px 14px",
@@ -2852,11 +2976,11 @@ function GuardianScreen(_ref19) {
     }
   }, "\uD83D\uDCDE \uC804\uD654\uD558\uAE30"))), sent ? /*#__PURE__*/React.createElement("div", {
     style: {
-      background: "#f0fdf4",
+      background: "#ECFDF5",
       borderRadius: 12,
       padding: 16,
       textAlign: "center",
-      color: "#16a34a",
+      color: "#059669",
       fontWeight: 600
     }
   }, "\u2705 \uBA54\uC2DC\uC9C0\uAC00 \uC804\uB2EC\uB410\uC5B4\uC694") : /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("textarea", {
@@ -2914,7 +3038,7 @@ function GuardianScreen(_ref19) {
         cursor: "pointer",
         fontSize: 12,
         fontWeight: 700,
-        background: visitDate === today.getMonth() + 1 + "월 " + d + "일" ? "#1e3a5f" : "white",
+        background: visitDate === today.getMonth() + 1 + "월 " + d + "일" ? "#1B3A6B" : "white",
         color: visitDate === today.getMonth() + 1 + "월 " + d + "일" ? "white" : "#334155"
       }
     }, d, "\uC77C");
@@ -2937,7 +3061,7 @@ function GuardianScreen(_ref19) {
         cursor: "pointer",
         fontSize: 12,
         fontWeight: 700,
-        background: visitTime === t ? "#1e3a5f" : "white",
+        background: visitTime === t ? "#1B3A6B" : "white",
         color: visitTime === t ? "white" : "#334155"
       }
     }, t);
@@ -2945,7 +3069,7 @@ function GuardianScreen(_ref19) {
     style: {
       marginTop: 8,
       fontSize: 12,
-      color: "#1e3a5f",
+      color: "#1B3A6B",
       fontWeight: 700
     }
   }, "\uD83D\uDCC5 \uBA74\uD68C \uC608\uC815: ", visitDate, " ", visitTime)), /*#__PURE__*/React.createElement("button", {
@@ -2955,7 +3079,7 @@ function GuardianScreen(_ref19) {
       padding: 13,
       borderRadius: 12,
       border: "none",
-      background: msg.trim() ? "#1e3a5f" : "#e2e8f0",
+      background: msg.trim() ? "#1B3A6B" : "#e2e8f0",
       color: msg.trim() ? "white" : "#aaa",
       fontSize: 14,
       fontWeight: 700,
@@ -3101,13 +3225,13 @@ function NurseScreen(_ref22) {
         height: 34,
         borderRadius: 10,
         flexShrink: 0,
-        background: isPending ? "#fffbeb" : sentToday ? "#f0fdf4" : "#f0f4f8",
+        background: isPending ? "#fffbeb" : sentToday ? "#f0fdf4" : "#F1F5F9",
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
         fontSize: 13,
         fontWeight: 800,
-        color: isPending ? "#713f12" : sentToday ? "#16a34a" : "#64748b"
+        color: isPending ? "#92400E" : sentToday ? "#16a34a" : "#64748b"
       }
     }, sentToday ? "✓" : isPending ? "⏳" : idx + 1), /*#__PURE__*/React.createElement("div", {
       style: {
@@ -3136,7 +3260,7 @@ function NurseScreen(_ref22) {
         fontSize: 10,
         fontWeight: 800,
         background: "#dcfce7",
-        color: "#166534",
+        color: "#065F46",
         borderRadius: 20,
         padding: "2px 8px"
       }
@@ -3148,14 +3272,14 @@ function NurseScreen(_ref22) {
     }, getWard(p.room), " \xB7 \uC785\uC6D0 ", p.days, "\uC77C\uC9F8"), p.alert && /*#__PURE__*/React.createElement("div", {
       style: {
         fontSize: 11,
-        color: "#ef4444",
+        color: "#DC2626",
         fontWeight: 700,
         marginTop: 2
       }
     }, "\u26A0\uFE0F ", p.alertMsg), sentToday && /*#__PURE__*/React.createElement("div", {
       style: {
         fontSize: 11,
-        color: "#16a34a",
+        color: "#059669",
         fontWeight: 600,
         marginTop: 2
       }
@@ -3173,7 +3297,7 @@ function NurseScreen(_ref22) {
     return /*#__PURE__*/React.createElement("div", {
       style: {
         fontFamily: "'Noto Sans KR',sans-serif",
-        background: "#f0f4f8",
+        background: "#F1F5F9",
         minHeight: "100vh",
         display: "flex",
         justifyContent: "center"
@@ -3186,13 +3310,13 @@ function NurseScreen(_ref22) {
       }
     }, /*#__PURE__*/React.createElement("div", {
       style: {
-        background: "linear-gradient(135deg,#0d5c56,#166534)",
+        background: "linear-gradient(135deg,#1B3A6B,#2563EB)",
         padding: "14px 20px",
         color: "white",
         display: "flex",
         alignItems: "center",
         gap: 12,
-      borderRadius: 16
+      borderRadius: 16,
       margin: "12px 16px 0"
       }
     }, /*#__PURE__*/React.createElement("button", {
@@ -3226,12 +3350,12 @@ function NurseScreen(_ref22) {
     }, "\u2705 \uC624\uB298 \uC804\uC1A1\uC644\uB8CC \xB7 ", r && r.updatedAt))), /*#__PURE__*/React.createElement("div", {
       style: {
         margin: "12px 0 0",
-        background: "#f0fdf4",
-        border: "1px solid #86efac",
+        background: "#ECFDF5",
+        border: "1px solid #6EE7B7",
         borderRadius: 14,
         padding: "12px 0",
         fontSize: 13,
-        color: "#166534",
+        color: "#065F46",
         fontWeight: 700
       }
     }, "\u2705 \uC624\uB298 \uBCF4\uD638\uC790\uC5D0\uAC8C \uC804\uB2EC\uC774 \uC644\uB8CC\uB410\uC5B4\uC694. \uB0B4\uC77C \uC0C8\uB85C \uC785\uB825\uD560 \uC218 \uC788\uC5B4\uC694."), /*#__PURE__*/React.createElement("div", {
@@ -3244,12 +3368,12 @@ function NurseScreen(_ref22) {
         background: "white",
         borderRadius: 16,
         overflow: "hidden",
-        border: "1.5px solid #cbd5e1",
+        border: "1.5px solid #CBD5E1",
         marginBottom: 12
       }
     }, /*#__PURE__*/React.createElement("div", {
       style: {
-        background: "#1e3a5f",
+        background: "#1B3A6B",
         padding: "5px 14px"
       }
     }, /*#__PURE__*/React.createElement("span", {
@@ -3285,7 +3409,7 @@ function NurseScreen(_ref22) {
     }), /*#__PURE__*/React.createElement(Row, {
       label: "\uD22C\uC57D",
       value: r && r.medication,
-      vc: r && r.medication === "정상 투약" ? "#166534" : "#ef4444"
+      vc: r && r.medication === "정상 투약" ? "#065F46" : "#ef4444"
     }), /*#__PURE__*/React.createElement(Row, {
       label: "\uD1B5\uC99D",
       value: r && r.painad !== null ? r.painad + "점" : "—"
@@ -3298,7 +3422,7 @@ function NurseScreen(_ref22) {
     }), /*#__PURE__*/React.createElement(Row, {
       label: "\uC695\uCC3D",
       value: r && r.bedsore,
-      vc: r && r.bedsore === "없음" ? "#166534" : "#ef4444"
+      vc: r && r.bedsore === "없음" ? "#065F46" : "#ef4444"
     }), /*#__PURE__*/React.createElement(Row, {
       label: "\uD55C\uBC29 \uCE58\uB8CC",
       value: r && r.oriental === true ? "시행" : r && r.oriental === false ? "미시행" : "—"
@@ -3314,22 +3438,22 @@ function NurseScreen(_ref22) {
       }
     }, "\uD83D\uDCDD ", r.note))), r && r.doctorComment && /*#__PURE__*/React.createElement("div", {
       style: {
-        background: "linear-gradient(135deg,#eff6ff,#dbeafe)",
+        background: "linear-gradient(135deg,#EFF6FF,#DBEAFE)",
         borderRadius: 14,
         padding: "12px 14px",
-        border: "1px solid #93c5fd"
+        border: "1px solid #93C5FD"
       }
     }, /*#__PURE__*/React.createElement("div", {
       style: {
         fontSize: 12,
         fontWeight: 800,
-        color: "#1e40af",
+        color: "#1B3A6B",
         marginBottom: 6
       }
     }, "\uD83D\uDC68\u200D\u2695\uFE0F \uC8FC\uCE58\uC758 \uCF54\uBA58\uD2B8"), /*#__PURE__*/React.createElement("div", {
       style: {
         fontSize: 13,
-        color: "#1e3a5f",
+        color: "#1B3A6B",
         lineHeight: 1.7
       }
     }, r.doctorComment)))));
@@ -3337,7 +3461,7 @@ function NurseScreen(_ref22) {
   if (screen === "list") return /*#__PURE__*/React.createElement("div", {
     style: {
       fontFamily: "'Noto Sans KR',sans-serif",
-      background: "#f0f4f8",
+      background: "#F1F5F9",
       minHeight: "100vh",
       display: "flex",
       justifyContent: "center"
@@ -3350,11 +3474,12 @@ function NurseScreen(_ref22) {
     }
   }, /*#__PURE__*/React.createElement("div", {
     style: {
-      background: "linear-gradient(135deg,#0d5c56,#0f766e)",
+      background: "linear-gradient(135deg,#1B3A6B,#2563EB)",
       padding: "14px 16px 12px",
       color: "white",
-      borderRadius: 16
-      margin: "12px 16px 0"
+      borderRadius: 16,
+      margin: "12px 16px 0",
+      boxShadow: "0 4px 12px rgba(27,58,107,0.2)"
     }
   }, /*#__PURE__*/React.createElement("div", {
     style: {
@@ -3405,15 +3530,15 @@ function NurseScreen(_ref22) {
     }
   }, doneCount, " / ", patients.length, "\uBA85"))), /*#__PURE__*/React.createElement("div", {
     style: {
-      background: "rgba(255,255,255,0.2)",
+      background: "rgba(255,255,255,0.15)",
       borderRadius: 99,
-      height: 5
+      height: 6
     }
   }, /*#__PURE__*/React.createElement("div", {
     style: {
-      background: "#4ade80",
+      background: "#10B981",
       borderRadius: 99,
-      height: 5,
+      height: 6,
       width: progress + "%"
     }
   })), /*#__PURE__*/React.createElement("div", {
@@ -3469,7 +3594,7 @@ function NurseScreen(_ref22) {
     icon: "\uD83D\uDD50",
     label: "\uC8FC\uCE58\uC758 \uAC80\uD1A0 \uB300\uAE30",
     count: pending.length,
-    color: "#713f12",
+    color: "#92400E",
     bg: "#fffbeb"
   }), pending.map(function (p, i) {
     return NurseCard(p, i + 1);
@@ -3485,7 +3610,7 @@ function NurseScreen(_ref22) {
     icon: "\u2705",
     label: "\uC804\uC1A1 \uC644\uB8CC",
     count: sent.length,
-    color: "#16a34a",
+    color: "#059669",
     bg: "#f0fdf4"
   }), sent.map(function (p, i) {
     return NurseCard(p, pending.length + notInput.length + i + 1);
@@ -3493,7 +3618,7 @@ function NurseScreen(_ref22) {
   if (screen === "messages") return /*#__PURE__*/React.createElement("div", {
     style: {
       fontFamily: "'Noto Sans KR',sans-serif",
-      background: "#f0f4f8",
+      background: "#F1F5F9",
       minHeight: "100vh",
       display: "flex",
       justifyContent: "center"
@@ -3506,14 +3631,15 @@ function NurseScreen(_ref22) {
     }
   }, /*#__PURE__*/React.createElement("div", {
     style: {
-      background: "linear-gradient(135deg,#0d5c56,#0f766e)",
+      background: "linear-gradient(135deg,#1B3A6B,#2563EB)",
       padding: "14px 20px",
       color: "white",
       display: "flex",
       alignItems: "center",
       gap: 12,
-      borderRadius: 16
-      margin: "12px 16px 0"
+      borderRadius: 16,
+      margin: "12px 16px 0",
+      boxShadow: "0 4px 12px rgba(27,58,107,0.2)"
     }
   }, /*#__PURE__*/React.createElement("button", {
     onClick: function onClick() {
@@ -3568,7 +3694,7 @@ function NurseScreen(_ref22) {
         background: "white",
         borderRadius: 14,
         padding: "14px 16px",
-        border: "1.5px solid #cbd5e1"
+        border: "1.5px solid #CBD5E1"
       }
     }, /*#__PURE__*/React.createElement("div", {
       style: {
@@ -3581,7 +3707,7 @@ function NurseScreen(_ref22) {
       style: {
         fontSize: 13,
         fontWeight: 800,
-        color: "#1e3a5f"
+        color: "#1B3A6B"
       }
     }, p && p.name, " ", getTitle(p), " \uAC00\uC871"), /*#__PURE__*/React.createElement("span", {
       style: {
@@ -3596,7 +3722,7 @@ function NurseScreen(_ref22) {
         padding: "6px 10px",
         marginBottom: 8,
         fontSize: 12,
-        color: "#1e40af",
+        color: "#1B3A6B",
         fontWeight: 700
       }
     }, "\uD83D\uDCC5 \uBA74\uD68C \uC608\uC815: ", m.visitDate, " ", m.visitTime), /*#__PURE__*/React.createElement("div", {
@@ -3621,7 +3747,7 @@ function NurseScreen(_ref22) {
   return /*#__PURE__*/React.createElement("div", {
     style: {
       fontFamily: "'Noto Sans KR',sans-serif",
-      background: "#f0f4f8",
+      background: "#F1F5F9",
       minHeight: "100vh",
       display: "flex",
       justifyContent: "center",
@@ -3635,7 +3761,7 @@ function NurseScreen(_ref22) {
     }
   }, /*#__PURE__*/React.createElement("div", {
     style: {
-      background: "linear-gradient(135deg,#0d5c56,#0f766e)",
+      background: "linear-gradient(135deg,#1B3A6B,#2563EB)",
       padding: "14px 20px",
       color: "white",
       display: "flex",
@@ -3644,7 +3770,7 @@ function NurseScreen(_ref22) {
       position: "sticky",
       top: 0,
       zIndex: 10,
-      borderRadius: 16
+      borderRadius: 16,
       margin: "12px 16px 0"
     }
   }, /*#__PURE__*/React.createElement("button", {
@@ -3690,10 +3816,10 @@ function NurseScreen(_ref22) {
     }
   }, "\uC774\uC0C1\uC5C6\uC74C")), selected && selected.alert && /*#__PURE__*/React.createElement("div", {
     style: {
-      background: "#fef2f2",
+      background: "#FFF1F2",
       padding: "10px 20px",
       fontSize: 12,
-      color: "#ef4444",
+      color: "#DC2626",
       fontWeight: 600
     }
   }, "\u26A0\uFE0F \uC5B4\uC81C \uD2B9\uC774\uC0AC\uD56D: ", selected.alertMsg), /*#__PURE__*/React.createElement("div", {
@@ -3711,7 +3837,7 @@ function NurseScreen(_ref22) {
       onClick: function onClick() {
         return set("consciousness", v);
       },
-      color: v === "명료" ? "#166534" : v === "졸림" ? "#713f12" : "#7f1d1d"
+      color: v === "명료" ? "#065F46" : v === "졸림" ? "#92400E" : "#7f1d1d"
     });
   }))), /*#__PURE__*/React.createElement(Sec, {
     title: "\uD83C\uDF5A \uC2DD\uC0AC"
@@ -3725,7 +3851,7 @@ function NurseScreen(_ref22) {
       onClick: function onClick() {
         return set("meal_amount", v);
       },
-      color: v === "잘 드심" ? "#166534" : v === "절반" ? "#713f12" : "#7f1d1d"
+      color: v === "잘 드심" ? "#065F46" : v === "절반" ? "#92400E" : "#7f1d1d"
     });
   })), /*#__PURE__*/React.createElement(Lbl, {
     text: "\uC2DD\uC0AC \uC885\uB958"
@@ -3832,7 +3958,7 @@ function NurseScreen(_ref22) {
       onClick: function onClick() {
         return set("fall_risk", v);
       },
-      color: v === "주의" ? "#713f12" : "#7f1d1d",
+      color: v === "주의" ? "#92400E" : "#7f1d1d",
       small: true
     });
   })), /*#__PURE__*/React.createElement(Lbl, {
@@ -3849,7 +3975,7 @@ function NurseScreen(_ref22) {
           return x !== "미참여";
         })), [v]));
       },
-      color: "#0d5c56",
+      color: "#1B3A6B",
       small: true
     });
   })), /*#__PURE__*/React.createElement(BtnRow, null, /*#__PURE__*/React.createElement(Btn, {
@@ -3870,7 +3996,7 @@ function NurseScreen(_ref22) {
       onClick: function onClick() {
         return set("urine", v);
       },
-      color: v === "정상" ? "#166534" : "#7f1d1d",
+      color: v === "정상" ? "#065F46" : "#7f1d1d",
       small: true
     });
   })), /*#__PURE__*/React.createElement(BtnRow, null, /*#__PURE__*/React.createElement(Btn, {
@@ -3879,7 +4005,7 @@ function NurseScreen(_ref22) {
     onClick: function onClick() {
       return set("urine_catheter", !form.urine_catheter);
     },
-    color: "#713f12",
+    color: "#92400E",
     small: true
   }))), /*#__PURE__*/React.createElement(Sec, {
     title: "\uD83D\uDEBD \uB300\uBCC0"
@@ -3891,7 +4017,7 @@ function NurseScreen(_ref22) {
       onClick: function onClick() {
         return set("bowel", v);
       },
-      color: v === "정상" ? "#166534" : "#7f1d1d",
+      color: v === "정상" ? "#065F46" : "#7f1d1d",
       small: true
     });
   }))), /*#__PURE__*/React.createElement(Sec, {
@@ -3904,7 +4030,7 @@ function NurseScreen(_ref22) {
       onClick: function onClick() {
         return set("medication", v);
       },
-      color: v === "정상 투약" ? "#166534" : "#7f1d1d",
+      color: v === "정상 투약" ? "#065F46" : "#7f1d1d",
       small: true
     });
   }))), /*#__PURE__*/React.createElement(Sec, {
@@ -3968,7 +4094,7 @@ function NurseScreen(_ref22) {
         borderRadius: 10,
         border: "none",
         cursor: "pointer",
-        background: form.painad === n ? n <= 2 ? "#166534" : n <= 6 ? "#713f12" : "#7f1d1d" : "#f8fafc",
+        background: form.painad === n ? n <= 2 ? "#065F46" : n <= 6 ? "#92400E" : "#7f1d1d" : "#f8fafc",
         color: form.painad === n ? "white" : "#334155"
       }
     }, /*#__PURE__*/React.createElement("span", {
@@ -3993,7 +4119,7 @@ function NurseScreen(_ref22) {
       onClick: function onClick() {
         return toggle("moods", v);
       },
-      color: v === "안정" ? "#166534" : "#7f1d1d",
+      color: v === "안정" ? "#065F46" : "#7f1d1d",
       small: true
     });
   }))), /*#__PURE__*/React.createElement(Sec, {
@@ -4006,7 +4132,7 @@ function NurseScreen(_ref22) {
       onClick: function onClick() {
         return toggle("mental", v);
       },
-      color: v === "이상 없음" ? "#166534" : "#7f1d1d",
+      color: v === "이상 없음" ? "#065F46" : "#7f1d1d",
       small: true
     });
   }))), /*#__PURE__*/React.createElement(Sec, {
@@ -4021,7 +4147,7 @@ function NurseScreen(_ref22) {
       onClick: function onClick() {
         return set("skin", v);
       },
-      color: v === "양호" ? "#166534" : "#7f1d1d",
+      color: v === "양호" ? "#065F46" : "#7f1d1d",
       small: true
     });
   })), /*#__PURE__*/React.createElement(Lbl, {
@@ -4034,7 +4160,7 @@ function NurseScreen(_ref22) {
       onClick: function onClick() {
         return set("hygiene", v);
       },
-      color: v === "양호" ? "#166534" : v === "보통" ? "#713f12" : "#7f1d1d",
+      color: v === "양호" ? "#065F46" : v === "보통" ? "#92400E" : "#7f1d1d",
       small: true
     });
   })), /*#__PURE__*/React.createElement(Lbl, {
@@ -4047,7 +4173,7 @@ function NurseScreen(_ref22) {
       onClick: function onClick() {
         return set("bedsore", v);
       },
-      color: v === "없음" ? "#166534" : "#7f1d1d",
+      color: v === "없음" ? "#065F46" : "#7f1d1d",
       small: true
     });
   }))), /*#__PURE__*/React.createElement(Sec, {
@@ -4061,7 +4187,7 @@ function NurseScreen(_ref22) {
         set("oriental", true);
         toggle("oriental_items", v);
       },
-      color: "#0d5c56",
+      color: "#1B3A6B",
       small: true
     });
   }), /*#__PURE__*/React.createElement(Btn, {
@@ -4101,7 +4227,7 @@ function NurseScreen(_ref22) {
         cursor: "pointer",
         fontSize: 12,
         fontWeight: noteMode === m ? 800 : 600,
-        background: noteMode === m ? "#1e3a5f" : "transparent",
+        background: noteMode === m ? "#1B3A6B" : "transparent",
         color: noteMode === m ? "white" : "#64748b"
       }
     }, l);
@@ -4155,7 +4281,7 @@ function NurseScreen(_ref22) {
         cursor: "pointer",
         fontSize: 12,
         fontWeight: isSel ? 700 : 500,
-        background: isSel ? "#1e3a5f" : "#f8fafc",
+        background: isSel ? "#1B3A6B" : "#f8fafc",
         color: isSel ? "white" : "#334155"
       }
     }, isSel ? "✓ " : "", p);
@@ -4163,10 +4289,10 @@ function NurseScreen(_ref22) {
     style: {
       marginTop: 8,
       padding: "8px 12px",
-      background: "#f0fdf4",
+      background: "#ECFDF5",
       borderRadius: 10,
       fontSize: 12,
-      color: "#166534",
+      color: "#065F46",
       lineHeight: 1.6
     }
   }, form.note))), /*#__PURE__*/React.createElement("button", {
@@ -4176,7 +4302,7 @@ function NurseScreen(_ref22) {
       padding: 15,
       borderRadius: 14,
       border: "none",
-      background: "#0d5c56",
+      background: "#1B3A6B",
       color: "white",
       fontSize: 15,
       fontWeight: 800,
@@ -4339,14 +4465,14 @@ function PatientManage(_ref26) {
         background: "white",
         borderRadius: 16,
         padding: 16,
-        border: "1.5px solid #cbd5e1",
+        border: "1.5px solid #CBD5E1",
         marginBottom: 14
       }
     }, /*#__PURE__*/React.createElement("div", {
       style: {
         fontSize: 13,
         fontWeight: 800,
-        color: "#1e3a5f",
+        color: "#1B3A6B",
         marginBottom: 14
       }
     }, title), children);
@@ -4356,13 +4482,13 @@ function PatientManage(_ref26) {
       back = _ref31.back;
     return /*#__PURE__*/React.createElement("div", {
       style: {
-        background: "linear-gradient(135deg,#1e3a5f,#2d6a9f)",
+        background: "linear-gradient(135deg,#1B3A6B,#2563EB)",
         padding: "14px 20px",
         color: "white",
         display: "flex",
         alignItems: "center",
         gap: 12,
-      borderRadius: 16
+      borderRadius: 16,
       margin: "12px 16px 0"
       }
     }, /*#__PURE__*/React.createElement("button", {
@@ -4459,7 +4585,7 @@ function PatientManage(_ref26) {
   if (view === "list") return /*#__PURE__*/React.createElement("div", {
     style: {
       fontFamily: "'Noto Sans KR',sans-serif",
-      background: "#f0f4f8",
+      background: "#F1F5F9",
       minHeight: "100vh",
       display: "flex",
       justifyContent: "center"
@@ -4487,7 +4613,7 @@ function PatientManage(_ref26) {
       padding: 14,
       borderRadius: 14,
       border: "none",
-      background: "#1e3a5f",
+      background: "#1B3A6B",
       color: "white",
       fontSize: 14,
       fontWeight: 800,
@@ -4525,7 +4651,7 @@ function PatientManage(_ref26) {
       style: {
         background: "white",
         borderRadius: 14,
-        border: "1.5px solid #cbd5e1",
+        border: "1.5px solid #CBD5E1",
         padding: "12px 14px",
         display: "flex",
         alignItems: "center",
@@ -4571,7 +4697,7 @@ function PatientManage(_ref26) {
   if (view === "register") return /*#__PURE__*/React.createElement("div", {
     style: {
       fontFamily: "'Noto Sans KR',sans-serif",
-      background: "#f0f4f8",
+      background: "#F1F5F9",
       minHeight: "100vh",
       display: "flex",
       justifyContent: "center",
@@ -4641,7 +4767,7 @@ function PatientManage(_ref26) {
         cursor: "pointer",
         fontSize: 13,
         fontWeight: 700,
-        background: reg.gender === g ? "#1e3a5f" : "#f1f5f9",
+        background: reg.gender === g ? "#1B3A6B" : "#f1f5f9",
         color: reg.gender === g ? "white" : "#64748b"
       }
     }, g);
@@ -4773,7 +4899,7 @@ function PatientManage(_ref26) {
       padding: 15,
       borderRadius: 14,
       border: "none",
-      background: reg.name && reg.room ? "#1e3a5f" : "#e2e8f0",
+      background: reg.name && reg.room ? "#1B3A6B" : "#e2e8f0",
       color: reg.name && reg.room ? "white" : "#aaa",
       fontSize: 15,
       fontWeight: 800,
@@ -4785,7 +4911,7 @@ function PatientManage(_ref26) {
   return /*#__PURE__*/React.createElement("div", {
     style: {
       fontFamily: "'Noto Sans KR',sans-serif",
-      background: "#f0f4f8",
+      background: "#F1F5F9",
       minHeight: "100vh",
       display: "flex",
       justifyContent: "center",
@@ -4941,7 +5067,7 @@ function PatientManage(_ref26) {
       padding: 15,
       borderRadius: 14,
       border: "none",
-      background: "#1e3a5f",
+      background: "#1B3A6B",
       color: "white",
       fontSize: 15,
       fontWeight: 800,
@@ -4957,7 +5083,7 @@ function PatientManage(_ref26) {
       padding: 12,
       borderRadius: 14,
       border: "none",
-      background: "#fef2f2",
+      background: "#FFF1F2",
       color: "#7f1d1d",
       fontSize: 13,
       fontWeight: 700,
@@ -5127,7 +5253,7 @@ function DoctorScreen(_ref32) {
         justifyContent: "center",
         fontSize: 13,
         fontWeight: 800,
-        color: p.alert ? "#ef4444" : isPending ? "#713f12" : isSent ? "#16a34a" : "#94a3b8"
+        color: p.alert ? "#ef4444" : isPending ? "#92400E" : isSent ? "#16a34a" : "#94a3b8"
       }
     }, idx), /*#__PURE__*/React.createElement("div", {
       style: {
@@ -5162,7 +5288,7 @@ function DoctorScreen(_ref32) {
     }, getWard(p.room), " \xB7 \uC785\uC6D0 ", p.days, "\uC77C\uC9F8"), p.alert && /*#__PURE__*/React.createElement("div", {
       style: {
         fontSize: 12,
-        color: "#ef4444",
+        color: "#DC2626",
         fontWeight: 700,
         marginBottom: 2
       }
@@ -5199,7 +5325,7 @@ function DoctorScreen(_ref32) {
     })), r && r.doctorComment && /*#__PURE__*/React.createElement("div", {
       style: {
         fontSize: 12,
-        color: "#0d5c56",
+        color: "#1B3A6B",
         marginTop: 3,
         fontWeight: 700
       }
@@ -5213,7 +5339,7 @@ function DoctorScreen(_ref32) {
   if (showMessages) return /*#__PURE__*/React.createElement("div", {
     style: {
       fontFamily: "'Noto Sans KR',sans-serif",
-      background: "#f0f4f8",
+      background: "#F1F5F9",
       minHeight: "100vh",
       display: "flex",
       justifyContent: "center"
@@ -5226,7 +5352,7 @@ function DoctorScreen(_ref32) {
     }
   }, /*#__PURE__*/React.createElement("div", {
     style: {
-      background: "linear-gradient(135deg,#1e3a5f,#2d6a9f)",
+      background: "linear-gradient(135deg,#1B3A6B,#2563EB)",
       padding: "14px 20px",
       color: "white",
       display: "flex",
@@ -5286,7 +5412,7 @@ function DoctorScreen(_ref32) {
         background: "white",
         borderRadius: 14,
         padding: "14px 16px",
-        border: "1.5px solid #cbd5e1"
+        border: "1.5px solid #CBD5E1"
       }
     }, /*#__PURE__*/React.createElement("div", {
       style: {
@@ -5299,7 +5425,7 @@ function DoctorScreen(_ref32) {
       style: {
         fontSize: 13,
         fontWeight: 800,
-        color: "#1e3a5f"
+        color: "#1B3A6B"
       }
     }, p && p.name, " ", getTitle(p), " \uAC00\uC871"), /*#__PURE__*/React.createElement("span", {
       style: {
@@ -5314,7 +5440,7 @@ function DoctorScreen(_ref32) {
         padding: "6px 10px",
         marginBottom: 8,
         fontSize: 12,
-        color: "#1e40af",
+        color: "#1B3A6B",
         fontWeight: 700
       }
     }, "\uD83D\uDCC5 \uBA74\uD68C \uC608\uC815: ", m.visitDate, " ", m.visitTime), /*#__PURE__*/React.createElement("div", {
@@ -5333,7 +5459,7 @@ function DoctorScreen(_ref32) {
     return /*#__PURE__*/React.createElement("div", {
       style: {
         fontFamily: "'Noto Sans KR',sans-serif",
-        background: "#f0f4f8",
+        background: "#F1F5F9",
         minHeight: "100vh",
         display: "flex",
         justifyContent: "center",
@@ -5351,17 +5477,17 @@ function DoctorScreen(_ref32) {
         position: "sticky",
         top: 0,
         zIndex: 10,
-        background: "#f0f4f8"
+        background: "#F1F5F9"
       }
     }, /*#__PURE__*/React.createElement("div", {
       style: {
-        background: "linear-gradient(135deg,#1e3a5f,#2d6a9f)",
+        background: "linear-gradient(135deg,#1B3A6B,#2563EB)",
         padding: "18px 20px",
         color: "white",
         display: "flex",
         alignItems: "center",
         gap: 12,
-      borderRadius: 16
+      borderRadius: 16,
       margin: "12px 16px 0"
       }
     }, /*#__PURE__*/React.createElement("button", {
@@ -5408,12 +5534,12 @@ function DoctorScreen(_ref32) {
         background: "white",
         borderRadius: 16,
         overflow: "hidden",
-        border: "1.5px solid #cbd5e1",
+        border: "1.5px solid #CBD5E1",
         marginBottom: 12
       }
     }, /*#__PURE__*/React.createElement("div", {
       style: {
-        background: "#1e3a5f",
+        background: "#1B3A6B",
         padding: "5px 14px"
       }
     }, /*#__PURE__*/React.createElement("span", {
@@ -5453,18 +5579,18 @@ function DoctorScreen(_ref32) {
     }), /*#__PURE__*/React.createElement(Row, {
       label: "\uD22C\uC57D \uC0C1\uD0DC",
       value: r.medication,
-      vc: r.medication === "정상 투약" ? "#166534" : r.medication ? "#ef4444" : "#333"
+      vc: r.medication === "정상 투약" ? "#065F46" : r.medication ? "#ef4444" : "#333"
     }), /*#__PURE__*/React.createElement(Row, {
       label: "\uD1B5\uC99D PAINAD",
       value: r.painad !== null && r.painad !== undefined ? r.painad + "점" : "—",
-      vc: r.painad <= 2 ? "#166534" : r.painad <= 6 ? "#713f12" : "#ef4444"
+      vc: r.painad <= 2 ? "#065F46" : r.painad <= 6 ? "#92400E" : "#ef4444"
     }), /*#__PURE__*/React.createElement(Row, {
       label: "\uAE30\uBD84",
       value: r.moods && r.moods.join(", ")
     }), /*#__PURE__*/React.createElement(Row, {
       label: "\uC815\uC2E0 \uC0C1\uD0DC",
       value: r.mental && r.mental.join(", "),
-      vc: r.mental && r.mental.includes("이상 없음") ? "#166534" : "#ef4444"
+      vc: r.mental && r.mental.includes("이상 없음") ? "#065F46" : "#ef4444"
     }), /*#__PURE__*/React.createElement(Row, {
       label: "\uD53C\uBD80",
       value: r.skin
@@ -5474,7 +5600,7 @@ function DoctorScreen(_ref32) {
     }), /*#__PURE__*/React.createElement(Row, {
       label: "\uC695\uCC3D",
       value: r.bedsore,
-      vc: r.bedsore === "없음" ? "#166534" : "#ef4444"
+      vc: r.bedsore === "없음" ? "#065F46" : "#ef4444"
     }), /*#__PURE__*/React.createElement(Row, {
       label: "\uD55C\uBC29 \uCE58\uB8CC",
       value: r.oriental === true ? "시행" : r.oriental === false ? "미시행" : "—"
@@ -5525,7 +5651,7 @@ function DoctorScreen(_ref32) {
       }
     }, /*#__PURE__*/React.createElement("div", {
       style: {
-        background: "#0d5c56",
+        background: "#1B3A6B",
         padding: "5px 14px",
         display: "flex",
         alignItems: "center",
@@ -5545,7 +5671,7 @@ function DoctorScreen(_ref32) {
       style: {
         padding: "10px 14px",
         fontSize: 13,
-        color: "#1e3a5f",
+        color: "#1B3A6B",
         lineHeight: 1.7,
         fontWeight: 600
       }
@@ -5554,12 +5680,12 @@ function DoctorScreen(_ref32) {
         background: "white",
         borderRadius: 16,
         overflow: "hidden",
-        border: "1.5px solid #cbd5e1",
+        border: "1.5px solid #CBD5E1",
         marginBottom: 12
       }
     }, /*#__PURE__*/React.createElement("div", {
       style: {
-        background: "#1e3a5f",
+        background: "#1B3A6B",
         padding: "5px 14px"
       }
     }, /*#__PURE__*/React.createElement("span", {
@@ -5583,12 +5709,12 @@ function DoctorScreen(_ref32) {
       v: "stable",
       l: "✅ 안정",
       bg: "#f0fdf4",
-      c: "#166534"
+      c: "#065F46"
     }, {
       v: "warning",
       l: "⚠️ 이상 징후",
       bg: "#fffbeb",
-      c: "#713f12"
+      c: "#92400E"
     }, {
       v: "treating",
       l: "🔴 치료 중",
@@ -5621,16 +5747,16 @@ function DoctorScreen(_ref32) {
       }, sel ? "✓ " : "", s.l);
     })), scenarioTypes.includes("warning") && /*#__PURE__*/React.createElement("div", {
       style: {
-        background: "#fffbeb",
+        background: "#FFFBEB",
         borderRadius: 10,
         padding: "10px 12px",
-        border: "1px solid #fcd34d",
+        border: "1px solid #FCD34D",
         marginBottom: 8
       }
     }, /*#__PURE__*/React.createElement("div", {
       style: {
         fontSize: 11,
-        color: "#713f12",
+        color: "#92400E",
         fontWeight: 700,
         marginBottom: 8
       }
@@ -5656,20 +5782,20 @@ function DoctorScreen(_ref32) {
           cursor: "pointer",
           fontSize: 11,
           fontWeight: 700,
-          background: sel ? "#713f12" : "white",
-          color: sel ? "white" : "#713f12"
+          background: sel ? "#92400E" : "white",
+          color: sel ? "white" : "#92400E"
         }
       }, sel ? "✓ " : "", v);
     })), warningSubs.length > 0 && /*#__PURE__*/React.createElement("div", {
       style: {
         marginTop: 8,
         fontSize: 11,
-        color: "#713f12",
+        color: "#92400E",
         fontWeight: 600
       }
     }, "\uC120\uD0DD\uB428: ", warningSubs.join(", "))), scenarioTypes.includes("treating") && /*#__PURE__*/React.createElement("div", {
       style: {
-        background: "#fef2f2",
+        background: "#FFF1F2",
         borderRadius: 10,
         padding: "10px 12px",
         border: "1px solid #fca5a5"
@@ -5719,12 +5845,12 @@ function DoctorScreen(_ref32) {
         background: "white",
         borderRadius: 16,
         overflow: "hidden",
-        border: "1.5px solid #cbd5e1",
+        border: "1.5px solid #CBD5E1",
         marginBottom: 12
       }
     }, /*#__PURE__*/React.createElement("div", {
       style: {
-        background: "#0d5c56",
+        background: "#1B3A6B",
         padding: "5px 14px"
       }
     }, /*#__PURE__*/React.createElement("span", {
@@ -5746,16 +5872,16 @@ function DoctorScreen(_ref32) {
     }, "\uC120\uC0DD\uB2D8 \uC774\uB984\uC73C\uB85C ", /*#__PURE__*/React.createElement("span", {
       style: {
         fontWeight: 700,
-        color: "#1e3a5f"
+        color: "#1B3A6B"
       }
     }, getGuardianComment(selected)), " \uC804\uB2EC\uB3FC\uC694"), r && r.doctorComment && /*#__PURE__*/React.createElement("div", {
       style: {
-        background: "#f0fdf4",
+        background: "#ECFDF5",
         borderRadius: 10,
         padding: "8px 12px",
         marginBottom: 8,
         fontSize: 12,
-        color: "#166534",
+        color: "#065F46",
         lineHeight: 1.6
       }
     }, "\uC774\uC804: ", r.doctorComment), /*#__PURE__*/React.createElement("div", {
@@ -5784,7 +5910,7 @@ function DoctorScreen(_ref32) {
           cursor: "pointer",
           fontSize: 12,
           fontWeight: commentMode === m ? 800 : 600,
-          background: commentMode === m ? "#0d5c56" : "transparent",
+          background: commentMode === m ? "#059669" : "transparent",
           color: commentMode === m ? "white" : "#64748b"
         }
       }, l);
@@ -5831,7 +5957,7 @@ function DoctorScreen(_ref32) {
           cursor: "pointer",
           fontSize: 12,
           fontWeight: isSel ? 700 : 500,
-          background: isSel ? "#0d5c56" : "#f8fafc",
+          background: isSel ? "#059669" : "#f8fafc",
           color: isSel ? "white" : "#334155"
         }
       }, isSel ? "✓ " : "", p);
@@ -5839,19 +5965,19 @@ function DoctorScreen(_ref32) {
       style: {
         marginTop: 8,
         padding: "8px 12px",
-        background: "#f0fdf4",
+        background: "#ECFDF5",
         borderRadius: 10,
         fontSize: 12,
-        color: "#166534",
+        color: "#065F46",
         lineHeight: 1.6
       }
     }, comment)))), saved ? /*#__PURE__*/React.createElement("div", {
       style: {
-        background: "#f0fdf4",
+        background: "#ECFDF5",
         borderRadius: 14,
         padding: 16,
         textAlign: "center",
-        color: "#166534",
+        color: "#065F46",
         fontWeight: 700,
         fontSize: 14,
         marginBottom: 8
@@ -5863,7 +5989,7 @@ function DoctorScreen(_ref32) {
         padding: 15,
         borderRadius: 14,
         border: "none",
-        background: "linear-gradient(135deg,#1e3a5f,#2d6a9f)",
+        background: "linear-gradient(135deg,#1B3A6B,#2563EB)",
         color: "white",
         fontSize: 15,
         fontWeight: 800,
@@ -5875,7 +6001,7 @@ function DoctorScreen(_ref32) {
   return /*#__PURE__*/React.createElement("div", {
     style: {
       fontFamily: "'Noto Sans KR',sans-serif",
-      background: "#f0f4f8",
+      background: "#F1F5F9",
       minHeight: "100vh",
       display: "flex",
       justifyContent: "center"
@@ -5892,10 +6018,10 @@ function DoctorScreen(_ref32) {
     }
   }, /*#__PURE__*/React.createElement("div", {
     style: {
-      background: "linear-gradient(135deg,#1e3a5f,#2d5a8e)",
+      background: "linear-gradient(135deg,#1B3A6B,#2563EB)",
       padding: "16px 20px",
       color: "white",
-      borderRadius: 16
+      borderRadius: 16,
       margin: "12px 16px 0"
     }
   }, /*#__PURE__*/React.createElement("div", {
@@ -6033,7 +6159,7 @@ function DoctorScreen(_ref32) {
     icon: "\uD83D\uDD50",
     label: "\uAC80\uD1A0 \uB300\uAE30",
     count: pendingList.length,
-    color: "#713f12",
+    color: "#92400E",
     bg: "#fffbeb"
   }), pendingList.map(function (p, i) {
     return PatientCard(p, i + 1);
@@ -6049,7 +6175,7 @@ function DoctorScreen(_ref32) {
     icon: "\u2705",
     label: "\uC804\uC1A1 \uC644\uB8CC",
     count: sentList.length,
-    color: "#16a34a",
+    color: "#059669",
     bg: "#f0fdf4"
   }), sentList.map(function (p, i) {
     return PatientCard(p, pendingList.length + notInputList.length + i + 1);
@@ -6162,7 +6288,7 @@ function MessagesScreen(_ref36) {
       style: {
         fontSize: 14,
         fontWeight: 800,
-        color: "#1e3a5f"
+        color: "#1B3A6B"
       }
     }, m.patient.name), /*#__PURE__*/React.createElement("span", {
       style: {
@@ -6180,8 +6306,8 @@ function MessagesScreen(_ref36) {
     }, getWard(m.patient.room)), /*#__PURE__*/React.createElement("span", {
       style: {
         fontSize: 11,
-        color: "#0d5c56",
-        background: "#f0fdf4",
+        color: "#1B3A6B",
+        background: "#ECFDF5",
         borderRadius: 6,
         padding: "1px 6px",
         fontWeight: 600
@@ -6199,7 +6325,7 @@ function MessagesScreen(_ref36) {
         padding: "6px 10px",
         marginBottom: 8,
         fontSize: 12,
-        color: "#1e40af",
+        color: "#1B3A6B",
         fontWeight: 700
       }
     }, "\uD83D\uDCC5 \uBA74\uD68C \uC608\uC815: ", m.visitDate, " ", m.visitTime), /*#__PURE__*/React.createElement("div", {
@@ -6214,7 +6340,7 @@ function MessagesScreen(_ref36) {
     }, m.text), /*#__PURE__*/React.createElement("div", {
       style: {
         fontSize: 11,
-        color: "#0d5c56",
+        color: "#1B3A6B",
         fontWeight: 600,
         marginTop: 8
       }
@@ -6223,7 +6349,7 @@ function MessagesScreen(_ref36) {
   return /*#__PURE__*/React.createElement("div", {
     style: {
       fontFamily: "'Noto Sans KR',sans-serif",
-      background: "#f0f4f8",
+      background: "#F1F5F9",
       minHeight: "100vh",
       display: "flex",
       justifyContent: "center"
@@ -6240,10 +6366,10 @@ function MessagesScreen(_ref36) {
     }
   }, /*#__PURE__*/React.createElement("div", {
     style: {
-      background: "linear-gradient(135deg,#1e3a5f,#2d5a8e)",
+      background: "linear-gradient(135deg,#1B3A6B,#2563EB)",
       padding: "16px 20px",
       color: "white",
-      borderRadius: 16
+      borderRadius: 16,
       margin: "12px 16px 0"
     }
   }, /*#__PURE__*/React.createElement("div", {
@@ -6328,7 +6454,7 @@ function MessagesScreen(_ref36) {
       padding: 4,
       gap: 4,
       marginBottom: 12,
-      border: "1.5px solid #cbd5e1"
+      border: "1.5px solid #CBD5E1"
     }
   }, /*#__PURE__*/React.createElement("button", {
     onClick: function onClick() {
@@ -6342,7 +6468,7 @@ function MessagesScreen(_ref36) {
       cursor: "pointer",
       fontSize: 13,
       fontWeight: !showArchived ? 800 : 500,
-      background: !showArchived ? "#1e3a5f" : "transparent",
+      background: !showArchived ? "#1B3A6B" : "transparent",
       color: !showArchived ? "white" : "#64748b"
     }
   }, "\uD65C\uC131 (", activeCount, ")"), /*#__PURE__*/React.createElement("button", {
@@ -6357,7 +6483,7 @@ function MessagesScreen(_ref36) {
       cursor: "pointer",
       fontSize: 13,
       fontWeight: showArchived ? 800 : 500,
-      background: showArchived ? "#1e3a5f" : "transparent",
+      background: showArchived ? "#1B3A6B" : "transparent",
       color: showArchived ? "white" : "#64748b"
     }
   }, "\uC644\uB8CC\xB7\uBCF4\uAD00 (", completedCount, ")")), /*#__PURE__*/React.createElement("div", {
@@ -6391,7 +6517,7 @@ function MessagesScreen(_ref36) {
         cursor: "pointer",
         fontSize: 12,
         fontWeight: wardFilter === w ? 800 : 500,
-        background: wardFilter === w ? "#1e3a5f" : "white",
+        background: wardFilter === w ? "#1B3A6B" : "white",
         color: wardFilter === w ? "white" : "#64748b"
       }
     }, w);
@@ -6422,7 +6548,7 @@ function MessagesScreen(_ref36) {
         cursor: "pointer",
         fontSize: 12,
         fontWeight: doctorFilter === d ? 800 : 500,
-        background: doctorFilter === d ? "#0d5c56" : "white",
+        background: doctorFilter === d ? "#059669" : "white",
         color: doctorFilter === d ? "white" : "#64748b"
       }
     }, d);
@@ -6447,7 +6573,7 @@ function MessagesScreen(_ref36) {
     label: "\uC774\uBC88 \uC8FC \uBA74\uD68C \uC608\uC815",
     count: thisWeek.length,
     unit: "\uAC74",
-    color: "#1e40af",
+    color: "#1B3A6B",
     bg: "#eff6ff"
   }), thisWeek.map(function (m, i) {
     return /*#__PURE__*/React.createElement(MsgCard, {
@@ -7001,7 +7127,7 @@ function App() {
       display: "flex",
       justifyContent: "center",
       alignItems: "center",
-      background: "#f0f4f8"
+      background: "#F1F5F9"
     }
   }, /*#__PURE__*/React.createElement("div", {
     style: {
@@ -7016,7 +7142,7 @@ function App() {
     style: {
       fontSize: 18,
       fontWeight: 700,
-      color: "#1e3a5f",
+      color: "#1B3A6B",
       marginBottom: 8
     }
   }, "\uC548\uBD80"), /*#__PURE__*/React.createElement("div", {
