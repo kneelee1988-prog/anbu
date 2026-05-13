@@ -2632,60 +2632,34 @@ function GuardianScreen(_ref19) {
       margin: "0 0"
     }
   }, tab === "today" && r && /*#__PURE__*/React.createElement(React.Fragment, null,
-  /*#__PURE__*/React.createElement("div", { style: { display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8, marginBottom: 8 } },
-    /*#__PURE__*/React.createElement("div", { style: { background: "white", borderRadius: 12, border: "1.5px solid #cbd5e1", overflow: "hidden" } },
-      /*#__PURE__*/React.createElement("div", { style: { background: "#1e3a5f", padding: "4px 10px", fontSize: 11, fontWeight: 800, color: "white" } }, "\uD83E\uDDE0 \uC758\uC2DD\uC218\uC900"),
-      /*#__PURE__*/React.createElement("div", { style: { padding: "8px 10px" } },
-        /*#__PURE__*/React.createElement("div", { style: { fontSize: 14, fontWeight: 800, color: scoreColor(r.consciousness) } }, r.consciousness || "—")
-      )
-    ),
-    /*#__PURE__*/React.createElement("div", { style: { background: "white", borderRadius: 12, border: "1.5px solid #cbd5e1", overflow: "hidden" } },
-      /*#__PURE__*/React.createElement("div", { style: { background: "#0d5c56", padding: "4px 10px", fontSize: 11, fontWeight: 800, color: "white" } }, "\uD83C\uDF5A \uC2DD\uC0AC"),
-      /*#__PURE__*/React.createElement("div", { style: { padding: "8px 10px" } },
-        /*#__PURE__*/React.createElement("div", { style: { fontSize: 13, fontWeight: 800, color: scoreColor(r.meal_amount) } }, r.meal_amount || "—"),
-        r.meal_type && /*#__PURE__*/React.createElement("div", { style: { fontSize: 11, color: "#64748b", marginTop: 2 } }, r.meal_type),
-        r.meal_refused && /*#__PURE__*/React.createElement("div", { style: { fontSize: 11, color: "#ef4444", fontWeight: 700, marginTop: 2 } }, "거부 있음")
-      )
-    ),
-    /*#__PURE__*/React.createElement("div", { style: { background: "white", borderRadius: 12, border: "1.5px solid #cbd5e1", overflow: "hidden" } },
-      /*#__PURE__*/React.createElement("div", { style: { background: "#2d6a9f", padding: "4px 10px", fontSize: 11, fontWeight: 800, color: "white" } }, "\uD83C\uDF19 \uC218\uBA74"),
-      /*#__PURE__*/React.createElement("div", { style: { padding: "8px 10px" } },
-        /*#__PURE__*/React.createElement("div", { style: { fontSize: 13, fontWeight: 800, color: "#334155" } }, r.sleep_hours ? r.sleep_hours : "—"),
-        r.sleep_wakeups && /*#__PURE__*/React.createElement("div", { style: { fontSize: 11, color: "#64748b", marginTop: 2 } }, "\uAC01\uC131 ", r.sleep_wakeups)
-      )
-    ),
-    /*#__PURE__*/React.createElement("div", { style: { background: "white", borderRadius: 12, border: "1.5px solid #cbd5e1", overflow: "hidden" } },
-      /*#__PURE__*/React.createElement("div", { style: { background: "#713f12", padding: "4px 10px", fontSize: 11, fontWeight: 800, color: "white" } }, "\uD83D\uDEB6 \uD65C\uB3D9"),
-      /*#__PURE__*/React.createElement("div", { style: { padding: "8px 10px" } },
-        /*#__PURE__*/React.createElement("div", { style: { fontSize: 13, fontWeight: 800, color: "#334155" } }, r.mobility || "—"),
-        r.fall_risk && /*#__PURE__*/React.createElement("div", { style: { fontSize: 11, color: r.fall_risk === "매우 높음" ? "#ef4444" : "#713f12", fontWeight: 700, marginTop: 2 } }, "\uB099\uC0C1 ", r.fall_risk)
-      )
-    ),
-    /*#__PURE__*/React.createElement("div", { style: { background: "white", borderRadius: 12, border: "1.5px solid #cbd5e1", overflow: "hidden" } },
-      /*#__PURE__*/React.createElement("div", { style: { background: "#0369a1", padding: "4px 10px", fontSize: 11, fontWeight: 800, color: "white" } }, "\uD83D\uDCA7 \uC18C\uBCC0"),
-      /*#__PURE__*/React.createElement("div", { style: { padding: "8px 10px" } },
-        /*#__PURE__*/React.createElement("div", { style: { fontSize: 14, fontWeight: 800, color: scoreColor(r.urine) } }, r.urine || "—")
-      )
-    ),
-    /*#__PURE__*/React.createElement("div", { style: { background: "white", borderRadius: 12, border: "1.5px solid #cbd5e1", overflow: "hidden" } },
-      /*#__PURE__*/React.createElement("div", { style: { background: "#6b21a8", padding: "4px 10px", fontSize: 11, fontWeight: 800, color: "white" } }, "\uD83D\uDEBD \uB300\uBCC0"),
-      /*#__PURE__*/React.createElement("div", { style: { padding: "8px 10px" } },
-        /*#__PURE__*/React.createElement("div", { style: { fontSize: 14, fontWeight: 800, color: scoreColor(r.bowel) } }, r.bowel || "—")
-      )
-    ),
-    /*#__PURE__*/React.createElement("div", { style: { background: "white", borderRadius: 12, border: "1.5px solid #cbd5e1", overflow: "hidden" } },
-      /*#__PURE__*/React.createElement("div", { style: { background: "#166534", padding: "4px 10px", fontSize: 11, fontWeight: 800, color: "white" } }, "\uD83D\uDE0A \uAE30\uBD84"),
-      /*#__PURE__*/React.createElement("div", { style: { padding: "8px 10px" } },
-        /*#__PURE__*/React.createElement("div", { style: { fontSize: 12, fontWeight: 800, color: r.moods && r.moods.includes("안정") ? "#166534" : "#7f1d1d" } }, r.moods && r.moods.length > 0 ? r.moods.join(", ") : "—")
-      )
-    ),
-    r.medication && /*#__PURE__*/React.createElement("div", { style: { background: "white", borderRadius: 12, border: "1.5px solid #cbd5e1", overflow: "hidden" } },
-      /*#__PURE__*/React.createElement("div", { style: { background: "#7c3aed", padding: "4px 10px", fontSize: 11, fontWeight: 800, color: "white" } }, "\uD83D\uDC8A \uD22C\uC57D"),
-      /*#__PURE__*/React.createElement("div", { style: { padding: "8px 10px", display: "flex", alignItems: "center", gap: 4 } },
-        /*#__PURE__*/React.createElement("span", { style: { fontSize: 16 } }, r.medication === "정상 투약" ? "✅" : "⚠️"),
-        /*#__PURE__*/React.createElement("span", { style: { fontSize: 12, fontWeight: 700, color: r.medication === "정상 투약" ? "#166534" : "#ef4444" } }, r.medication)
-      )
-    )
+  /*#__PURE__*/React.createElement("div", { style: { display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 6, marginBottom: 8 } },
+    [
+      { bg: "#1e3a5f", icon: "🧠", label: "의식수준", value: r.consciousness || "—", sub: null, vc: scoreColor(r.consciousness) },
+      { bg: "#0d5c56", icon: "🍚", label: "식사", value: r.meal_amount || "—", sub: r.meal_type, vc: scoreColor(r.meal_amount) },
+      { bg: "#2d6a9f", icon: "🌙", label: "수면", value: r.sleep_hours || "—", sub: r.sleep_wakeups ? "각성 " + r.sleep_wakeups : null, vc: "#334155" },
+      { bg: "#713f12", icon: "🚶", label: "활동", value: r.mobility || "—", sub: r.fall_risk ? "낙상 " + r.fall_risk : null, vc: "#334155" },
+      { bg: "#0369a1", icon: "💧", label: "소변", value: r.urine || "—", sub: null, vc: scoreColor(r.urine) },
+      { bg: "#6b21a8", icon: "🚽", label: "대변", value: r.bowel || "—", sub: null, vc: scoreColor(r.bowel) },
+      { bg: "#166534", icon: "😊", label: "기분", value: r.moods && r.moods.length > 0 ? r.moods[0] : "—", sub: r.moods && r.moods.length > 1 ? r.moods.slice(1).join(", ") : null, vc: r.moods && r.moods.includes("안정") ? "#166534" : "#7f1d1d" },
+      { bg: "#7c3aed", icon: "💊", label: "투약", value: r.medication ? (r.medication === "정상 투약" ? "✅ 정상" : "⚠️ 이상") : "—", sub: null, vc: r.medication === "정상 투약" ? "#166534" : "#ef4444" },
+      { bg: "#475569", icon: "🧴", label: "피부", value: r.skin || "—", sub: null, vc: scoreColor(r.skin) },
+      { bg: "#475569", icon: "🪥", label: "위생", value: r.hygiene || "—", sub: null, vc: scoreColor(r.hygiene) },
+      { bg: "#475569", icon: "🛏", label: "욕창", value: r.bedsore || "—", sub: null, vc: r.bedsore === "없음" ? "#166534" : "#ef4444" },
+      r.oriental !== null && r.oriental !== undefined ? { bg: "#115e59", icon: "🪡", label: "한방", value: r.oriental ? "시행" : "미시행", sub: null, vc: r.oriental ? "#0d5c56" : "#64748b" } : null
+    ].filter(Boolean).map(function(item, i) {
+      return /*#__PURE__*/React.createElement("div", {
+        key: i,
+        style: { background: "white", borderRadius: 12, border: "1.5px solid #cbd5e1", overflow: "hidden", aspectRatio: "1 / 1", display: "flex", flexDirection: "column" }
+      },
+        /*#__PURE__*/React.createElement("div", { style: { background: item.bg, padding: "4px 6px", fontSize: 10, fontWeight: 800, color: "white", textAlign: "center", flexShrink: 0 } },
+          item.icon + " " + item.label
+        ),
+        /*#__PURE__*/React.createElement("div", { style: { flex: 1, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", padding: "4px 6px" } },
+          /*#__PURE__*/React.createElement("div", { style: { fontSize: 12, fontWeight: 800, color: item.vc, textAlign: "center", lineHeight: 1.3 } }, item.value),
+          item.sub && /*#__PURE__*/React.createElement("div", { style: { fontSize: 10, color: "#94a3b8", marginTop: 2, textAlign: "center" } }, item.sub)
+        )
+      );
+    })
   ),
   /*#__PURE__*/React.createElement("div", { style: { background: "white", borderRadius: 12, border: "1.5px solid #cbd5e1", overflow: "hidden", marginBottom: 8 } },
     /*#__PURE__*/React.createElement("div", { style: { background: "#1e3a5f", padding: "4px 10px", fontSize: 11, fontWeight: 800, color: "white" } }, "\uD83E\uDDE9 \uC815\uC2E0 \uBC0F \uC774\uC0C1\uD589\uB3D9"),
@@ -2694,24 +2668,6 @@ function GuardianScreen(_ref19) {
         return /*#__PURE__*/React.createElement("span", { key: s, style: { fontSize: 12, fontWeight: 700, borderRadius: 20, padding: "2px 10px", background: s === "이상 없음" ? "#f0fdf4" : s === "미입력" ? "#f1f5f9" : "#fef2f2", color: s === "이상 없음" ? "#166534" : s === "미입력" ? "#aaa" : "#7f1d1d" } }, s);
       })
     )
-  ),
-  /*#__PURE__*/React.createElement("div", { style: { display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 8, marginBottom: 8 } },
-    /*#__PURE__*/React.createElement("div", { style: { background: "white", borderRadius: 12, border: "1.5px solid #cbd5e1", overflow: "hidden" } },
-      /*#__PURE__*/React.createElement("div", { style: { background: "#475569", padding: "4px 6px", fontSize: 10, fontWeight: 800, color: "white", textAlign: "center" } }, "\uD53C\uBD80"),
-      /*#__PURE__*/React.createElement("div", { style: { padding: "6px 8px", fontSize: 12, fontWeight: 800, color: scoreColor(r.skin), textAlign: "center" } }, r.skin || "—")
-    ),
-    /*#__PURE__*/React.createElement("div", { style: { background: "white", borderRadius: 12, border: "1.5px solid #cbd5e1", overflow: "hidden" } },
-      /*#__PURE__*/React.createElement("div", { style: { background: "#475569", padding: "4px 6px", fontSize: 10, fontWeight: 800, color: "white", textAlign: "center" } }, "\uC704\uC0DD"),
-      /*#__PURE__*/React.createElement("div", { style: { padding: "6px 8px", fontSize: 12, fontWeight: 800, color: scoreColor(r.hygiene), textAlign: "center" } }, r.hygiene || "—")
-    ),
-    /*#__PURE__*/React.createElement("div", { style: { background: "white", borderRadius: 12, border: "1.5px solid #cbd5e1", overflow: "hidden" } },
-      /*#__PURE__*/React.createElement("div", { style: { background: "#475569", padding: "4px 6px", fontSize: 10, fontWeight: 800, color: "white", textAlign: "center" } }, "\uC695\uCC3D"),
-      /*#__PURE__*/React.createElement("div", { style: { padding: "6px 8px", fontSize: 12, fontWeight: 800, color: r.bedsore === "없음" ? "#166634" : "#ef4444", textAlign: "center" } }, r.bedsore || "—")
-    )
-  ),
-  r.oriental !== null && r.oriental !== undefined && /*#__PURE__*/React.createElement("div", { style: { background: "white", borderRadius: 12, border: "1.5px solid #cbd5e1", overflow: "hidden", marginBottom: 8 } },
-    /*#__PURE__*/React.createElement("div", { style: { background: "#115e59", padding: "4px 10px", fontSize: 11, fontWeight: 800, color: "white" } }, "\uD83E\uDEA1 \uD55C\uBC29 \uCE58\uB8CC"),
-    /*#__PURE__*/React.createElement("div", { style: { padding: "8px 10px", fontSize: 13, fontWeight: 800, color: r.oriental ? "#0d5c56" : "#64748b" } }, r.oriental ? "시행" : "미시행")
   ),
   r.note && /*#__PURE__*/React.createElement("div", {
     style: { background: "linear-gradient(135deg,#f0fdf4,#dcfce7)", borderRadius: 12, padding: "10px 12px", marginBottom: 8, border: "1px solid #86efac" }
