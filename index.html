@@ -1201,13 +1201,20 @@ function LoginScreen(_ref1) {
     guardian: "👨‍👩‍👧 보호자 로그인",
     messages: "💬 보호자 한마디"
   };
+  var bgColors = {
+    nurse: "linear-gradient(160deg,#052e16,#0d5c56)",
+    doctor: "linear-gradient(160deg,#0f172a,#1e3a5f)",
+    admin: "linear-gradient(160deg,#0f172a,#1e3a5f)",
+    guardian: "linear-gradient(160deg,#0f2744,#1a56db)",
+    messages: "linear-gradient(160deg,#0c1a2e,#0369a1)"
+  };
   var handleKeyDown = function handleKeyDown(e) {
     if (e.key === "Enter") handleLogin();
   };
   return /*#__PURE__*/React.createElement("div", {
     style: {
       fontFamily: "'Noto Sans KR',sans-serif",
-      background: "linear-gradient(160deg,#0f172a,#1e3a5f)",
+      background: bgColors[loginType] || "linear-gradient(160deg,#0f172a,#1e3a5f)",
       minHeight: "100vh",
       display: "flex",
       justifyContent: "center",
@@ -2258,40 +2265,46 @@ function RoleSelect(_ref17) {
     type: "guardian",
     icon: "👨‍👩‍👧",
     label: "보호자",
-    sub: "어머니 오늘 상태 확인"
+    sub: "어머니 오늘 상태 확인",
+    color: "#1a56db"
   }, {
     type: "nurse",
     icon: "👩‍⚕️",
     label: "간호사",
-    sub: "환자 상태 입력"
+    sub: "환자 상태 입력",
+    color: "#0d5c56"
   }, {
     type: "doctor",
     icon: "🩺",
     label: "의사",
-    sub: "담당 환자 현황 확인"
+    sub: "담당 환자 현황 확인",
+    color: "#1e3a5f"
   }, {
     type: "messages",
     icon: "💬",
     label: "보호자 한마디",
-    sub: "면회 일정 및 메시지 확인"
+    sub: "면회 일정 및 메시지 확인",
+    color: "#0369a1"
   }, {
     type: "admin",
     icon: "👑",
     label: "관리자",
-    sub: "직원 계정 및 환자 관리"
+    sub: "직원 계정 및 환자 관리",
+    color: "#1e3a5f"
   }].map(function (_ref18) {
     var type = _ref18.type,
       icon = _ref18.icon,
       label = _ref18.label,
-      sub = _ref18.sub;
+      sub = _ref18.sub,
+      color = _ref18.color;
     return /*#__PURE__*/React.createElement("button", {
       key: type,
       onClick: function onClick() {
         return onSelect(type);
       },
       style: {
-        background: "rgba(255,255,255,0.1)",
-        border: "1.5px solid rgba(255,255,255,0.15)",
+        background: "rgba(255,255,255,0.08)",
+        border: "1.5px solid rgba(255,255,255,0.12)",
         borderRadius: 16,
         padding: "16px 20px",
         display: "flex",
@@ -2300,9 +2313,17 @@ function RoleSelect(_ref17) {
         cursor: "pointer",
         textAlign: "left"
       }
-    }, /*#__PURE__*/React.createElement("span", {
+    }, /*#__PURE__*/React.createElement("div", {
       style: {
-        fontSize: 26
+        width: 46,
+        height: 46,
+        borderRadius: 14,
+        background: color || "#1e3a5f",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        fontSize: 24,
+        flexShrink: 0
       }
     }, icon), /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("div", {
       style: {
@@ -2411,7 +2432,7 @@ function GuardianScreen(_ref19) {
     }
   }, /*#__PURE__*/React.createElement("div", {
     style: {
-      background: "linear-gradient(135deg,#1e3a5f,#2d6a9f)",
+      background: "linear-gradient(135deg,#1a56db,#3b82f6)",
       padding: "16px 20px",
       color: "white",
       borderRadius: 20
@@ -3316,7 +3337,7 @@ function NurseScreen(_ref22) {
     }
   }, /*#__PURE__*/React.createElement("div", {
     style: {
-      background: "linear-gradient(135deg,#1e3a5f,#2d6a9f)",
+      background: "linear-gradient(135deg,#0d5c56,#0f766e)",
       padding: "14px 20px 12px",
       color: "white"
     }
@@ -3468,7 +3489,7 @@ function NurseScreen(_ref22) {
     }
   }, /*#__PURE__*/React.createElement("div", {
     style: {
-      background: "linear-gradient(135deg,#1e3a5f,#2d6a9f)",
+      background: "linear-gradient(135deg,#0d5c56,#0f766e)",
       padding: "14px 20px",
       color: "white",
       display: "flex",
@@ -3593,7 +3614,7 @@ function NurseScreen(_ref22) {
     }
   }, /*#__PURE__*/React.createElement("div", {
     style: {
-      background: "linear-gradient(135deg,#1e3a5f,#2d6a9f)",
+      background: "linear-gradient(135deg,#0d5c56,#0f766e)",
       padding: "14px 20px",
       color: "white",
       display: "flex",
@@ -5837,7 +5858,7 @@ function DoctorScreen(_ref32) {
     }
   }, /*#__PURE__*/React.createElement("div", {
     style: {
-      background: "linear-gradient(135deg,#1e3a5f,#2d6a9f)",
+      background: "linear-gradient(135deg,#1a56db,#3b82f6)",
       padding: "16px 20px",
       color: "white",
       borderRadius: 20
@@ -6183,7 +6204,7 @@ function MessagesScreen(_ref36) {
     }
   }, /*#__PURE__*/React.createElement("div", {
     style: {
-      background: "linear-gradient(135deg,#1e3a5f,#2d6a9f)",
+      background: "linear-gradient(135deg,#1a56db,#3b82f6)",
       padding: "16px 20px",
       color: "white",
       borderRadius: 20
