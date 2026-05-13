@@ -2512,16 +2512,16 @@ function GuardianScreen(_ref19) {
           { bg: "linear-gradient(135deg,#374151,#4b5563)", label: "욕창", value: r.bedsore||"—", sub: null, vc: r.bedsore==="없음"?"#166534":"#ef4444" },
           r.oriental!==null&&r.oriental!==undefined?{ bg: "linear-gradient(135deg,#064e3b,#065f46)", label: "한방", value: r.oriental?"시행":"미시행", sub: null, vc: r.oriental?"#0d5c56":"#64748b" }:null
         ].filter(Boolean).map(function(item, i) {
-          return /*#__PURE__*/React.createElement("div", { key: i, style: { background: "white", borderRadius: 12, border: "1px solid #e8ecf0", overflow: "hidden", boxShadow: "0 2px 8px rgba(0,0,0,0.05)", display: "flex", flexDirection: "column" } },
+          return /*#__PURE__*/React.createElement("div", { key: i, style: { background: "white", borderRadius: 12, border: "1px solid #e8ecf0", overflow: "hidden", boxShadow: "0 4px 14px rgba(0,0,0,0.13)", display: "flex", flexDirection: "column" } },
             /*#__PURE__*/React.createElement("div", { style: { background: item.bg, padding: "10px 8px", fontSize: 11, fontWeight: 700, color: "white", textAlign: "center" } }, item.label),
-            /*#__PURE__*/React.createElement("div", { style: { flex: 1, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", padding: "14px 6px" } },
-              /*#__PURE__*/React.createElement("div", { style: { fontSize: 14, fontWeight: 800, color: item.vc, textAlign: "center", lineHeight: 1.3 } }, item.value),
-              item.sub && /*#__PURE__*/React.createElement("div", { style: { fontSize: 10, color: "#94a3b8", marginTop: 4, textAlign: "center" } }, item.sub)
+            /*#__PURE__*/React.createElement("div", { style: { flex: 1, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", padding: "8px 6px" } },
+              /*#__PURE__*/React.createElement("div", { style: { fontSize: 13, fontWeight: 800, color: item.vc, textAlign: "center", lineHeight: 1.3 } }, item.value),
+              item.sub && /*#__PURE__*/React.createElement("div", { style: { fontSize: 10, color: "#94a3b8", marginTop: 3, textAlign: "center" } }, item.sub)
             )
           );
         })
       ),
-      /*#__PURE__*/React.createElement("div", { style: { background: "white", borderRadius: 14, border: "1px solid #e8ecf0", overflow: "hidden", marginBottom: 10, boxShadow: "0 2px 8px rgba(0,0,0,0.05)" } },
+      /*#__PURE__*/React.createElement("div", { style: { background: "white", borderRadius: 14, border: "1px solid #e8ecf0", overflow: "hidden", marginBottom: 10, boxShadow: "0 4px 14px rgba(0,0,0,0.13)" } },
         /*#__PURE__*/React.createElement("div", { style: { background: "linear-gradient(135deg,#1a3358,#2a5298)", padding: "10px 14px", fontSize: 12, fontWeight: 700, color: "white" } }, "\uD83E\uDDE9 정신 및 이상행동"),
         /*#__PURE__*/React.createElement("div", { style: { padding: "12px 14px", display: "flex", flexWrap: "wrap", gap: 6 } },
           (r.mental&&r.mental.length>0?r.mental:["미입력"]).map(function(s) {
@@ -2529,11 +2529,11 @@ function GuardianScreen(_ref19) {
           })
         )
       ),
-      r.note && /*#__PURE__*/React.createElement("div", { style: { background: "white", borderRadius: 14, border: "1px solid #d1fae5", overflow: "hidden", marginBottom: 10, boxShadow: "0 2px 8px rgba(0,0,0,0.05)" } },
+      r.note && /*#__PURE__*/React.createElement("div", { style: { background: "white", borderRadius: 14, border: "1px solid #d1fae5", overflow: "hidden", marginBottom: 10, boxShadow: "0 4px 14px rgba(0,0,0,0.13)" } },
         /*#__PURE__*/React.createElement("div", { style: { background: "linear-gradient(135deg,#065f46,#0d9488)", padding: "10px 14px", fontSize: 12, fontWeight: 700, color: "white" } }, "\uD83D\uDCDD 간호사 특이사항"),
         /*#__PURE__*/React.createElement("div", { style: { padding: "14px", fontSize: 15, color: "#166534", lineHeight: 1.8, fontWeight: 600 } }, r.note)
       ),
-      r.doctorComment && /*#__PURE__*/React.createElement("div", { style: { background: "white", borderRadius: 14, border: "1px solid #bfdbfe", overflow: "hidden", marginBottom: 10, boxShadow: "0 2px 8px rgba(0,0,0,0.05)" } },
+      r.doctorComment && /*#__PURE__*/React.createElement("div", { style: { background: "white", borderRadius: 14, border: "1px solid #bfdbfe", overflow: "hidden", marginBottom: 10, boxShadow: "0 4px 14px rgba(0,0,0,0.13)" } },
         /*#__PURE__*/React.createElement("div", { style: { background: "linear-gradient(135deg,#1e3a6e,#2563eb)", padding: "10px 14px", fontSize: 12, fontWeight: 700, color: "white" } }, "\uD83D\uDC68\u200D\u2695\uFE0F 주치의 코멘트 · ", r.doctorCommentDate),
         /*#__PURE__*/React.createElement("div", { style: { padding: "14px", fontSize: 15, color: "#1e3a5f", lineHeight: 1.8, fontWeight: 600 } }, r.doctorComment)
       )
