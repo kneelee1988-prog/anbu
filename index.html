@@ -6077,7 +6077,9 @@ function MessagesScreen(_ref36) {
 
 // ── 메인 앱 ───────────────────────────────────────────────────
 function App() {
-  var _useState71 = useState(false),
+  var _useState71 = useState(function() {
+      try { return localStorage.getItem('anbu_onboarded') === '1'; } catch(e) { return false; }
+    }),
     _useState72 = _slicedToArray(_useState71, 2),
     onboarded = _useState72[0],
     setOnboarded = _useState72[1];
@@ -6105,6 +6107,11 @@ function App() {
     _useState84 = _slicedToArray(_useState83, 2),
     loading = _useState84[0],
     setLoading = _useState84[1];
+  // 로딩 안전장치: 8초 후에도 loading이면 강제 해제
+  useEffect(function() {
+    var t = setTimeout(function() { setLoading(false); }, 8000);
+    return function() { clearTimeout(t); };
+  }, []);
   var loadPatients = /*#__PURE__*/function () {
     var _ref38 = _asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee8() {
       var res, data, mapped, withRecords, _t9;
@@ -6585,6 +6592,7 @@ function App() {
   };
   if (!onboarded) return /*#__PURE__*/React.createElement(OnboardingScreen, {
     onDone: function onDone() {
+      try { localStorage.setItem('anbu_onboarded', '1'); } catch(e) {}
       return setOnboarded(true);
     }
   });
