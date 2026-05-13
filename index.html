@@ -2850,9 +2850,9 @@ function GuardianScreen(_ref19) {
     placeholder: "\uC608) " + (patient && patient.gender === "\uC5EC" ? "\uC5B4\uBA38\uB2C8" : "\uC544\uBC84\uC9C0") + " \uC624\uB298 \uBC25 \uC798 \uB4DC\uC138\uC694 \uD83D\uDE0A",
     style: {
       width: "100%",
-      height: 80,
+      height: 120,
       borderRadius: 12,
-      border: "1px solid #e2e8f0",
+      border: "2px solid #94a3b8",
       padding: 12,
       fontSize: 14,
       color: "#333",
@@ -2867,7 +2867,7 @@ function GuardianScreen(_ref19) {
     style: {
       background: "#f8fafc",
       borderRadius: 12,
-      padding: "12px 14px",
+      padding: "10px 12px",
       marginBottom: 10
     }
   }, /*#__PURE__*/React.createElement("div", {
@@ -2875,18 +2875,18 @@ function GuardianScreen(_ref19) {
       fontSize: 12,
       fontWeight: 700,
       color: "#475569",
-      marginBottom: 8
+      marginBottom: 6
     }
   }, "\uD83D\uDCC5 \uBA74\uD68C \uC608\uC815\uC77C (\uC120\uD0DD)"),
   /*#__PURE__*/React.createElement("div", {
-    style: { display: "flex", gap: 6, marginBottom: 8 }
+    style: { display: "flex", gap: 6, marginBottom: 6 }
   },
     [today.getMonth() + 1, today.getMonth() + 2 > 12 ? 1 : today.getMonth() + 2].map(function(m) {
       return /*#__PURE__*/React.createElement("button", {
         key: m,
         onClick: function() { setVisitMonth(m); setVisitDay(""); setVisitDate(""); setVisitTime(""); },
         style: {
-          padding: "5px 14px",
+          padding: "4px 14px",
           borderRadius: 8,
           border: "1px solid #e2e8f0",
           cursor: "pointer",
@@ -2899,7 +2899,7 @@ function GuardianScreen(_ref19) {
     })
   ),
   /*#__PURE__*/React.createElement("div", {
-    style: { display: "flex", gap: 5, flexWrap: "wrap", marginBottom: 8 }
+    style: { display: "flex", gap: 4, flexWrap: "wrap", marginBottom: 6 }
   },
     Array.from({ length: 31 }, function(_, i) { return i + 1; }).map(function(d) {
       var isSelected = visitDay === d && visitMonth;
@@ -2913,12 +2913,12 @@ function GuardianScreen(_ref19) {
           setVisitTime("");
         },
         style: {
-          width: 34,
-          height: 34,
-          borderRadius: 8,
+          width: 30,
+          height: 28,
+          borderRadius: 6,
           border: "1px solid #e2e8f0",
           cursor: visitMonth ? "pointer" : "default",
-          fontSize: 12,
+          fontSize: 11,
           fontWeight: 700,
           background: isSelected ? "#1e3a5f" : "white",
           color: isSelected ? "white" : visitMonth ? "#334155" : "#cbd5e1"
@@ -2927,22 +2927,31 @@ function GuardianScreen(_ref19) {
     })
   ),
   visitDate && /*#__PURE__*/React.createElement("div", {
-    style: { display: "flex", gap: 6, flexWrap: "wrap" }
-  }, ["\uC624\uC804 9\uC2DC", "\uC624\uC804 11\uC2DC", "\uC624\uD6C4 1\uC2DC", "\uC624\uD6C4 3\uC2DC", "\uC624\uD6C4 5\uC2DC"].map(function(t) {
+    style: { display: "flex", gap: 5, flexWrap: "wrap", marginTop: 4 }
+  }, [
+    { label: "9~10시", color: "#eff6ff", border: "#bfdbfe", text: "#1e40af" },
+    { label: "10~11시", color: "#f0fdf4", border: "#86efac", text: "#166534" },
+    { label: "점심시간", color: "#fffbeb", border: "#fcd34d", text: "#713f12" },
+    { label: "13~14시", color: "#fdf4ff", border: "#e9d5ff", text: "#6b21a8" },
+    { label: "14~15시", color: "#fff1f2", border: "#fecdd3", text: "#9f1239" },
+    { label: "15~16시", color: "#f0fdfa", border: "#99f6e4", text: "#115e59" },
+    { label: "16~17시", color: "#fff7ed", border: "#fed7aa", text: "#9a3412" }
+  ].map(function(t) {
+    var isSelected = visitTime === t.label;
     return /*#__PURE__*/React.createElement("button", {
-      key: t,
-      onClick: function() { setVisitTime(visitTime === t ? "" : t); },
+      key: t.label,
+      onClick: function() { setVisitTime(visitTime === t.label ? "" : t.label); },
       style: {
-        padding: "5px 10px",
+        padding: "5px 9px",
         borderRadius: 8,
-        border: "1px solid #e2e8f0",
+        border: "1.5px solid " + (isSelected ? t.text : t.border),
         cursor: "pointer",
-        fontSize: 12,
+        fontSize: 11,
         fontWeight: 700,
-        background: visitTime === t ? "#1e3a5f" : "white",
-        color: visitTime === t ? "white" : "#334155"
+        background: isSelected ? t.text : t.color,
+        color: isSelected ? "white" : t.text
       }
-    }, t);
+    }, t.label);
   })),
   visitDate && /*#__PURE__*/React.createElement("div", {
     style: { marginTop: 8, fontSize: 12, color: "#1e3a5f", fontWeight: 700 }
