@@ -1835,7 +1835,8 @@ function AdminScreen(_ref11) {
       background: "linear-gradient(135deg,#1e3a5f,#2d5a8e)",
       padding: "14px 20px",
       color: "white",
-      borderRadius: "0 0 20px 20px"
+      borderRadius: 20,
+      margin: "14px 20px 0"
     }
   }, /*#__PURE__*/React.createElement("div", {
     style: {
@@ -1872,7 +1873,7 @@ function AdminScreen(_ref11) {
     }
   }, "\uD83C\uDFE5 \uC774\uC694\uC131 \uBCD1\uC6D0\uC7A5")))), /*#__PURE__*/React.createElement("div", {
     style: {
-      margin: "12px 0 0",
+      margin: "12px 20px 0",
       display: "flex",
       background: "white",
       borderRadius: 14,
@@ -2472,17 +2473,17 @@ function GuardianScreen(_ref19) {
   }, /*#__PURE__*/React.createElement("div", {
     style: {
       background: "linear-gradient(135deg,#1e3a5f,#2d5a8e)",
-      padding: "16px 0",
+      padding: "16px 20px",
       color: "white",
-      borderRadius: "0 0 20px 20px"
+      borderRadius: 20,
+      padding: "0 20px"
     }
   }, /*#__PURE__*/React.createElement("div", {
     style: {
       display: "flex",
       alignItems: "center",
       gap: 10,
-      marginBottom: 12,
-      padding: "0 20px"
+      marginBottom: 12
     }
   }, /*#__PURE__*/React.createElement("button", {
     onClick: function onClick() {
@@ -2507,21 +2508,18 @@ function GuardianScreen(_ref19) {
     style: {
       fontSize: 22,
       fontWeight: 700,
-      marginBottom: 2,
-      padding: "0 20px"
+      marginBottom: 2
     }
   }, patient && patient.name, " ", getTitle(patient)), /*#__PURE__*/React.createElement("div", {
     style: {
       fontSize: 13,
       opacity: 0.75,
-      marginBottom: 14,
-      padding: "0 20px"
+      marginBottom: 14
     }
   }, getWard(patient && patient.room), " \xB7 \uC8FC\uCE58\uC758 : ", getDoctorTitle(patient && patient.doctorId)), /*#__PURE__*/React.createElement("div", {
     style: {
       display: "flex",
-      gap: 8,
-      padding: "0 20px"
+      gap: 8
     }
   }, [{
     label: "입원일수",
@@ -2558,11 +2556,11 @@ function GuardianScreen(_ref19) {
     }, item.value));
   })))), pending && /*#__PURE__*/React.createElement("div", {
     style: {
-      margin: "10px 0 0",
+      margin: "10px 20px 0",
       background: "#fffbeb",
       border: "1px solid #fcd34d",
       borderRadius: 14,
-      padding: "12px 20px",
+      padding: "12px 16px",
       fontSize: 13,
       color: "#713f12",
       fontWeight: 700,
@@ -2572,11 +2570,11 @@ function GuardianScreen(_ref19) {
     }
   }, /*#__PURE__*/React.createElement("span", null, "\uD83E\uDE7A"), /*#__PURE__*/React.createElement("span", null, "\uAC04\uD638\uC0AC \uC785\uB825 \uC644\uB8CC \xB7 \uC8FC\uCE58\uC758 \uAC80\uD1A0 \uD6C4 \uC804\uB2EC \uC608\uC815\uC774\uC5D0\uC694.")), !r && !pending && /*#__PURE__*/React.createElement("div", {
     style: {
-      margin: "10px 0 0",
+      margin: "10px 20px 0",
       background: "#eff6ff",
       border: "1px solid #bfdbfe",
       borderRadius: 14,
-      padding: "12px 20px",
+      padding: "12px 16px",
       fontSize: 13,
       color: "#1e40af",
       fontWeight: 700,
@@ -2586,18 +2584,18 @@ function GuardianScreen(_ref19) {
     }
   }, /*#__PURE__*/React.createElement("span", null, "\u23F3"), /*#__PURE__*/React.createElement("span", null, "\uC624\uB298 \uC0C1\uD0DC\uB294 \uC800\uB141 \uAC04\uD638\uC0AC \uC785\uB825 \uD6C4 \uD655\uC778\uD558\uC2E4 \uC218 \uC788\uC5B4\uC694.")), r && /*#__PURE__*/React.createElement("div", {
     style: {
-      margin: "10px 0 0",
+      margin: "10px 20px 0",
       background: "#f0fdf4",
       border: "1px solid #86efac",
       borderRadius: 14,
-      padding: "10px 20px",
+      padding: "10px 16px",
       fontSize: 12,
       color: "#166534",
       fontWeight: 700
     }
   }, "\u2705 ", r.updatedAt, " \uC785\uB825 \uC644\uB8CC \xB7 \uC8FC\uCE58\uC758 \uD655\uC778\uB428"), /*#__PURE__*/React.createElement("div", {
     style: {
-      margin: "10px 0 0",
+      margin: "10px 20px 0",
       display: "flex",
       background: "white",
       borderRadius: 14,
@@ -2628,8 +2626,7 @@ function GuardianScreen(_ref19) {
     }, l);
   })), /*#__PURE__*/React.createElement("div", {
     style: {
-      padding: "12px 20px 0",
-      margin: "0 0"
+      padding: "12px 20px 0"
     }
   }, tab === "today" && r && /*#__PURE__*/React.createElement(React.Fragment, null,
   /*#__PURE__*/React.createElement("div", { style: { display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 6, marginBottom: 8 } },
@@ -2651,8 +2648,7 @@ function GuardianScreen(_ref19) {
         key: i,
         style: { background: "white", borderRadius: 12, border: "1.5px solid #cbd5e1", overflow: "hidden", aspectRatio: "1 / 1", display: "flex", flexDirection: "column" }
       },
-        /*#__PURE__*/React.createElement("div", { style: { background: item.bg, padding: "8px 4px", fontSize: 12, fontWeight: 800, color: "white", textAlign: "center", flexShrink: 0, lineHeight: 1.4 } },
-          /*#__PURE__*/React.createElement("div", { style: { fontSize: 18, marginBottom: 2 } }, item.icon),
+        /*#__PURE__*/React.createElement("div", { style: { background: item.bg, padding: "12px 6px", fontSize: 12, fontWeight: 800, color: "white", textAlign: "center", flexShrink: 0, lineHeight: 1.3, display: "flex", alignItems: "center", justifyContent: "center", minHeight: "42%" } },
           item.label
         ),
         /*#__PURE__*/React.createElement("div", { style: { flex: 1, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", padding: "4px 6px" } },
@@ -2673,7 +2669,7 @@ function GuardianScreen(_ref19) {
   r.note && /*#__PURE__*/React.createElement("div", {
     style: { background: "linear-gradient(135deg,#f0fdf4,#dcfce7)", borderRadius: 12, padding: "12px 14px", marginBottom: 8, border: "1px solid #86efac" }
   }, /*#__PURE__*/React.createElement("div", { style: { fontSize: 13, fontWeight: 800, color: "#166534", marginBottom: 6 } }, "\uD83D\uDCDD \uAC04\uD638\uC0AC \uD2B9\uC774\uC0AC\uD56D"),
-    /*#__PURE__*/React.createElement("div", { style: { fontSize: 15, color: "#166534", lineHeight: 1.8 } }, r.note)
+    /*#__PURE__*/React.createElement("div", { style: { fontSize: 15, color: "#166534", lineHeight: 1.8, fontWeight: 600 } }, r.note)
   ),
   r.doctorComment && /*#__PURE__*/React.createElement("div", {
     style: { background: "linear-gradient(135deg,#eff6ff,#dbeafe)", borderRadius: 12, padding: "12px 14px", marginBottom: 8, border: "1px solid #93c5fd" }
@@ -2976,7 +2972,7 @@ function NurseBox(_ref_box) {
 function NurseHdr(_ref_hdr) {
   var title = _ref_hdr.title, back = _ref_hdr.back;
   return /*#__PURE__*/React.createElement("div", {
-    style: { background: "linear-gradient(135deg,#1e3a5f,#2d6a9f)", padding: "14px 20px", color: "white", display: "flex", alignItems: "center", gap: 12, borderRadius: "0 0 20px 20px" }
+    style: { background: "linear-gradient(135deg,#1e3a5f,#2d6a9f)", padding: "14px 20px", color: "white", display: "flex", alignItems: "center", gap: 12, borderRadius: 20 }
   }, /*#__PURE__*/React.createElement("button", {
     onClick: back,
     style: { background: "rgba(255,255,255,0.15)", border: "none", borderRadius: 8, padding: "6px 12px", color: "white", fontSize: 13, cursor: "pointer", fontWeight: 700 }
@@ -3213,7 +3209,7 @@ function NurseScreen(_ref22) {
         display: "flex",
         alignItems: "center",
         gap: 12,
-      borderRadius: "0 0 20px 20px"
+      borderRadius: 20, margin: "14px 20px 0"
       }
     }, /*#__PURE__*/React.createElement("button", {
       onClick: function onClick() {
@@ -3249,15 +3245,15 @@ function NurseScreen(_ref22) {
         background: "#f0fdf4",
         border: "1px solid #86efac",
         borderRadius: 14,
-        padding: "12px 0",
+        padding: "12px 20px",
         fontSize: 13,
         color: "#166534",
         fontWeight: 700
       }
     }, "\u2705 \uC624\uB298 \uBCF4\uD638\uC790\uC5D0\uAC8C \uC804\uB2EC\uC774 \uC644\uB8CC\uB410\uC5B4\uC694. \uB0B4\uC77C \uC0C8\uB85C \uC785\uB825\uD560 \uC218 \uC788\uC5B4\uC694."), /*#__PURE__*/React.createElement("div", {
       style: {
-        padding: "12px 0 0",
-        margin: "0 20px"
+        padding: "12px 20px 0",
+        
       }
     }, /*#__PURE__*/React.createElement("div", {
       style: {
@@ -3373,7 +3369,8 @@ function NurseScreen(_ref22) {
       background: "linear-gradient(135deg,#0d5c56,#0f766e)",
       padding: "14px 16px 12px",
       color: "white",
-      borderRadius: "0 0 20px 20px"
+      borderRadius: 20,
+      margin: "14px 20px 0"
     }
   }, /*#__PURE__*/React.createElement("div", {
     style: {
@@ -3478,8 +3475,7 @@ function NurseScreen(_ref22) {
     }
   }, "\uD83D\uDC65 \uD658\uC790\uAD00\uB9AC"))), /*#__PURE__*/React.createElement("div", {
     style: {
-      padding: "12px 0 32px",
-      margin: "0 20px",
+      padding: "12px 20px 32px",
       display: "flex",
       flexDirection: "column",
       gap: 6
@@ -3531,7 +3527,7 @@ function NurseScreen(_ref22) {
       display: "flex",
       alignItems: "center",
       gap: 12,
-      borderRadius: "0 0 20px 20px"
+      borderRadius: 20, margin: "14px 20px 0"
     }
   }, /*#__PURE__*/React.createElement("button", {
     onClick: function onClick() {
@@ -3554,8 +3550,8 @@ function NurseScreen(_ref22) {
     }
   }, "\uD83D\uDCAC \uBCF4\uD638\uC790 \uD55C\uB9C8\uB514")), /*#__PURE__*/React.createElement("div", {
     style: {
-      padding: "14px 0",
-      margin: "0 20px",
+      padding: "14px 20px",
+      
       display: "flex",
       flexDirection: "column",
       gap: 10
@@ -3662,7 +3658,7 @@ function NurseScreen(_ref22) {
       position: "sticky",
       top: 0,
       zIndex: 10,
-      borderRadius: "0 0 20px 20px"
+      borderRadius: 20, margin: "14px 20px 0"
     }
   }, /*#__PURE__*/React.createElement("button", {
     onClick: function onClick() {
@@ -3715,8 +3711,8 @@ function NurseScreen(_ref22) {
     }
   }, "\u26A0\uFE0F \uC5B4\uC81C \uD2B9\uC774\uC0AC\uD56D: ", selected.alertMsg), /*#__PURE__*/React.createElement("div", {
     style: {
-      padding: "14px 0 0",
-      margin: "0 20px"
+      padding: "14px 20px 0",
+      
     }
   }, /*#__PURE__*/React.createElement(Sec, {
     title: "\uD83E\uDDE0 \uC758\uC2DD\uC218\uC900"
@@ -4379,8 +4375,8 @@ function PatientManage(_ref26) {
     back: onBack
   }), /*#__PURE__*/React.createElement("div", {
     style: {
-      padding: "12px 0",
-      margin: "0 20px"
+      padding: "12px 20px",
+      
     }
   }, /*#__PURE__*/React.createElement("button", {
     onClick: function onClick() {
@@ -5158,8 +5154,8 @@ function DoctorScreen(_ref32) {
     }
   }, "\uD83D\uDCAC \uBCF4\uD638\uC790 \uD55C\uB9C8\uB514")), /*#__PURE__*/React.createElement("div", {
     style: {
-      padding: "14px 0",
-      margin: "0 20px",
+      padding: "14px 20px",
+      
       display: "flex",
       flexDirection: "column",
       gap: 10
@@ -5265,7 +5261,7 @@ function DoctorScreen(_ref32) {
         display: "flex",
         alignItems: "center",
         gap: 12,
-      borderRadius: "0 0 20px 20px"
+      borderRadius: 20, margin: "14px 20px 0"
       }
     }, /*#__PURE__*/React.createElement("button", {
       onClick: function onClick() {
@@ -5303,8 +5299,8 @@ function DoctorScreen(_ref32) {
       }
     }, getWard(selected.room), " \xB7 \uC785\uC6D0 ", selected.days, "\uC77C\uC9F8")))), /*#__PURE__*/React.createElement("div", {
       style: {
-        padding: "12px 0 0",
-        margin: "0 20px"
+        padding: "12px 20px 0",
+        
       }
     }, r ? /*#__PURE__*/React.createElement("div", {
       style: {
@@ -5798,7 +5794,7 @@ function DoctorScreen(_ref32) {
       background: "linear-gradient(135deg,#1e3a5f,#2d5a8e)",
       padding: "16px 20px",
       color: "white",
-      borderRadius: "0 0 20px 20px"
+      borderRadius: 20, margin: "14px 20px 0"
     }
   }, /*#__PURE__*/React.createElement("div", {
     style: {
@@ -5925,8 +5921,8 @@ function DoctorScreen(_ref32) {
     }
   }, /*#__PURE__*/React.createElement("span", null, "\uD83D\uDCAC \uBCF4\uD638\uC790 \uD55C\uB9C8\uB514 \uD655\uC778 ", unread > 0 ? "🔔" : ""), /*#__PURE__*/React.createElement("span", null, unread > 0 ? "🔴 " + unread + "건" : "없음")))), /*#__PURE__*/React.createElement("div", {
     style: {
-      padding: "12px 0",
-      margin: "0 20px",
+      padding: "12px 20px",
+      
       display: "flex",
       flexDirection: "column",
       gap: 6
@@ -6145,7 +6141,7 @@ function MessagesScreen(_ref36) {
       background: "linear-gradient(135deg,#1e3a5f,#2d5a8e)",
       padding: "16px 20px",
       color: "white",
-      borderRadius: "0 0 20px 20px"
+      borderRadius: 20, margin: "14px 20px 0"
     }
   }, /*#__PURE__*/React.createElement("div", {
     style: {
@@ -6218,8 +6214,8 @@ function MessagesScreen(_ref36) {
     }, s.v));
   })))), /*#__PURE__*/React.createElement("div", {
     style: {
-      padding: "12px 0 0",
-      margin: "0 20px"
+      padding: "12px 20px 0",
+      
     }
   }, /*#__PURE__*/React.createElement("div", {
     style: {
