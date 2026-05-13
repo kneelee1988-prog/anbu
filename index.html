@@ -1973,7 +1973,34 @@ function AdminScreen(_ref11) {
       key: o.v,
       value: o.v
     }, o.l);
-  }))), newUser.role === "nurse" && /*#__PURE__*/React.createElement("div", {
+  }))), newUser.role === "nurse" && /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("div", {
+    style: {
+      marginBottom: 10
+    }
+  }, /*#__PURE__*/React.createElement("div", {
+    style: {
+      fontSize: 12,
+      color: "#64748b",
+      fontWeight: 600,
+      marginBottom: 4
+    }
+  }, "\uC774\uB984"), /*#__PURE__*/React.createElement("input", {
+    value: newUser.name,
+    onChange: function onChange(e) {
+      return setN("name", e.target.value);
+    },
+    placeholder: "\uAC04\uD638\uC0AC \uC774\uB984",
+    style: {
+      width: "100%",
+      padding: "9px 12px",
+      borderRadius: 10,
+      border: "1px solid #e2e8f0",
+      fontSize: 13,
+      color: "#333",
+      outline: "none",
+      boxSizing: "border-box"
+    }
+  })), /*#__PURE__*/React.createElement("div", {
     style: {
       marginBottom: 10
     }
@@ -2003,7 +2030,7 @@ function AdminScreen(_ref11) {
       key: w,
       value: w
     }, w);
-  }))), newUser.role === "doctor" && /*#__PURE__*/React.createElement("div", {
+  })))), newUser.role === "doctor" && /*#__PURE__*/React.createElement("div", {
     style: {
       marginBottom: 10
     }
@@ -2376,6 +2403,14 @@ function GuardianScreen(_ref19) {
     _useState24 = _slicedToArray(_useState23, 2),
     visitTime = _useState24[0],
     setVisitTime = _useState24[1];
+  var _useState23b = useState(function() { return new Date().getMonth() + 1; }),
+    _useState24b = _slicedToArray(_useState23b, 2),
+    visitMonth = _useState24b[0],
+    setVisitMonth = _useState24b[1];
+  var _useState23c = useState(""),
+    _useState24c = _slicedToArray(_useState23c, 2),
+    visitDay = _useState24c[0],
+    setVisitDay = _useState24c[1];
   var _useState25 = useState(false),
     _useState26 = _slicedToArray(_useState25, 2),
     sent = _useState26[0],
@@ -2410,6 +2445,8 @@ function GuardianScreen(_ref19) {
     setMsg("");
     setVisitDate("");
     setVisitTime("");
+    setVisitDay("");
+    setVisitMonth(today.getMonth() + 1);
     setTimeout(function () {
       return setSent(false);
     }, 3000);
@@ -2568,7 +2605,7 @@ function GuardianScreen(_ref19) {
       gap: 3,
       border: "1.5px solid #cbd5e1"
     }
-  }, [["today", "오늘"], ["message", getTitle(patient) + " 한마디"]].map(function (_ref20) {
+  }, [["today", "오늘의 안부"], ["message", getTitle(patient) + " 한마디"]].map(function (_ref20) {
     var _ref21 = _slicedToArray(_ref20, 2),
       t = _ref21[0],
       l = _ref21[1];
@@ -2796,13 +2833,127 @@ function GuardianScreen(_ref19) {
       color: "#1a1a1a",
       marginBottom: 10
     }
-  }, getTitle(patient), " \uD55C\uB9C8\uB514"), /*#__PURE__*/React.createElement("div", {
+  }, getTitle(patient), " \uD55C\uB9C8\uB514"), sent ? /*#__PURE__*/React.createElement("div", {
+    style: {
+      background: "#f0fdf4",
+      borderRadius: 12,
+      padding: 16,
+      textAlign: "center",
+      color: "#16a34a",
+      fontWeight: 600
+    }
+  }, "\u2705 \uBA54\uC2DC\uC9C0\uAC00 \uC804\uB2EC\uB410\uC5B4\uC694") : /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("textarea", {
+    value: msg,
+    onChange: function onChange(e) {
+      return setMsg(e.target.value);
+    },
+    placeholder: "\uC608) " + (patient && patient.gender === "\uC5EC" ? "\uC5B4\uBA38\uB2C8" : "\uC544\uBC84\uC9C0") + " \uC624\uB298 \uBC25 \uC798 \uB4DC\uC138\uC694 \uD83D\uDE0A",
+    style: {
+      width: "100%",
+      height: 80,
+      borderRadius: 12,
+      border: "1px solid #e2e8f0",
+      padding: 12,
+      fontSize: 14,
+      color: "#333",
+      resize: "none",
+      outline: "none",
+      fontFamily: "inherit",
+      boxSizing: "border-box",
+      lineHeight: 1.6,
+      marginBottom: 10
+    }
+  }), /*#__PURE__*/React.createElement("div", {
+    style: {
+      background: "#f8fafc",
+      borderRadius: 12,
+      padding: "12px 14px",
+      marginBottom: 10
+    }
+  }, /*#__PURE__*/React.createElement("div", {
+    style: {
+      fontSize: 12,
+      fontWeight: 700,
+      color: "#475569",
+      marginBottom: 8
+    }
+  }, "\uD83D\uDCC5 \uBA74\uD68C \uC608\uC815\uC77C (\uC120\uD0DD)"),
+  /*#__PURE__*/React.createElement("div", {
+    style: { display: "flex", gap: 6, marginBottom: 8 }
+  },
+    [today.getMonth() + 1, today.getMonth() + 2 > 12 ? 1 : today.getMonth() + 2].map(function(m) {
+      return /*#__PURE__*/React.createElement("button", {
+        key: m,
+        onClick: function() { setVisitMonth(m); setVisitDay(""); setVisitDate(""); setVisitTime(""); },
+        style: {
+          padding: "5px 14px",
+          borderRadius: 8,
+          border: "1px solid #e2e8f0",
+          cursor: "pointer",
+          fontSize: 12,
+          fontWeight: 700,
+          background: visitMonth === m ? "#1e3a5f" : "white",
+          color: visitMonth === m ? "white" : "#334155"
+        }
+      }, m + "\uC6D4");
+    })
+  ),
+  /*#__PURE__*/React.createElement("div", {
+    style: { display: "flex", gap: 5, flexWrap: "wrap", marginBottom: 8 }
+  },
+    Array.from({ length: 31 }, function(_, i) { return i + 1; }).map(function(d) {
+      var isSelected = visitDay === d && visitMonth;
+      return /*#__PURE__*/React.createElement("button", {
+        key: d,
+        onClick: function() {
+          if (!visitMonth) return;
+          var newDate = visitMonth + "\uC6D4 " + d + "\uC77C";
+          if (visitDay === d && visitMonth) { setVisitDay(""); setVisitDate(""); }
+          else { setVisitDay(d); setVisitDate(newDate); }
+          setVisitTime("");
+        },
+        style: {
+          width: 34,
+          height: 34,
+          borderRadius: 8,
+          border: "1px solid #e2e8f0",
+          cursor: visitMonth ? "pointer" : "default",
+          fontSize: 12,
+          fontWeight: 700,
+          background: isSelected ? "#1e3a5f" : "white",
+          color: isSelected ? "white" : visitMonth ? "#334155" : "#cbd5e1"
+        }
+      }, d);
+    })
+  ),
+  visitDate && /*#__PURE__*/React.createElement("div", {
+    style: { display: "flex", gap: 6, flexWrap: "wrap" }
+  }, ["\uC624\uC804 9\uC2DC", "\uC624\uC804 11\uC2DC", "\uC624\uD6C4 1\uC2DC", "\uC624\uD6C4 3\uC2DC", "\uC624\uD6C4 5\uC2DC"].map(function(t) {
+    return /*#__PURE__*/React.createElement("button", {
+      key: t,
+      onClick: function() { setVisitTime(visitTime === t ? "" : t); },
+      style: {
+        padding: "5px 10px",
+        borderRadius: 8,
+        border: "1px solid #e2e8f0",
+        cursor: "pointer",
+        fontSize: 12,
+        fontWeight: 700,
+        background: visitTime === t ? "#1e3a5f" : "white",
+        color: visitTime === t ? "white" : "#334155"
+      }
+    }, t);
+  })),
+  visitDate && /*#__PURE__*/React.createElement("div", {
+    style: { marginTop: 8, fontSize: 12, color: "#1e3a5f", fontWeight: 700 }
+  }, "\uD83D\uDCC5 \uBA74\uD68C \uC608\uC815: ", visitDate, " ", visitTime)),
+  /*#__PURE__*/React.createElement("div", {
     style: {
       background: "#f0f7ff",
       border: "1px solid #bfdbfe",
       borderRadius: 10,
       padding: "12px 14px",
-      marginBottom: 14
+      marginBottom: 10
     }
   }, /*#__PURE__*/React.createElement("div", {
     style: {
@@ -2848,105 +2999,7 @@ function GuardianScreen(_ref19) {
       fontWeight: 700,
       textDecoration: "none"
     }
-  }, "\uD83D\uDCDE \uC804\uD654\uD558\uAE30"))), sent ? /*#__PURE__*/React.createElement("div", {
-    style: {
-      background: "#f0fdf4",
-      borderRadius: 12,
-      padding: 16,
-      textAlign: "center",
-      color: "#16a34a",
-      fontWeight: 600
-    }
-  }, "\u2705 \uBA54\uC2DC\uC9C0\uAC00 \uC804\uB2EC\uB410\uC5B4\uC694") : /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("textarea", {
-    value: msg,
-    onChange: function onChange(e) {
-      return setMsg(e.target.value);
-    },
-    placeholder: "예) " + (patient && patient.gender === "여" ? "어머니" : "아버지") + " 오늘 밥 잘 드세요 😊",
-    style: {
-      width: "100%",
-      height: 80,
-      borderRadius: 12,
-      border: "1px solid #e2e8f0",
-      padding: 12,
-      fontSize: 14,
-      color: "#333",
-      resize: "none",
-      outline: "none",
-      fontFamily: "inherit",
-      boxSizing: "border-box",
-      lineHeight: 1.6,
-      marginBottom: 10
-    }
-  }), /*#__PURE__*/React.createElement("div", {
-    style: {
-      background: "#f8fafc",
-      borderRadius: 12,
-      padding: "12px 14px",
-      marginBottom: 10
-    }
-  }, /*#__PURE__*/React.createElement("div", {
-    style: {
-      fontSize: 12,
-      fontWeight: 700,
-      color: "#475569",
-      marginBottom: 8
-    }
-  }, "\uD83D\uDCC5 \uBA74\uD68C \uC608\uC815\uC77C (\uC120\uD0DD)"), /*#__PURE__*/React.createElement("div", {
-    style: {
-      display: "flex",
-      gap: 6,
-      flexWrap: "wrap",
-      marginBottom: 8
-    }
-  }, dates.slice(0, 14).map(function (d) {
-    return /*#__PURE__*/React.createElement("button", {
-      key: d,
-      onClick: function onClick() {
-        return setVisitDate(visitDate === today.getMonth() + 1 + "월 " + d + "일" ? "" : today.getMonth() + 1 + "월 " + d + "일");
-      },
-      style: {
-        padding: "5px 10px",
-        borderRadius: 8,
-        border: "1px solid #e2e8f0",
-        cursor: "pointer",
-        fontSize: 12,
-        fontWeight: 700,
-        background: visitDate === today.getMonth() + 1 + "월 " + d + "일" ? "#1e3a5f" : "white",
-        color: visitDate === today.getMonth() + 1 + "월 " + d + "일" ? "white" : "#334155"
-      }
-    }, d, "\uC77C");
-  })), visitDate && /*#__PURE__*/React.createElement("div", {
-    style: {
-      display: "flex",
-      gap: 6,
-      flexWrap: "wrap"
-    }
-  }, ["오전 10시", "오전 11시", "오후 1시", "오후 2시", "오후 3시", "오후 4시"].map(function (t) {
-    return /*#__PURE__*/React.createElement("button", {
-      key: t,
-      onClick: function onClick() {
-        return setVisitTime(visitTime === t ? "" : t);
-      },
-      style: {
-        padding: "5px 10px",
-        borderRadius: 8,
-        border: "1px solid #e2e8f0",
-        cursor: "pointer",
-        fontSize: 12,
-        fontWeight: 700,
-        background: visitTime === t ? "#1e3a5f" : "white",
-        color: visitTime === t ? "white" : "#334155"
-      }
-    }, t);
-  })), visitDate && /*#__PURE__*/React.createElement("div", {
-    style: {
-      marginTop: 8,
-      fontSize: 12,
-      color: "#1e3a5f",
-      fontWeight: 700
-    }
-  }, "\uD83D\uDCC5 \uBA74\uD68C \uC608\uC815: ", visitDate, " ", visitTime)), /*#__PURE__*/React.createElement("button", {
+  }, "\uD83D\uDCDE \uC804\uD654\uD558\uAE30"))), /*#__PURE__*/React.createElement("button", {
     onClick: handleSend,
     style: {
       width: "100%",
@@ -2960,6 +3013,90 @@ function GuardianScreen(_ref19) {
       cursor: msg.trim() ? "pointer" : "default"
     }
   }, "\uC804\uB2EC\uD558\uAE30"))))));
+}
+
+// ── 간호사 환자등록 공용 컴포넌트 ────────────────────────────
+function NurseInp(_ref_inp) {
+  var value = _ref_inp.value,
+    onChange = _ref_inp.onChange,
+    placeholder = _ref_inp.placeholder,
+    type = _ref_inp.type;
+  var _ls = useState(value || ""),
+    _lsa = _slicedToArray(_ls, 2),
+    localVal = _lsa[0],
+    setLocalVal = _lsa[1];
+  var composingRef = React.useRef(false);
+  return /*#__PURE__*/React.createElement("input", {
+    type: type || "text",
+    value: localVal,
+    onCompositionStart: function() { composingRef.current = true; },
+    onCompositionEnd: function(e) {
+      composingRef.current = false;
+      setLocalVal(e.target.value);
+      onChange(e.target.value);
+    },
+    onChange: function(e) {
+      setLocalVal(e.target.value);
+      if (!composingRef.current) onChange(e.target.value);
+    },
+    placeholder: placeholder,
+    style: {
+      width: "100%",
+      padding: "10px 12px",
+      borderRadius: 10,
+      border: "1px solid #e2e8f0",
+      fontSize: 13,
+      color: "#333",
+      outline: "none",
+      boxSizing: "border-box"
+    }
+  });
+}
+function NurseSel(_ref_sel) {
+  var value = _ref_sel.value,
+    onChange = _ref_sel.onChange,
+    options = _ref_sel.options;
+  return /*#__PURE__*/React.createElement("select", {
+    value: value,
+    onChange: function(e) { onChange(e.target.value); },
+    style: {
+      width: "100%",
+      padding: "10px 12px",
+      borderRadius: 10,
+      border: "1px solid #e2e8f0",
+      fontSize: 13,
+      color: "#333",
+      background: "white",
+      outline: "none"
+    }
+  }, options.map(function(o) {
+    return /*#__PURE__*/React.createElement("option", { key: o.value || o, value: o.value || o }, o.label || o);
+  }));
+}
+function NurseFL(_ref_fl) {
+  var text = _ref_fl.text;
+  return /*#__PURE__*/React.createElement("div", {
+    style: { fontSize: 12, color: "#64748b", fontWeight: 700, marginBottom: 6 }
+  }, text);
+}
+function NurseBox(_ref_box) {
+  var title = _ref_box.title, children = _ref_box.children;
+  return /*#__PURE__*/React.createElement("div", {
+    style: { background: "white", borderRadius: 16, padding: 16, border: "1.5px solid #cbd5e1", marginBottom: 14 }
+  }, /*#__PURE__*/React.createElement("div", {
+    style: { fontSize: 13, fontWeight: 800, color: "#1e3a5f", marginBottom: 14 }
+  }, title), children);
+}
+function NurseHdr(_ref_hdr) {
+  var title = _ref_hdr.title, back = _ref_hdr.back;
+  return /*#__PURE__*/React.createElement("div", {
+    style: { background: "linear-gradient(135deg,#1e3a5f,#2d6a9f)", padding: "14px 20px", color: "white", display: "flex", alignItems: "center", gap: 12, borderRadius: "0 0 20px 20px" }
+  }, /*#__PURE__*/React.createElement("button", {
+    onClick: back,
+    style: { background: "rgba(255,255,255,0.15)", border: "none", borderRadius: 8, padding: "6px 12px", color: "white", fontSize: 13, cursor: "pointer", fontWeight: 700 }
+  }, "\u2190 \uB3CC\uC544\uAC00\uAE30"), /*#__PURE__*/React.createElement("div", {
+    style: { fontSize: 15, fontWeight: 800 }
+  }, title));
 }
 
 // ── 간호사 화면 ───────────────────────────────────────────────
@@ -4264,119 +4401,7 @@ function PatientManage(_ref26) {
       label: d.name + " " + d.title
     };
   });
-  var Inp = function Inp(_ref27) {
-    var value = _ref27.value,
-      _onChange = _ref27.onChange,
-      placeholder = _ref27.placeholder,
-      type = _ref27.type;
-    return /*#__PURE__*/React.createElement("input", {
-      type: type || "text",
-      value: value,
-      onChange: function onChange(e) {
-        return _onChange(e.target.value);
-      },
-      placeholder: placeholder,
-      style: {
-        width: "100%",
-        padding: "10px 12px",
-        borderRadius: 10,
-        border: "1px solid #e2e8f0",
-        fontSize: 13,
-        color: "#333",
-        outline: "none",
-        boxSizing: "border-box"
-      }
-    });
-  };
-  var Sel = function Sel(_ref28) {
-    var value = _ref28.value,
-      _onChange2 = _ref28.onChange,
-      options = _ref28.options;
-    return /*#__PURE__*/React.createElement("select", {
-      value: value,
-      onChange: function onChange(e) {
-        return _onChange2(e.target.value);
-      },
-      style: {
-        width: "100%",
-        padding: "10px 12px",
-        borderRadius: 10,
-        border: "1px solid #e2e8f0",
-        fontSize: 13,
-        color: "#333",
-        background: "white",
-        outline: "none"
-      }
-    }, options.map(function (o) {
-      return /*#__PURE__*/React.createElement("option", {
-        key: o.value || o,
-        value: o.value || o
-      }, o.label || o);
-    }));
-  };
-  var FL = function FL(_ref29) {
-    var text = _ref29.text;
-    return /*#__PURE__*/React.createElement("div", {
-      style: {
-        fontSize: 12,
-        color: "#64748b",
-        fontWeight: 700,
-        marginBottom: 6
-      }
-    }, text);
-  };
-  var Box = function Box(_ref30) {
-    var title = _ref30.title,
-      children = _ref30.children;
-    return /*#__PURE__*/React.createElement("div", {
-      style: {
-        background: "white",
-        borderRadius: 16,
-        padding: 16,
-        border: "1.5px solid #cbd5e1",
-        marginBottom: 14
-      }
-    }, /*#__PURE__*/React.createElement("div", {
-      style: {
-        fontSize: 13,
-        fontWeight: 800,
-        color: "#1e3a5f",
-        marginBottom: 14
-      }
-    }, title), children);
-  };
-  var Hdr = function Hdr(_ref31) {
-    var title = _ref31.title,
-      back = _ref31.back;
-    return /*#__PURE__*/React.createElement("div", {
-      style: {
-        background: "linear-gradient(135deg,#1e3a5f,#2d6a9f)",
-        padding: "14px 20px",
-        color: "white",
-        display: "flex",
-        alignItems: "center",
-        gap: 12,
-      borderRadius: "0 0 20px 20px"
-      }
-    }, /*#__PURE__*/React.createElement("button", {
-      onClick: back,
-      style: {
-        background: "rgba(255,255,255,0.15)",
-        border: "none",
-        borderRadius: 8,
-        padding: "6px 12px",
-        color: "white",
-        fontSize: 13,
-        cursor: "pointer",
-        fontWeight: 700
-      }
-    }, "\u2190 \uB3CC\uC544\uAC00\uAE30"), /*#__PURE__*/React.createElement("div", {
-      style: {
-        fontSize: 15,
-        fontWeight: 800
-      }
-    }, title));
-  };
+  var Inp = NurseInp;
   if (showConfirm) return /*#__PURE__*/React.createElement("div", {
     style: {
       fontFamily: "'Noto Sans KR',sans-serif",
@@ -4463,7 +4488,7 @@ function PatientManage(_ref26) {
       maxWidth: 390,
       paddingBottom: 32
     }
-  }, /*#__PURE__*/React.createElement(Hdr, {
+  }, /*#__PURE__*/React.createElement(NurseHdr, {
     title: "\uD83D\uDC65 \uD658\uC790\uAD00\uB9AC (\uB4F1\uB85D\xB7\uC218\uC815)",
     back: onBack
   }), /*#__PURE__*/React.createElement("div", {
@@ -4576,7 +4601,7 @@ function PatientManage(_ref26) {
       maxWidth: 390,
       
     }
-  }, /*#__PURE__*/React.createElement(Hdr, {
+  }, /*#__PURE__*/React.createElement(NurseHdr, {
     title: "\u2795 \uC2E0\uADDC \uD658\uC790 \uB4F1\uB85D",
     back: function back() {
       return setView("list");
@@ -4585,34 +4610,34 @@ function PatientManage(_ref26) {
     style: {
       padding: "16px 0 0"
     }
-  }, /*#__PURE__*/React.createElement(Box, {
+  }, /*#__PURE__*/React.createElement(NurseBox, {
     title: "\uD83D\uDCCB \uD658\uC790 \uAE30\uBCF8 \uC815\uBCF4"
-  }, /*#__PURE__*/React.createElement(FL, {
+  }, /*#__PURE__*/React.createElement(NurseFL, {
     text: "\uC774\uB984"
   }), /*#__PURE__*/React.createElement("div", {
     style: {
       marginBottom: 12
     }
-  }, /*#__PURE__*/React.createElement(Inp, {
+  }, /*#__PURE__*/React.createElement(NurseInp, {
     value: reg.name,
     onChange: function onChange(v) {
       return setR("name", v);
     },
     placeholder: "\uD658\uC790 \uC774\uB984"
-  })), /*#__PURE__*/React.createElement(FL, {
+  })), /*#__PURE__*/React.createElement(NurseFL, {
     text: "\uB098\uC774"
   }), /*#__PURE__*/React.createElement("div", {
     style: {
       marginBottom: 12
     }
-  }, /*#__PURE__*/React.createElement(Inp, {
+  }, /*#__PURE__*/React.createElement(NurseInp, {
     value: reg.age,
     onChange: function onChange(v) {
       return setR("age", v);
     },
     placeholder: "\uB9CC \uB098\uC774",
     type: "number"
-  })), /*#__PURE__*/React.createElement(FL, {
+  })), /*#__PURE__*/React.createElement(NurseFL, {
     text: "\uC131\uBCC4"
   }), /*#__PURE__*/React.createElement("div", {
     style: {
@@ -4638,28 +4663,28 @@ function PatientManage(_ref26) {
         color: reg.gender === g ? "white" : "#64748b"
       }
     }, g);
-  }))), /*#__PURE__*/React.createElement(Box, {
+  }))), /*#__PURE__*/React.createElement(NurseBox, {
     title: "\uD83C\uDFE5 \uBCD1\uB3D9 \uBC0F \uD638\uC2E4"
-  }, /*#__PURE__*/React.createElement(FL, {
+  }, /*#__PURE__*/React.createElement(NurseFL, {
     text: "\uBCD1\uB3D9"
   }), /*#__PURE__*/React.createElement("div", {
     style: {
       marginBottom: 12
     }
-  }, /*#__PURE__*/React.createElement(Sel, {
+  }, /*#__PURE__*/React.createElement(NurseSel, {
     value: reg.ward,
     onChange: function onChange(v) {
       setR("ward", v);
       setR("room", "");
     },
     options: ["믿음병동", "소망병동", "사랑병동", "행복병동"]
-  })), /*#__PURE__*/React.createElement(FL, {
+  })), /*#__PURE__*/React.createElement(NurseFL, {
     text: "\uD638\uC2E4"
   }), /*#__PURE__*/React.createElement("div", {
     style: {
       marginBottom: 12
     }
-  }, /*#__PURE__*/React.createElement(Sel, {
+  }, /*#__PURE__*/React.createElement(NurseSel, {
     value: reg.room,
     onChange: function onChange(v) {
       return setR("room", v);
@@ -4673,27 +4698,27 @@ function PatientManage(_ref26) {
         label: r
       };
     })))
-  })), /*#__PURE__*/React.createElement(FL, {
+  })), /*#__PURE__*/React.createElement(NurseFL, {
     text: "\uC8FC\uCE58\uC758"
   }), /*#__PURE__*/React.createElement("div", {
     style: {
       marginBottom: 4
     }
-  }, /*#__PURE__*/React.createElement(Sel, {
+  }, /*#__PURE__*/React.createElement(NurseSel, {
     value: reg.doctorId,
     onChange: function onChange(v) {
       return setR("doctorId", v);
     },
     options: doctorOpts
-  }))), /*#__PURE__*/React.createElement(Box, {
+  }))), /*#__PURE__*/React.createElement(NurseBox, {
     title: "\uD83D\uDC68\u200D\uD83D\uDC69\u200D\uD83D\uDC67 \uBCF4\uD638\uC790 \uC815\uBCF4"
-  }, /*#__PURE__*/React.createElement(FL, {
+  }, /*#__PURE__*/React.createElement(NurseFL, {
     text: "\uBCF4\uD638\uC790 \uC720\uD615"
   }), /*#__PURE__*/React.createElement("div", {
     style: {
       marginBottom: 12
     }
-  }, /*#__PURE__*/React.createElement(Sel, {
+  }, /*#__PURE__*/React.createElement(NurseSel, {
     value: reg.guardianType,
     onChange: function onChange(v) {
       return setR("guardianType", v);
@@ -4705,25 +4730,25 @@ function PatientManage(_ref26) {
       value: "official",
       label: "공무원/복지사"
     }]
-  })), /*#__PURE__*/React.createElement(FL, {
+  })), /*#__PURE__*/React.createElement(NurseFL, {
     text: "\uBCF4\uD638\uC790 \uC774\uB984"
   }), /*#__PURE__*/React.createElement("div", {
     style: {
       marginBottom: 12
     }
-  }, /*#__PURE__*/React.createElement(Inp, {
+  }, /*#__PURE__*/React.createElement(NurseInp, {
     value: reg.guardianName,
     onChange: function onChange(v) {
       return setR("guardianName", v);
     },
     placeholder: "\uBCF4\uD638\uC790 \uC774\uB984"
-  })), /*#__PURE__*/React.createElement(FL, {
+  })), /*#__PURE__*/React.createElement(NurseFL, {
     text: "\uC5F0\uB77D\uCC98"
   }), /*#__PURE__*/React.createElement("div", {
     style: {
       marginBottom: 4
     }
-  }, /*#__PURE__*/React.createElement(Inp, {
+  }, /*#__PURE__*/React.createElement(NurseInp, {
     value: reg.guardianPhone,
     onChange: function onChange(v) {
       return setR("guardianPhone", v);
@@ -4790,7 +4815,7 @@ function PatientManage(_ref26) {
       maxWidth: 390,
       
     }
-  }, /*#__PURE__*/React.createElement(Hdr, {
+  }, /*#__PURE__*/React.createElement(NurseHdr, {
     title: (editTarget && editTarget.name) + " 어르신 정보 수정",
     back: function back() {
       return setView("list");
@@ -4799,9 +4824,9 @@ function PatientManage(_ref26) {
     style: {
       padding: "16px 0 0"
     }
-  }, /*#__PURE__*/React.createElement(Box, {
+  }, /*#__PURE__*/React.createElement(NurseBox, {
     title: "\uD83C\uDFE5 \uBCD1\uB3D9 \xB7 \uD638\uC2E4 \uBCC0\uACBD"
-  }, /*#__PURE__*/React.createElement(FL, {
+  }, /*#__PURE__*/React.createElement(NurseFL, {
     text: "\uD604\uC7AC"
   }), /*#__PURE__*/React.createElement("div", {
     style: {
@@ -4812,26 +4837,26 @@ function PatientManage(_ref26) {
       color: "#64748b",
       marginBottom: 12
     }
-  }, getWard(editTarget && editTarget.room || ""), " \xB7 ", editTarget && editTarget.room), /*#__PURE__*/React.createElement(FL, {
+  }, getWard(editTarget && editTarget.room || ""), " \xB7 ", editTarget && editTarget.room), /*#__PURE__*/React.createElement(NurseFL, {
     text: "\uBCC0\uACBD\uD560 \uBCD1\uB3D9"
   }), /*#__PURE__*/React.createElement("div", {
     style: {
       marginBottom: 12
     }
-  }, /*#__PURE__*/React.createElement(Sel, {
+  }, /*#__PURE__*/React.createElement(NurseSel, {
     value: curWard,
     onChange: function onChange(v) {
       setE("ward", v);
       setE("room", "");
     },
     options: ["믿음병동", "소망병동", "사랑병동", "행복병동"]
-  })), /*#__PURE__*/React.createElement(FL, {
+  })), /*#__PURE__*/React.createElement(NurseFL, {
     text: "\uBCC0\uACBD\uD560 \uD638\uC2E4"
   }), /*#__PURE__*/React.createElement("div", {
     style: {
       marginBottom: 4
     }
-  }, /*#__PURE__*/React.createElement(Sel, {
+  }, /*#__PURE__*/React.createElement(NurseSel, {
     value: edit.room || editTarget && editTarget.room || "",
     onChange: function onChange(v) {
       return setE("room", v);
@@ -4842,9 +4867,9 @@ function PatientManage(_ref26) {
         label: r
       };
     })
-  }))), /*#__PURE__*/React.createElement(Box, {
+  }))), /*#__PURE__*/React.createElement(NurseBox, {
     title: "\uD83E\uDE7A \uC8FC\uCE58\uC758 \uBCC0\uACBD"
-  }, /*#__PURE__*/React.createElement(FL, {
+  }, /*#__PURE__*/React.createElement(NurseFL, {
     text: "\uD604\uC7AC \uC8FC\uCE58\uC758"
   }), /*#__PURE__*/React.createElement("div", {
     style: {
@@ -4855,27 +4880,27 @@ function PatientManage(_ref26) {
       color: "#64748b",
       marginBottom: 12
     }
-  }, getDoctorTitle(editTarget && editTarget.doctorId)), /*#__PURE__*/React.createElement(FL, {
+  }, getDoctorTitle(editTarget && editTarget.doctorId)), /*#__PURE__*/React.createElement(NurseFL, {
     text: "\uBCC0\uACBD\uD560 \uC8FC\uCE58\uC758"
   }), /*#__PURE__*/React.createElement("div", {
     style: {
       marginBottom: 4
     }
-  }, /*#__PURE__*/React.createElement(Sel, {
+  }, /*#__PURE__*/React.createElement(NurseSel, {
     value: edit.doctorId || editTarget && editTarget.doctorId || "doc1",
     onChange: function onChange(v) {
       return setE("doctorId", v);
     },
     options: doctorOpts
-  }))), /*#__PURE__*/React.createElement(Box, {
+  }))), /*#__PURE__*/React.createElement(NurseBox, {
     title: "\uD83D\uDC68\u200D\uD83D\uDC69\u200D\uD83D\uDC67 \uBCF4\uD638\uC790 \uC815\uBCF4 \uC218\uC815"
-  }, /*#__PURE__*/React.createElement(FL, {
+  }, /*#__PURE__*/React.createElement(NurseFL, {
     text: "\uBCF4\uD638\uC790 \uC720\uD615"
   }), /*#__PURE__*/React.createElement("div", {
     style: {
       marginBottom: 12
     }
-  }, /*#__PURE__*/React.createElement(Sel, {
+  }, /*#__PURE__*/React.createElement(NurseSel, {
     value: edit.guardianType || editTarget && editTarget.guardianType || "family",
     onChange: function onChange(v) {
       return setE("guardianType", v);
@@ -4887,37 +4912,37 @@ function PatientManage(_ref26) {
       value: "official",
       label: "공무원/복지사"
     }]
-  })), (edit.guardianType || editTarget && editTarget.guardianType) === "family" && /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement(FL, {
+  })), (edit.guardianType || editTarget && editTarget.guardianType) === "family" && /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement(NurseFL, {
     text: "\uAD00\uACC4"
   }), /*#__PURE__*/React.createElement("div", {
     style: {
       marginBottom: 12
     }
-  }, /*#__PURE__*/React.createElement(Sel, {
+  }, /*#__PURE__*/React.createElement(NurseSel, {
     value: edit.guardianRelation || editTarget && editTarget.guardianRelation || "아들",
     onChange: function onChange(v) {
       return setE("guardianRelation", v);
     },
     options: ["아들", "딸", "배우자", "손자", "손녀", "형제자매", "조카", "기타"]
-  }))), /*#__PURE__*/React.createElement(FL, {
+  }))), /*#__PURE__*/React.createElement(NurseFL, {
     text: "\uBCF4\uD638\uC790 \uC774\uB984"
   }), /*#__PURE__*/React.createElement("div", {
     style: {
       marginBottom: 12
     }
-  }, /*#__PURE__*/React.createElement(Inp, {
+  }, /*#__PURE__*/React.createElement(NurseInp, {
     value: edit.guardianName !== undefined ? edit.guardianName : editTarget && editTarget.guardianName || "",
     onChange: function onChange(v) {
       return setE("guardianName", v);
     },
     placeholder: "\uBCF4\uD638\uC790 \uC774\uB984"
-  })), /*#__PURE__*/React.createElement(FL, {
+  })), /*#__PURE__*/React.createElement(NurseFL, {
     text: "\uC5F0\uB77D\uCC98"
   }), /*#__PURE__*/React.createElement("div", {
     style: {
       marginBottom: 4
     }
-  }, /*#__PURE__*/React.createElement(Inp, {
+  }, /*#__PURE__*/React.createElement(NurseInp, {
     value: edit.guardianPhone !== undefined ? edit.guardianPhone : editTarget && editTarget.guardianPhone || "",
     onChange: function onChange(v) {
       return setE("guardianPhone", v);
