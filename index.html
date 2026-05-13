@@ -1172,7 +1172,7 @@ function LoginScreen(_ref1) {
             if (result) {
               onLogin({
                 role: "guardian",
-                patient: result.patient,
+                patientId: result.patient.id,
                 guardianRole: result.role
               });
             } else setError("입력하신 정보와 일치하는 환자를 찾을 수 없어요.");
@@ -2365,150 +2365,12 @@ function GuardianScreen(_ref19) {
     return p.id === selectedId;
   }) : patients[0];
 
-  // 환자 선택 화면
-  if (!selectedId && patients.length > 1) return /*#__PURE__*/React.createElement("div", {
-    style: {
-      fontFamily: "'Noto Sans KR',sans-serif",
-      background: "linear-gradient(160deg,#0f172a,#1e3a5f)",
-      minHeight: "100vh",
-      display: "flex",
-      justifyContent: "center",
-      alignItems: "center",
-      padding: 24
-    }
-  }, /*#__PURE__*/React.createElement("div", {
-    style: {
-      width: "100%",
-      maxWidth: 340
-    }
-  }, /*#__PURE__*/React.createElement("div", {
-    style: {
-      textAlign: "center",
-      marginBottom: 32
-    }
-  }, /*#__PURE__*/React.createElement("div", {
-    style: {
-      fontSize: 36,
-      marginBottom: 10
-    }
-  }, "\uD83D\uDC68\u200D\uD83D\uDC69\u200D\uD83D\uDC67"), /*#__PURE__*/React.createElement("div", {
-    style: {
-      fontSize: 22,
-      fontWeight: 900,
-      color: "white",
-      marginBottom: 6
-    }
-  }, "\uBCF4\uD638\uC790 \uB85C\uADF8\uC778"), /*#__PURE__*/React.createElement("div", {
-    style: {
-      fontSize: 13,
-      color: "rgba(255,255,255,0.6)"
-    }
-  }, "\uC5B4\uB974\uC2E0 \uC131\uD568\uC744 \uC120\uD0DD\uD574\uC8FC\uC138\uC694")), /*#__PURE__*/React.createElement("div", {
-    style: {
-      display: "flex",
-      flexDirection: "column",
-      gap: 10
-    }
-  }, _toConsumableArray(patients).sort(function (a, b) {
-    var aS = a.record && a.record.sentToGuardian ? 0 : a.record ? 1 : 2;
-    var bS = b.record && b.record.sentToGuardian ? 0 : b.record ? 1 : 2;
-    return aS - bS;
-  }).map(function (p) {
-    var isSent = p.record && p.record.sentToGuardian;
-    var isPending = p.record && !p.record.sentToGuardian;
-    return /*#__PURE__*/React.createElement("button", {
-      key: p.id,
-      onClick: function onClick() {
-        return setSelectedId(p.id);
-      },
-      style: {
-        background: isSent ? "rgba(255,255,255,0.15)" : "rgba(255,255,255,0.07)",
-        border: isSent ? "1.5px solid rgba(134,239,172,0.6)" : "1.5px solid rgba(255,255,255,0.1)",
-        borderRadius: 16,
-        padding: "16px 20px",
-        display: "flex",
-        alignItems: "center",
-        gap: 14,
-        cursor: "pointer",
-        textAlign: "left"
-      }
-    }, /*#__PURE__*/React.createElement("div", {
-      style: {
-        width: 44,
-        height: 44,
-        borderRadius: 12,
-        background: isSent ? "rgba(134,239,172,0.2)" : "rgba(255,255,255,0.12)",
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
-        fontSize: 20,
-        flexShrink: 0
-      }
-    }, p.gender === "여" ? "👩" : "👴"), /*#__PURE__*/React.createElement("div", {
-      style: {
-        flex: 1
-      }
-    }, /*#__PURE__*/React.createElement("div", {
-      style: {
-        display: "flex",
-        alignItems: "center",
-        gap: 8,
-        marginBottom: 3
-      }
-    }, /*#__PURE__*/React.createElement("span", {
-      style: {
-        fontSize: 16,
-        fontWeight: 800,
-        color: "white"
-      }
-    }, p.guardianType === "official" ? getTitle(p) : p.name + " " + getTitle(p)), isSent && /*#__PURE__*/React.createElement("span", {
-      style: {
-        fontSize: 10,
-        fontWeight: 800,
-        background: "#4ade80",
-        color: "#14532d",
-        borderRadius: 20,
-        padding: "2px 8px"
-      }
-    }, "\uC624\uB298 \uD655\uC778 \uAC00\uB2A5"), isPending && /*#__PURE__*/React.createElement("span", {
-      style: {
-        fontSize: 10,
-        fontWeight: 800,
-        background: "rgba(253,224,71,0.3)",
-        color: "#fde047",
-        borderRadius: 20,
-        padding: "2px 8px"
-      }
-    }, "\uAC80\uD1A0 \uC911")), /*#__PURE__*/React.createElement("div", {
-      style: {
-        fontSize: 12,
-        color: "rgba(255,255,255,0.6)"
-      }
-    }, getWard(p.room), " \xB7 \uC785\uC6D0 ", p.days, "\uC77C\uC9F8"), isSent && /*#__PURE__*/React.createElement("div", {
-      style: {
-        fontSize: 11,
-        color: "#4ade80",
-        marginTop: 3,
-        fontWeight: 600
-      }
-    }, "\u2713 ", p.record.updatedAt, " \uC5C5\uB370\uC774\uD2B8")), /*#__PURE__*/React.createElement("span", {
-      style: {
-        color: isSent ? "#4ade80" : "rgba(255,255,255,0.3)",
-        fontSize: 18
-      }
-    }, "\u203A"));
-  })), /*#__PURE__*/React.createElement("button", {
-    onClick: onBack,
-    style: {
-      marginTop: 20,
-      width: "100%",
-      background: "transparent",
-      border: "none",
-      color: "rgba(255,255,255,0.4)",
-      fontSize: 13,
-      cursor: "pointer"
-    }
-  }, "\u2190 \uC5ED\uD560 \uC120\uD0DD\uC73C\uB85C")));
+  // 환자가 1명이면 바로 그 환자로 (로그인 후 본인 환자만)
+  if (!selectedId && patients.length === 1) {
+    setTimeout(function () {
+      return setSelectedId(patients[0].id);
+    }, 0);
+  }
   var rec = patient && patient.record;
   var r = rec && rec.sentToGuardian ? rec : null;
   var pending = rec && !rec.sentToGuardian;
@@ -7117,11 +6979,17 @@ function App() {
   });
   if (appScreen === "app" && currentUser) {
     var role = currentUser.role;
-    if (role === "guardian") return /*#__PURE__*/React.createElement(GuardianScreen, {
-      patients: patients,
-      onBack: handleLogout,
-      onMessage: handleMessage
-    });
+    if (role === "guardian") {
+      var guardianPatient = patients.filter(function (p) {
+        return p.id === currentUser.patientId;
+      });
+      return /*#__PURE__*/React.createElement(GuardianScreen, {
+        patients: guardianPatient.length > 0 ? guardianPatient : patients,
+        onBack: handleLogout,
+        onMessage: handleMessage,
+        guardianRole: currentUser.guardianRole
+      });
+    }
     if (role === "nurse") return /*#__PURE__*/React.createElement(NurseScreen, {
       patients: patients,
       onSave: handleSave,
