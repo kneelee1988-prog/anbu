@@ -1,0 +1,1863 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>안부 - 입원 환자 케어 플랫폼</title>
+  <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+  <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: 'Noto Sans KR', sans-serif; -webkit-font-smoothing: antialiased; }
+    select option { color: #333; background: white; }
+  </style>
+</head>
+<body>
+  <div id="root"></div>
+  <script type="text/babel">
+
+const { useState, useEffect } = React;
+
+
+// ── Supabase 연결 ─────────────────────────────────────────────
+const SUPABASE_URL = "https://imulqwqpwjpjgublmhxb.supabase.co";
+const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImltdWxxd3Fwd2pwamd1YmxtaHhiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg1OTcyNjYsImV4cCI6MjA5NDE3MzI2Nn0.rFV99EsG8CRXfMcYecOl8ERDY7QkHoaYtMRSyk1AfyA";
+
+const sb = {
+  from: (table) => ({
+    select: (cols) => fetch(`${SUPABASE_URL}/rest/v1/${table}?select=${cols||"*"}`, {
+      headers: { apikey: SUPABASE_KEY, Authorization: "Bearer " + SUPABASE_KEY }
+    }).then(r => r.json()),
+
+    insert: (data) => fetch(`${SUPABASE_URL}/rest/v1/${table}`, {
+      method: "POST",
+      headers: { apikey: SUPABASE_KEY, Authorization: "Bearer " + SUPABASE_KEY, "Content-Type": "application/json", Prefer: "return=representation" },
+      body: JSON.stringify(data)
+    }).then(r => r.json()),
+
+    update: (data) => ({
+      eq: (col, val) => fetch(`${SUPABASE_URL}/rest/v1/${table}?${col}=eq.${val}`, {
+        method: "PATCH",
+        headers: { apikey: SUPABASE_KEY, Authorization: "Bearer " + SUPABASE_KEY, "Content-Type": "application/json", Prefer: "return=representation" },
+        body: JSON.stringify(data)
+      }).then(r => r.json())
+    }),
+
+    delete: () => ({
+      eq: (col, val) => fetch(`${SUPABASE_URL}/rest/v1/${table}?${col}=eq.${val}`, {
+        method: "DELETE",
+        headers: { apikey: SUPABASE_KEY, Authorization: "Bearer " + SUPABASE_KEY }
+      }).then(r => r.json())
+    }),
+
+    eq: (col, val) => ({
+      select: (cols) => fetch(`${SUPABASE_URL}/rest/v1/${table}?${col}=eq.${encodeURIComponent(val)}&select=${cols||"*"}`, {
+        headers: { apikey: SUPABASE_KEY, Authorization: "Bearer " + SUPABASE_KEY }
+      }).then(r => r.json())
+    }),
+
+    order: (col, opts) => ({
+      select: (cols) => fetch(`${SUPABASE_URL}/rest/v1/${table}?select=${cols||"*"}&order=${col}${opts&&opts.ascending===false?".desc":""}`, {
+        headers: { apikey: SUPABASE_KEY, Authorization: "Bearer " + SUPABASE_KEY }
+      }).then(r => r.json())
+    }),
+  })
+};
+
+
+const DOCTORS = [
+  { id: "doc1", name: "이요성", title: "병원장", role: "정신건강의학과" },
+  { id: "doc2", name: "김성민", title: "원장",   role: "외과" },
+  { id: "doc3", name: "박지원", title: "원장",   role: "정형외과" },
+  { id: "doc4", name: "최동훈", title: "원장",   role: "가정의학과" },
+  { id: "doc5", name: "정한솔", title: "원장",   role: "한방과" },
+];
+
+const getWard = (room) => {
+  const n = parseInt(room);
+  if (n >= 301 && n <= 309) return "믿음병동";
+  if (n >= 310 && n <= 318) return "소망병동";
+  if (n >= 201 && n <= 211) return "사랑병동";
+  if (n >= 501 && n <= 509) return "행복병동";
+  return "";
+};
+
+const getDoctorTitle = (id) => {
+  const d = DOCTORS.find(x => x.id === id);
+  return d ? d.name + " " + d.title : "";
+};
+
+const RELATION_MAP = {
+  "아들":   { tab: (p) => p.gender==="여" ? "어머니께" : "아버지께", comment: (p) => p.name+"님 아드님께" },
+  "딸":     { tab: (p) => p.gender==="여" ? "어머니께" : "아버지께", comment: (p) => p.name+"님 따님께" },
+  "배우자": { tab: (p) => p.name+"님께",                              comment: (p) => p.name+"님 배우자분께" },
+  "손자":   { tab: (p) => p.gender==="여" ? "할머니께" : "할아버지께", comment: (p) => p.name+"님 손자분께" },
+  "손녀":   { tab: (p) => p.gender==="여" ? "할머니께" : "할아버지께", comment: (p) => p.name+"님 손녀분께" },
+  "형제자매":{ tab: (p) => p.name+"님께",                             comment: (p) => p.name+"님 형제분께" },
+  "조카":   { tab: (p) => p.name+"님께",                              comment: (p) => p.name+"님 조카분께" },
+  "기타":   { tab: (p) => p.name+"님께",                              comment: (p) => p.name+"님 보호자분께" },
+};
+
+const getTitle = (p) => {
+  if (!p) return "";
+  if (p.guardianType === "official") return p.name + " 어르신";
+  const rel = p.guardianRelation;
+  if (rel && RELATION_MAP[rel]) return RELATION_MAP[rel].tab(p);
+  // 기본값 - 관계 미입력시
+  return p.gender === "여" ? "어머니께" : "아버지께";
+};
+
+const getGuardianComment = (p) => {
+  if (!p) return "";
+  if (p.guardianType === "official") return p.name + " 어르신 보호자분께";
+  const rel = p.guardianRelation;
+  if (rel && RELATION_MAP[rel]) return RELATION_MAP[rel].comment(p);
+  return p.gender === "여" ? p.name + "님 보호자분께" : p.name + "님 보호자분께";
+};
+
+const PATIENTS = [
+  { id:1,  room:"301호", name:"김순자",  age:78, gender:"여", days:42, alert:false, alertMsg:"",               guardianType:"family",   guardianRelation:"딸",    doctorId:"doc1", record:null },
+  { id:2,  room:"302호", name:"이철수",  age:83, gender:"남", days:28, alert:true,  alertMsg:"어제 식사량 저하", guardianType:"family",   guardianRelation:"아들",  doctorId:"doc2", record:null },
+  { id:3,  room:"303호", name:"박영희",  age:76, gender:"여", days:15, alert:false, alertMsg:"",               guardianType:"official",  doctorId:"doc3", record:null },
+  { id:4,  room:"304호", name:"최병호",  age:81, gender:"남", days:60, alert:true,  alertMsg:"어제 섬망 증상",  guardianType:"family",   doctorId:"doc1", record:null },
+  { id:5,  room:"305호", name:"정순애",  age:79, gender:"여", days:33, alert:false, alertMsg:"",               guardianType:"official",  doctorId:"doc4", record:null },
+  { id:6,  room:"310호", name:"한기수",  age:77, gender:"남", days:55, alert:false, alertMsg:"",               guardianType:"family",   doctorId:"doc2", record:null },
+  { id:7,  room:"311호", name:"오명자",  age:82, gender:"여", days:14, alert:true,  alertMsg:"어제 낙상 위험",  guardianType:"family",   doctorId:"doc3", record:null },
+  { id:8,  room:"312호", name:"배철수",  age:88, gender:"남", days:90, alert:false, alertMsg:"",               guardianType:"official",  doctorId:"doc1", record:null },
+  { id:9,  room:"201호", name:"조민숙",  age:73, gender:"여", days:45, alert:false, alertMsg:"",               guardianType:"family",   doctorId:"doc2", record:null },
+  { id:10, room:"202호", name:"권태양",  age:86, gender:"남", days:62, alert:true,  alertMsg:"어제 발열",       guardianType:"family",   doctorId:"doc4", record:null },
+  { id:11, room:"203호", name:"남궁희",  age:81, gender:"여", days:9,  alert:false, alertMsg:"",               guardianType:"official",  doctorId:"doc3", record:null },
+  { id:12, room:"501호", name:"전미경",  age:75, gender:"여", days:52, alert:false, alertMsg:"",               guardianType:"family",   doctorId:"doc4", record:null },
+  { id:13, room:"502호", name:"노병길",  age:83, gender:"남", days:26, alert:true,  alertMsg:"어제 혈압 이상",  guardianType:"family",   doctorId:"doc3", record:null },
+  { id:14, room:"503호", name:"방순덕",  age:79, gender:"여", days:41, alert:false, alertMsg:"",               guardianType:"official",  doctorId:"doc2", record:null },
+  { id:15, room:"504호", name:"선우진",  age:84, gender:"남", days:13, alert:false, alertMsg:"",               guardianType:"family",   doctorId:"doc1", record:null },
+];
+
+const initForm = () => ({
+  consciousness:"", meal_amount:"", meal_type:"", meal_refused:false, meal_aspiration:false,
+  sleep_hours:"", sleep_wakeups:"", sleep_nap:false, sleep_abnormal:false,
+  mobility:"", walk_count:"", fall_risk:"", programs:[],
+  urine:"", urine_catheter:false, bowel:"", medication:"",
+  painad:null, moods:[], mental:[],
+  skin:"", hygiene:"", bedsore:"",
+  oriental:null, oriental_items:[], note:"",
+  updatedAt:"", pending:true, sentToGuardian:false,
+});
+
+
+// ── 로그인 함수 ───────────────────────────────────────────────
+// 직원 계정 (DB 연결 전 임시 하드코딩)
+const STAFF_ACCOUNTS = [
+  { name:"이요성", role:"admin",  doctorId:"doc1", password:"anbu1234",  active:true },
+  { name:"이요성", role:"doctor", doctorId:"doc1", password:"anbu1234",  active:true },
+  { name:"김성민", role:"doctor", doctorId:"doc2", password:"anbu1234",  active:true },
+  { name:"박지원", role:"doctor", doctorId:"doc3", password:"anbu1234",  active:true },
+  { name:"최동훈", role:"doctor", doctorId:"doc4", password:"anbu1234",  active:true },
+  { name:"정한솔", role:"doctor", doctorId:"doc5", password:"anbu1234",  active:true },
+  { name:"믿음병동", role:"nurse", ward:"믿음병동", password:"nurse1234", active:true },
+  { name:"소망병동", role:"nurse", ward:"소망병동", password:"nurse1234", active:true },
+  { name:"사랑병동", role:"nurse", ward:"사랑병동", password:"nurse1234", active:true },
+  { name:"행복병동", role:"nurse", ward:"행복병동", password:"nurse1234", active:true },
+];
+
+const loginUser = async (name, password, role) => {
+  const user = STAFF_ACCOUNTS.find(u => {
+    if (u.role !== role || !u.active) return false;
+    if (role === "nurse") return u.ward === name && u.password === password;
+    return u.name === name && u.password === password;
+  });
+  return user || null;
+};
+
+const loginGuardian = async (patientName, birthdate, phone, patients) => {
+  // 먼저 로컬 patients 배열에서 찾기 (빠름)
+  console.log("로그인 시도:", patientName, birthdate, phone);
+  console.log("patients 수:", patients ? patients.length : 0);
+  if (patients && patients.length > 0) {
+    console.log("첫번째 환자:", patients[0].name, patients[0].birthdate, patients[0].guardianPhone);
+    const p = patients.find(x => x.name === patientName);
+    console.log("이름 일치:", p ? p.name : "없음", "birthdate:", p ? p.birthdate : "없음");
+    const p2 = patients.find(x => x.name === patientName && x.birthdate === birthdate);
+    if (p2) {
+      if (p2.guardianPhone === phone) return { patient: p2, role: "primary" };
+      if (p2.guardian2Phone === phone) return { patient: p2, role: "secondary" };
+      return null;
+    }
+  }
+  // DB에서 찾기 (fallback)
+  try {
+    const url = `${SUPABASE_URL}/rest/v1/patients?name=eq.${encodeURIComponent(patientName)}&select=*`;
+    const res = await fetch(url, {
+      headers: { apikey: SUPABASE_KEY, Authorization: "Bearer " + SUPABASE_KEY }
+    });
+    const data = await res.json();
+    if (!Array.isArray(data) || data.length === 0) return null;
+    const p = data.find(x => x.birthdate === birthdate);
+    if (!p) return null;
+    if (p.guardian_phone === phone) return { patient: p, role: "primary" };
+    if (p.guardian2_phone === phone) return { patient: p, role: "secondary" };
+    return null;
+  } catch(e) { return null; }
+};
+
+// ── 공통 컴포넌트 ─────────────────────────────────────────────
+const Btn = ({ label, active, onClick, color="#1e3a5f", small }) => (
+  <button onClick={onClick} style={{
+    padding: small ? "7px 12px" : "9px 16px", borderRadius:10, border:"none", cursor:"pointer",
+    fontSize: small ? 12 : 13, fontWeight:700, flexShrink:0,
+    background: active ? color : "#f1f5f9", color: active ? "white" : "#64748b",
+  }}>{label}</button>
+);
+const BtnRow = ({ children }) => <div style={{ display:"flex", flexWrap:"wrap", gap:6, marginBottom:10 }}>{children}</div>;
+const Lbl = ({ text }) => <div style={{ fontSize:12, color:"#64748b", fontWeight:600, marginBottom:6 }}>{text}</div>;
+const Sec = ({ title, accent, children }) => (
+  <div style={{ marginBottom:14 }}>
+    <div style={{ fontSize:12, fontWeight:800, color:"white", background: accent||"#1e3a5f", borderRadius:"10px 10px 0 0", padding:"5px 14px" }}>{title}</div>
+    <div style={{ background:"white", borderRadius:"0 0 10px 10px", padding:"12px 14px", border:"1.5px solid #cbd5e1", borderTop:"none" }}>{children}</div>
+  </div>
+);
+const Row = ({ label, value, vc }) => (
+  <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center", paddingBottom:4, marginBottom:4, borderBottom:"1px solid #f1f5f9" }}>
+    <span style={{ fontSize:13, color:"#444", fontWeight:600 }}>{label}</span>
+    <span style={{ fontSize:13, fontWeight:700, color: vc||"#222" }}>{value||"—"}</span>
+  </div>
+);
+const Card = ({ icon, title, accent, children }) => (
+  <div style={{ background:"white", borderRadius:14, overflow:"hidden", border:"1.5px solid #cbd5e1", marginBottom:10 }}>
+    <div style={{ display:"flex", alignItems:"center", gap:7, padding:"4px 12px", background: accent||"#1e3a5f" }}>
+      <span style={{ fontSize:13 }}>{icon}</span>
+      <span style={{ fontSize:12, fontWeight:800, color:"#f0f9ff" }}>{title}</span>
+    </div>
+    <div style={{ padding:"8px 12px" }}>{children}</div>
+  </div>
+);
+
+const getTodayStr = () => {
+  const d = new Date();
+  return (d.getMonth()+1) + "월 " + d.getDate() + "일";
+};
+
+const isToday = (updatedAt) => {
+  if (!updatedAt) return false;
+  const today = getTodayStr();
+  return updatedAt.includes(today);
+};
+
+
+// ── 섹션 헤더 (공통) ──────────────────────────────────────────
+const SectionHeader = ({ icon, label, count, color, bg, unit }) => (
+  <div style={{ display:"flex", alignItems:"center", gap:8, padding:"6px 4px 2px" }}>
+    <span style={{ fontSize:13, fontWeight:800, color }}>{icon} {label}</span>
+    <span style={{ fontSize:12, fontWeight:700, color, background:bg, borderRadius:20, padding:"1px 8px" }}>{count}{unit||"명"}</span>
+    <div style={{ flex:1, height:1, background:color, opacity:0.3 }} />
+  </div>
+);
+
+const scoreColor = (v) => ["양호","잘 드심","명료","안정","없음","정상","이상 없음"].includes(v) ? "#166534" : ["보통","절반","졸림"].includes(v) ? "#713f12" : v ? "#7f1d1d" : "#333";
+
+
+// ── 온보딩 화면 ──────────────────────────────────────────────
+const SLIDES = [
+  { icon:"🏥", title:"안부 (安否)", sub:"입원 환자와 가족을 매일 연결합니다", desc:"간호사가 입력하고, 의사가 검토하고, 보호자가 확인하는 케어 연속성 플랫폼", color:"#1e3a5f" },
+  { icon:"👨‍👩‍👧", title:"보호자", sub:"매일 아침 어머니 상태를 확인하세요", desc:"식사·수면·활동·통증 등 오늘 상태가 매일 업데이트됩니다. 면회 일정도 앱으로 미리 알려주세요.", color:"#2d6a9f" },
+  { icon:"👩‍⚕️", title:"간호사", sub:"저녁 라운딩 중 30초, 환자 상태를 기록하세요", desc:"버튼 터치 한 번으로 대부분 입력 완료. 기록하면 주치의 검토 후 보호자에게 자동 전달됩니다.", color:"#0d5c56" },
+  { icon:"🩺", title:"의사", sub:"간호사 기록을 검토하고 코멘트를 남기세요", desc:"담당 환자만 골라서 확인하고, 이상 징후와 치료 상태를 변경할 수 있어요. 코멘트는 선생님 이름으로 보호자에게 전달됩니다.", color:"#166534" },
+  { icon:"💬", title:"보호자 한마디", sub:"면회 일정과 메시지를 한눈에", desc:"병동별·주치의별 필터로 원하는 메시지만 확인하세요. 면회 예정일은 날짜순으로 자동 정렬됩니다.", color:"#713f12" },
+];
+
+function OnboardingScreen({ onDone }) {
+  const [idx, setIdx] = useState(0);
+  const slide = SLIDES[idx];
+  const isLast = idx === SLIDES.length - 1;
+
+  return (
+    <div style={{ fontFamily:"'Noto Sans KR',sans-serif", minHeight:"100vh", display:"flex", justifyContent:"center", alignItems:"center", background:"linear-gradient(160deg,#0f172a," + slide.color + ")", padding:24, transition:"background 0.4s" }}>
+      <div style={{ width:"100%", maxWidth:340, textAlign:"center" }}>
+        <div style={{ display:"flex", justifyContent:"center", gap:8, marginBottom:36 }}>
+          {SLIDES.map((_,i) => (
+            <div key={i} onClick={() => setIdx(i)} style={{ width: i===idx?24:8, height:8, borderRadius:99, background: i===idx?"white":"rgba(255,255,255,0.3)", transition:"all 0.3s", cursor:"pointer" }} />
+          ))}
+        </div>
+        <div style={{ width:100, height:100, borderRadius:28, background:"rgba(255,255,255,0.12)", display:"flex", alignItems:"center", justifyContent:"center", fontSize:52, margin:"0 auto 24px", border:"1.5px solid rgba(255,255,255,0.2)" }}>
+          {slide.icon}
+        </div>
+        <div style={{ display:"inline-block", background:"rgba(255,255,255,0.15)", borderRadius:20, padding:"4px 16px", fontSize:12, fontWeight:700, color:"rgba(255,255,255,0.85)", marginBottom:14, letterSpacing:1 }}>{slide.title}</div>
+        <div style={{ fontSize:22, fontWeight:900, color:"white", lineHeight:1.4, marginBottom:16 }}>{slide.sub}</div>
+        <div style={{ fontSize:14, color:"rgba(255,255,255,0.7)", lineHeight:1.8, marginBottom:44 }}>{slide.desc}</div>
+        <div style={{ display:"flex", gap:10 }}>
+          {idx > 0 && (
+            <button onClick={() => setIdx(idx-1)} style={{ flex:1, padding:"14px 0", borderRadius:14, border:"none", background:"rgba(255,255,255,0.12)", color:"white", fontSize:15, fontWeight:700, cursor:"pointer" }}>← 이전</button>
+          )}
+          <button onClick={() => isLast ? onDone() : setIdx(idx+1)} style={{ flex:2, padding:"14px 0", borderRadius:14, border:"none", background:"white", color:slide.color, fontSize:15, fontWeight:800, cursor:"pointer" }}>
+            {isLast ? "시작하기 →" : "다음 →"}
+          </button>
+        </div>
+        {!isLast && (
+          <button onClick={onDone} style={{ marginTop:14, background:"transparent", border:"none", color:"rgba(255,255,255,0.4)", fontSize:13, cursor:"pointer" }}>건너뛰기</button>
+        )}
+      </div>
+    </div>
+  );
+}
+
+
+// ── 로그인 화면 ───────────────────────────────────────────────
+function LoginScreen({ loginType, onLogin, onBack, patients }) {
+  const [step, setStep] = useState("input");
+  const [form, setForm] = useState({ name:"", password:"", ward:"믿음병동", patientName:"", birthdate:"", phone:"", msgLoginType:"nurse" });
+  const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
+  const set = (k,v) => setForm(f => ({...f,[k]:v}));
+
+  const handleLogin = async () => {
+    setLoading(true);
+    setError("");
+    try {
+      if (loginType === "messages") {
+        // 간호사 또는 의사 계정으로 로그인
+        const nurseUser = await loginUser(form.ward, form.password, "nurse");
+        const doctorUser = form.name ? await loginUser(form.name, form.password, "doctor") : null;
+        const adminUser = form.name ? await loginUser(form.name, form.password, "admin") : null;
+        if (nurseUser || doctorUser || adminUser) {
+          onLogin({ role:"messages", userName: nurseUser ? form.ward : (form.name) });
+        } else setError("올바르지 않은 계정이에요.");
+      } else if (loginType === "nurse") {
+        const user = await loginUser(form.ward, form.password, "nurse");
+        if (user) { onLogin({ role:"nurse", ward:form.ward, userName:form.ward }); }
+        else setError("병동명 또는 비밀번호가 올바르지 않아요.");
+      } else if (loginType === "doctor") {
+        const user = await loginUser(form.name, form.password, "doctor");
+        if (user) { onLogin({ role:"doctor", doctorId:user.doctor_id, userName:user.name }); }
+        else setError("이름 또는 비밀번호가 올바르지 않아요.");
+      } else if (loginType === "admin") {
+        const user = await loginUser(form.name, form.password, "admin");
+        if (user) { onLogin({ role:"admin", doctorId:user.doctor_id, userName:user.name }); }
+        else setError("이름 또는 비밀번호가 올바르지 않아요.");
+      } else if (loginType === "guardian") {
+        const result = await loginGuardian(form.patientName, form.birthdate, form.phone, patients);
+        if (result) { onLogin({ role:"guardian", patient:result.patient, guardianRole:result.role }); }
+        else setError("입력하신 정보와 일치하는 환자를 찾을 수 없어요.");
+      }
+    } catch(e) { setError("오류가 발생했어요. 다시 시도해주세요."); }
+    setLoading(false);
+  };
+
+
+
+  const titles = { nurse:"👩‍⚕️ 간호사 로그인", doctor:"🩺 의사 로그인", admin:"🏥 관리자 로그인", guardian:"👨‍👩‍👧 보호자 로그인", messages:"💬 보호자 한마디" };
+  const handleKeyDown = (e) => { if (e.key === "Enter") handleLogin(); };
+
+  return (
+    <div style={{ fontFamily:"'Noto Sans KR',sans-serif", background:"linear-gradient(160deg,#0f172a,#1e3a5f)", minHeight:"100vh", display:"flex", justifyContent:"center", alignItems:"center", padding:24 }}>
+      <div style={{ width:"100%", maxWidth:340 }}>
+        <button onClick={onBack} style={{ background:"transparent", border:"none", color:"rgba(255,255,255,0.5)", fontSize:13, cursor:"pointer", marginBottom:24 }}>← 역할 선택</button>
+        <div style={{ fontSize:22, fontWeight:900, color:"white", marginBottom:6 }}>{titles[loginType]}</div>
+        <div style={{ fontSize:13, color:"rgba(255,255,255,0.5)", marginBottom:32 }}>안부 · 입원 환자 케어 플랫폼</div>
+
+        {loginType === "messages" && (
+          <>
+            <div style={{ background:"rgba(255,255,255,0.1)", borderRadius:12, padding:"12px 14px", marginBottom:14 }}>
+              <div style={{ fontSize:12, color:"rgba(255,255,255,0.7)", marginBottom:10 }}>간호사 또는 의사 계정으로 로그인하세요</div>
+              <div style={{ display:"flex", gap:8, marginBottom:12 }}>
+                <button onClick={() => set("msgLoginType","nurse")} style={{ flex:1, padding:"8px 0", borderRadius:10, border:"none", cursor:"pointer", fontSize:12, fontWeight:700, background: form.msgLoginType==="doctor"?"rgba(255,255,255,0.1)":"white", color: form.msgLoginType==="doctor"?"rgba(255,255,255,0.6)":"#1e3a5f" }}>👩‍⚕️ 간호사</button>
+                <button onClick={() => set("msgLoginType","doctor")} style={{ flex:1, padding:"8px 0", borderRadius:10, border:"none", cursor:"pointer", fontSize:12, fontWeight:700, background: form.msgLoginType==="doctor"?"white":"rgba(255,255,255,0.1)", color: form.msgLoginType==="doctor"?"#1e3a5f":"rgba(255,255,255,0.6)" }}>🩺 의사</button>
+              </div>
+              {form.msgLoginType !== "doctor" ? (
+                <div style={{ marginBottom:10 }}>
+                  <div style={{ fontSize:12, color:"rgba(255,255,255,0.7)", fontWeight:700, marginBottom:6 }}>병동 선택</div>
+                  <select value={form.ward} onChange={e=>set("ward",e.target.value)} style={{ width:"100%", padding:"10px 12px", borderRadius:10, border:"1.5px solid rgba(255,255,255,0.2)", background:"rgba(255,255,255,0.1)", color:"white", fontSize:13, outline:"none" }}>
+                    {["믿음병동","소망병동","사랑병동","행복병동"].map(w => <option key={w} value={w} style={{ color:"#333" }}>{w}</option>)}
+                  </select>
+                </div>
+              ) : (
+                <div style={{ marginBottom:10 }}>
+                  <div style={{ fontSize:12, color:"rgba(255,255,255,0.7)", fontWeight:700, marginBottom:6 }}>의사 이름</div>
+                  <select value={form.name} onChange={e=>set("name",e.target.value)} style={{ width:"100%", padding:"10px 12px", borderRadius:10, border:"1.5px solid rgba(255,255,255,0.2)", background:"rgba(255,255,255,0.1)", color:"white", fontSize:13, outline:"none" }}>
+                    <option value="" style={{ color:"#333" }}>이름 선택</option>
+                    {DOCTORS.map(d => <option key={d.id} value={d.name} style={{ color:"#333" }}>{d.name} {d.title}</option>)}
+                  </select>
+                </div>
+              )}
+            </div>
+            <div style={{ marginBottom:14 }}>
+              <div style={{ fontSize:12, color:"rgba(255,255,255,0.7)", fontWeight:700, marginBottom:6 }}>비밀번호</div>
+              <input type="password" value={form.password} onChange={e => set("password", e.target.value)} onKeyDown={handleKeyDown} placeholder="비밀번호 입력"
+                style={{ width:"100%", padding:"12px 14px", borderRadius:12, border:"1.5px solid rgba(255,255,255,0.2)", background:"rgba(255,255,255,0.1)", color:"white", fontSize:14, outline:"none", boxSizing:"border-box" }} />
+            </div>
+          </>
+        )}
+
+        {loginType === "nurse" && (
+          <>
+            <div style={{ marginBottom:14 }}>
+              <div style={{ fontSize:12, color:"rgba(255,255,255,0.7)", fontWeight:700, marginBottom:6 }}>병동 선택</div>
+              <select value={form.ward} onChange={e=>set("ward",e.target.value)} style={{ width:"100%", padding:"12px 14px", borderRadius:12, border:"1.5px solid rgba(255,255,255,0.2)", background:"rgba(255,255,255,0.1)", color:"white", fontSize:14, outline:"none" }}>
+                {["믿음병동","소망병동","사랑병동","행복병동"].map(w => <option key={w} value={w} style={{ color:"#333" }}>{w}</option>)}
+              </select>
+            </div>
+            <div style={{ marginBottom:14 }}>
+          <div style={{ fontSize:12, color:"rgba(255,255,255,0.7)", fontWeight:700, marginBottom:6 }}>비밀번호</div>
+          <input type="password" value={form.password} onChange={e => set("password", e.target.value)} onKeyDown={handleKeyDown} placeholder="비밀번호 입력"
+            style={{ width:"100%", padding:"12px 14px", borderRadius:12, border:"1.5px solid rgba(255,255,255,0.2)", background:"rgba(255,255,255,0.1)", color:"white", fontSize:14, outline:"none", boxSizing:"border-box" }} />
+        </div>
+          </>
+        )}
+
+        {(loginType === "doctor" || loginType === "admin") && (
+          <>
+            <div style={{ marginBottom:14 }}>
+              <div style={{ fontSize:12, color:"rgba(255,255,255,0.7)", fontWeight:700, marginBottom:6 }}>{loginType === "admin" ? "관리자 이름" : "의사 이름"}</div>
+              <select value={form.name} onChange={e=>set("name",e.target.value)} style={{ width:"100%", padding:"12px 14px", borderRadius:12, border:"1.5px solid rgba(255,255,255,0.2)", background:"rgba(255,255,255,0.1)", color:"white", fontSize:14, outline:"none" }}>
+                <option value="" style={{ color:"#333" }}>이름 선택</option>
+                {loginType === "admin"
+                  ? [{ name:"이요성" }].map(d => <option key={d.name} value={d.name} style={{ color:"#333" }}>{d.name} 병원장</option>)
+                  : DOCTORS.map(d => <option key={d.id} value={d.name} style={{ color:"#333" }}>{d.name} {d.title}</option>)
+                }
+              </select>
+            </div>
+            <div style={{ marginBottom:14 }}>
+          <div style={{ fontSize:12, color:"rgba(255,255,255,0.7)", fontWeight:700, marginBottom:6 }}>비밀번호</div>
+          <input type="password" value={form.password} onChange={e => set("password", e.target.value)} onKeyDown={handleKeyDown} placeholder="비밀번호 입력"
+            style={{ width:"100%", padding:"12px 14px", borderRadius:12, border:"1.5px solid rgba(255,255,255,0.2)", background:"rgba(255,255,255,0.1)", color:"white", fontSize:14, outline:"none", boxSizing:"border-box" }} />
+        </div>
+          </>
+        )}
+
+        {loginType === "guardian" && (
+          <>
+            <div style={{ marginBottom:14 }}>
+          <div style={{ fontSize:12, color:"rgba(255,255,255,0.7)", fontWeight:700, marginBottom:6 }}>어르신 성함</div>
+          <input type="text" value={form.patientName} onChange={e => set("patientName", e.target.value)} placeholder="예) 김순자"
+            style={{ width:"100%", padding:"12px 14px", borderRadius:12, border:"1.5px solid rgba(255,255,255,0.2)", background:"rgba(255,255,255,0.1)", color:"white", fontSize:14, outline:"none", boxSizing:"border-box" }} />
+        </div>
+            <div style={{ marginBottom:14 }}>
+          <div style={{ fontSize:12, color:"rgba(255,255,255,0.7)", fontWeight:700, marginBottom:6 }}>어르신 생년월일</div>
+          <input type="text" value={form.birthdate} onChange={e => set("birthdate", e.target.value)} placeholder="예) 19460315"
+            style={{ width:"100%", padding:"12px 14px", borderRadius:12, border:"1.5px solid rgba(255,255,255,0.2)", background:"rgba(255,255,255,0.1)", color:"white", fontSize:14, outline:"none", boxSizing:"border-box" }} />
+        </div>
+            <div style={{ marginBottom:14 }}>
+          <div style={{ fontSize:12, color:"rgba(255,255,255,0.7)", fontWeight:700, marginBottom:6 }}>보호자 전화번호</div>
+          <input type="tel" value={form.phone} onChange={e => set("phone", e.target.value)} onKeyDown={handleKeyDown} placeholder="예) 01012345678"
+            style={{ width:"100%", padding:"12px 14px", borderRadius:12, border:"1.5px solid rgba(255,255,255,0.2)", background:"rgba(255,255,255,0.1)", color:"white", fontSize:14, outline:"none", boxSizing:"border-box" }} />
+        </div>
+          </>
+        )}
+
+        {error && <div style={{ background:"rgba(239,68,68,0.2)", border:"1px solid rgba(239,68,68,0.4)", borderRadius:10, padding:"10px 14px", fontSize:13, color:"#fca5a5", marginBottom:14 }}>⚠️ {error}</div>}
+
+        <button onClick={handleLogin} disabled={loading} style={{ width:"100%", padding:"14px 0", borderRadius:14, border:"none", background: loading ? "rgba(255,255,255,0.2)" : "white", color: loading ? "rgba(255,255,255,0.5)" : "#1e3a5f", fontSize:15, fontWeight:800, cursor: loading ? "default" : "pointer", marginTop:8 }}>
+          {loading ? "확인 중..." : "로그인"}
+        </button>
+      </div>
+    </div>
+  );
+}
+
+// ── 관리자 화면 ───────────────────────────────────────────────
+function AdminScreen({ patients, onBack, onLogout }) {
+  const [users, setUsers] = useState([]);
+  const [tab, setTab] = useState("users");
+  const [showAdd, setShowAdd] = useState(false);
+  const [newUser, setNewUser] = useState({ name:"", role:"nurse", ward:"믿음병동", doctor_id:"doc1", password:"anbu1234" });
+  const setN = (k,v) => setNewUser(f=>({...f,[k]:v}));
+
+  const loadUsers = async () => {
+    try {
+      const res = await fetch(`${SUPABASE_URL}/rest/v1/users?select=*&order=role`, {
+        headers: { apikey: SUPABASE_KEY, Authorization: "Bearer " + SUPABASE_KEY }
+      });
+      const data = await res.json();
+      if (Array.isArray(data)) setUsers(data);
+    } catch(e) {}
+  };
+
+  const toggleActive = async (user) => {
+    try {
+      await fetch(`${SUPABASE_URL}/rest/v1/users?id=eq.${user.id}`, {
+        method: "PATCH",
+        headers: { apikey: SUPABASE_KEY, Authorization: "Bearer " + SUPABASE_KEY, "Content-Type":"application/json" },
+        body: JSON.stringify({ active: !user.active })
+      });
+      await loadUsers();
+    } catch(e) {}
+  };
+
+  const addUser = async () => {
+    try {
+      await fetch(`${SUPABASE_URL}/rest/v1/users`, {
+        method: "POST",
+        headers: { apikey: SUPABASE_KEY, Authorization: "Bearer " + SUPABASE_KEY, "Content-Type":"application/json" },
+        body: JSON.stringify(newUser)
+      });
+      setShowAdd(false);
+      setNewUser({ name:"", role:"nurse", ward:"믿음병동", doctor_id:"doc1", password:"anbu1234" });
+      await loadUsers();
+    } catch(e) {}
+  };
+
+  useEffect(() => { loadUsers(); }, []);
+
+  const roleLabel = (r) => r==="admin"?"관리자":r==="doctor"?"의사":r==="nurse"?"간호사":"보호자";
+  const roleColor = (r) => r==="admin"?"#7c3aed":r==="doctor"?"#1e40af":r==="nurse"?"#0d5c56":"#713f12";
+
+  return (
+    <div style={{ fontFamily:"'Noto Sans KR',sans-serif", background:"#f0f4f8", minHeight:"100vh", display:"flex", justifyContent:"center" }}>
+      <div style={{ width:"100%", maxWidth:390, paddingBottom:32 }}>
+        <div style={{ background:"linear-gradient(135deg,#1e3a5f,#2d5a8e)", padding:"14px 20px", color:"white" }}>
+          <div style={{ display:"flex", alignItems:"center", gap:10, marginBottom:4 }}>
+            <button onClick={onLogout} style={{ background:"rgba(255,255,255,0.15)", border:"none", borderRadius:8, padding:"4px 10px", color:"white", fontSize:12, cursor:"pointer", fontWeight:700 }}>← 로그아웃</button>
+            <div style={{ flex:1 }}>
+              <div style={{ fontSize:11, opacity:0.7 }}>안부 · 관리자</div>
+              <div style={{ fontSize:17, fontWeight:800 }}>🏥 이요성 병원장</div>
+            </div>
+          </div>
+        </div>
+
+        <div style={{ margin:"12px 16px 0", display:"flex", background:"white", borderRadius:14, padding:4, gap:3, border:"1.5px solid #cbd5e1" }}>
+          {[["users","👥 직원 계정"],["patients","🏥 환자 현황"]].map(([t,l]) => (
+            <button key={t} onClick={() => setTab(t)} style={{ flex:1, padding:"8px 4px", borderRadius:10, border:"none", cursor:"pointer", fontSize:13, fontWeight: tab===t?800:600, background: tab===t?"#1e3a5f":"transparent", color: tab===t?"white":"#64748b" }}>{l}</button>
+          ))}
+        </div>
+
+        <div style={{ padding:"12px 16px" }}>
+          {tab === "users" && (
+            <>
+              <button onClick={() => setShowAdd(!showAdd)} style={{ width:"100%", padding:12, borderRadius:14, border:"none", background:"#1e3a5f", color:"white", fontSize:14, fontWeight:800, cursor:"pointer", marginBottom:14 }}>➕ 직원 계정 추가</button>
+
+              {showAdd && (
+                <div style={{ background:"white", borderRadius:16, padding:16, border:"1.5px solid #cbd5e1", marginBottom:14 }}>
+                  <div style={{ fontSize:13, fontWeight:800, color:"#1e3a5f", marginBottom:12 }}>신규 직원 등록</div>
+                  <div style={{ marginBottom:10 }}>
+                    <div style={{ fontSize:12, color:"#64748b", fontWeight:600, marginBottom:4 }}>역할</div>
+                    <select value={newUser.role} onChange={e=>setN("role",e.target.value)} style={{ width:"100%", padding:"9px 12px", borderRadius:10, border:"1px solid #e2e8f0", fontSize:13, color:"#333", outline:"none" }}>
+                      {[{v:"nurse",l:"간호사"},{v:"doctor",l:"의사"}].map(o => <option key={o.v} value={o.v}>{o.l}</option>)}
+                    </select>
+                  </div>
+                  {newUser.role === "nurse" && (
+                    <div style={{ marginBottom:10 }}>
+                      <div style={{ fontSize:12, color:"#64748b", fontWeight:600, marginBottom:4 }}>병동</div>
+                      <select value={newUser.ward} onChange={e=>setN("ward",e.target.value)} style={{ width:"100%", padding:"9px 12px", borderRadius:10, border:"1px solid #e2e8f0", fontSize:13, color:"#333", outline:"none" }}>
+                        {["믿음병동","소망병동","사랑병동","행복병동"].map(w => <option key={w} value={w}>{w}</option>)}
+                      </select>
+                    </div>
+                  )}
+                  {newUser.role === "doctor" && (
+                    <div style={{ marginBottom:10 }}>
+                      <div style={{ fontSize:12, color:"#64748b", fontWeight:600, marginBottom:4 }}>이름</div>
+                      <input value={newUser.name} onChange={e=>setN("name",e.target.value)} placeholder="의사 이름" style={{ width:"100%", padding:"9px 12px", borderRadius:10, border:"1px solid #e2e8f0", fontSize:13, color:"#333", outline:"none", boxSizing:"border-box" }} />
+                    </div>
+                  )}
+                  <div style={{ marginBottom:10 }}>
+                    <div style={{ fontSize:12, color:"#64748b", fontWeight:600, marginBottom:4 }}>비밀번호</div>
+                    <input value={newUser.password} onChange={e=>setN("password",e.target.value)} placeholder="초기 비밀번호" style={{ width:"100%", padding:"9px 12px", borderRadius:10, border:"1px solid #e2e8f0", fontSize:13, color:"#333", outline:"none", boxSizing:"border-box" }} />
+                  </div>
+                  <button onClick={addUser} style={{ width:"100%", padding:10, borderRadius:10, border:"none", background:"#1e3a5f", color:"white", fontSize:13, fontWeight:700, cursor:"pointer" }}>등록하기</button>
+                </div>
+              )}
+
+              <div style={{ fontSize:12, color:"#64748b", fontWeight:700, marginBottom:8 }}>전체 직원 {users.length}명</div>
+              <div style={{ display:"flex", flexDirection:"column", gap:8 }}>
+                {users.map(u => (
+                  <div key={u.id} style={{ background:"white", borderRadius:14, padding:"12px 14px", border:`1.5px solid ${u.active?"#cbd5e1":"#fca5a5"}`, display:"flex", alignItems:"center", gap:12 }}>
+                    <div style={{ width:36, height:36, borderRadius:10, background: u.active ? "#e8f0fe" : "#fef2f2", display:"flex", alignItems:"center", justifyContent:"center", fontSize:16 }}>
+                      {u.role==="admin"?"👑":u.role==="doctor"?"🩺":u.role==="nurse"?"👩‍⚕️":"👨‍👩‍👧"}
+                    </div>
+                    <div style={{ flex:1 }}>
+                      <div style={{ display:"flex", alignItems:"center", gap:6, marginBottom:2 }}>
+                        <span style={{ fontSize:14, fontWeight:800, color: u.active?"#1a1a1a":"#94a3b8" }}>{u.name}</span>
+                        <span style={{ fontSize:10, fontWeight:700, borderRadius:20, padding:"1px 7px", background: "#e8f0fe", color:roleColor(u.role) }}>{roleLabel(u.role)}</span>
+                      </div>
+                      <div style={{ fontSize:11, color: u.active?"#64748b":"#ef4444", fontWeight:600 }}>{u.active?"● 활성":"● 비활성"} {u.ward||""}</div>
+                    </div>
+                    {u.role !== "admin" && (
+                      <button onClick={() => toggleActive(u)} style={{ padding:"6px 12px", borderRadius:8, border:"none", cursor:"pointer", fontSize:12, fontWeight:700, background: u.active?"#fef2f2":"#f0fdf4", color: u.active?"#ef4444":"#16a34a" }}>
+                        {u.active ? "비활성화" : "활성화"}
+                      </button>
+                    )}
+                  </div>
+                ))}
+              </div>
+            </>
+          )}
+
+          {tab === "patients" && (
+            <div style={{ display:"flex", flexDirection:"column", gap:8 }}>
+              <div style={{ fontSize:12, color:"#64748b", fontWeight:700, marginBottom:4 }}>전체 입원 환자 {patients.length}명</div>
+              {patients.map(p => (
+                <div key={p.id} style={{ background:"white", borderRadius:14, padding:"12px 14px", border:"1.5px solid #cbd5e1" }}>
+                  <div style={{ display:"flex", alignItems:"center", gap:8, marginBottom:2 }}>
+                    <span style={{ fontSize:14, fontWeight:800, color:"#1a1a1a" }}>{p.name}</span>
+                    <span style={{ fontSize:11, color:"#94a3b8" }}>{p.age}세 · {p.gender}</span>
+                    {p.record && p.record.sentToGuardian && <span style={{ fontSize:10, fontWeight:700, background:"#f0fdf4", color:"#16a34a", borderRadius:20, padding:"1px 7px" }}>전송완료</span>}
+                    {p.alert && <span style={{ fontSize:10, fontWeight:700, background:"#fef2f2", color:"#ef4444", borderRadius:20, padding:"1px 7px" }}>⚠️주의</span>}
+                  </div>
+                  <div style={{ fontSize:12, color:"#64748b" }}>{getWard(p.room)} · {getDoctorTitle(p.doctorId)}</div>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ── 역할 선택 ─────────────────────────────────────────────────
+function RoleSelect({ onSelect }) {
+  return (
+    <div style={{ fontFamily:"'Noto Sans KR',sans-serif", background:"linear-gradient(160deg,#0f172a,#1e3a5f)", minHeight:"100vh", display:"flex", justifyContent:"center", alignItems:"center", padding:24 }}>
+      <div style={{ width:"100%", maxWidth:340, textAlign:"center" }}>
+        <div style={{ fontSize:36, marginBottom:10 }}>🏥</div>
+        <div style={{ fontSize:28, fontWeight:900, color:"white", marginBottom:4 }}>안부</div>
+        <div style={{ fontSize:13, color:"rgba(255,255,255,0.6)", marginBottom:36 }}>입원 환자 케어 연결 플랫폼</div>
+        <div style={{ display:"flex", flexDirection:"column", gap:10 }}>
+          {[
+            { type:"guardian", icon:"👨‍👩‍👧", label:"보호자",       sub:"어머니 오늘 상태 확인" },
+            { type:"nurse",    icon:"👩‍⚕️", label:"간호사",       sub:"환자 상태 입력" },
+            { type:"doctor",   icon:"🩺",   label:"의사",         sub:"담당 환자 현황 확인" },
+            { type:"messages", icon:"💬",   label:"보호자 한마디", sub:"면회 일정 및 메시지 확인" },
+            { type:"admin",    icon:"👑",   label:"관리자",       sub:"직원 계정 및 환자 관리" },
+          ].map(({ type, icon, label, sub }) => (
+            <button key={type} onClick={() => onSelect(type)} style={{ background:"rgba(255,255,255,0.1)", border:"1.5px solid rgba(255,255,255,0.15)", borderRadius:16, padding:"16px 20px", display:"flex", alignItems:"center", gap:14, cursor:"pointer", textAlign:"left" }}>
+              <span style={{ fontSize:26 }}>{icon}</span>
+              <div>
+                <div style={{ fontSize:15, fontWeight:800, color:"white" }}>{label}</div>
+                <div style={{ fontSize:12, color:"rgba(255,255,255,0.6)", marginTop:2 }}>{sub}</div>
+              </div>
+              <span style={{ marginLeft:"auto", color:"rgba(255,255,255,0.4)", fontSize:18 }}>›</span>
+            </button>
+          ))}
+        </div>
+        <div style={{ marginTop:28, fontSize:11, color:"rgba(255,255,255,0.3)" }}>버전 1.0</div>
+      </div>
+    </div>
+  );
+}
+
+// ── 보호자 화면 ───────────────────────────────────────────────
+function GuardianScreen({ patients, onBack, onMessage }) {
+  const [tab, setTab] = useState("today");
+  const [msg, setMsg] = useState("");
+  const [visitDate, setVisitDate] = useState("");
+  const [visitTime, setVisitTime] = useState("");
+  const [sent, setSent] = useState(false);
+  const [selectedId, setSelectedId] = useState(null);
+
+  const patient = selectedId ? patients.find(p => p.id === selectedId) : patients[0];
+
+  // 환자 선택 화면
+  if (!selectedId && patients.length > 1) return (
+    <div style={{ fontFamily:"'Noto Sans KR',sans-serif", background:"linear-gradient(160deg,#0f172a,#1e3a5f)", minHeight:"100vh", display:"flex", justifyContent:"center", alignItems:"center", padding:24 }}>
+      <div style={{ width:"100%", maxWidth:340 }}>
+        <div style={{ textAlign:"center", marginBottom:32 }}>
+          <div style={{ fontSize:36, marginBottom:10 }}>👨‍👩‍👧</div>
+          <div style={{ fontSize:22, fontWeight:900, color:"white", marginBottom:6 }}>보호자 로그인</div>
+          <div style={{ fontSize:13, color:"rgba(255,255,255,0.6)" }}>어르신 성함을 선택해주세요</div>
+        </div>
+        <div style={{ display:"flex", flexDirection:"column", gap:10 }}>
+          {[...patients].sort((a,b) => {
+            const aS = a.record && a.record.sentToGuardian ? 0 : a.record ? 1 : 2;
+            const bS = b.record && b.record.sentToGuardian ? 0 : b.record ? 1 : 2;
+            return aS - bS;
+          }).map(p => {
+            const isSent = p.record && p.record.sentToGuardian;
+            const isPending = p.record && !p.record.sentToGuardian;
+            return (
+              <button key={p.id} onClick={() => setSelectedId(p.id)} style={{ background: isSent ? "rgba(255,255,255,0.15)" : "rgba(255,255,255,0.07)", border: isSent ? "1.5px solid rgba(134,239,172,0.6)" : "1.5px solid rgba(255,255,255,0.1)", borderRadius:16, padding:"16px 20px", display:"flex", alignItems:"center", gap:14, cursor:"pointer", textAlign:"left" }}>
+                <div style={{ width:44, height:44, borderRadius:12, background: isSent ? "rgba(134,239,172,0.2)" : "rgba(255,255,255,0.12)", display:"flex", alignItems:"center", justifyContent:"center", fontSize:20, flexShrink:0 }}>
+                  {p.gender === "여" ? "👩" : "👴"}
+                </div>
+                <div style={{ flex:1 }}>
+                  <div style={{ display:"flex", alignItems:"center", gap:8, marginBottom:3 }}>
+                    <span style={{ fontSize:16, fontWeight:800, color:"white" }}>{p.name} {getTitle(p)}</span>
+                    {isSent && (
+                      <span style={{ fontSize:10, fontWeight:800, background:"#4ade80", color:"#14532d", borderRadius:20, padding:"2px 8px" }}>오늘 확인 가능</span>
+                    )}
+                    {isPending && (
+                      <span style={{ fontSize:10, fontWeight:800, background:"rgba(253,224,71,0.3)", color:"#fde047", borderRadius:20, padding:"2px 8px" }}>검토 중</span>
+                    )}
+                  </div>
+                  <div style={{ fontSize:12, color:"rgba(255,255,255,0.6)" }}>{getWard(p.room)} · 입원 {p.days}일째</div>
+                  {isSent && (
+                    <div style={{ fontSize:11, color:"#4ade80", marginTop:3, fontWeight:600 }}>✓ {p.record.updatedAt} 업데이트</div>
+                  )}
+                </div>
+                <span style={{ color: isSent ? "#4ade80" : "rgba(255,255,255,0.3)", fontSize:18 }}>›</span>
+              </button>
+            );
+          })}
+        </div>
+        <button onClick={onBack} style={{ marginTop:20, width:"100%", background:"transparent", border:"none", color:"rgba(255,255,255,0.4)", fontSize:13, cursor:"pointer" }}>← 역할 선택으로</button>
+      </div>
+    </div>
+  );
+  const rec = patient && patient.record;
+  const r = rec && rec.sentToGuardian ? rec : null;
+  const pending = rec && !rec.sentToGuardian;
+
+  const today = new Date();
+  const dates = Array.from({ length:14 }, (_, i) => today.getDate() + i);
+
+  const handleSend = () => {
+    if (!msg.trim()) return;
+    if (onMessage) onMessage(patient.id, msg, visitDate, visitTime);
+    setSent(true);
+    setMsg(""); setVisitDate(""); setVisitTime("");
+    setTimeout(() => setSent(false), 3000);
+  };
+
+  return (
+    <div style={{ fontFamily:"'Noto Sans KR',sans-serif", background:"#f0f4f8", minHeight:"100vh", display:"flex", justifyContent:"center" }}>
+      <div style={{ width:"100%", maxWidth:390, paddingBottom:32 }}>
+        <div style={{ padding:"14px 16px 0" }}>
+          <div style={{ background:"linear-gradient(135deg,#1e3a5f,#2d6a9f)", padding:"16px 20px", color:"white", borderRadius:20 }}>
+            <div style={{ display:"flex", alignItems:"center", gap:10, marginBottom:12 }}>
+              <button onClick={() => patients.length > 1 ? setSelectedId(null) : onBack()} style={{ background:"rgba(255,255,255,0.15)", border:"none", borderRadius:8, padding:"4px 10px", color:"white", fontSize:12, cursor:"pointer", fontWeight:700 }}>← {patients.length > 1 ? "환자 선택" : "역할 선택"}</button>
+              <div style={{ fontSize:11, opacity:0.7 }}>안부 · 보호자</div>
+            </div>
+            <div style={{ fontSize:22, fontWeight:700, marginBottom:2 }}>{patient && patient.name} {getTitle(patient)}</div>
+            <div style={{ fontSize:13, opacity:0.75, marginBottom:14 }}>{getWard(patient && patient.room)} · 주치의 : {getDoctorTitle(patient && patient.doctorId)}</div>
+            <div style={{ display:"flex", gap:8 }}>
+              {[
+                { label:"입원일수", value: (patient && patient.days) + "일째" },
+                { label:"의식수준", value: r ? (r.consciousness||"—") : "—" },
+                { label:"식사",     value: r ? (r.meal_amount === "잘 드심" ? "양호" : r.meal_amount === "절반" ? "보통" : r.meal_amount ? "저하" : "—") : "—" },
+                { label:"기분",     value: r ? (r.moods && r.moods.length > 0 ? r.moods[0] : "—") : "—" },
+              ].map(item => (
+                <div key={item.label} style={{ flex:1, background:"rgba(255,255,255,0.12)", borderRadius:12, padding:"10px 6px" }}>
+                  <div style={{ fontSize:9, opacity:0.7, marginBottom:2 }}>{item.label}</div>
+                  <div style={{ fontSize:12, fontWeight:800 }}>{item.value}</div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+
+        {pending && (
+          <div style={{ margin:"10px 16px 0", background:"#fffbeb", border:"1px solid #fcd34d", borderRadius:14, padding:"12px 16px", fontSize:13, color:"#713f12", fontWeight:700, display:"flex", alignItems:"center", gap:8 }}>
+            <span>🩺</span><span>간호사 입력 완료 · 주치의 검토 후 전달 예정이에요.</span>
+          </div>
+        )}
+        {!r && !pending && (
+          <div style={{ margin:"10px 16px 0", background:"#eff6ff", border:"1px solid #bfdbfe", borderRadius:14, padding:"12px 16px", fontSize:13, color:"#1e40af", fontWeight:700, display:"flex", alignItems:"center", gap:8 }}>
+            <span>⏳</span><span>오늘 상태는 저녁 간호사 입력 후 확인하실 수 있어요.</span>
+          </div>
+        )}
+        {r && (
+          <div style={{ margin:"10px 16px 0", background:"#f0fdf4", border:"1px solid #86efac", borderRadius:14, padding:"10px 16px", fontSize:12, color:"#166534", fontWeight:700 }}>
+            ✅ {r.updatedAt} 입력 완료 · 주치의 확인됨
+          </div>
+        )}
+
+        <div style={{ margin:"10px 16px 0", display:"flex", background:"white", borderRadius:14, padding:4, gap:3, border:"1.5px solid #cbd5e1" }}>
+          {[["today","오늘"],["message", getTitle(patient)+" 한마디"]].map(([t,l]) => (
+            <button key={t} onClick={() => setTab(t)} style={{ flex:1, padding:"8px 4px", borderRadius:10, border:"none", cursor:"pointer", fontSize:13, fontWeight: tab===t ? 800 : 600, background: tab===t ? "#1e3a5f" : "transparent", color: tab===t ? "white" : "#64748b" }}>{l}</button>
+          ))}
+        </div>
+
+        <div style={{ padding:"12px 16px 0" }}>
+          {tab === "today" && r && (
+            <>
+              <Card icon="🧠" title="의식수준"><Row label="의식수준" value={r.consciousness} vc={scoreColor(r.consciousness)} /></Card>
+              <Card icon="🍚" title="식사">
+                <Row label="식사량" value={r.meal_amount} vc={scoreColor(r.meal_amount)} />
+                <Row label="식사 종류" value={r.meal_type} />
+                {r.meal_refused && <Row label="식사 거부" value="있음" vc="#ef4444" />}
+              </Card>
+              <Card icon="🌙" title="수면">
+                <Row label="수면 시간" value={r.sleep_hours} />
+                <Row label="중간 각성" value={r.sleep_wakeups} />
+              </Card>
+              <Card icon="🚶" title="활동">
+                <Row label="이동 방법" value={r.mobility} />
+                <Row label="낙상 위험" value={r.fall_risk} vc={r.fall_risk === "매우 높음" ? "#ef4444" : "#713f12"} />
+                {r.programs && r.programs.length > 0 && <Row label="프로그램" value={r.programs.join(", ")} />}
+              </Card>
+              <Card icon="💧" title="소변"><Row label="소변 상태" value={r.urine} vc={scoreColor(r.urine)} /></Card>
+              <Card icon="🚽" title="대변"><Row label="배변 상태" value={r.bowel} vc={scoreColor(r.bowel)} /></Card>
+              {r.medication && (
+                <Card icon="💊" title="투약 상태">
+                  <div style={{ display:"flex", alignItems:"center", gap:10, background:"#f8fafc", borderRadius:10, padding:"8px 12px" }}>
+                    <span style={{ fontSize:20 }}>{r.medication === "정상 투약" ? "✅" : "⚠️"}</span>
+                    <div style={{ fontSize:14, fontWeight:700, color: r.medication === "정상 투약" ? "#166534" : "#ef4444" }}>{r.medication}</div>
+                  </div>
+                </Card>
+              )}
+              <Card icon="😊" title="기분"><Row label="기분" value={r.moods && r.moods.join(", ")} vc={r.moods && r.moods.includes("안정") ? "#166534" : "#7f1d1d"} /></Card>
+              <Card icon="🧩" title="정신 및 이상행동 상태">
+                <div style={{ display:"flex", flexWrap:"wrap", gap:6 }}>
+                  {(r.mental && r.mental.length > 0 ? r.mental : ["미입력"]).map(s => (
+                    <span key={s} style={{ fontSize:12, fontWeight:700, borderRadius:20, padding:"2px 10px", background: s==="이상 없음" ? "#f0fdf4" : s==="미입력" ? "#f1f5f9" : "#fef2f2", color: s==="이상 없음" ? "#166534" : s==="미입력" ? "#aaa" : "#7f1d1d" }}>{s}</span>
+                  ))}
+                </div>
+              </Card>
+              <Card icon="🧴" title="피부 · 위생 · 욕창">
+                <Row label="피부" value={r.skin} vc={scoreColor(r.skin)} />
+                <Row label="위생" value={r.hygiene} vc={scoreColor(r.hygiene)} />
+                <Row label="욕창" value={r.bedsore} vc={r.bedsore==="없음" ? "#166534" : "#ef4444"} />
+              </Card>
+              {r.oriental !== null && r.oriental !== undefined && (
+                <Card icon="🪡" title="한방 치료">
+                  <Row label="시행 여부" value={r.oriental ? "시행" : "미시행"} vc={r.oriental ? "#0d5c56" : "#64748b"} />
+                </Card>
+              )}
+              {r.note && (
+                <div style={{ background:"linear-gradient(135deg,#f0fdf4,#dcfce7)", borderRadius:14, padding:"12px 16px", marginBottom:10, border:"1px solid #86efac" }}>
+                  <div style={{ fontSize:12, fontWeight:800, color:"#166534", marginBottom:6 }}>📝 간호사 특이사항</div>
+                  <div style={{ fontSize:13, color:"#166534", lineHeight:1.7 }}>{r.note}</div>
+                </div>
+              )}
+              {r.doctorComment && (
+                <div style={{ background:"linear-gradient(135deg,#eff6ff,#dbeafe)", borderRadius:14, padding:"12px 16px", marginBottom:10, border:"1px solid #93c5fd" }}>
+                  <div style={{ fontSize:12, fontWeight:800, color:"#1e40af", marginBottom:6 }}>👨‍⚕️ 주치의 코멘트 · {r.doctorCommentDate}</div>
+                  <div style={{ fontSize:13, color:"#1e3a5f", lineHeight:1.7, fontWeight:600 }}>{r.doctorComment}</div>
+                </div>
+              )}
+            </>
+          )}
+          {tab === "today" && !r && (
+            <div style={{ textAlign:"center", padding:"40px 20px", color:"#94a3b8" }}>
+              <div style={{ fontSize:40, marginBottom:12 }}>⏳</div>
+              <div style={{ fontSize:14, fontWeight:600 }}>아직 오늘 상태가 입력되지 않았어요</div>
+            </div>
+          )}
+          {tab === "message" && (
+            <div style={{ background:"white", borderRadius:16, padding:20, border:"1.5px solid #cbd5e1" }}>
+              <div style={{ fontSize:14, fontWeight:700, color:"#1a1a1a", marginBottom:10 }}>{getTitle(patient)} 한마디</div>
+              <div style={{ background:"#f0f7ff", border:"1px solid #bfdbfe", borderRadius:10, padding:"12px 14px", marginBottom:14 }}>
+                <div style={{ fontSize:12, color:"#1e40af", lineHeight:1.7, marginBottom:10 }}>
+                  이 메시지는 {getTitle(patient)}께 전달되는 용도입니다.<br />
+                  <span style={{ color:"#1d4ed8", fontWeight:700 }}>이 곳에서는 답장이 어렵습니다.</span>
+                </div>
+                <div style={{ borderTop:"1px solid #bfdbfe", paddingTop:10, display:"flex", alignItems:"center", justifyContent:"space-between" }}>
+                  <div>
+                    <div style={{ fontSize:11, color:"#1d4ed8", fontWeight:700, marginBottom:3 }}>긴급 시 병원으로 연락주세요</div>
+                    <div style={{ fontSize:15, fontWeight:800, color:"#1e3a5f" }}>041-574-1777</div>
+                  </div>
+                  <a href="tel:041-574-1777" style={{ background:"#1e3a5f", color:"white", borderRadius:10, padding:"9px 14px", fontSize:13, fontWeight:700, textDecoration:"none" }}>📞 전화하기</a>
+                </div>
+              </div>
+              {sent ? (
+                <div style={{ background:"#f0fdf4", borderRadius:12, padding:16, textAlign:"center", color:"#16a34a", fontWeight:600 }}>✅ 메시지가 전달됐어요</div>
+              ) : (
+                <>
+                  <textarea value={msg} onChange={e => setMsg(e.target.value)} placeholder={"예) " + (patient && patient.gender==="여" ? "어머니" : "아버지") + " 오늘 밥 잘 드세요 😊"} style={{ width:"100%", height:80, borderRadius:12, border:"1px solid #e2e8f0", padding:12, fontSize:14, color:"#333", resize:"none", outline:"none", fontFamily:"inherit", boxSizing:"border-box", lineHeight:1.6, marginBottom:10 }} />
+                  <div style={{ background:"#f8fafc", borderRadius:12, padding:"12px 14px", marginBottom:10 }}>
+                    <div style={{ fontSize:12, fontWeight:700, color:"#475569", marginBottom:8 }}>📅 면회 예정일 (선택)</div>
+                    <div style={{ display:"flex", gap:6, flexWrap:"wrap", marginBottom:8 }}>
+                      {dates.slice(0,14).map(d => (
+                        <button key={d} onClick={() => setVisitDate(visitDate === (today.getMonth()+1) + "월 " + d + "일" ? "" : (today.getMonth()+1) + "월 " + d + "일")} style={{ padding:"5px 10px", borderRadius:8, border:"1px solid #e2e8f0", cursor:"pointer", fontSize:12, fontWeight:700, background: visitDate === (today.getMonth()+1) + "월 " + d + "일" ? "#1e3a5f" : "white", color: visitDate === (today.getMonth()+1) + "월 " + d + "일" ? "white" : "#334155" }}>{d}일</button>
+                      ))}
+                    </div>
+                    {visitDate && (
+                      <div style={{ display:"flex", gap:6, flexWrap:"wrap" }}>
+                        {["오전 10시","오전 11시","오후 1시","오후 2시","오후 3시","오후 4시"].map(t => (
+                          <button key={t} onClick={() => setVisitTime(visitTime === t ? "" : t)} style={{ padding:"5px 10px", borderRadius:8, border:"1px solid #e2e8f0", cursor:"pointer", fontSize:12, fontWeight:700, background: visitTime === t ? "#1e3a5f" : "white", color: visitTime === t ? "white" : "#334155" }}>{t}</button>
+                        ))}
+                      </div>
+                    )}
+                    {visitDate && <div style={{ marginTop:8, fontSize:12, color:"#1e3a5f", fontWeight:700 }}>📅 면회 예정: {visitDate} {visitTime}</div>}
+                  </div>
+                  <button onClick={handleSend} style={{ width:"100%", padding:13, borderRadius:12, border:"none", background: msg.trim() ? "#1e3a5f" : "#e2e8f0", color: msg.trim() ? "white" : "#aaa", fontSize:14, fontWeight:700, cursor: msg.trim() ? "pointer" : "default" }}>전달하기</button>
+                </>
+              )}
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ── 간호사 화면 ───────────────────────────────────────────────
+function NurseScreen({ patients, onSave, onBack, messages, onMarkRead, onAddPatient, onUpdatePatient }) {
+  const [screen, setScreen] = useState("list");
+  const [selected, setSelected] = useState(null);
+  const [form, setForm] = useState(initForm());
+  const [noteMode, setNoteMode] = useState("direct");
+
+  const [detailPatient, setDetailPatient] = useState(null);
+  const set = (k,v) => setForm(f => ({ ...f, [k]:v }));
+  const toggle = (k,v) => setForm(f => ({ ...f, [k]: f[k].includes(v) ? f[k].filter(x=>x!==v) : [...f[k],v] }));
+
+  const doneCount = patients.filter(p => p.record).length;
+  const progress = Math.round(doneCount / patients.length * 100);
+  const unread = messages ? messages.filter(m => !m.read).length : 0;
+
+  const now = () => { const d = new Date(); return (d.getMonth()+1) + "월 " + d.getDate() + "일 " + d.getHours() + ":" + String(d.getMinutes()).padStart(2,"0"); };
+
+  const handleSave = () => {
+    onSave(selected.id, { ...form, updatedAt: now(), pending:true, sentToGuardian:false });
+    setScreen("list");
+  };
+
+  const handleSkip = () => {
+    onSave(selected.id, { ...initForm(), consciousness:"명료", meal_amount:"잘 드심", meal_type:"죽", sleep_hours:"6~8시간", sleep_wakeups:"없음", mobility:"워커", fall_risk:"주의", urine:"정상", bowel:"정상", medication:"정상 투약", painad:0, moods:["안정"], mental:["이상 없음"], skin:"양호", hygiene:"양호", bedsore:"없음", oriental:false, note:"이상 없음", updatedAt:now(), pending:true, sentToGuardian:false });
+    setScreen("list");
+  };
+
+  const PRESET_NOTES = ["전반적으로 안정적인 하루였습니다.","식사량이 평소보다 줄었습니다.","수면 중 자주 깨어 불안해하셨습니다.","보행 시 불안정한 모습이 관찰됩니다.","통증을 호소하셨으나 처치 후 안정됐습니다.","섬망 증상이 관찰되었습니다.","기침이 잦아 관찰 중입니다.","발열이 있어 처치 중입니다.","가족 면회 후 기분이 좋아보이셨습니다.","프로그램 참여 시 즐거워하셨습니다.","경관식 잘 진행되었습니다.","욕창 처치 시행하였습니다.","체위 변경 2시간마다 시행하였습니다.","낙상 위험으로 침대 난간 올려두었습니다."];
+
+  const sortAlert = arr => [...arr.filter(p => p.alert), ...arr.filter(p => !p.alert)];
+  const pending = sortAlert(patients.filter(p => p.record && !p.record.sentToGuardian));
+  const notInput = sortAlert(patients.filter(p => !p.record));
+  const sent = sortAlert(patients.filter(p => p.record && p.record.sentToGuardian));
+
+
+
+  const NurseCard = (p, idx) => {
+    const isDone = !!p.record;
+    const isPending = isDone && !p.record.sentToGuardian;
+    const isSent = isDone && p.record.sentToGuardian;
+    const sentToday = isSent && isToday(p.record.updatedAt);
+    return (
+      <button key={p.id} onClick={() => { if (sentToday) { setDetailPatient(p); } else { setSelected(p); setForm(initForm()); setScreen("input"); } }} style={{ background:"white", borderRadius:14, border: isPending ? "1.5px solid #fcd34d" : sentToday ? "1.5px solid #86efac" : "1.5px solid #cbd5e1", padding:"13px 14px", display:"flex", alignItems:"center", gap:12, cursor:"pointer", textAlign:"left", width:"100%" }}>
+        <div style={{ width:34, height:34, borderRadius:10, flexShrink:0, background: isPending ? "#fffbeb" : sentToday ? "#f0fdf4" : "#f0f4f8", display:"flex", alignItems:"center", justifyContent:"center", fontSize:13, fontWeight:800, color: isPending ? "#713f12" : sentToday ? "#16a34a" : "#64748b" }}>{sentToday ? "✓" : isPending ? "⏳" : idx+1}</div>
+        <div style={{ flex:1 }}>
+          <div style={{ display:"flex", alignItems:"center", gap:6, marginBottom:2 }}>
+            <span style={{ fontSize:15, fontWeight:800, color:"#1a1a1a" }}>{p.name}</span>
+            <span style={{ fontSize:11, color:"#94a3b8" }}>{p.age}세 · {p.gender}</span>
+            {sentToday && <span style={{ fontSize:10, fontWeight:800, background:"#dcfce7", color:"#166534", borderRadius:20, padding:"2px 8px" }}>✅ 오늘 전송완료</span>}
+          </div>
+          <div style={{ fontSize:12, color:"#64748b" }}>{getWard(p.room)} · 입원 {p.days}일째</div>
+          {p.alert && <div style={{ fontSize:11, color:"#ef4444", fontWeight:700, marginTop:2 }}>⚠️ {p.alertMsg}</div>}
+          {sentToday && <div style={{ fontSize:11, color:"#16a34a", fontWeight:600, marginTop:2 }}>보호자 전달 완료 · {p.record.updatedAt}</div>}
+        </div>
+        <div style={{ fontSize:16, color: sentToday ? "#86efac" : "#cbd5e1" }}>{sentToday ? "👁" : "›"}</div>
+      </button>
+    );
+  };
+
+  // 전송완료 환자 상세보기
+  if (detailPatient) {
+    const r = detailPatient.record;
+    return (
+      <div style={{ fontFamily:"'Noto Sans KR',sans-serif", background:"#f0f4f8", minHeight:"100vh", display:"flex", justifyContent:"center" }}>
+        <div style={{ width:"100%", maxWidth:390, paddingBottom:32 }}>
+          <div style={{ background:"linear-gradient(135deg,#0d5c56,#166534)", padding:"14px 20px", color:"white", display:"flex", alignItems:"center", gap:12 }}>
+            <button onClick={() => setDetailPatient(null)} style={{ background:"rgba(255,255,255,0.15)", border:"none", borderRadius:8, padding:"6px 12px", color:"white", fontSize:13, cursor:"pointer", fontWeight:700 }}>← 목록</button>
+            <div style={{ flex:1 }}>
+              <div style={{ fontSize:16, fontWeight:800 }}>{detailPatient.name} 어르신</div>
+              <div style={{ fontSize:11, opacity:0.8 }}>✅ 오늘 전송완료 · {r && r.updatedAt}</div>
+            </div>
+          </div>
+          <div style={{ margin:"12px 16px 0", background:"#f0fdf4", border:"1px solid #86efac", borderRadius:14, padding:"12px 16px", fontSize:13, color:"#166534", fontWeight:700 }}>
+            ✅ 오늘 보호자에게 전달이 완료됐어요. 내일 새로 입력할 수 있어요.
+          </div>
+          <div style={{ padding:"12px 16px 0" }}>
+            <div style={{ background:"white", borderRadius:16, overflow:"hidden", border:"1.5px solid #cbd5e1", marginBottom:12 }}>
+              <div style={{ background:"#1e3a5f", padding:"5px 14px" }}><span style={{ fontSize:12, fontWeight:800, color:"#f0f9ff" }}>📋 오늘 입력 내용</span></div>
+              <div style={{ padding:"10px 14px" }}>
+                <Row label="의식수준" value={r && r.consciousness} vc={scoreColor(r && r.consciousness)} />
+                <Row label="식사량" value={r && r.meal_amount} vc={scoreColor(r && r.meal_amount)} />
+                <Row label="수면" value={r && r.sleep_hours} />
+                <Row label="이동 방법" value={r && r.mobility} />
+                <Row label="소변" value={r && r.urine} />
+                <Row label="대변" value={r && r.bowel} />
+                <Row label="투약" value={r && r.medication} vc={r && r.medication==="정상 투약"?"#166534":"#ef4444"} />
+                <Row label="통증" value={r && r.painad !== null ? r.painad+"점" : "—"} />
+                <Row label="기분" value={r && r.moods && r.moods.join(", ")} />
+                <Row label="정신 상태" value={r && r.mental && r.mental.join(", ")} />
+                <Row label="욕창" value={r && r.bedsore} vc={r && r.bedsore==="없음"?"#166534":"#ef4444"} />
+                <Row label="한방 치료" value={r && r.oriental===true?"시행":r && r.oriental===false?"미시행":"—"} />
+                {r && r.note && <div style={{ marginTop:6, padding:"8px 10px", background:"#f8fafc", borderRadius:10, fontSize:12, color:"#444", lineHeight:1.6 }}>📝 {r.note}</div>}
+              </div>
+            </div>
+            {r && r.doctorComment && (
+              <div style={{ background:"linear-gradient(135deg,#eff6ff,#dbeafe)", borderRadius:14, padding:"12px 16px", border:"1px solid #93c5fd" }}>
+                <div style={{ fontSize:12, fontWeight:800, color:"#1e40af", marginBottom:6 }}>👨‍⚕️ 주치의 코멘트</div>
+                <div style={{ fontSize:13, color:"#1e3a5f", lineHeight:1.7 }}>{r.doctorComment}</div>
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (screen === "list") return (
+    <div style={{ fontFamily:"'Noto Sans KR',sans-serif", background:"#f0f4f8", minHeight:"100vh", display:"flex", justifyContent:"center" }}>
+      <div style={{ width:"100%", maxWidth:390 }}>
+        <div style={{ background:"linear-gradient(135deg,#1e3a5f,#2d6a9f)", padding:"14px 20px 12px", color:"white" }}>
+          <div style={{ display:"flex", alignItems:"center", gap:10, marginBottom:10 }}>
+            <button onClick={onBack} style={{ background:"rgba(255,255,255,0.15)", border:"none", borderRadius:8, padding:"4px 10px", color:"white", fontSize:12, cursor:"pointer", fontWeight:700 }}>← 역할 선택</button>
+            <div style={{ flex:1 }}>
+              <div style={{ fontSize:11, opacity:0.7 }}>안부 · 간호사</div>
+              <div style={{ fontSize:17, fontWeight:800 }}>오늘 상태 입력</div>
+            </div>
+            <div style={{ textAlign:"right" }}>
+              <div style={{ fontSize:11, opacity:0.7 }}>입력 완료</div>
+              <div style={{ fontSize:18, fontWeight:800 }}>{doneCount} / {patients.length}명</div>
+            </div>
+          </div>
+          <div style={{ background:"rgba(255,255,255,0.2)", borderRadius:99, height:5 }}>
+            <div style={{ background:"#4ade80", borderRadius:99, height:5, width: progress + "%" }} />
+          </div>
+          <div style={{ display:"flex", gap:8, marginTop:10 }}>
+            <button onClick={() => { if(onMarkRead) onMarkRead(); setScreen("messages"); }} style={{ flex:2, background: unread > 0 ? "#ef4444" : "rgba(255,255,255,0.15)", border:"none", borderRadius:10, padding:"8px 14px", color:"white", fontSize:12, cursor:"pointer", fontWeight:700, display:"flex", alignItems:"center", justifyContent:"space-between" }}>
+              <span>💬 보호자 한마디</span>
+              <span>{unread > 0 ? "🔴 " + unread + "건" : "없음"}</span>
+            </button>
+            <button onClick={() => setScreen("manage")} style={{ flex:1, background:"rgba(255,255,255,0.15)", border:"none", borderRadius:10, padding:"8px 10px", color:"white", fontSize:11, cursor:"pointer", fontWeight:700, textAlign:"center" }}>👥 환자관리</button>
+          </div>
+        </div>
+        <div style={{ padding:"12px 16px 32px", display:"flex", flexDirection:"column", gap:6 }}>
+          {pending.length > 0 && <><SectionHeader icon="🕐" label="주치의 검토 대기" count={pending.length} color="#713f12" bg="#fffbeb" />{pending.map((p,i) => NurseCard(p, i+1))}</>}
+          {notInput.length > 0 && <><SectionHeader icon="⏳" label="미입력" count={notInput.length} color="#334155" bg="#e2e8f0" />{notInput.map((p,i) => NurseCard(p, pending.length+i+1))}</>}
+          {sent.length > 0 && <><SectionHeader icon="✅" label="전송 완료" count={sent.length} color="#16a34a" bg="#f0fdf4" />{sent.map((p,i) => NurseCard(p, pending.length+notInput.length+i+1))}</>}
+        </div>
+      </div>
+    </div>
+  );
+
+  if (screen === "messages") return (
+    <div style={{ fontFamily:"'Noto Sans KR',sans-serif", background:"#f0f4f8", minHeight:"100vh", display:"flex", justifyContent:"center" }}>
+      <div style={{ width:"100%", maxWidth:390 }}>
+        <div style={{ background:"linear-gradient(135deg,#1e3a5f,#2d6a9f)", padding:"14px 20px", color:"white", display:"flex", alignItems:"center", gap:12 }}>
+          <button onClick={() => setScreen("list")} style={{ background:"rgba(255,255,255,0.15)", border:"none", borderRadius:8, padding:"6px 12px", color:"white", fontSize:13, cursor:"pointer", fontWeight:700 }}>← 목록</button>
+          <div style={{ fontSize:16, fontWeight:800 }}>💬 보호자 한마디</div>
+        </div>
+        <div style={{ padding:"14px 16px", display:"flex", flexDirection:"column", gap:10 }}>
+          {!messages || messages.length === 0 ? (
+            <div style={{ textAlign:"center", padding:"40px 20px", color:"#94a3b8" }}>
+              <div style={{ fontSize:40, marginBottom:8 }}>💬</div>
+              <div style={{ fontSize:14, fontWeight:600 }}>보호자 메시지가 없어요</div>
+            </div>
+          ) : messages.slice().reverse().map((m, i) => {
+            const p = patients.find(x => x.id === m.patientId);
+            return (
+              <div key={i} style={{ background:"white", borderRadius:14, padding:"14px 16px", border:"1.5px solid #cbd5e1" }}>
+                <div style={{ display:"flex", alignItems:"center", gap:8, marginBottom:6 }}>
+                  <span style={{ fontSize:13, fontWeight:800, color:"#1e3a5f" }}>{p && p.name} {getTitle(p)} 가족</span>
+                  <span style={{ fontSize:11, color:"#aaa", marginLeft:"auto" }}>{m.time}</span>
+                </div>
+                {m.visitDate && <div style={{ background:"#eff6ff", borderRadius:8, padding:"6px 10px", marginBottom:8, fontSize:12, color:"#1e40af", fontWeight:700 }}>📅 면회 예정: {m.visitDate} {m.visitTime}</div>}
+                <div style={{ fontSize:13, color:"#334155", lineHeight:1.7, background:"#f8fafc", borderRadius:10, padding:"10px 12px" }}>{m.text}</div>
+              </div>
+            );
+          })}
+        </div>
+      </div>
+    </div>
+  );
+
+  if (screen === "manage") return (
+    <PatientManage patients={patients} onBack={() => setScreen("list")} onAddPatient={onAddPatient} onUpdatePatient={onUpdatePatient} />
+  );
+
+  return (
+    <div style={{ fontFamily:"'Noto Sans KR',sans-serif", background:"#f0f4f8", minHeight:"100vh", display:"flex", justifyContent:"center", paddingBottom:40 }}>
+      <div style={{ width:"100%", maxWidth:390 }}>
+        <div style={{ background:"linear-gradient(135deg,#1e3a5f,#2d6a9f)", padding:"14px 20px", color:"white", display:"flex", alignItems:"center", gap:10, position:"sticky", top:0, zIndex:10 }}>
+          <button onClick={() => setScreen("list")} style={{ background:"rgba(255,255,255,0.15)", border:"none", borderRadius:10, padding:"6px 12px", color:"white", fontSize:13, cursor:"pointer", fontWeight:700 }}>← 목록</button>
+          <div style={{ flex:1 }}>
+            <div style={{ fontSize:16, fontWeight:800 }}>{selected && selected.name} 어르신</div>
+            <div style={{ fontSize:11, opacity:0.75 }}>{selected && getWard(selected.room)} · {selected && selected.age}세</div>
+          </div>
+          <button onClick={handleSkip} style={{ background:"rgba(255,255,255,0.15)", border:"none", borderRadius:10, padding:"6px 10px", color:"white", fontSize:11, cursor:"pointer", fontWeight:700, textAlign:"center" }}>이상없음</button>
+        </div>
+        {selected && selected.alert && <div style={{ background:"#fef2f2", padding:"10px 20px", fontSize:12, color:"#ef4444", fontWeight:600 }}>⚠️ 어제 특이사항: {selected.alertMsg}</div>}
+        <div style={{ padding:"14px 16px 0" }}>
+          <Sec title="🧠 의식수준"><BtnRow>{["명료","졸림","많이졸림"].map(v => <Btn key={v} label={v} active={form.consciousness===v} onClick={() => set("consciousness",v)} color={v==="명료"?"#166534":v==="졸림"?"#713f12":"#7f1d1d"} />)}</BtnRow></Sec>
+          <Sec title="🍚 식사">
+            <Lbl text="식사량" /><BtnRow>{["잘 드심","절반","거의 안 드심"].map(v => <Btn key={v} label={v} active={form.meal_amount===v} onClick={() => set("meal_amount",v)} color={v==="잘 드심"?"#166534":v==="절반"?"#713f12":"#7f1d1d"} />)}</BtnRow>
+            <Lbl text="식사 종류" /><BtnRow>{["일반식","죽","유동식","경관식"].map(v => <Btn key={v} label={v} active={form.meal_type===v} onClick={() => set("meal_type",v)} small />)}</BtnRow>
+            <BtnRow><Btn label="식사 거부" active={form.meal_refused} onClick={() => set("meal_refused",!form.meal_refused)} color="#7f1d1d" small /><Btn label="흡인 위험" active={form.meal_aspiration} onClick={() => set("meal_aspiration",!form.meal_aspiration)} color="#7f1d1d" small /></BtnRow>
+          </Sec>
+          <Sec title="🌙 수면">
+            <Lbl text="수면 시간" /><BtnRow>{["4시간 미만","4~6시간","6~8시간","8시간 이상"].map(v => <Btn key={v} label={v} active={form.sleep_hours===v} onClick={() => set("sleep_hours",v)} small />)}</BtnRow>
+            <Lbl text="중간 각성" /><BtnRow>{["없음","1회","2회","3회 이상"].map(v => <Btn key={v} label={v} active={form.sleep_wakeups===v} onClick={() => set("sleep_wakeups",v)} small />)}</BtnRow>
+            <BtnRow><Btn label="낮잠 있음" active={form.sleep_nap} onClick={() => set("sleep_nap",!form.sleep_nap)} small /><Btn label="수면 중 이상행동" active={form.sleep_abnormal} onClick={() => set("sleep_abnormal",!form.sleep_abnormal)} color="#7f1d1d" small /></BtnRow>
+          </Sec>
+          <Sec title="🚶 활동">
+            <Lbl text="이동 방법" /><BtnRow>{["독립 보행","부축 보행","워커","휠체어","침상 안정"].map(v => <Btn key={v} label={v} active={form.mobility===v} onClick={() => set("mobility",v)} small />)}</BtnRow>
+            {form.mobility && form.mobility !== "침상 안정" && (<><Lbl text="이동 횟수" /><BtnRow>{["1회","2회","3회","4회 이상"].map(v => <Btn key={v} label={v} active={form.walk_count===v} onClick={() => set("walk_count",v)} small />)}</BtnRow></>)}
+            <Lbl text="낙상 위험" /><BtnRow>{["주의","높음","매우 높음"].map(v => <Btn key={v} label={v} active={form.fall_risk===v} onClick={() => set("fall_risk",v)} color={v==="주의"?"#713f12":"#7f1d1d"} small />)}</BtnRow>
+            <Lbl text="프로그램 참여" />
+            <BtnRow>{["그림그리기","음악치료","예배","생일잔치","공연"].map(v => <Btn key={v} label={v} active={form.programs.includes(v)} onClick={() => { set("programs", form.programs.includes(v) ? form.programs.filter(x=>x!==v) : [...form.programs.filter(x=>x!=="미참여"), v]); }} color="#0d5c56" small />)}</BtnRow>
+            <BtnRow><Btn label="미참여" active={form.programs.includes("미참여")} onClick={() => set("programs", form.programs.includes("미참여") ? [] : ["미참여"])} color="#94a3b8" small /></BtnRow>
+          </Sec>
+          <Sec title="💧 소변">
+            <BtnRow>{["정상","감소","농축","실금"].map(v => <Btn key={v} label={v} active={form.urine===v} onClick={() => set("urine",v)} color={v==="정상"?"#166534":"#7f1d1d"} small />)}</BtnRow>
+            <BtnRow><Btn label="카테터 사용 중" active={form.urine_catheter} onClick={() => set("urine_catheter",!form.urine_catheter)} color="#713f12" small /></BtnRow>
+          </Sec>
+          <Sec title="🚽 대변"><BtnRow>{["정상","변비","설사","묽은 변","실금","관장"].map(v => <Btn key={v} label={v} active={form.bowel===v} onClick={() => set("bowel",v)} color={v==="정상"?"#166534":"#7f1d1d"} small />)}</BtnRow></Sec>
+          <Sec title="💊 투약 상태"><BtnRow>{["정상 투약","투약 거부","투약 일시중단","약물 토함"].map(v => <Btn key={v} label={v} active={form.medication===v} onClick={() => set("medication",v)} color={v==="정상 투약"?"#166534":"#7f1d1d"} small />)}</BtnRow></Sec>
+          <Sec title="💊 통증 (PAINAD)">
+            <div style={{ fontSize:12, color:"#64748b", marginBottom:10 }}>0 = 통증 없음 · 10 = 극심한 통증</div>
+            <div style={{ display:"flex", flexDirection:"column", gap:5 }}>
+              {[{n:0,desc:"통증 없음 — 편안한 호흡, 이완된 표정"},{n:1,desc:"통증 거의 없음 — 약간 힘든 호흡"},{n:2,desc:"경미 — 가끔 찡그림"},{n:3,desc:"경미~중등도 — 간헐적 신음, 긴장"},{n:4,desc:"중등도 — 반복적 신음, 주먹 쥠"},{n:5,desc:"중등도~심함 — 자주 신음"},{n:6,desc:"심함 — 반복적 울음, 달래기 어려움"},{n:7,desc:"매우 심함 — 지속적 울음·경직"},{n:8,desc:"극심 — 극도 긴장, 달래도 무반응"},{n:9,desc:"극심 — 통증으로 반응 불가"},{n:10,desc:"최고 극심 — 극도 고통 상태"}].map(({n,desc}) => (
+                <button key={n} onClick={() => set("painad",n)} style={{ textAlign:"left", padding:"7px 12px", borderRadius:10, border:"none", cursor:"pointer", background: form.painad===n ? (n<=2?"#166534":n<=6?"#713f12":"#7f1d1d") : "#f8fafc", color: form.painad===n ? "white" : "#334155" }}>
+                  <span style={{ fontSize:13, fontWeight:800, marginRight:8 }}>{n}점</span>
+                  <span style={{ fontSize:11, opacity: form.painad===n ? 0.9 : 0.7 }}>{desc}</span>
+                </button>
+              ))}
+            </div>
+          </Sec>
+          <Sec title="😊 기분 (복수 선택)"><BtnRow>{["안정","불안","초조","무기력","공격적","우울","들뜸"].map(v => <Btn key={v} label={v} active={form.moods.includes(v)} onClick={() => toggle("moods",v)} color={v==="안정"?"#166534":"#7f1d1d"} small />)}</BtnRow></Sec>
+          <Sec title="🧩 정신 및 이상행동 상태 (복수 선택)"><BtnRow>{["이상 없음","섬망","환청","환시","혼잣말","야간 혼돈","망상","배회","공격성","케어 저항"].map(v => <Btn key={v} label={v} active={form.mental.includes(v)} onClick={() => toggle("mental",v)} color={v==="이상 없음"?"#166534":"#7f1d1d"} small />)}</BtnRow></Sec>
+          <Sec title="🧴 피부 · 위생 · 욕창">
+            <Lbl text="피부 상태" /><BtnRow>{["양호","건조","발진","상처"].map(v => <Btn key={v} label={v} active={form.skin===v} onClick={() => set("skin",v)} color={v==="양호"?"#166534":"#7f1d1d"} small />)}</BtnRow>
+            <Lbl text="위생 상태" /><BtnRow>{["양호","보통","불량"].map(v => <Btn key={v} label={v} active={form.hygiene===v} onClick={() => set("hygiene",v)} color={v==="양호"?"#166534":v==="보통"?"#713f12":"#7f1d1d"} small />)}</BtnRow>
+            <Lbl text="욕창" /><BtnRow>{["없음","1단계","2단계","3단계","4단계"].map(v => <Btn key={v} label={v} active={form.bedsore===v} onClick={() => set("bedsore",v)} color={v==="없음"?"#166534":"#7f1d1d"} small />)}</BtnRow>
+          </Sec>
+          <Sec title="🪡 한방 치료">
+            <BtnRow>{["침치료","뜸치료","부항"].map(v => <Btn key={v} label={v} active={form.oriental_items.includes(v)} onClick={() => { set("oriental",true); toggle("oriental_items",v); }} color="#0d5c56" small />)}<Btn label="미시행" active={form.oriental===false} onClick={() => { set("oriental",false); set("oriental_items",[]); }} color="#94a3b8" small /></BtnRow>
+          </Sec>
+          <Sec title="📝 특이사항 메모">
+            <div style={{ display:"flex", background:"#f1f5f9", borderRadius:10, padding:3, gap:3, marginBottom:10 }}>
+              {[["direct","✏️ 직접입력"],["preset","📋 항목선택하기"]].map(([m,l]) => (
+                <button key={m} onClick={() => setNoteMode(m)} style={{ flex:1, padding:"7px 0", borderRadius:8, border:"none", cursor:"pointer", fontSize:12, fontWeight: noteMode===m ? 800 : 600, background: noteMode===m ? "#1e3a5f" : "transparent", color: noteMode===m ? "white" : "#64748b" }}>{l}</button>
+              ))}
+            </div>
+            {noteMode === "direct" ? (
+              <textarea value={form.note} onChange={e => set("note",e.target.value)} placeholder="특이사항을 직접 입력하세요 (선택)" style={{ width:"100%", height:80, borderRadius:10, border:"1px solid #e2e8f0", padding:10, fontSize:13, color:"#333", resize:"none", outline:"none", fontFamily:"inherit", lineHeight:1.6, boxSizing:"border-box" }} />
+            ) : (
+              <div>
+                <div style={{ fontSize:11, color:"#64748b", marginBottom:8, fontWeight:600 }}>항목을 눌러 선택하세요</div>
+                <div style={{ display:"flex", flexDirection:"column", gap:6, maxHeight:200, overflowY:"auto" }}>
+                  {PRESET_NOTES.map((p,i) => {
+                    const isSel = form.note.includes(p);
+                    return <button key={i} onClick={() => set("note", isSel ? form.note.replace(p,"").trim() : (form.note ? form.note + " " + p : p))} style={{ textAlign:"left", padding:"8px 12px", borderRadius:10, border:"none", cursor:"pointer", fontSize:12, fontWeight: isSel ? 700 : 500, background: isSel ? "#1e3a5f" : "#f8fafc", color: isSel ? "white" : "#334155" }}>{isSel ? "✓ " : ""}{p}</button>;
+                  })}
+                </div>
+                {form.note && <div style={{ marginTop:8, padding:"8px 12px", background:"#f0fdf4", borderRadius:10, fontSize:12, color:"#166534", lineHeight:1.6 }}>{form.note}</div>}
+              </div>
+            )}
+          </Sec>
+          <button onClick={handleSave} style={{ width:"100%", padding:15, borderRadius:14, border:"none", background:"#0d5c56", color:"white", fontSize:15, fontWeight:800, cursor:"pointer", marginBottom:8 }}>저장 · 주치의 검토 대기 ✓</button>
+          <div style={{ fontSize:12, color:"#94a3b8", textAlign:"center", marginBottom:8 }}>저장 후 주치의가 검토하고 보호자에게 전달해요</div>
+          <button onClick={() => setScreen("list")} style={{ width:"100%", padding:12, borderRadius:14, border:"none", background:"#f1f5f9", color:"#64748b", fontSize:13, fontWeight:600, cursor:"pointer", marginBottom:24 }}>목록으로 돌아가기</button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ── 환자 관리 ─────────────────────────────────────────────────
+function PatientManage({ patients, onBack, onAddPatient, onUpdatePatient }) {
+  const [view, setView] = useState("list");
+  const [editTarget, setEditTarget] = useState(null);
+  const [showConfirm, setShowConfirm] = useState(false);
+  const [reg, setReg] = useState({ name:"", age:"", gender:"여", ward:"믿음병동", room:"", doctorId:"doc1", guardianType:"family", guardianRelation:"아들", guardianName:"", guardianPhone:"" });
+  const [edit, setEdit] = useState({});
+  const setR = (k,v) => setReg(f => ({...f,[k]:v}));
+  const setE = (k,v) => setEdit(f => ({...f,[k]:v}));
+
+  const WARD_ROOMS = {
+    "믿음병동":["301호","302호","303호","304호","305호","306호","307호","308호","309호"],
+    "소망병동":["310호","311호","312호","313호","314호","315호","316호","317호","318호"],
+    "사랑병동":["201호","202호","203호","204호","205호","206호","207호","208호","209호","210호","211호"],
+    "행복병동":["501호","502호","503호","504호","505호","506호","507호","508호","509호"],
+  };
+
+  const doctorOpts = DOCTORS.filter(d => d.id !== "doc5").map(d => ({ value:d.id, label:d.name + " " + d.title }));
+
+  const Inp = ({ value, onChange, placeholder, type }) => (
+    <input type={type||"text"} value={value} onChange={e => onChange(e.target.value)} placeholder={placeholder} style={{ width:"100%", padding:"10px 12px", borderRadius:10, border:"1px solid #e2e8f0", fontSize:13, color:"#333", outline:"none", boxSizing:"border-box" }} />
+  );
+  const Sel = ({ value, onChange, options }) => (
+    <select value={value} onChange={e => onChange(e.target.value)} style={{ width:"100%", padding:"10px 12px", borderRadius:10, border:"1px solid #e2e8f0", fontSize:13, color:"#333", background:"white", outline:"none" }}>
+      {options.map(o => <option key={o.value||o} value={o.value||o}>{o.label||o}</option>)}
+    </select>
+  );
+  const FL = ({ text }) => <div style={{ fontSize:12, color:"#64748b", fontWeight:700, marginBottom:6 }}>{text}</div>;
+  const Box = ({ title, children }) => (
+    <div style={{ background:"white", borderRadius:16, padding:16, border:"1.5px solid #cbd5e1", marginBottom:14 }}>
+      <div style={{ fontSize:13, fontWeight:800, color:"#1e3a5f", marginBottom:14 }}>{title}</div>
+      {children}
+    </div>
+  );
+  const Hdr = ({ title, back }) => (
+    <div style={{ background:"linear-gradient(135deg,#1e3a5f,#2d6a9f)", padding:"14px 20px", color:"white", display:"flex", alignItems:"center", gap:12 }}>
+      <button onClick={back} style={{ background:"rgba(255,255,255,0.15)", border:"none", borderRadius:8, padding:"6px 12px", color:"white", fontSize:13, cursor:"pointer", fontWeight:700 }}>← 돌아가기</button>
+      <div style={{ fontSize:15, fontWeight:800 }}>{title}</div>
+    </div>
+  );
+
+  if (showConfirm) return (
+    <div style={{ fontFamily:"'Noto Sans KR',sans-serif", background:"rgba(0,0,0,0.5)", minHeight:"100vh", display:"flex", justifyContent:"center", alignItems:"center", padding:24 }}>
+      <div style={{ background:"white", borderRadius:20, padding:24, width:"100%", maxWidth:320 }}>
+        <div style={{ fontSize:16, fontWeight:800, color:"#7f1d1d", marginBottom:8 }}>🚪 퇴원 처리</div>
+        <div style={{ fontSize:13, color:"#334155", lineHeight:1.7, marginBottom:20 }}>{editTarget && editTarget.name} 어르신을 퇴원 처리하시겠습니까?</div>
+        <div style={{ display:"flex", gap:8 }}>
+          <button onClick={() => setShowConfirm(false)} style={{ flex:1, padding:12, borderRadius:12, border:"none", background:"#f1f5f9", color:"#64748b", fontSize:14, fontWeight:700, cursor:"pointer" }}>취소</button>
+          <button onClick={() => { onUpdatePatient(editTarget.id, { discharged:true }); setShowConfirm(false); setView("list"); }} style={{ flex:1, padding:12, borderRadius:12, border:"none", background:"#7f1d1d", color:"white", fontSize:14, fontWeight:700, cursor:"pointer" }}>퇴원 처리</button>
+        </div>
+      </div>
+    </div>
+  );
+
+  if (view === "list") return (
+    <div style={{ fontFamily:"'Noto Sans KR',sans-serif", background:"#f0f4f8", minHeight:"100vh", display:"flex", justifyContent:"center" }}>
+      <div style={{ width:"100%", maxWidth:390, paddingBottom:32 }}>
+        <Hdr title="👥 환자관리 (등록·수정)" back={onBack} />
+        <div style={{ padding:"12px 16px" }}>
+          <button onClick={() => setView("register")} style={{ width:"100%", padding:14, borderRadius:14, border:"none", background:"#1e3a5f", color:"white", fontSize:14, fontWeight:800, cursor:"pointer", marginBottom:14 }}>➕ 신규 환자 등록</button>
+          <div style={{ fontSize:12, color:"#64748b", fontWeight:700, marginBottom:8 }}>입원 환자 {patients.length}명 (눌러서 수정)</div>
+          <div style={{ display:"flex", flexDirection:"column", gap:8 }}>
+            {patients.map(p => (
+              <button key={p.id} onClick={() => { setEditTarget(p); setEdit({ ward:getWard(p.room), room:p.room, doctorId:p.doctorId, guardianType:p.guardianType, guardianName:p.guardianName||"", guardianPhone:p.guardianPhone||"" }); setView("edit"); }} style={{ background:"white", borderRadius:14, border:"1.5px solid #cbd5e1", padding:"12px 14px", display:"flex", alignItems:"center", gap:12, cursor:"pointer", textAlign:"left", width:"100%" }}>
+                <div style={{ flex:1 }}>
+                  <div style={{ display:"flex", alignItems:"center", gap:8, marginBottom:2 }}>
+                    <span style={{ fontSize:14, fontWeight:800, color:"#1a1a1a" }}>{p.name}</span>
+                    <span style={{ fontSize:11, color:"#94a3b8" }}>{p.age}세 · {p.gender}</span>
+                  </div>
+                  <div style={{ fontSize:12, color:"#64748b" }}>{getWard(p.room)} · {getDoctorTitle(p.doctorId)}</div>
+                </div>
+                <span style={{ fontSize:12, color:"#94a3b8" }}>수정 ›</span>
+              </button>
+            ))}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+
+  if (view === "register") return (
+    <div style={{ fontFamily:"'Noto Sans KR',sans-serif", background:"#f0f4f8", minHeight:"100vh", display:"flex", justifyContent:"center", paddingBottom:40 }}>
+      <div style={{ width:"100%", maxWidth:390 }}>
+        <Hdr title="➕ 신규 환자 등록" back={() => setView("list")} />
+        <div style={{ padding:"16px 16px 0" }}>
+          <Box title="📋 환자 기본 정보">
+            <FL text="이름" /><div style={{ marginBottom:12 }}><Inp value={reg.name} onChange={v => setR("name",v)} placeholder="환자 이름" /></div>
+            <FL text="나이" /><div style={{ marginBottom:12 }}><Inp value={reg.age} onChange={v => setR("age",v)} placeholder="만 나이" type="number" /></div>
+            <FL text="성별" />
+            <div style={{ display:"flex", gap:8, marginBottom:4 }}>
+              {["여","남"].map(g => <button key={g} onClick={() => setR("gender",g)} style={{ flex:1, padding:"9px 0", borderRadius:10, border:"none", cursor:"pointer", fontSize:13, fontWeight:700, background: reg.gender===g ? "#1e3a5f" : "#f1f5f9", color: reg.gender===g ? "white" : "#64748b" }}>{g}</button>)}
+            </div>
+          </Box>
+          <Box title="🏥 병동 및 호실">
+            <FL text="병동" /><div style={{ marginBottom:12 }}><Sel value={reg.ward} onChange={v => { setR("ward",v); setR("room",""); }} options={["믿음병동","소망병동","사랑병동","행복병동"]} /></div>
+            <FL text="호실" /><div style={{ marginBottom:12 }}><Sel value={reg.room} onChange={v => setR("room",v)} options={[{value:"",label:"호실 선택"}, ...(WARD_ROOMS[reg.ward]||[]).map(r => ({value:r,label:r}))]} /></div>
+            <FL text="주치의" /><div style={{ marginBottom:4 }}><Sel value={reg.doctorId} onChange={v => setR("doctorId",v)} options={doctorOpts} /></div>
+          </Box>
+          <Box title="👨‍👩‍👧 보호자 정보">
+            <FL text="보호자 유형" /><div style={{ marginBottom:12 }}><Sel value={reg.guardianType} onChange={v => setR("guardianType",v)} options={[{value:"family",label:"가족"},{value:"official",label:"공무원/복지사"}]} /></div>
+            <FL text="보호자 이름" /><div style={{ marginBottom:12 }}><Inp value={reg.guardianName} onChange={v => setR("guardianName",v)} placeholder="보호자 이름" /></div>
+            <FL text="연락처" /><div style={{ marginBottom:4 }}><Inp value={reg.guardianPhone} onChange={v => setR("guardianPhone",v)} placeholder="010-0000-0000" type="tel" /></div>
+          </Box>
+          <button onClick={() => { if(!reg.name||!reg.room) return; onAddPatient({ id:Date.now(), room:reg.room, name:reg.name, age:parseInt(reg.age)||0, gender:reg.gender, days:1, alert:false, alertMsg:"", guardianType:reg.guardianType, doctorId:reg.doctorId, guardianName:reg.guardianName, guardianPhone:reg.guardianPhone, record:null }); setReg({ name:"", age:"", gender:"여", ward:"믿음병동", room:"", doctorId:"doc1", guardianType:"family", guardianName:"", guardianPhone:"" }); setView("list"); }} style={{ width:"100%", padding:15, borderRadius:14, border:"none", background: reg.name&&reg.room ? "#1e3a5f" : "#e2e8f0", color: reg.name&&reg.room ? "white" : "#aaa", fontSize:15, fontWeight:800, cursor: reg.name&&reg.room ? "pointer" : "default", marginBottom:24 }}>등록하기</button>
+        </div>
+      </div>
+    </div>
+  );
+
+  const curWard = edit.ward || getWard((editTarget && editTarget.room)||"") || "믿음병동";
+  return (
+    <div style={{ fontFamily:"'Noto Sans KR',sans-serif", background:"#f0f4f8", minHeight:"100vh", display:"flex", justifyContent:"center", paddingBottom:40 }}>
+      <div style={{ width:"100%", maxWidth:390 }}>
+        <Hdr title={(editTarget && editTarget.name) + " 어르신 정보 수정"} back={() => setView("list")} />
+        <div style={{ padding:"16px 16px 0" }}>
+          <Box title="🏥 병동 · 호실 변경">
+            <FL text="현재" /><div style={{ padding:"10px 12px", background:"#f8fafc", borderRadius:10, fontSize:13, color:"#64748b", marginBottom:12 }}>{getWard((editTarget&&editTarget.room)||"")} · {editTarget&&editTarget.room}</div>
+            <FL text="변경할 병동" /><div style={{ marginBottom:12 }}><Sel value={curWard} onChange={v => { setE("ward",v); setE("room",""); }} options={["믿음병동","소망병동","사랑병동","행복병동"]} /></div>
+            <FL text="변경할 호실" /><div style={{ marginBottom:4 }}><Sel value={edit.room||(editTarget&&editTarget.room)||""} onChange={v => setE("room",v)} options={(WARD_ROOMS[curWard]||[]).map(r => ({value:r,label:r}))} /></div>
+          </Box>
+          <Box title="🩺 주치의 변경">
+            <FL text="현재 주치의" /><div style={{ padding:"10px 12px", background:"#f8fafc", borderRadius:10, fontSize:13, color:"#64748b", marginBottom:12 }}>{getDoctorTitle(editTarget&&editTarget.doctorId)}</div>
+            <FL text="변경할 주치의" /><div style={{ marginBottom:4 }}><Sel value={edit.doctorId||(editTarget&&editTarget.doctorId)||"doc1"} onChange={v => setE("doctorId",v)} options={doctorOpts} /></div>
+          </Box>
+          <Box title="👨‍👩‍👧 보호자 정보 수정">
+            <FL text="보호자 유형" /><div style={{ marginBottom:12 }}><Sel value={edit.guardianType||(editTarget&&editTarget.guardianType)||"family"} onChange={v => setE("guardianType",v)} options={[{value:"family",label:"가족"},{value:"official",label:"공무원/복지사"}]} /></div>
+            {(edit.guardianType||(editTarget&&editTarget.guardianType)) === "family" && (
+              <><FL text="관계" /><div style={{ marginBottom:12 }}><Sel value={edit.guardianRelation||(editTarget&&editTarget.guardianRelation)||"아들"} onChange={v => setE("guardianRelation",v)} options={["아들","딸","배우자","손자","손녀","형제자매","조카","기타"]} /></div></>
+            )}
+            <FL text="보호자 이름" /><div style={{ marginBottom:12 }}><Inp value={edit.guardianName !== undefined ? edit.guardianName : ((editTarget&&editTarget.guardianName)||"")} onChange={v => setE("guardianName",v)} placeholder="보호자 이름" /></div>
+            <FL text="연락처" /><div style={{ marginBottom:4 }}><Inp value={edit.guardianPhone !== undefined ? edit.guardianPhone : ((editTarget&&editTarget.guardianPhone)||"")} onChange={v => setE("guardianPhone",v)} placeholder="010-0000-0000" type="tel" /></div>
+          </Box>
+          <button onClick={() => { onUpdatePatient(editTarget.id, edit); setView("list"); }} style={{ width:"100%", padding:15, borderRadius:14, border:"none", background:"#1e3a5f", color:"white", fontSize:15, fontWeight:800, cursor:"pointer", marginBottom:10 }}>수정 완료</button>
+          <button onClick={() => setShowConfirm(true)} style={{ width:"100%", padding:12, borderRadius:14, border:"none", background:"#fef2f2", color:"#7f1d1d", fontSize:13, fontWeight:700, cursor:"pointer", marginBottom:24 }}>🚪 퇴원 처리</button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ── 의사 대시보드 ─────────────────────────────────────────────
+function DoctorScreen({ patients, onSave, onBack, messages, onMarkRead, doctorId }) {
+  const [selected, setSelected] = useState(null);
+  const [comment, setComment] = useState("");
+  const [scenarioTypes, setScenarioTypes] = useState([]);
+  const [warningSubs, setWarningSubs] = useState([]);
+  const [treatingSubs, setTreatingSubs] = useState([]);
+  const [saved, setSaved] = useState(false);
+  const [showMessages, setShowMessages] = useState(false);
+  const [commentMode, setCommentMode] = useState("direct");
+
+  const total = patients.length;
+  const doneCount = patients.filter(p => p.record).length;
+  const alertCount = patients.filter(p => p.alert).length;
+  const stableCount = patients.filter(p => p.record && p.record.sentToGuardian && !p.alert).length;
+  const unread = messages ? messages.filter(m => !m.read).length : 0;
+
+  const sortAlert = arr => [...arr.filter(p => p.alert), ...arr.filter(p => !p.alert)];
+  const pendingList = sortAlert(patients.filter(p => p.record && !p.record.sentToGuardian));
+  const notInputList = sortAlert(patients.filter(p => !p.record));
+  const sentList = sortAlert(patients.filter(p => p.record && p.record.sentToGuardian));
+
+  const now = () => { const d = new Date(); return (d.getMonth()+1) + "월 " + d.getDate() + "일"; };
+
+  const handleSend = () => {
+    const rec = { ...(selected.record||{}), doctorComment:comment, doctorCommentDate:now(), scenarioTypes, warningSubs, treatingSubs, pending:false, sentToGuardian:true };
+    onSave(selected.id, rec);
+    setSaved(true);
+    setTimeout(() => { setSaved(false); setSelected(null); setComment(""); setScenarioTypes([]); setWarningSubs([]); setTreatingSubs([]); }, 1500);
+  };
+
+  const DOCTOR_PRESETS = ["전반적으로 안정적입니다.","수면 패턴이 불규칙하여 지켜보고 있습니다.","식욕이 다소 저하되어 영양 보충 중입니다.","발열로 인해 치료 중입니다.","폐렴 소견으로 항생제 치료를 시작했습니다.","전반적인 상태가 호전되고 있습니다.","인지 기능이 다소 저하되어 관찰 중입니다.","다음 진료 시 자세히 상담하겠습니다."];
+
+
+
+  const Row = ({ label, value, vc }) => (
+    <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center", paddingBottom:4, marginBottom:4, borderBottom:"1px solid #f1f5f9" }}>
+      <span style={{ fontSize:13, color:"#444", fontWeight:600 }}>{label}</span>
+      <span style={{ fontSize:13, fontWeight:700, color:vc||"#222" }}>{value||"—"}</span>
+    </div>
+  );
+
+  const PatientCard = (p, idx) => {
+    const r = p.record;
+    const isPending = r && !r.sentToGuardian;
+    const isSent = r && r.sentToGuardian;
+    const borderColor = isPending ? "#fcd34d" : isSent ? "#86efac" : "#e2e8f0";
+    return (
+      <button key={p.id} onClick={() => { setSelected(p); setComment((r&&r.doctorComment)||""); setScenarioTypes((r&&r.scenarioTypes)||[]); setWarningSubs((r&&r.warningSubs)||[]); setTreatingSubs((r&&r.treatingSubs)||[]); }} style={{ background:"white", borderRadius:14, width:"100%", border:"1.5px solid "+borderColor, padding:"13px 14px", display:"flex", alignItems:"center", gap:12, cursor:"pointer", textAlign:"left" }}>
+        <div style={{ width:36, height:36, borderRadius:10, flexShrink:0, background: p.alert?"#fef2f2":isPending?"#fffbeb":isSent?"#f0fdf4":"#f8fafc", display:"flex", alignItems:"center", justifyContent:"center", fontSize:13, fontWeight:800, color: p.alert?"#ef4444":isPending?"#713f12":isSent?"#16a34a":"#94a3b8" }}>{idx}</div>
+        <div style={{ flex:1 }}>
+          <div style={{ display:"flex", alignItems:"center", gap:6, marginBottom:3 }}>
+            <span style={{ fontSize:16, fontWeight:800, color:"#1a1a1a" }}>{p.name}</span>
+            <span style={{ fontSize:12, color:"#64748b", fontWeight:600 }}>{p.age}세 · {p.gender}</span>
+          </div>
+          <div style={{ fontSize:13, color:"#475569", fontWeight:600, marginBottom: r?4:0 }}>{getWard(p.room)} · 입원 {p.days}일째</div>
+          {p.alert && <div style={{ fontSize:12, color:"#ef4444", fontWeight:700, marginBottom:2 }}>⚠️ {p.alertMsg}</div>}
+          {r && (
+            <div style={{ display:"flex", gap:6, flexWrap:"wrap" }}>
+              {[r.consciousness&&{l:r.consciousness,c:scoreColor(r.consciousness)}, r.meal_amount&&{l:r.meal_amount==="잘 드심"?"식사양호":r.meal_amount==="절반"?"식사보통":"식사저하",c:scoreColor(r.meal_amount)}, r.moods&&r.moods.length>0&&{l:r.moods[0],c:scoreColor(r.moods[0])}, r.painad>2&&{l:"통증"+r.painad+"점",c:"#ef4444"}].filter(Boolean).map((tag,i) => (
+                <span key={i} style={{ fontSize:11, fontWeight:700, borderRadius:6, padding:"2px 8px", background:tag.c+"15", color:tag.c }}>{tag.l}</span>
+              ))}
+            </div>
+          )}
+          {r&&r.doctorComment && <div style={{ fontSize:12, color:"#0d5c56", marginTop:3, fontWeight:700 }}>✍️ 코멘트 작성됨</div>}
+        </div>
+        <div style={{ fontSize:18, color:"#cbd5e1" }}>›</div>
+      </button>
+    );
+  };
+
+  if (showMessages) return (
+    <div style={{ fontFamily:"'Noto Sans KR',sans-serif", background:"#f0f4f8", minHeight:"100vh", display:"flex", justifyContent:"center" }}>
+      <div style={{ width:"100%", maxWidth:390 }}>
+        <div style={{ background:"linear-gradient(135deg,#1e3a5f,#2d6a9f)", padding:"14px 20px", color:"white", display:"flex", alignItems:"center", gap:12 }}>
+          <button onClick={() => setShowMessages(false)} style={{ background:"rgba(255,255,255,0.15)", border:"none", borderRadius:8, padding:"6px 12px", color:"white", fontSize:13, cursor:"pointer", fontWeight:700 }}>← 목록</button>
+          <div style={{ fontSize:16, fontWeight:800 }}>💬 보호자 한마디</div>
+        </div>
+        <div style={{ padding:"14px 16px", display:"flex", flexDirection:"column", gap:10 }}>
+          {!messages||messages.length===0 ? (
+            <div style={{ textAlign:"center", padding:"40px 20px", color:"#94a3b8" }}><div style={{ fontSize:40, marginBottom:8 }}>💬</div><div style={{ fontSize:14, fontWeight:600 }}>보호자 메시지가 없어요</div></div>
+          ) : messages.slice().reverse().map((m,i) => {
+            const p = patients.find(x => x.id===m.patientId);
+            return (
+              <div key={i} style={{ background:"white", borderRadius:14, padding:"14px 16px", border:"1.5px solid #cbd5e1" }}>
+                <div style={{ display:"flex", alignItems:"center", gap:8, marginBottom:6 }}>
+                  <span style={{ fontSize:13, fontWeight:800, color:"#1e3a5f" }}>{p&&p.name} {getTitle(p)} 가족</span>
+                  <span style={{ fontSize:11, color:"#aaa", marginLeft:"auto" }}>{m.time}</span>
+                </div>
+                {m.visitDate && <div style={{ background:"#eff6ff", borderRadius:8, padding:"6px 10px", marginBottom:8, fontSize:12, color:"#1e40af", fontWeight:700 }}>📅 면회 예정: {m.visitDate} {m.visitTime}</div>}
+                <div style={{ fontSize:13, color:"#334155", lineHeight:1.7, background:"#f8fafc", borderRadius:10, padding:"10px 12px" }}>{m.text}</div>
+              </div>
+            );
+          })}
+        </div>
+      </div>
+    </div>
+  );
+
+  if (selected) {
+    const r = selected.record;
+    return (
+      <div style={{ fontFamily:"'Noto Sans KR',sans-serif", background:"#f0f4f8", minHeight:"100vh", display:"flex", justifyContent:"center", paddingBottom:40 }}>
+        <div style={{ width:"100%", maxWidth:390 }}>
+          <div style={{ padding:"14px 16px 0", position:"sticky", top:0, zIndex:10, background:"#f0f4f8" }}>
+            <div style={{ background:"linear-gradient(135deg,#1e3a5f,#2d6a9f)", padding:"18px 20px", color:"white", display:"flex", alignItems:"center", gap:12, borderRadius:20 }}>
+              <button onClick={() => { setSelected(null); setComment(""); setScenarioTypes([]); setWarningSubs([]); setTreatingSubs([]); }} style={{ background:"rgba(255,255,255,0.15)", border:"none", borderRadius:10, padding:"8px 12px", color:"white", fontSize:13, cursor:"pointer", fontWeight:700, flexShrink:0 }}>← 목록</button>
+              <div style={{ flex:1 }}>
+                <div style={{ fontSize:17, fontWeight:800, marginBottom:4 }}>{selected.name} {selected.age}세 · {selected.gender}</div>
+                <div style={{ fontSize:12, opacity:0.75 }}>{getWard(selected.room)} · 입원 {selected.days}일째</div>
+              </div>
+            </div>
+          </div>
+          <div style={{ padding:"12px 16px 0" }}>
+            {r ? (
+              <div style={{ background:"white", borderRadius:16, overflow:"hidden", border:"1.5px solid #cbd5e1", marginBottom:12 }}>
+                <div style={{ background:"#1e3a5f", padding:"5px 14px" }}><span style={{ fontSize:12, fontWeight:800, color:"#f0f9ff" }}>📋 오늘 상태 요약</span></div>
+                <div style={{ padding:"10px 14px" }}>
+                  <Row label="의식수준" value={r.consciousness} vc={scoreColor(r.consciousness)} />
+                  <Row label="식사량" value={r.meal_amount} vc={scoreColor(r.meal_amount)} />
+                  <Row label="수면" value={r.sleep_hours} />
+                  <Row label="이동 방법" value={r.mobility} />
+                  <Row label="낙상 위험" value={r.fall_risk} vc={r.fall_risk==="매우 높음"?"#ef4444":"#333"} />
+                  <Row label="소변" value={r.urine} />
+                  <Row label="대변" value={r.bowel} />
+                  <Row label="투약 상태" value={r.medication} vc={r.medication==="정상 투약"?"#166534":r.medication?"#ef4444":"#333"} />
+                  <Row label="통증 PAINAD" value={r.painad!==null&&r.painad!==undefined ? r.painad+"점" : "—"} vc={r.painad<=2?"#166534":r.painad<=6?"#713f12":"#ef4444"} />
+                  <Row label="기분" value={r.moods&&r.moods.join(", ")} />
+                  <Row label="정신 상태" value={r.mental&&r.mental.join(", ")} vc={r.mental&&r.mental.includes("이상 없음")?"#166534":"#ef4444"} />
+                  <Row label="피부" value={r.skin} />
+                  <Row label="위생" value={r.hygiene} />
+                  <Row label="욕창" value={r.bedsore} vc={r.bedsore==="없음"?"#166534":"#ef4444"} />
+                  <Row label="한방 치료" value={r.oriental===true?"시행":r.oriental===false?"미시행":"—"} />
+                  {r.note && <div style={{ marginTop:6, padding:"8px 10px", background:"#f8fafc", borderRadius:10, fontSize:12, color:"#444", lineHeight:1.6 }}>{r.note}</div>}
+                  <div style={{ marginTop:6, fontSize:11, color:"#aaa", textAlign:"right" }}>{r.updatedAt} 간호사 입력</div>
+                </div>
+              </div>
+            ) : (
+              <div style={{ background:"white", borderRadius:14, padding:20, border:"1.5px solid #e2e8f0", marginBottom:12, textAlign:"center", color:"#94a3b8" }}>
+                <div style={{ fontSize:32, marginBottom:8 }}>⏳</div>
+                <div style={{ fontSize:13, fontWeight:600 }}>아직 간호사 입력이 없어요</div>
+              </div>
+            )}
+            {r&&r.note && (
+              <div style={{ background:"white", borderRadius:14, overflow:"hidden", border:"1.5px solid #86efac", marginBottom:12 }}>
+                <div style={{ background:"#0d5c56", padding:"5px 14px", display:"flex", alignItems:"center", gap:6 }}>
+                  <span style={{ fontSize:13 }}>📝</span>
+                  <span style={{ fontSize:12, fontWeight:800, color:"#f0f9ff" }}>간호사 특이사항</span>
+                </div>
+                <div style={{ padding:"10px 14px", fontSize:13, color:"#1e3a5f", lineHeight:1.7, fontWeight:600 }}>{r.note}</div>
+              </div>
+            )}
+            <div style={{ background:"white", borderRadius:16, overflow:"hidden", border:"1.5px solid #cbd5e1", marginBottom:12 }}>
+              <div style={{ background:"#1e3a5f", padding:"5px 14px" }}><span style={{ fontSize:12, fontWeight:800, color:"#f0f9ff" }}>🔄 환자 상태 변경 (복수 선택 가능)</span></div>
+              <div style={{ padding:"10px 14px" }}>
+                <div style={{ display:"flex", flexWrap:"wrap", gap:8, marginBottom:10 }}>
+                  {[{v:"stable",l:"✅ 안정",bg:"#f0fdf4",c:"#166534"},{v:"warning",l:"⚠️ 이상 징후",bg:"#fffbeb",c:"#713f12"},{v:"treating",l:"🔴 치료 중",bg:"#fef2f2",c:"#7f1d1d"},{v:"recovering",l:"🔵 회복 중",bg:"#eff6ff",c:"#1e40af"}].map(s => {
+                    const sel = scenarioTypes.includes(s.v);
+                    return <button key={s.v} onClick={() => setScenarioTypes(sel ? scenarioTypes.filter(x=>x!==s.v) : [...scenarioTypes,s.v])} style={{ padding:"8px 14px", borderRadius:10, border:"none", cursor:"pointer", fontSize:12, fontWeight:700, background: sel?s.c:s.bg, color: sel?"white":s.c }}>{sel?"✓ ":""}{s.l}</button>;
+                  })}
+                </div>
+                {scenarioTypes.includes("warning") && (
+                  <div style={{ background:"#fffbeb", borderRadius:10, padding:"10px 12px", border:"1px solid #fcd34d", marginBottom:8 }}>
+                    <div style={{ fontSize:11, color:"#713f12", fontWeight:700, marginBottom:8 }}>⚠️ 이상 징후 종류 (복수 선택)</div>
+                    <div style={{ display:"flex", flexWrap:"wrap", gap:6 }}>
+                      {["발열","호흡 이상","혈압 이상","식욕 저하","의식저하","섬망","산소포화도 저하","낙상","통증 호소","부종","기타"].map(v => {
+                        const sel = warningSubs.includes(v);
+                        return <button key={v} onClick={() => setWarningSubs(sel ? warningSubs.filter(x=>x!==v) : [...warningSubs,v])} style={{ padding:"5px 10px", borderRadius:8, border:"none", cursor:"pointer", fontSize:11, fontWeight:700, background: sel?"#713f12":"white", color: sel?"white":"#713f12" }}>{sel?"✓ ":""}{v}</button>;
+                      })}
+                    </div>
+                    {warningSubs.length>0 && <div style={{ marginTop:8, fontSize:11, color:"#713f12", fontWeight:600 }}>선택됨: {warningSubs.join(", ")}</div>}
+                  </div>
+                )}
+                {scenarioTypes.includes("treating") && (
+                  <div style={{ background:"#fef2f2", borderRadius:10, padding:"10px 12px", border:"1px solid #fca5a5" }}>
+                    <div style={{ fontSize:11, color:"#7f1d1d", fontWeight:700, marginBottom:8 }}>🔴 치료 종류 (복수 선택)</div>
+                    <div style={{ display:"flex", flexWrap:"wrap", gap:6 }}>
+                      {["폐렴","요로감염","패혈증","욕창 처치","골절","탈수","심부전","뇌졸중","섬망","불면증","불안증","우울","기타"].map(v => {
+                        const sel = treatingSubs.includes(v);
+                        return <button key={v} onClick={() => setTreatingSubs(sel ? treatingSubs.filter(x=>x!==v) : [...treatingSubs,v])} style={{ padding:"5px 10px", borderRadius:8, border:"none", cursor:"pointer", fontSize:11, fontWeight:700, background: sel?"#7f1d1d":"white", color: sel?"white":"#7f1d1d" }}>{sel?"✓ ":""}{v}</button>;
+                      })}
+                    </div>
+                    {treatingSubs.length>0 && <div style={{ marginTop:8, fontSize:11, color:"#7f1d1d", fontWeight:600 }}>선택됨: {treatingSubs.join(", ")}</div>}
+                  </div>
+                )}
+              </div>
+            </div>
+            <div style={{ background:"white", borderRadius:16, overflow:"hidden", border:"1.5px solid #cbd5e1", marginBottom:12 }}>
+              <div style={{ background:"#0d5c56", padding:"5px 14px" }}><span style={{ fontSize:12, fontWeight:800, color:"#f0f9ff" }}>✍️ 보호자에게 코멘트</span></div>
+              <div style={{ padding:"10px 14px" }}>
+                <div style={{ fontSize:12, color:"#64748b", marginBottom:8 }}>
+                  선생님 이름으로 <span style={{ fontWeight:700, color:"#1e3a5f" }}>{getGuardianComment(selected)}</span> 전달돼요
+                </div>
+                {r&&r.doctorComment && <div style={{ background:"#f0fdf4", borderRadius:10, padding:"8px 12px", marginBottom:8, fontSize:12, color:"#166534", lineHeight:1.6 }}>이전: {r.doctorComment}</div>}
+                <div style={{ display:"flex", background:"#f1f5f9", borderRadius:10, padding:3, gap:3, marginBottom:10 }}>
+                  {[["direct","✏️ 직접입력"],["preset","📋 선택하기"]].map(([m,l]) => (
+                    <button key={m} onClick={() => setCommentMode(m)} style={{ flex:1, padding:"7px 0", borderRadius:8, border:"none", cursor:"pointer", fontSize:12, fontWeight: commentMode===m?800:600, background: commentMode===m?"#0d5c56":"transparent", color: commentMode===m?"white":"#64748b" }}>{l}</button>
+                  ))}
+                </div>
+                {commentMode==="direct" ? (
+                  <textarea value={comment} onChange={e => setComment(e.target.value)} placeholder="예) 전반적으로 안정적입니다." style={{ width:"100%", height:90, borderRadius:10, border:"1px solid #e2e8f0", padding:10, fontSize:13, color:"#333", resize:"none", outline:"none", fontFamily:"inherit", lineHeight:1.6, boxSizing:"border-box" }} />
+                ) : (
+                  <div>
+                    <div style={{ display:"flex", flexDirection:"column", gap:6, maxHeight:200, overflowY:"auto" }}>
+                      {DOCTOR_PRESETS.map((p,i) => {
+                        const isSel = comment.includes(p);
+                        return <button key={i} onClick={() => setComment(isSel ? comment.replace(p,"").trim() : (comment ? comment+" "+p : p))} style={{ textAlign:"left", padding:"8px 12px", borderRadius:10, border:"none", cursor:"pointer", fontSize:12, fontWeight: isSel?700:500, background: isSel?"#0d5c56":"#f8fafc", color: isSel?"white":"#334155" }}>{isSel?"✓ ":""}{p}</button>;
+                      })}
+                    </div>
+                    {comment && <div style={{ marginTop:8, padding:"8px 12px", background:"#f0fdf4", borderRadius:10, fontSize:12, color:"#166534", lineHeight:1.6 }}>{comment}</div>}
+                  </div>
+                )}
+              </div>
+            </div>
+            {saved ? (
+              <div style={{ background:"#f0fdf4", borderRadius:14, padding:16, textAlign:"center", color:"#166534", fontWeight:700, fontSize:14, marginBottom:8 }}>✅ 저장 완료 · 보호자에게 전달됐어요</div>
+            ) : (
+              <button onClick={handleSend} style={{ width:"100%", padding:15, borderRadius:14, border:"none", background:"linear-gradient(135deg,#1e3a5f,#2d6a9f)", color:"white", fontSize:15, fontWeight:800, cursor:"pointer", marginBottom:24 }}>최종 확인 · 보호자에게 전송 →</button>
+            )}
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div style={{ fontFamily:"'Noto Sans KR',sans-serif", background:"#f0f4f8", minHeight:"100vh", display:"flex", justifyContent:"center" }}>
+      <div style={{ width:"100%", maxWidth:390, paddingBottom:32 }}>
+        <div style={{ padding:"14px 16px 0" }}>
+          <div style={{ background:"linear-gradient(135deg,#1e3a5f,#2d6a9f)", padding:"16px 20px", color:"white", borderRadius:20 }}>
+            <div style={{ display:"flex", alignItems:"center", gap:10, marginBottom:14 }}>
+              <button onClick={onBack} style={{ background:"rgba(255,255,255,0.15)", border:"none", borderRadius:8, padding:"8px 12px", color:"white", fontSize:12, cursor:"pointer", fontWeight:700, flexShrink:0 }}>← 역할 선택</button>
+              <div style={{ flex:1 }}>
+                <div style={{ fontSize:16, fontWeight:800 }}>환자 현황 <span style={{ fontSize:12, fontWeight:600, opacity:0.75 }}>(의사)</span></div>
+                <div style={{ fontSize:11, opacity:0.7 }}>{getDoctorTitle(doctorId)} 담당 {total}명</div>
+              </div>
+              <div style={{ textAlign:"right", lineHeight:1 }}>
+                <div style={{ fontSize:11, opacity:0.9, fontWeight:700, marginBottom:4 }}>오늘 입력</div>
+                <div style={{ fontSize:15, fontWeight:800 }}>{doneCount} / {total}명</div>
+              </div>
+            </div>
+            <div style={{ display:"flex", justifyContent:"space-between", gap:6, marginBottom:10 }}>
+              {[{l:"전체",v:total,bg:"rgba(255,255,255,0.12)",c:"white"},{l:"⚠️ 주의",v:alertCount,bg:alertCount>0?"#fef2f2":"rgba(255,255,255,0.12)",c:alertCount>0?"#ef4444":"white"},{l:"✅ 안정",v:stableCount,bg:stableCount>0?"#f0fdf4":"rgba(255,255,255,0.12)",c:stableCount>0?"#16a34a":"white"}].map(s => (
+                <div key={s.l} style={{ width:"30%", background:s.bg, borderRadius:10, padding:"4px 8px", display:"flex", alignItems:"center", justifyContent:"space-between" }}>
+                  <div style={{ fontSize:11, color:s.c, fontWeight:800 }}>{s.l}</div>
+                  <div style={{ fontSize:16, fontWeight:900, color:s.c }}>{s.v}</div>
+                </div>
+              ))}
+            </div>
+            <button onClick={() => { if(onMarkRead) onMarkRead(); setShowMessages(true); }} style={{ width:"100%", background: unread>0?"#ef4444":"rgba(255,255,255,0.15)", border:"none", borderRadius:10, padding:"8px 14px", color:"white", fontSize:12, cursor:"pointer", fontWeight:700, display:"flex", alignItems:"center", justifyContent:"space-between" }}>
+              <span>💬 보호자 한마디 확인</span>
+              <span>{unread>0 ? "🔴 "+unread+"건" : "없음"}</span>
+            </button>
+          </div>
+        </div>
+        <div style={{ padding:"12px 16px", display:"flex", flexDirection:"column", gap:6 }}>
+          {pendingList.length>0 && <><SectionHeader icon="🕐" label="검토 대기" count={pendingList.length} color="#713f12" bg="#fffbeb" />{pendingList.map((p,i) => PatientCard(p, i+1))}</>}
+          {notInputList.length>0 && <><SectionHeader icon="⏳" label="미입력" count={notInputList.length} color="#334155" bg="#e2e8f0" />{notInputList.map((p,i) => PatientCard(p, pendingList.length+i+1))}</>}
+          {sentList.length>0 && <><SectionHeader icon="✅" label="전송 완료" count={sentList.length} color="#16a34a" bg="#f0fdf4" />{sentList.map((p,i) => PatientCard(p, pendingList.length+notInputList.length+i+1))}</>}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ── 보호자 한마디 전체 화면 ───────────────────────────────────
+function MessagesScreen({ patients, messages, onBack, onMarkRead }) {
+  const [wardFilter, setWardFilter] = useState("전체");
+  const [doctorFilter, setDoctorFilter] = useState("전체");
+  const [showArchived, setShowArchived] = useState(false);
+
+  const today = new Date();
+  const wards = ["전체","믿음병동","소망병동","사랑병동","행복병동"];
+  const doctors = ["전체", ...DOCTORS.map(d => d.name)];
+
+  const enriched = messages.map(m => ({ ...m, patient: patients.find(p => p.id===m.patientId) })).filter(m => m.patient);
+
+  const categorize = (m) => {
+    if (m.visitDate) {
+      const day = parseInt(m.visitDate.split("월 ")[1]);
+      if (day < today.getDate()) return "completed";
+    }
+    return "active";
+  };
+
+  const filtered = enriched.filter(m => {
+    const ward = getWard(m.patient.room);
+    const doctorName = getDoctorTitle(m.patient.doctorId).split(" ")[0];
+    const isActive = categorize(m) === "active";
+    if (showArchived ? isActive : !isActive) return false;
+    if (wardFilter !== "전체" && ward !== wardFilter) return false;
+    if (doctorFilter !== "전체" && doctorName !== doctorFilter) return false;
+    return true;
+  });
+
+  const thisWeek = filtered.filter(m => { if(!m.visitDate) return false; const day=parseInt(m.visitDate.split("월 ")[1]); const diff=day-today.getDate(); return diff>=0&&diff<=7; }).sort((a,b) => parseInt(a.visitDate.split("월 ")[1])-parseInt(b.visitDate.split("월 ")[1]));
+  const laterVisit = filtered.filter(m => { if(!m.visitDate) return false; const day=parseInt(m.visitDate.split("월 ")[1]); return day-today.getDate()>7; }).sort((a,b) => parseInt(a.visitDate.split("월 ")[1])-parseInt(b.visitDate.split("월 ")[1]));
+  const general = filtered.filter(m => !m.visitDate).reverse();
+
+  const activeCount = enriched.filter(m => categorize(m)==="active").length;
+  const completedCount = enriched.filter(m => categorize(m)==="completed").length;
+  const unread = enriched.filter(m => !m.read && categorize(m)==="active").length;
+
+  const MsgCard = ({ m }) => (
+    <div style={{ background:"white", borderRadius:14, padding:"14px 16px", border: !m.read?"1.5px solid #93c5fd":"1.5px solid #cbd5e1", marginBottom:8 }}>
+      <div style={{ display:"flex", alignItems:"center", gap:6, marginBottom:6, flexWrap:"wrap" }}>
+        {!m.read && <span style={{ fontSize:10, background:"#3b82f6", color:"white", borderRadius:20, padding:"1px 7px", fontWeight:700 }}>NEW</span>}
+        <span style={{ fontSize:14, fontWeight:800, color:"#1e3a5f" }}>{m.patient.name}</span>
+        <span style={{ fontSize:12, color:"#94a3b8" }}>{getTitle(m.patient)} 가족</span>
+        <span style={{ fontSize:11, color:"#aaa", background:"#f1f5f9", borderRadius:6, padding:"1px 6px" }}>{getWard(m.patient.room)}</span>
+        <span style={{ fontSize:11, color:"#0d5c56", background:"#f0fdf4", borderRadius:6, padding:"1px 6px", fontWeight:600 }}>{getDoctorTitle(m.patient.doctorId)}</span>
+        <span style={{ fontSize:11, color:"#aaa", marginLeft:"auto" }}>{m.time}</span>
+      </div>
+      {m.visitDate && <div style={{ background:"#eff6ff", borderRadius:8, padding:"6px 10px", marginBottom:8, fontSize:12, color:"#1e40af", fontWeight:700 }}>📅 면회 예정: {m.visitDate} {m.visitTime}</div>}
+      <div style={{ fontSize:13, color:"#334155", lineHeight:1.7, background:"#f8fafc", borderRadius:10, padding:"10px 12px" }}>{m.text}</div>
+      <div style={{ fontSize:11, color:"#0d5c56", fontWeight:600, marginTop:8 }}>✓ {m.patient.name} 어르신께 전달해주세요</div>
+    </div>
+  );
+
+
+
+  return (
+    <div style={{ fontFamily:"'Noto Sans KR',sans-serif", background:"#f0f4f8", minHeight:"100vh", display:"flex", justifyContent:"center" }}>
+      <div style={{ width:"100%", maxWidth:390, paddingBottom:32 }}>
+        <div style={{ padding:"14px 16px 0" }}>
+          <div style={{ background:"linear-gradient(135deg,#1e3a5f,#2d6a9f)", padding:"16px 20px", color:"white", borderRadius:20 }}>
+            <div style={{ display:"flex", alignItems:"center", gap:10, marginBottom:10 }}>
+              <button onClick={onBack} style={{ background:"rgba(255,255,255,0.15)", border:"none", borderRadius:8, padding:"4px 10px", color:"white", fontSize:12, cursor:"pointer", fontWeight:700 }}>← 역할 선택</button>
+              <div style={{ fontSize:17, fontWeight:800 }}>💬 보호자 한마디</div>
+            </div>
+            <div style={{ display:"flex", gap:8 }}>
+              {[{l:"전체",v:enriched.length,bg:"rgba(255,255,255,0.12)",c:"white"},{l:"미확인",v:unread,bg:unread>0?"#fef2f2":"rgba(255,255,255,0.12)",c:unread>0?"#ef4444":"white"},{l:"완료",v:completedCount,bg:completedCount>0?"#f0fdf4":"rgba(255,255,255,0.12)",c:completedCount>0?"#16a34a":"white"}].map(s => (
+                <div key={s.l} style={{ flex:1, background:s.bg, borderRadius:10, padding:"5px 8px", display:"flex", alignItems:"center", justifyContent:"space-between" }}>
+                  <div style={{ fontSize:11, color:s.c, fontWeight:700 }}>{s.l}</div>
+                  <div style={{ fontSize:16, fontWeight:900, color:s.c }}>{s.v}</div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+        <div style={{ padding:"12px 16px 0" }}>
+          <div style={{ display:"flex", background:"white", borderRadius:12, padding:4, gap:4, marginBottom:12, border:"1.5px solid #cbd5e1" }}>
+            <button onClick={() => setShowArchived(false)} style={{ flex:1, padding:"7px 0", borderRadius:8, border:"none", cursor:"pointer", fontSize:13, fontWeight: !showArchived?800:500, background: !showArchived?"#1e3a5f":"transparent", color: !showArchived?"white":"#64748b" }}>활성 ({activeCount})</button>
+            <button onClick={() => setShowArchived(true)} style={{ flex:1, padding:"7px 0", borderRadius:8, border:"none", cursor:"pointer", fontSize:13, fontWeight: showArchived?800:500, background: showArchived?"#1e3a5f":"transparent", color: showArchived?"white":"#64748b" }}>완료·보관 ({completedCount})</button>
+          </div>
+          <div style={{ marginBottom:8 }}>
+            <div style={{ fontSize:11, color:"#64748b", fontWeight:700, marginBottom:6 }}>병동</div>
+            <div style={{ display:"flex", gap:6, flexWrap:"wrap", marginBottom:10 }}>
+              {wards.map(w => <button key={w} onClick={() => setWardFilter(w)} style={{ padding:"5px 12px", borderRadius:20, border:"1px solid #e2e8f0", cursor:"pointer", fontSize:12, fontWeight: wardFilter===w?800:500, background: wardFilter===w?"#1e3a5f":"white", color: wardFilter===w?"white":"#64748b" }}>{w}</button>)}
+            </div>
+            <div style={{ fontSize:11, color:"#64748b", fontWeight:700, marginBottom:6 }}>주치의</div>
+            <div style={{ display:"flex", gap:6, flexWrap:"wrap", marginBottom:14 }}>
+              {doctors.map(d => <button key={d} onClick={() => setDoctorFilter(d)} style={{ padding:"5px 12px", borderRadius:20, border:"1px solid #e2e8f0", cursor:"pointer", fontSize:12, fontWeight: doctorFilter===d?800:500, background: doctorFilter===d?"#0d5c56":"white", color: doctorFilter===d?"white":"#64748b" }}>{d}</button>)}
+            </div>
+          </div>
+          {filtered.length===0 ? (
+            <div style={{ textAlign:"center", padding:"40px 20px", color:"#94a3b8" }}><div style={{ fontSize:40, marginBottom:10 }}>💬</div><div style={{ fontSize:14, fontWeight:600 }}>메시지가 없어요</div></div>
+          ) : (
+            <>
+              {thisWeek.length>0 && <><SectionHeader icon="📅" label="이번 주 면회 예정" count={thisWeek.length} unit="건" color="#1e40af" bg="#eff6ff" />{thisWeek.map((m,i) => <MsgCard key={i} m={m} />)}</>}
+              {laterVisit.length>0 && <><SectionHeader icon="📆" label="이후 면회 예정" count={laterVisit.length} unit="건" color="#475569" bg="#f1f5f9" />{laterVisit.map((m,i) => <MsgCard key={i} m={m} />)}</>}
+              {general.length>0 && <><SectionHeader icon="💬" label="일반 메시지" count={general.length} unit="건" color="#475569" bg="#f1f5f9" />{general.map((m,i) => <MsgCard key={i} m={m} />)}</>}
+            </>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ── 메인 앱 ───────────────────────────────────────────────────
+export default function App() {
+  const [onboarded, setOnboarded] = useState(false);
+  const [appScreen, setAppScreen] = useState("roleSelect");
+  const [loginType, setLoginType] = useState(null);
+  const [currentUser, setCurrentUser] = useState(null);
+  const [patients, setPatients] = useState([]);
+  const [messages, setMessages] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  const loadPatients = async () => {
+    try {
+      const res = await fetch(`${SUPABASE_URL}/rest/v1/patients?select=*&discharged=eq.false`, {
+        headers: { apikey: SUPABASE_KEY, Authorization: "Bearer " + SUPABASE_KEY }
+      });
+      const data = await res.json();
+      if (Array.isArray(data)) {
+        const mapped = data.map(p => ({
+          id: p.id, name: p.name, age: p.age, gender: p.gender, room: p.room,
+          doctorId: p.doctor_id, guardianType: p.guardian_type,
+          guardianRelation: p.guardian_relation,
+          guardianName: p.guardian_name, guardianPhone: p.guardian_phone,
+          guardian2Name: p.guardian2_name, guardian2Phone: p.guardian2_phone,
+          days: p.days, alert: p.alert, alertMsg: p.alert_msg || "",
+          birthdate: p.birthdate,
+          guardianPhone: p.guardian_phone,
+          guardian2Phone: p.guardian2_phone,
+          record: null,
+        }));
+        const withRecords = await Promise.all(mapped.map(async p => {
+          try {
+            const rRes = await fetch(`${SUPABASE_URL}/rest/v1/records?patient_id=eq.${p.id}&order=created_at.desc&limit=1&select=*`, {
+              headers: { apikey: SUPABASE_KEY, Authorization: "Bearer " + SUPABASE_KEY }
+            });
+            const rData = await rRes.json();
+            if (Array.isArray(rData) && rData.length > 0) {
+              const r = rData[0];
+              return { ...p, record: {
+                recordId: r.id, consciousness: r.consciousness,
+                meal_amount: r.meal_amount, meal_type: r.meal_type,
+                meal_refused: r.meal_refused, meal_aspiration: r.meal_aspiration,
+                sleep_hours: r.sleep_hours, sleep_wakeups: r.sleep_wakeups,
+                sleep_nap: r.sleep_nap, sleep_abnormal: r.sleep_abnormal,
+                mobility: r.mobility, walk_count: r.walk_count,
+                fall_risk: r.fall_risk, programs: r.programs || [],
+                urine: r.urine, urine_catheter: r.urine_catheter,
+                bowel: r.bowel, medication: r.medication, painad: r.painad,
+                moods: r.moods || [], mental: r.mental || [],
+                skin: r.skin, hygiene: r.hygiene, bedsore: r.bedsore,
+                oriental: r.oriental, oriental_items: r.oriental_items || [],
+                note: r.note, doctorComment: r.doctor_comment,
+                doctorCommentDate: r.doctor_comment_date,
+                scenarioTypes: r.scenario_types || [],
+                warningSubs: r.warning_subs || [],
+                treatingSubs: r.treating_subs || [],
+                pending: r.pending, sentToGuardian: r.sent_to_guardian,
+                updatedAt: r.updated_at,
+              }};
+            }
+          } catch(e) {}
+          return p;
+        }));
+        setPatients(withRecords);
+      }
+    } catch(e) { console.error(e); }
+    setLoading(false);
+  };
+
+  const loadMessages = async () => {
+    try {
+      const res = await fetch(`${SUPABASE_URL}/rest/v1/messages?select=*&order=created_at.desc`, {
+        headers: { apikey: SUPABASE_KEY, Authorization: "Bearer " + SUPABASE_KEY }
+      });
+      const data = await res.json();
+      if (Array.isArray(data)) {
+        setMessages(data.map(m => ({
+          patientId: m.patient_id, text: m.text,
+          visitDate: m.visit_date, visitTime: m.visit_time,
+          time: m.time, read: m.read, dbId: m.id,
+        })));
+      }
+    } catch(e) {}
+  };
+
+  useEffect(() => { loadPatients(); loadMessages(); }, []);
+
+  const handleSave = async (patientId, record) => {
+    const p = patients.find(x => x.id === patientId);
+    const dbData = {
+      patient_id: patientId, consciousness: record.consciousness,
+      meal_amount: record.meal_amount, meal_type: record.meal_type,
+      meal_refused: record.meal_refused, meal_aspiration: record.meal_aspiration,
+      sleep_hours: record.sleep_hours, sleep_wakeups: record.sleep_wakeups,
+      sleep_nap: record.sleep_nap, sleep_abnormal: record.sleep_abnormal,
+      mobility: record.mobility, walk_count: record.walk_count,
+      fall_risk: record.fall_risk, programs: record.programs,
+      urine: record.urine, urine_catheter: record.urine_catheter,
+      bowel: record.bowel, medication: record.medication, painad: record.painad,
+      moods: record.moods, mental: record.mental,
+      skin: record.skin, hygiene: record.hygiene, bedsore: record.bedsore,
+      oriental: record.oriental, oriental_items: record.oriental_items,
+      note: record.note, doctor_comment: record.doctorComment,
+      doctor_comment_date: record.doctorCommentDate,
+      scenario_types: record.scenarioTypes || [],
+      warning_subs: record.warningSubs || [],
+      treating_subs: record.treatingSubs || [],
+      pending: record.pending, sent_to_guardian: record.sentToGuardian,
+      updated_at: record.updatedAt,
+    };
+    try {
+      if (p && p.record && p.record.recordId) {
+        await fetch(`${SUPABASE_URL}/rest/v1/records?id=eq.${p.record.recordId}`, {
+          method: "PATCH",
+          headers: { apikey: SUPABASE_KEY, Authorization: "Bearer " + SUPABASE_KEY, "Content-Type": "application/json" },
+          body: JSON.stringify(dbData)
+        });
+      } else {
+        await fetch(`${SUPABASE_URL}/rest/v1/records`, {
+          method: "POST",
+          headers: { apikey: SUPABASE_KEY, Authorization: "Bearer " + SUPABASE_KEY, "Content-Type": "application/json" },
+          body: JSON.stringify(dbData)
+        });
+      }
+      await loadPatients();
+    } catch(e) {}
+    setPatients(prev => prev.map(p => p.id===patientId ? {...p, record} : p));
+  };
+
+  const handleAddPatient = async (p) => {
+    try {
+      await fetch(`${SUPABASE_URL}/rest/v1/patients`, {
+        method: "POST",
+        headers: { apikey: SUPABASE_KEY, Authorization: "Bearer " + SUPABASE_KEY, "Content-Type": "application/json" },
+        body: JSON.stringify({ name:p.name, age:p.age, gender:p.gender, room:p.room, doctor_id:p.doctorId, guardian_type:p.guardianType, guardian_relation:p.guardianRelation, guardian_name:p.guardianName, guardian_phone:p.guardianPhone, days:1, alert:false, alert_msg:"" })
+      });
+      await loadPatients();
+    } catch(e) {}
+  };
+
+  const handleUpdatePatient = async (id, updates) => {
+    try {
+      if (updates.discharged) {
+        await fetch(`${SUPABASE_URL}/rest/v1/patients?id=eq.${id}`, {
+          method: "PATCH",
+          headers: { apikey: SUPABASE_KEY, Authorization: "Bearer " + SUPABASE_KEY, "Content-Type": "application/json" },
+          body: JSON.stringify({ discharged: true })
+        });
+      } else {
+        await fetch(`${SUPABASE_URL}/rest/v1/patients?id=eq.${id}`, {
+          method: "PATCH",
+          headers: { apikey: SUPABASE_KEY, Authorization: "Bearer " + SUPABASE_KEY, "Content-Type": "application/json" },
+          body: JSON.stringify({ room:updates.room, doctor_id:updates.doctorId, guardian_type:updates.guardianType, guardian_relation:updates.guardianRelation, guardian_name:updates.guardianName, guardian_phone:updates.guardianPhone })
+        });
+      }
+      await loadPatients();
+    } catch(e) {}
+  };
+
+  const handleMessage = async (patientId, text, visitDate, visitTime) => {
+    const d = new Date();
+    const time = (d.getMonth()+1) + "월 " + d.getDate() + "일 " + d.getHours() + ":" + String(d.getMinutes()).padStart(2,"0");
+    try {
+      await fetch(`${SUPABASE_URL}/rest/v1/messages`, {
+        method: "POST",
+        headers: { apikey: SUPABASE_KEY, Authorization: "Bearer " + SUPABASE_KEY, "Content-Type": "application/json" },
+        body: JSON.stringify({ patient_id:patientId, text, visit_date:visitDate, visit_time:visitTime, time, read:false })
+      });
+      await loadMessages();
+    } catch(e) {}
+  };
+
+  const markRead = () => setMessages(prev => prev.map(m => ({...m, read:true})));
+
+  const handleRoleSelect = (type) => {
+    if (type === "messages") { setLoginType("messages"); setAppScreen("login"); return; }
+    setLoginType(type);
+    setAppScreen("login");
+  };
+
+  const handleLoginSuccess = (user) => { setCurrentUser(user); setAppScreen("app"); };
+  const handleLogout = () => { setCurrentUser(null); setLoginType(null); setAppScreen("roleSelect"); };
+
+  if (!onboarded) return <OnboardingScreen onDone={() => setOnboarded(true)} />;
+
+  if (loading) return (
+    <div style={{ fontFamily:"'Noto Sans KR',sans-serif", minHeight:"100vh", display:"flex", justifyContent:"center", alignItems:"center", background:"#f0f4f8" }}>
+      <div style={{ textAlign:"center" }}>
+        <div style={{ fontSize:48, marginBottom:16 }}>🏥</div>
+        <div style={{ fontSize:18, fontWeight:700, color:"#1e3a5f", marginBottom:8 }}>안부</div>
+        <div style={{ fontSize:14, color:"#94a3b8" }}>데이터를 불러오는 중...</div>
+      </div>
+    </div>
+  );
+
+  if (appScreen === "roleSelect") return <RoleSelect onSelect={handleRoleSelect} />;
+  if (appScreen === "login") return <LoginScreen loginType={loginType} onLogin={handleLoginSuccess} onBack={() => setAppScreen("roleSelect")} patients={patients} />;
+
+  if (appScreen === "app" && currentUser) {
+    const { role } = currentUser;
+    if (role === "guardian") return <GuardianScreen patients={patients} onBack={handleLogout} onMessage={handleMessage} />;
+    if (role === "nurse") return <NurseScreen patients={patients} onSave={handleSave} onBack={handleLogout} messages={messages} onMarkRead={markRead} onAddPatient={handleAddPatient} onUpdatePatient={handleUpdatePatient} />;
+    if (role === "doctor") return <DoctorScreen patients={patients.filter(p => p.doctorId===currentUser.doctorId)} onSave={handleSave} onBack={handleLogout} messages={messages} onMarkRead={markRead} doctorId={currentUser.doctorId} />;
+    if (role === "messages") return <MessagesScreen patients={patients} messages={messages} onBack={handleLogout} onMarkRead={markRead} />;
+    if (role === "admin") return <AdminScreen patients={patients} onBack={handleLogout} onLogout={handleLogout} />;
+  }
+
+  return null;
+}
+
+    const root = ReactDOM.createRoot(document.getElementById('root'));
+    root.render(<App />);
+  </script>
+</body>
+</html>
