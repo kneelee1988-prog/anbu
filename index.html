@@ -2267,7 +2267,7 @@ function RoleSelect(_ref17) {
     icon: "👨‍👩‍👧",
     label: "보호자",
     sub: "어머니 오늘 상태 확인",
-    color: "#1a56db"
+    color: "#1e3a5f"
   }, {
     type: "nurse",
     icon: "👩‍⚕️",
@@ -2285,7 +2285,7 @@ function RoleSelect(_ref17) {
     icon: "💬",
     label: "보호자 한마디",
     sub: "면회 일정 및 메시지 확인",
-    color: "#0369a1"
+    color: "#0d5c56"
   }, {
     type: "admin",
     icon: "👑",
@@ -2433,7 +2433,7 @@ function GuardianScreen(_ref19) {
     }
   }, /*#__PURE__*/React.createElement("div", {
     style: {
-      background: "linear-gradient(135deg,#1a56db,#3b82f6)",
+      background: "linear-gradient(135deg,#1e3a5f,#2d5a8e)",
       padding: "16px 20px",
       color: "white",
       borderRadius: 16
@@ -3417,8 +3417,8 @@ function NurseScreen(_ref22) {
     },
     style: {
       flex: 2,
-      background: unread > 0 ? "#ef4444" : "rgba(255,255,255,0.15)",
-      border: "none",
+      background: unread > 0 ? "rgba(255,255,255,0.25)" : "rgba(255,255,255,0.15)",
+      border: unread > 0 ? "1.5px solid rgba(255,255,255,0.5)" : "none",
       borderRadius: 10,
       padding: "8px 14px",
       color: "white",
@@ -3429,7 +3429,7 @@ function NurseScreen(_ref22) {
       alignItems: "center",
       justifyContent: "space-between"
     }
-  }, /*#__PURE__*/React.createElement("span", null, "\uD83D\uDCAC \uBCF4\uD638\uC790 \uD55C\uB9C8\uB514"), /*#__PURE__*/React.createElement("span", null, unread > 0 ? "🔴 " + unread + "건" : "없음")), /*#__PURE__*/React.createElement("button", {
+  }, /*#__PURE__*/React.createElement("span", null, "\uD83D\uDCAC \uBCF4\uD638\uC790 \uD55C\uB9C8\uB514 ", unread > 0 ? "🔔" : ""), /*#__PURE__*/React.createElement("span", null, unread > 0 ? "🔴 " + unread + "건" : "없음")), /*#__PURE__*/React.createElement("button", {
     onClick: function onClick() {
       return setScreen("manage");
     },
@@ -5864,7 +5864,7 @@ function DoctorScreen(_ref32) {
     }
   }, /*#__PURE__*/React.createElement("div", {
     style: {
-      background: "linear-gradient(135deg,#1a56db,#3b82f6)",
+      background: "linear-gradient(135deg,#1e3a5f,#2d5a8e)",
       padding: "16px 20px",
       color: "white",
       borderRadius: 16
@@ -5980,8 +5980,8 @@ function DoctorScreen(_ref32) {
     },
     style: {
       width: "100%",
-      background: unread > 0 ? "#ef4444" : "rgba(255,255,255,0.15)",
-      border: "none",
+      background: unread > 0 ? "rgba(255,255,255,0.25)" : "rgba(255,255,255,0.15)",
+      border: unread > 0 ? "1.5px solid rgba(255,255,255,0.5)" : "none",
       borderRadius: 10,
       padding: "8px 14px",
       color: "white",
@@ -5992,7 +5992,7 @@ function DoctorScreen(_ref32) {
       alignItems: "center",
       justifyContent: "space-between"
     }
-  }, /*#__PURE__*/React.createElement("span", null, "\uD83D\uDCAC \uBCF4\uD638\uC790 \uD55C\uB9C8\uB514 \uD655\uC778"), /*#__PURE__*/React.createElement("span", null, unread > 0 ? "🔴 " + unread + "건" : "없음")))), /*#__PURE__*/React.createElement("div", {
+  }, /*#__PURE__*/React.createElement("span", null, "\uD83D\uDCAC \uBCF4\uD638\uC790 \uD55C\uB9C8\uB514 \uD655\uC778 ", unread > 0 ? "🔔" : ""), /*#__PURE__*/React.createElement("span", null, unread > 0 ? "🔴 " + unread + "건" : "없음")))), /*#__PURE__*/React.createElement("div", {
     style: {
       padding: "12px 16px",
       display: "flex",
@@ -6210,7 +6210,7 @@ function MessagesScreen(_ref36) {
     }
   }, /*#__PURE__*/React.createElement("div", {
     style: {
-      background: "linear-gradient(135deg,#1a56db,#3b82f6)",
+      background: "linear-gradient(135deg,#1e3a5f,#2d5a8e)",
       padding: "16px 20px",
       color: "white",
       borderRadius: 16
