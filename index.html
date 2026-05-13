@@ -1136,7 +1136,7 @@ function LoginScreen(_ref1) {
             if (_user) {
               onLogin({
                 role: "doctor",
-                doctorId: _user.doctor_id,
+                doctorId: _user.doctorId,
                 userName: _user.name
               });
             } else setError("이름 또는 비밀번호가 올바르지 않아요.");
@@ -1154,7 +1154,7 @@ function LoginScreen(_ref1) {
             if (_user2) {
               onLogin({
                 role: "admin",
-                doctorId: _user2.doctor_id,
+                doctorId: _user2.doctorId,
                 userName: _user2.name
               });
             } else setError("이름 또는 비밀번호가 올바르지 않아요.");
