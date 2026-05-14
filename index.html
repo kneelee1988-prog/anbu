@@ -2787,96 +2787,29 @@ function NurseScreen(_ref22) {
     return /*#__PURE__*/React.createElement("button", {
       key: p.id,
       onClick: function onClick() {
-        if (sentToday) {
-          setDetailPatient(p);
-        } else {
-          setSelected(p);
-          setForm(initForm());
-          setScreen("input");
-        }
+        if (sentToday) { setDetailPatient(p); }
+        else { setSelected(p); setForm(initForm()); setScreen("input"); }
       },
       style: {
-        background: "white",
-        borderRadius: 14,
-        border: isPending ? "1.5px solid #fcd34d" : sentToday ? "1.5px solid #86efac" : "1.5px solid #cbd5e1",
-        padding: "13px 16px",
-        display: "flex",
-        alignItems: "center",
-        gap: 12,
+        background: sentToday ? "#f0fdf4" : isPending ? "#fffbeb" : "white",
+        borderRadius: 12,
+        border: isPending ? "1.5px solid #fcd34d" : sentToday ? "1.5px solid #86efac" : "1.5px solid #e2e8f0",
+        padding: "10px 10px",
         cursor: "pointer",
         textAlign: "left",
-        width: "100%"
+        boxShadow: "0 2px 8px rgba(0,0,0,0.08)"
       }
-    }, /*#__PURE__*/React.createElement("div", {
-      style: {
-        width: 34,
-        height: 34,
-        borderRadius: 10,
-        flexShrink: 0,
-        background: isPending ? "#fffbeb" : sentToday ? "#f0fdf4" : "#f0f4f8",
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
-        fontSize: 13,
-        fontWeight: 800,
-        color: isPending ? "#713f12" : sentToday ? "#16a34a" : "#64748b"
-      }
-    }, sentToday ? "✓" : isPending ? "⏳" : idx + 1), /*#__PURE__*/React.createElement("div", {
-      style: {
-        flex: 1
-      }
-    }, /*#__PURE__*/React.createElement("div", {
-      style: {
-        display: "flex",
-        alignItems: "center",
-        gap: 6,
-        marginBottom: 2
-      }
-    }, /*#__PURE__*/React.createElement("span", {
-      style: {
-        fontSize: 15,
-        fontWeight: 800,
-        color: "#1a1a1a"
-      }
-    }, p.name), /*#__PURE__*/React.createElement("span", {
-      style: {
-        fontSize: 11,
-        color: "#94a3b8"
-      }
-    }, p.age, "\uC138 \xB7 ", p.gender), sentToday && /*#__PURE__*/React.createElement("span", {
-      style: {
-        fontSize: 10,
-        fontWeight: 800,
-        background: "#dcfce7",
-        color: "#166534",
-        borderRadius: 20,
-        padding: "2px 8px"
-      }
-    }, "\u2705 \uC624\uB298 \uC804\uC1A1\uC644\uB8CC")), /*#__PURE__*/React.createElement("div", {
-      style: {
-        fontSize: 12,
-        color: "#64748b"
-      }
-    }, getWard(p.room), " \xB7 \uC785\uC6D0 ", p.days, "\uC77C\uC9F8"), p.alert && /*#__PURE__*/React.createElement("div", {
-      style: {
-        fontSize: 11,
-        color: "#ef4444",
-        fontWeight: 700,
-        marginTop: 2
-      }
-    }, "\u26A0\uFE0F ", p.alertMsg), sentToday && /*#__PURE__*/React.createElement("div", {
-      style: {
-        fontSize: 11,
-        color: "#16a34a",
-        fontWeight: 600,
-        marginTop: 2
-      }
-    }, "\uBCF4\uD638\uC790 \uC804\uB2EC \uC644\uB8CC \xB7 ", p.record.updatedAt)), /*#__PURE__*/React.createElement("div", {
-      style: {
-        fontSize: 16,
-        color: sentToday ? "#86efac" : "#cbd5e1"
-      }
-    }, sentToday ? "👁" : "›"));
+    },
+    /*#__PURE__*/React.createElement("div", { style: { display: "flex", alignItems: "center", gap: 6, marginBottom: 3 } },
+      /*#__PURE__*/React.createElement("div", {
+        style: { width: 22, height: 22, borderRadius: 6, flexShrink: 0, background: isPending ? "#fef3c7" : sentToday ? "#dcfce7" : "#f0f4f8", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 11, fontWeight: 800, color: isPending ? "#713f12" : sentToday ? "#16a34a" : "#64748b" }
+      }, sentToday ? "✓" : isPending ? "⏳" : idx),
+      /*#__PURE__*/React.createElement("span", { style: { fontSize: 14, fontWeight: 800, color: "#1a1a1a" } }, p.name)
+    ),
+    /*#__PURE__*/React.createElement("div", { style: { fontSize: 11, color: "#64748b", marginBottom: 2 } }, p.age, "세 · ", p.gender),
+    p.alert && /*#__PURE__*/React.createElement("div", { style: { fontSize: 10, color: "#ef4444", fontWeight: 700 } }, "⚠️ ", p.alertMsg),
+    sentToday && /*#__PURE__*/React.createElement("div", { style: { fontSize: 10, color: "#16a34a", fontWeight: 600, marginTop: 2 } }, "전송완료")
+    );
   };
 
   // 전송완료 환자 상세보기
@@ -3176,30 +3109,18 @@ function NurseScreen(_ref22) {
       gap: 6
     }
   }, pending.length > 0 && /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement(SectionHeader, {
-    icon: "\uD83D\uDD50",
-    label: "\uC8FC\uCE58\uC758 \uAC80\uD1A0 \uB300\uAE30",
-    count: pending.length,
-    color: "#713f12",
-    bg: "#fffbeb"
-  }), pending.map(function (p, i) {
-    return NurseCard(p, i + 1);
-  })), notInput.length > 0 && /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement(SectionHeader, {
-    icon: "\u23F3",
-    label: "\uBBF8\uC785\uB825",
-    count: notInput.length,
-    color: "#334155",
-    bg: "#e2e8f0"
-  }), notInput.map(function (p, i) {
-    return NurseCard(p, pending.length + i + 1);
-  })), sent.length > 0 && /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement(SectionHeader, {
-    icon: "\u2705",
-    label: "\uC804\uC1A1 \uC644\uB8CC",
-    count: sent.length,
-    color: "#16a34a",
-    bg: "#f0fdf4"
-  }), sent.map(function (p, i) {
-    return NurseCard(p, pending.length + notInput.length + i + 1);
-  })))));
+    icon: "\uD83D\uDD50", label: "\uC8FC\uCE58\uC758 \uAC80\uD1A0 \uB300\uAE30", count: pending.length, color: "#713f12", bg: "#fffbeb"
+  }), /*#__PURE__*/React.createElement("div", { style: { display: "grid", gridTemplateColumns: "1fr 1fr", gap: 6 } },
+    pending.map(function (p, i) { return NurseCard(p, i + 1); })
+  )), notInput.length > 0 && /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement(SectionHeader, {
+    icon: "\u23F3", label: "\uBBF8\uC785\uB825", count: notInput.length, color: "#334155", bg: "#e2e8f0"
+  }), /*#__PURE__*/React.createElement("div", { style: { display: "grid", gridTemplateColumns: "1fr 1fr", gap: 6 } },
+    notInput.map(function (p, i) { return NurseCard(p, pending.length + i + 1); })
+  )), sent.length > 0 && /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement(SectionHeader, {
+    icon: "\u2705", label: "\uC804\uC1A1 \uC644\uB8CC", count: sent.length, color: "#16a34a", bg: "#f0fdf4"
+  }), /*#__PURE__*/React.createElement("div", { style: { display: "grid", gridTemplateColumns: "1fr 1fr", gap: 6 } },
+    sent.map(function (p, i) { return NurseCard(p, pending.length + notInput.length + i + 1); })
+  )))))
   if (screen === "messages") return /*#__PURE__*/React.createElement("div", {
     style: {
       fontFamily: "'Noto Sans KR',sans-serif",
@@ -4126,19 +4047,19 @@ function PatientManage(_ref26) {
         padding: "12px 10px",
         cursor: "pointer",
         textAlign: "left",
-        boxShadow: "0 2px 6px rgba(0,0,0,0.06)"
+        boxShadow: "0 2px 8px rgba(0,0,0,0.09)"
       }
     }, /*#__PURE__*/React.createElement("div", {
-      style: { fontSize: 14, fontWeight: 800, color: "#1a1a1a", marginBottom: 3 }
+      style: { fontSize: 14, fontWeight: 800, color: "#1a1a1a", marginBottom: 2 }
     }, p.name),
     /*#__PURE__*/React.createElement("div", {
-      style: { fontSize: 11, color: "#64748b", marginBottom: 2 }
+      style: { fontSize: 11, color: "#64748b", marginBottom: 1 }
     }, p.age, "\uC138 · ", p.gender),
     /*#__PURE__*/React.createElement("div", {
       style: { fontSize: 11, color: "#0d9488", fontWeight: 600 }
     }, getWard(p.room)),
     /*#__PURE__*/React.createElement("div", {
-      style: { fontSize: 10, color: "#94a3b8", marginTop: 4, textAlign: "right" }
+      style: { fontSize: 10, color: "#94a3b8", marginTop: 2, textAlign: "right" }
     }, "\uC218\uC815 \u203A"));
   })))));
   if (view === "register") return /*#__PURE__*/React.createElement("div", {
