@@ -2807,8 +2807,8 @@ function NurseScreen(_ref22) {
         style: { width: 22, height: 22, borderRadius: 6, flexShrink: 0, background: isPending ? "#fef3c7" : sentToday ? "#dcfce7" : "#f0f4f8", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 11, fontWeight: 800, color: isPending ? "#713f12" : sentToday ? "#16a34a" : "#64748b" }
       }, sentToday ? "✓" : isPending ? "⏳" : idx),
       /*#__PURE__*/React.createElement("span", { style: { fontSize: 14, fontWeight: 800, color: "#1a1a1a" } }, p.name),
-      p.dnr === true && /*#__PURE__*/React.createElement("span", { style: { fontSize: 9, fontWeight: 800, background: "#dcfce7", color: "#15803d", borderRadius: 4, padding: "1px 5px" } }, "DNR"),
-      p.dnr === false && /*#__PURE__*/React.createElement("span", { style: { fontSize: 9, fontWeight: 800, background: "#fee2e2", color: "#dc2626", borderRadius: 4, padding: "1px 5px" } }, "DNR\uAC70\uBD80")
+      (p.dnr === true || p.dnr === "true") && /*#__PURE__*/React.createElement("span", { style: { fontSize: 9, fontWeight: 800, background: "#dcfce7", color: "#15803d", borderRadius: 4, padding: "1px 5px" } }, "DNR\uB3D9\uC758"),
+      (p.dnr === false || p.dnr === "false") && /*#__PURE__*/React.createElement("span", { style: { fontSize: 9, fontWeight: 800, background: "#fee2e2", color: "#dc2626", borderRadius: 4, padding: "1px 5px" } }, "DNR\uBE44\uB3D9\uC758")
     ),
     /*#__PURE__*/React.createElement("div", { style: { fontSize: 11, color: "#64748b", marginBottom: 2 } }, p.age, "세 · ", p.gender),
     p.alert && /*#__PURE__*/React.createElement("div", { style: { fontSize: 10, color: "#ef4444", fontWeight: 700 } }, "⚠️ ", p.alertMsg),
@@ -4048,7 +4048,7 @@ function PatientManage(_ref26) {
           guardianType: p.guardianType,
           guardianName: p.guardianName || "",
           guardianPhone: p.guardianPhone || "",
-          dnr: p.dnr !== undefined ? p.dnr : null
+          dnr: p.dnr === true || p.dnr === "true" ? true : p.dnr === false || p.dnr === "false" ? false : null
         });
         setView("edit");
       },
@@ -4670,8 +4670,8 @@ function DoctorScreen(_ref32) {
       /*#__PURE__*/React.createElement("div", { style: { display: "flex", alignItems: "center", gap: 6, marginBottom: 3 } },
         /*#__PURE__*/React.createElement("span", { style: { fontSize: 16, fontWeight: 800, color: "#1a1a1a" } }, p.name),
         /*#__PURE__*/React.createElement("span", { style: { fontSize: 12, color: "#64748b", fontWeight: 600 } }, p.age, "\uC138 \xB7 ", p.gender),
-        p.dnr === true && /*#__PURE__*/React.createElement("span", { style: { fontSize: 10, fontWeight: 800, background: "#dcfce7", color: "#15803d", borderRadius: 4, padding: "2px 6px" } }, "DNR"),
-        p.dnr === false && /*#__PURE__*/React.createElement("span", { style: { fontSize: 10, fontWeight: 800, background: "#fee2e2", color: "#dc2626", borderRadius: 4, padding: "2px 6px" } }, "DNR\uAC70\uBD80")
+        (p.dnr === true || p.dnr === "true") && /*#__PURE__*/React.createElement("span", { style: { fontSize: 10, fontWeight: 800, background: "#dcfce7", color: "#15803d", borderRadius: 4, padding: "2px 6px" } }, "DNR\uB3D9\uC758"),
+        (p.dnr === false || p.dnr === "false") && /*#__PURE__*/React.createElement("span", { style: { fontSize: 10, fontWeight: 800, background: "#fee2e2", color: "#dc2626", borderRadius: 4, padding: "2px 6px" } }, "DNR\uBE44\uB3D9\uC758")
       ),
       /*#__PURE__*/React.createElement("div", { style: { fontSize: 13, color: "#475569", fontWeight: 600, marginBottom: r ? 4 : 0 } }, getWard(p.room), " \xB7 \uC785\uC6D0 ", p.days, "\uC77C\uC9F8"),
       p.alert && /*#__PURE__*/React.createElement("div", { style: { fontSize: 12, color: "#ef4444", fontWeight: 700, marginBottom: 2 } }, "\u26A0\uFE0F ", p.alertMsg),
@@ -6055,7 +6055,7 @@ function App() {
                 gender: p.gender,
                 room: p.room,
                 ward: p.ward || getWard(p.room),
-                dnr: p.dnr !== undefined ? p.dnr : null,
+                dnr: p.dnr === true || p.dnr === "true" ? true : p.dnr === false || p.dnr === "false" ? false : null,
                 doctorId: p.doctor_id,
                 guardianType: p.guardian_type,
                 guardianRelation: p.guardian_relation,
