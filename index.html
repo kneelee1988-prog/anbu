@@ -2684,7 +2684,8 @@ function NurseScreen(_ref22) {
     messages = _ref22.messages,
     onMarkRead = _ref22.onMarkRead,
     onAddPatient = _ref22.onAddPatient,
-    onUpdatePatient = _ref22.onUpdatePatient;
+    onUpdatePatient = _ref22.onUpdatePatient,
+    nurseWard = _ref22.nurseWard;
   var _useState29 = useState("list"),
     _useState30 = _slicedToArray(_useState29, 2),
     screen = _useState30[0],
@@ -3026,9 +3027,13 @@ function NurseScreen(_ref22) {
   }, /*#__PURE__*/React.createElement("div", {
     style: {
       fontSize: 11,
-      opacity: 0.7
+      opacity: 0.85,
+      fontWeight: 700,
+      whiteSpace: "nowrap",
+      overflow: "hidden",
+      textOverflow: "ellipsis"
     }
-  }, "\uC548\uBD80 \xB7 \uAC04\uD638\uC0AC"), /*#__PURE__*/React.createElement("div", {
+  }, "\uC548\uBD80 \xB7 \uAC04\uD638\uC0AC", nurseWard ? " \xB7 " + nurseWard.replace("병동", "") : ""), /*#__PURE__*/React.createElement("div", {
     style: {
       fontSize: 17,
       fontWeight: 800
