@@ -6628,12 +6628,12 @@ function App() {
       });
     }
     if (role === "nurse") return /*#__PURE__*/React.createElement(NurseScreen, {
-      patients: patients.filter(function(p) { return !currentUser.ward || p.ward === currentUser.ward; }),
+      patients: patients.filter(function(p) { return !currentUser.ward || getWard(p.room) === currentUser.ward; }),
       onSave: handleSave,
       onBack: handleLogout,
       messages: messages.filter(function(m) {
         var mp = patients.find(function(p) { return p.id === m.patientId; });
-        return !currentUser.ward || (mp && mp.ward === currentUser.ward);
+        return !currentUser.ward || (mp && getWard(mp.room) === currentUser.ward);
       }),
       onMarkRead: markRead,
       onAddPatient: handleAddPatient,
@@ -6651,10 +6651,10 @@ function App() {
       doctorId: currentUser.doctorId
     });
     if (role === "messages") return /*#__PURE__*/React.createElement(MessagesScreen, {
-      patients: currentUser.ward ? patients.filter(function(p) { return p.ward === currentUser.ward; }) : patients,
+      patients: currentUser.ward ? patients.filter(function(p) { return getWard(p.room) === currentUser.ward; }) : patients,
       messages: currentUser.ward ? messages.filter(function(m) {
         var mp = patients.find(function(p) { return p.id === m.patientId; });
-        return mp && mp.ward === currentUser.ward;
+        return mp && getWard(mp.room) === currentUser.ward;
       }) : messages,
       onBack: handleLogout,
       onMarkRead: markRead
