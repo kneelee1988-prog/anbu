@@ -2659,20 +2659,20 @@ function NurseFL(_ref_fl) {
 function NurseBox(_ref_box) {
   var title = _ref_box.title, children = _ref_box.children;
   return /*#__PURE__*/React.createElement("div", {
-    style: { background: "white", borderRadius: 16, padding: 16, border: "1.5px solid #cbd5e1", marginBottom: 14 }
+    style: { background: "white", borderRadius: 16, padding: 16, border: "1.5px solid #cbd5e1", marginBottom: 14, marginLeft: 20, marginRight: 20 }
   }, /*#__PURE__*/React.createElement("div", {
-    style: { fontSize: 13, fontWeight: 800, color: "#1e3a5f", marginBottom: 14 }
+    style: { fontSize: 13, fontWeight: 800, color: "#0d5c56", marginBottom: 14 }
   }, title), children);
 }
 function NurseHdr(_ref_hdr) {
   var title = _ref_hdr.title, back = _ref_hdr.back;
   return /*#__PURE__*/React.createElement("div", {
-    style: { background: "linear-gradient(135deg,#1e3a5f,#2d6a9f)", padding: "14px 20px", color: "white", display: "flex", alignItems: "center", gap: 12, borderRadius: 20 }
+    style: { background: "linear-gradient(135deg,#0d5c56,#0f766e)", padding: "16px 20px", color: "white", display: "flex", alignItems: "center", gap: 12, borderRadius: 20, margin: "14px 20px 0" }
   }, /*#__PURE__*/React.createElement("button", {
     onClick: back,
     style: { background: "rgba(255,255,255,0.15)", border: "none", borderRadius: 8, padding: "6px 12px", color: "white", fontSize: 13, cursor: "pointer", fontWeight: 700 }
   }, "\u2190 \uB3CC\uC544\uAC00\uAE30"), /*#__PURE__*/React.createElement("div", {
-    style: { fontSize: 15, fontWeight: 800 }
+    style: { fontSize: 16, fontWeight: 800 }
   }, title));
 }
 
@@ -3399,10 +3399,14 @@ function NurseScreen(_ref22) {
   }, "\uC774\uC0C1\uC5C6\uC74C")), selected && selected.alert && /*#__PURE__*/React.createElement("div", {
     style: {
       background: "#fef2f2",
-      padding: "10px 20px",
+      margin: "0 20px",
+      padding: "10px 16px",
       fontSize: 12,
       color: "#ef4444",
-      fontWeight: 600
+      fontWeight: 600,
+      borderRadius: "0 0 12px 12px",
+      border: "1px solid #fecaca",
+      borderTop: "none"
     }
   }, "\u26A0\uFE0F \uC5B4\uC81C \uD2B9\uC774\uC0AC\uD56D: ", selected.alertMsg), /*#__PURE__*/React.createElement("div", {
     style: {
@@ -3411,7 +3415,7 @@ function NurseScreen(_ref22) {
     }
   }, /*#__PURE__*/React.createElement(Sec, {
     title: "\uD83E\uDDE0 \uC758\uC2DD\uC218\uC900"
-  }, /*#__PURE__*/React.createElement(BtnRow, null, ["명료", "졸림", "많이졸림"].map(function (v) {
+  }, /*#__PURE__*/React.createElement(BtnRow, null, ["명료", "졸림", "혼미", "반혼수", "혼수"].map(function (v) {
     return /*#__PURE__*/React.createElement(Btn, {
       key: v,
       label: v,
@@ -3419,13 +3423,14 @@ function NurseScreen(_ref22) {
       onClick: function onClick() {
         return set("consciousness", v);
       },
-      color: v === "명료" ? "#166534" : v === "졸림" ? "#713f12" : "#7f1d1d"
+      color: v === "명료" ? "#166534" : v === "졸림" ? "#713f12" : "#7f1d1d",
+      small: true
     });
   }))), /*#__PURE__*/React.createElement(Sec, {
     title: "\uD83C\uDF5A \uC2DD\uC0AC"
   }, /*#__PURE__*/React.createElement(Lbl, {
     text: "\uC2DD\uC0AC\uB7C9"
-  }), /*#__PURE__*/React.createElement(BtnRow, null, ["잘 드심", "절반", "거의 안 드심"].map(function (v) {
+  }), /*#__PURE__*/React.createElement(BtnRow, null, ["잘 드심", "절반", "거의 안 드심", "안 드심"].map(function (v) {
     return /*#__PURE__*/React.createElement(Btn, {
       key: v,
       label: v,
@@ -3433,33 +3438,30 @@ function NurseScreen(_ref22) {
       onClick: function onClick() {
         return set("meal_amount", v);
       },
-      color: v === "잘 드심" ? "#166534" : v === "절반" ? "#713f12" : "#7f1d1d"
+      color: v === "잘 드심" ? "#166534" : v === "절반" ? "#713f12" : "#7f1d1d",
+      small: true
     });
   })), /*#__PURE__*/React.createElement(Lbl, {
-    text: "\uC2DD\uC0AC \uC885\uB958"
-  }), /*#__PURE__*/React.createElement(BtnRow, null, ["일반식", "죽", "유동식", "경관식"].map(function (v) {
+    text: "\uC2DD\uC0AC \uC885\uB958 (\uBCF5\uC218 \uC120\uD0DD)"
+  }), /*#__PURE__*/React.createElement(BtnRow, null, ["일반식", "죽", "갈죽", "갈찬", "유동식", "경관식"].map(function (v) {
     return /*#__PURE__*/React.createElement(Btn, {
       key: v,
       label: v,
-      active: form.meal_type === v,
+      active: Array.isArray(form.meal_type) ? form.meal_type.includes(v) : form.meal_type === v,
       onClick: function onClick() {
-        return set("meal_type", v);
+        var cur = Array.isArray(form.meal_type) ? form.meal_type : form.meal_type ? [form.meal_type] : [];
+        var next = cur.includes(v) ? cur.filter(function(x) { return x !== v; }) : cur.concat(v);
+        return set("meal_type", next);
       },
       small: true
     });
-  })), /*#__PURE__*/React.createElement(BtnRow, null, /*#__PURE__*/React.createElement(Btn, {
+  })), /*#__PURE__*/React.createElement(Lbl, {
+    text: "\uC2DD\uC0AC \uAC70\uBD80"
+  }), /*#__PURE__*/React.createElement(BtnRow, null, /*#__PURE__*/React.createElement(Btn, {
     label: "\uC2DD\uC0AC \uAC70\uBD80",
     active: form.meal_refused,
     onClick: function onClick() {
       return set("meal_refused", !form.meal_refused);
-    },
-    color: "#7f1d1d",
-    small: true
-  }), /*#__PURE__*/React.createElement(Btn, {
-    label: "\uD761\uC778 \uC704\uD5D8",
-    active: form.meal_aspiration,
-    onClick: function onClick() {
-      return set("meal_aspiration", !form.meal_aspiration);
     },
     color: "#7f1d1d",
     small: true
@@ -3693,7 +3695,7 @@ function NurseScreen(_ref22) {
     }, desc));
   }))), /*#__PURE__*/React.createElement(Sec, {
     title: "\uD83D\uDE0A \uAE30\uBD84 (\uBCF5\uC218 \uC120\uD0DD)"
-  }, /*#__PURE__*/React.createElement(BtnRow, null, ["안정", "불안", "초조", "무기력", "공격적", "우울", "들뜸"].map(function (v) {
+  }, /*#__PURE__*/React.createElement(BtnRow, null, ["안정", "불안", "초조", "무기력", "우울", "들뜸", "수시로 변함", "의욕저하", "무감동"].map(function (v) {
     return /*#__PURE__*/React.createElement(Btn, {
       key: v,
       label: v,
@@ -3706,7 +3708,7 @@ function NurseScreen(_ref22) {
     });
   }))), /*#__PURE__*/React.createElement(Sec, {
     title: "\uD83E\uDDE9 \uC815\uC2E0 \uBC0F \uC774\uC0C1\uD589\uB3D9 \uC0C1\uD0DC (\uBCF5\uC218 \uC120\uD0DD)"
-  }, /*#__PURE__*/React.createElement(BtnRow, null, ["이상 없음", "섬망", "환청", "환시", "혼잣말", "야간 혼돈", "망상", "배회", "공격성", "케어 저항"].map(function (v) {
+  }, /*#__PURE__*/React.createElement(BtnRow, null, ["이상 없음", "섬망", "환청", "환시", "혼잣말", "야간 혼돈", "망상", "배회", "공격성", "케어 저항", "충동적행동", "인지저하", "반복적 소리지름"].map(function (v) {
     return /*#__PURE__*/React.createElement(Btn, {
       key: v,
       label: v,
@@ -3721,7 +3723,7 @@ function NurseScreen(_ref22) {
     title: "\uD83E\uDDF4 \uD53C\uBD80 \xB7 \uC704\uC0DD \xB7 \uC695\uCC3D"
   }, /*#__PURE__*/React.createElement(Lbl, {
     text: "\uD53C\uBD80 \uC0C1\uD0DC"
-  }), /*#__PURE__*/React.createElement(BtnRow, null, ["양호", "건조", "발진", "상처"].map(function (v) {
+  }), /*#__PURE__*/React.createElement(BtnRow, null, ["양호", "건조", "발진", "상처", "소양감"].map(function (v) {
     return /*#__PURE__*/React.createElement(Btn, {
       key: v,
       label: v,
@@ -3734,7 +3736,7 @@ function NurseScreen(_ref22) {
     });
   })), /*#__PURE__*/React.createElement(Lbl, {
     text: "\uC704\uC0DD \uC0C1\uD0DC"
-  }), /*#__PURE__*/React.createElement(BtnRow, null, ["양호", "보통", "불량"].map(function (v) {
+  }), /*#__PURE__*/React.createElement(BtnRow, null, ["양호", "보통", "불량", "위생관리거부"].map(function (v) {
     return /*#__PURE__*/React.createElement(Btn, {
       key: v,
       label: v,
@@ -4070,7 +4072,7 @@ function PatientManage(_ref26) {
     back: onBack
   }), /*#__PURE__*/React.createElement("div", {
     style: {
-      padding: "12px 20px",
+      padding: "14px 20px",
       
     }
   }, /*#__PURE__*/React.createElement("button", {
@@ -4082,7 +4084,7 @@ function PatientManage(_ref26) {
       padding: 14,
       borderRadius: 14,
       border: "none",
-      background: "#1e3a5f",
+      background: "linear-gradient(135deg,#065f46,#0d9488)",
       color: "white",
       fontSize: 14,
       fontWeight: 800,
