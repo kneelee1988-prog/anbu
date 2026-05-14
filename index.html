@@ -468,6 +468,7 @@ var initForm = function initForm() {
     bedsore: "",
     oriental: null,
     oriental_items: [],
+    care_items: [],
     note: "",
     updatedAt: "",
     pending: true,
@@ -2530,6 +2531,14 @@ function GuardianScreen(_ref19) {
           })
         )
       ),
+      r.care_items && r.care_items.length > 0 && /*#__PURE__*/React.createElement("div", { style: { background: "white", borderRadius: 14, border: "1px solid #bae6fd", overflow: "hidden", marginBottom: 10, boxShadow: "0 4px 14px rgba(0,0,0,0.13)" } },
+        /*#__PURE__*/React.createElement("div", { style: { background: "linear-gradient(135deg,#0c4a6e,#0369a1)", padding: "10px 14px", fontSize: 12, fontWeight: 700, color: "white" } }, "\uD83D\uDEC1 \uC624\uB298\uC758 \uCF00\uC5B4"),
+        /*#__PURE__*/React.createElement("div", { style: { padding: "10px 14px", display: "flex", flexWrap: "wrap", gap: 6 } },
+          r.care_items.map(function(item) {
+            return /*#__PURE__*/React.createElement("span", { key: item, style: { fontSize: 12, fontWeight: 700, borderRadius: 20, padding: "3px 12px", background: "#e0f2fe", color: "#0369a1" } }, "\u2713 " + item);
+          })
+        )
+      ),
       r.note && /*#__PURE__*/React.createElement("div", { style: { background: "white", borderRadius: 14, border: "1px solid #d1fae5", overflow: "hidden", marginBottom: 10, boxShadow: "0 4px 14px rgba(0,0,0,0.13)" } },
         /*#__PURE__*/React.createElement("div", { style: { background: "linear-gradient(135deg,#065f46,#0d9488)", padding: "10px 14px", fontSize: 12, fontWeight: 700, color: "white" } }, "\uD83D\uDCDD 간호사 특이사항"),
         /*#__PURE__*/React.createElement("div", { style: { padding: "14px", fontSize: 15, color: "#166534", lineHeight: 1.8, fontWeight: 600 } }, r.note)
@@ -3714,6 +3723,21 @@ function NurseScreen(_ref22) {
     },
     color: "#94a3b8",
     small: true
+  }))), /*#__PURE__*/React.createElement(Sec, {
+    title: "\uD83D\uDEC1 \uC77C\uC0C1 \uCF00\uC5B4 (\uBCF5\uC218 \uC120\uD0DD)"
+  }, /*#__PURE__*/React.createElement(BtnRow, null, [
+    "\uBAA9\uC695", "\uAD6C\uAC15\uCF00\uC5B4", "\uD658\uC758\uAD50\uCCB4", "\uC2DC\uD2B8\uAD50\uCCB4",
+    "\uACBD\uAD00\uC2DD\uD29C\uBE0C\uAD50\uCCB4", "\uC5BC\uC74C\uD329", "\uC0B0\uC18C\uACF5\uAE09", "\uB124\uBB3C\uB77C\uC774\uC800",
+    "\uCCB4\uC704\uBCC0\uACBD", "\uC190\uBC1C\uD1B1\uAD00\uB9AC", "\uBA74\uB3C4", "\uBA38\uB9AC\uAC10\uAE30"
+  ].map(function(v) {
+    return /*#__PURE__*/React.createElement(Btn, {
+      key: v,
+      label: v,
+      active: form.care_items.includes(v),
+      onClick: function onClick() { return toggle("care_items", v); },
+      color: "#0369a1",
+      small: true
+    });
   }))), /*#__PURE__*/React.createElement(Sec, {
     title: "\uD83D\uDCDD \uD2B9\uC774\uC0AC\uD56D \uBA54\uBAA8"
   }, /*#__PURE__*/React.createElement("div", {
@@ -6123,6 +6147,7 @@ function App() {
                           bedsore: r.bedsore,
                           oriental: r.oriental,
                           oriental_items: r.oriental_items || [],
+                          care_items: r.care_items || [],
                           note: r.note,
                           doctorComment: r.doctor_comment,
                           doctorCommentDate: r.doctor_comment_date,
@@ -6257,6 +6282,7 @@ function App() {
               bedsore: record.bedsore,
               oriental: record.oriental,
               oriental_items: record.oriental_items,
+              care_items: record.care_items || [],
               note: record.note,
               doctor_comment: record.doctorComment,
               doctor_comment_date: record.doctorCommentDate,
