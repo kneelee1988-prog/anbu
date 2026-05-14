@@ -5529,31 +5529,42 @@ function DoctorScreen(_ref32) {
       flexDirection: "column",
       gap: 6
     }
-  }, pendingList.length > 0 && /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement(SectionHeader, {
-    icon: "\uD83D\uDD50",
-    label: "\uAC80\uD1A0 \uB300\uAE30",
-    count: pendingList.length,
-    color: "#713f12",
-    bg: "#fffbeb"
-  }), pendingList.map(function (p, i) {
-    return PatientCard(p, i + 1);
-  })), notInputList.length > 0 && /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement(SectionHeader, {
-    icon: "\u23F3",
-    label: "\uBBF8\uC785\uB825",
-    count: notInputList.length,
-    color: "#334155",
-    bg: "#e2e8f0"
-  }), notInputList.map(function (p, i) {
-    return PatientCard(p, pendingList.length + i + 1);
-  })), sentList.length > 0 && /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement(SectionHeader, {
-    icon: "\u2705",
-    label: "\uC804\uC1A1 \uC644\uB8CC",
-    count: sentList.length,
-    color: "#16a34a",
-    bg: "#f0fdf4"
-  }), sentList.map(function (p, i) {
-    return PatientCard(p, pendingList.length + notInputList.length + i + 1);
-  })))));
+  }, pendingList.length > 0 && /*#__PURE__*/React.createElement(React.Fragment, null,
+    /*#__PURE__*/React.createElement(SectionHeader, { icon: "\uD83D\uDD50", label: "\uAC80\uD1A0 \uB300\uAE30", count: pendingList.length, color: "#713f12", bg: "#fffbeb" }),
+    /*#__PURE__*/React.createElement("div", { style: { display: "grid", gridTemplateColumns: "1fr 1fr", gap: 6 } },
+      pendingList.map(function(p, i) { return PatientCard(p, i + 1); })
+    )
+  ),
+  notInputList.length > 0 && /*#__PURE__*/React.createElement(React.Fragment, null,
+    /*#__PURE__*/React.createElement(SectionHeader, { icon: "\u23F3", label: "\uBBF8\uC785\uB825", count: notInputList.length, color: "#334155", bg: "#e2e8f0" }),
+    ["\uBBF8\uC74C\uBCD1\uB3D9","\uC18C\uB9DD\uBCD1\uB3D9","\uC0AC\uB791\uBCD1\uB3D9","\uD589\uBCF5\uBCD1\uB3D9"].map(function(ward) {
+      var wp = notInputList.filter(function(p) { return getWard(p.room) === ward; });
+      if (wp.length === 0) return null;
+      return /*#__PURE__*/React.createElement(React.Fragment, { key: ward },
+        /*#__PURE__*/React.createElement("div", {
+          style: { fontSize: 12, fontWeight: 800, color: "#1e3a5f", background: "#e8f0fe", borderRadius: 8, padding: "5px 12px", margin: "6px 0 4px" }
+        }, ward.replace("\uBCD1\uB3D9",""), " \xB7 ", wp.length, "\uBA85"),
+        /*#__PURE__*/React.createElement("div", { style: { display: "grid", gridTemplateColumns: "1fr 1fr", gap: 6 } },
+          wp.map(function(p, i) { return PatientCard(p, i + 1); })
+        )
+      );
+    })
+  ),
+  sentList.length > 0 && /*#__PURE__*/React.createElement(React.Fragment, null,
+    /*#__PURE__*/React.createElement(SectionHeader, { icon: "\u2705", label: "\uC804\uC1A1 \uC644\uB8CC", count: sentList.length, color: "#16a34a", bg: "#f0fdf4" }),
+    ["\uBBF8\uC74C\uBCD1\uB3D9","\uC18C\uB9DD\uBCD1\uB3D9","\uC0AC\uB791\uBCD1\uB3D9","\uD589\uBCF5\uBCD1\uB3D9"].map(function(ward) {
+      var wp = sentList.filter(function(p) { return getWard(p.room) === ward; });
+      if (wp.length === 0) return null;
+      return /*#__PURE__*/React.createElement(React.Fragment, { key: ward },
+        /*#__PURE__*/React.createElement("div", {
+          style: { fontSize: 12, fontWeight: 800, color: "#166534", background: "#dcfce7", borderRadius: 8, padding: "5px 12px", margin: "6px 0 4px" }
+        }, ward.replace("\uBCD1\uB3D9",""), " \xB7 ", wp.length, "\uBA85"),
+        /*#__PURE__*/React.createElement("div", { style: { display: "grid", gridTemplateColumns: "1fr 1fr", gap: 6 } },
+          wp.map(function(p, i) { return PatientCard(p, i + 1); })
+        )
+      );
+    })
+  ))));
 }
 
 // ── 보호자 한마디 전체 화면 ───────────────────────────────────
