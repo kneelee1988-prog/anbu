@@ -859,7 +859,7 @@ var SLIDES = [{
   title: "安否",
   sub: "안부",
   meaning: "잘 지내고 있는지에 대한 소식",
-  desc: "간호사가 입력하고, 의사가 검토하고, 보호자가 확인하는\n[케어 연속성 플랫폼]",
+  desc: "간호사와 의사가 함께 기록하고 검토하며, 보호자가 확인하는\n[케어 연속성 플랫폼]",
   color: "#1e3a5f"
 }, {
   icon: "👨‍👩‍👧",
@@ -887,7 +887,8 @@ var SLIDES = [{
   color: "#713f12"
 }];
 function OnboardingScreen(_ref0) {
-  var onDone = _ref0.onDone;
+  var onDone = _ref0.onDone,
+    alreadySeen = _ref0.alreadySeen;
   var _useState = useState(0),
     _useState2 = _slicedToArray(_useState, 2),
     idx = _useState2[0],
@@ -2408,14 +2409,29 @@ function RoleSelect(_ref17) {
   return /*#__PURE__*/React.createElement("div", {
     style: { fontFamily: "'Noto Sans KR',sans-serif", background: "linear-gradient(160deg,#0f172a,#1e3a5f)", minHeight: "100vh", display: "flex", justifyContent: "center", alignItems: "center", padding: 24 }
   }, /*#__PURE__*/React.createElement("div", { style: { width: "100%", maxWidth: 340, textAlign: "center" } },
-    /*#__PURE__*/React.createElement("div", { style: { fontSize: 36, marginBottom: 10 } }, "\uD83C\uDFE5"),
+    /*#__PURE__*/React.createElement("svg", {
+      width: 72, height: 72, viewBox: "0 0 72 72", fill: "none",
+      xmlns: "http://www.w3.org/2000/svg",
+      style: { margin: "0 auto 10px", display: "block" }
+    },
+      /*#__PURE__*/React.createElement("rect", { width: 72, height: 72, rx: 20, fill: "rgba(255,255,255,0.1)" }),
+      /*#__PURE__*/React.createElement("rect", { x: 1, y: 1, width: 70, height: 70, rx: 19, stroke: "rgba(255,255,255,0.2)", strokeWidth: 1.5 }),
+      /*#__PURE__*/React.createElement("text", {
+        x: 36, y: 52,
+        textAnchor: "middle",
+        fontSize: 42,
+        fontWeight: "bold",
+        fontFamily: "'Noto Serif KR','Noto Serif CJK KR',serif",
+        fill: "rgba(200,210,220,0.7)"
+      }, "\u5B89")
+    ),
     /*#__PURE__*/React.createElement("div", { style: { fontSize: 28, fontWeight: 900, color: "white", marginBottom: 4 } }, "\uC548\uBD80"),
     /*#__PURE__*/React.createElement("div", { style: { fontSize: 13, color: "rgba(255,255,255,0.6)", marginBottom: 36 } }, "\uC785\uC6D0 \uD658\uC790 \uCF00\uC5B4 \uC5F0\uACB0 \uD50C\uB7AB\uD3FC"),
     /*#__PURE__*/React.createElement("div", { style: { display: "flex", flexDirection: "column", gap: 10 } },
       [{type:"guardian",icon:"\uD83D\uDC68\u200D\uD83D\uDC69\u200D\uD83D\uDC67",label:"\uBCF4\uD638\uC790",sub:"\uC624\uB298 \uD558\uB8E8 \uAC00\uC871\uC758 \uC0C1\uD0DC\uB97C \uD655\uC778\uD558\uC138\uC694",color:"#1e3a5f"},
        {type:"nurse",icon:"\uD83D\uDC69\u200D\u2695\uFE0F",label:"\uAC04\uD638\uC0AC",sub:"\uD658\uC790 \uC0C1\uD0DC \uC785\uB825",color:"#0d5c56"},
        {type:"doctor",icon:"\uD83E\uDE7A",label:"\uC758\uC0AC",sub:"\uB2F4\uB2F9 \uD658\uC790 \uD604\uD669 \uD655\uC778",color:"#1e3a5f"},
-       {type:"messages",icon:"\uD83D\uDCAC",label:"\uBCF4\uD638\uC790 \uD55C\uB9C8\uB514",sub:"\uBA74\uD68C \uC77C\uC815 \uBC0F \uBA54\uC2DC\uC9C0 \uD655\uC778",color:"#0d5c56"},
+       {type:"messages",icon:"\uD83D\uDCAC",label:"\uAC00\uC871\uC5D0\uAC8C \uD55C\uB9C8\uB514",sub:"\uBA74\uD68C \uC77C\uC815 \uBC0F \uBA54\uC2DC\uC9C0 \uD655\uC778",color:"#0d5c56"},
        {type:"admin",icon:"\uD83D\uDC51",label:"\uAD00\uB9AC\uC790",sub:"\uC9C1\uC6D0 \uACC4\uC815 \uBC0F \uD658\uC790 \uAD00\uB9AC",color:"#1e3a5f"}
       ].map(function(item) {
         return /*#__PURE__*/React.createElement("button", {
@@ -6118,7 +6134,7 @@ function App() {
     setIntroFading = _useState_fadea[1];
   useEffect(function() {
     var t1 = setTimeout(function() { setIntroFading(true); }, 2000);
-    var t2 = setTimeout(function() { setShowIntro(false); }, 3500);
+    var t2 = setTimeout(function() { setShowIntro(false); setOnboarded(false); }, 3500);
     return function() { clearTimeout(t1); clearTimeout(t2); };
   }, []);
   // 로딩 안전장치: 8초 후에도 loading이면 강제 해제
@@ -6667,7 +6683,8 @@ function App() {
     onDone: function onDone() {
       try { localStorage.setItem('anbu_onboarded', '1'); } catch(e) {}
       return setOnboarded(true);
-    }
+    },
+    alreadySeen: function() { try { return localStorage.getItem('anbu_onboarded') === '1'; } catch(e) { return false; } }()
   });
   if (loading) return /*#__PURE__*/React.createElement("div", {
     style: {
