@@ -5532,33 +5532,57 @@ function DoctorScreen(_ref32) {
   ),
   notInputList.length > 0 && /*#__PURE__*/React.createElement(React.Fragment, null,
     /*#__PURE__*/React.createElement(SectionHeader, { icon: "\u23F3", label: "\uBBF8\uC785\uB825", count: notInputList.length, color: "#334155", bg: "#e2e8f0" }),
-    ["\uBBF8\uC74C\uBCD1\uB3D9","\uC18C\uB9DD\uBCD1\uB3D9","\uC0AC\uB791\uBCD1\uB3D9","\uD589\uBCF5\uBCD1\uB3D9"].map(function(ward) {
-      var wp = notInputList.filter(function(p) { return getWard(p.room) === ward; });
-      if (wp.length === 0) return null;
-      return /*#__PURE__*/React.createElement(React.Fragment, { key: ward },
-        /*#__PURE__*/React.createElement("div", {
-          style: { fontSize: 12, fontWeight: 800, color: "#1e3a5f", background: "#e8f0fe", borderRadius: 8, padding: "5px 12px", margin: "6px 0 4px" }
-        }, ward.replace("\uBCD1\uB3D9",""), " \xB7 ", wp.length, "\uBA85"),
-        /*#__PURE__*/React.createElement("div", { style: { display: "grid", gridTemplateColumns: "1fr", gap: 6 } },
-          wp.map(function(p, i) { return PatientCard(p, i + 1); })
-        )
-      );
-    })
+    (function() {
+      var wardOrder = ["\uBBF8\uC74C\uBCD1\uB3D9","\uC18C\uB9DD\uBCD1\uB3D9","\uC0AC\uB791\uBCD1\uB3D9","\uD589\uBCF5\uBCD1\uB3D9"];
+      var grouped = {};
+      wardOrder.forEach(function(w) { grouped[w] = []; });
+      grouped["\uAE30\uD0C0"] = [];
+      notInputList.forEach(function(p) {
+        var w = p.ward || getWard(p.room);
+        if (wardOrder.includes(w)) grouped[w].push(p);
+        else grouped["\uAE30\uD0C0"].push(p);
+      });
+      var allWards = wardOrder.concat(["\uAE30\uD0C0"]);
+      return allWards.map(function(ward) {
+        var wp = grouped[ward];
+        if (wp.length === 0) return null;
+        return /*#__PURE__*/React.createElement(React.Fragment, { key: ward },
+          /*#__PURE__*/React.createElement("div", {
+            style: { fontSize: 12, fontWeight: 800, color: "#1e3a5f", background: "#e8f0fe", borderRadius: 8, padding: "5px 12px", margin: "6px 0 4px" }
+          }, ward.replace("\uBCD1\uB3D9",""), " \xB7 ", wp.length, "\uBA85"),
+          /*#__PURE__*/React.createElement("div", { style: { display: "grid", gridTemplateColumns: "1fr", gap: 6 } },
+            wp.map(function(p, i) { return PatientCard(p, i + 1); })
+          )
+        );
+      });
+    })()
   ),
   sentList.length > 0 && /*#__PURE__*/React.createElement(React.Fragment, null,
     /*#__PURE__*/React.createElement(SectionHeader, { icon: "\u2705", label: "\uC804\uC1A1 \uC644\uB8CC", count: sentList.length, color: "#16a34a", bg: "#f0fdf4" }),
-    ["\uBBF8\uC74C\uBCD1\uB3D9","\uC18C\uB9DD\uBCD1\uB3D9","\uC0AC\uB791\uBCD1\uB3D9","\uD589\uBCF5\uBCD1\uB3D9"].map(function(ward) {
-      var wp = sentList.filter(function(p) { return getWard(p.room) === ward; });
-      if (wp.length === 0) return null;
-      return /*#__PURE__*/React.createElement(React.Fragment, { key: ward },
-        /*#__PURE__*/React.createElement("div", {
-          style: { fontSize: 12, fontWeight: 800, color: "#166534", background: "#dcfce7", borderRadius: 8, padding: "5px 12px", margin: "6px 0 4px" }
-        }, ward.replace("\uBCD1\uB3D9",""), " \xB7 ", wp.length, "\uBA85"),
-        /*#__PURE__*/React.createElement("div", { style: { display: "grid", gridTemplateColumns: "1fr", gap: 6 } },
-          wp.map(function(p, i) { return PatientCard(p, i + 1); })
-        )
-      );
-    })
+    (function() {
+      var wardOrder = ["\uBBF8\uC74C\uBCD1\uB3D9","\uC18C\uB9DD\uBCD1\uB3D9","\uC0AC\uB791\uBCD1\uB3D9","\uD589\uBCF5\uBCD1\uB3D9"];
+      var grouped = {};
+      wardOrder.forEach(function(w) { grouped[w] = []; });
+      grouped["\uAE30\uD0C0"] = [];
+      sentList.forEach(function(p) {
+        var w = p.ward || getWard(p.room);
+        if (wardOrder.includes(w)) grouped[w].push(p);
+        else grouped["\uAE30\uD0C0"].push(p);
+      });
+      var allWards = wardOrder.concat(["\uAE30\uD0C0"]);
+      return allWards.map(function(ward) {
+        var wp = grouped[ward];
+        if (wp.length === 0) return null;
+        return /*#__PURE__*/React.createElement(React.Fragment, { key: ward },
+          /*#__PURE__*/React.createElement("div", {
+            style: { fontSize: 12, fontWeight: 800, color: "#166534", background: "#dcfce7", borderRadius: 8, padding: "5px 12px", margin: "6px 0 4px" }
+          }, ward.replace("\uBCD1\uB3D9",""), " \xB7 ", wp.length, "\uBA85"),
+          /*#__PURE__*/React.createElement("div", { style: { display: "grid", gridTemplateColumns: "1fr", gap: 6 } },
+            wp.map(function(p, i) { return PatientCard(p, i + 1); })
+          )
+        );
+      });
+    })()
   ))));
 }
 
@@ -6053,6 +6077,7 @@ function App() {
                 age: p.age,
                 gender: p.gender,
                 room: p.room,
+                ward: p.ward || getWard(p.room),
                 doctorId: p.doctor_id,
                 guardianType: p.guardian_type,
                 guardianRelation: p.guardian_relation,
