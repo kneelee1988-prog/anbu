@@ -3136,18 +3136,21 @@ function NurseScreen(_ref22) {
   }, /*#__PURE__*/React.createElement("div", {
     style: {
       width: "100%",
-      maxWidth: 390,
-      
+      maxWidth: 390
+    }
+  }, /*#__PURE__*/React.createElement("div", {
+    style: {
+      padding: "16px 16px 0"
     }
   }, /*#__PURE__*/React.createElement("div", {
     style: {
       background: "linear-gradient(135deg,#0d5c56,#0f766e)",
-      padding: "14px 20px",
+      padding: "20px 20px",
       color: "white",
       display: "flex",
       alignItems: "center",
       gap: 12,
-      borderRadius: 20, margin: "14px 20px 0"
+      borderRadius: 20
     }
   }, /*#__PURE__*/React.createElement("button", {
     onClick: function onClick() {
@@ -3168,10 +3171,10 @@ function NurseScreen(_ref22) {
       fontSize: 16,
       fontWeight: 800
     }
-  }, "\uD83D\uDCAC \uBCF4\uD638\uC790 \uD55C\uB9C8\uB514")), /*#__PURE__*/React.createElement("div", {
+  }, "\uD83D\uDCAC \uBCF4\uD638\uC790 \uD55C\uB9C8\uB514"))), /*#__PURE__*/React.createElement("div", {
     style: {
-      padding: "14px 20px",
-      
+      padding: "14px 16px",
+
       display: "flex",
       flexDirection: "column",
       gap: 10
@@ -6565,16 +6568,17 @@ function App() {
       onUpdatePatient: handleUpdatePatient,
       nurseWard: currentUser.ward
     });
-    if (role === "doctor") return /*#__PURE__*/React.createElement(DoctorScreen, {
-      patients: patients.filter(function (p) {
-        return p.doctorId === currentUser.doctorId;
-      }),
-      onSave: handleSave,
-      onBack: handleLogout,
-      messages: messages,
-      onMarkRead: markRead,
-      doctorId: currentUser.doctorId
-    });
+    if (role === "doctor") {
+      var docPatientIds = patients.filter(function(p) { return p.doctorId === currentUser.doctorId; }).map(function(p) { return p.id; });
+      return /*#__PURE__*/React.createElement(DoctorScreen, {
+        patients: patients.filter(function (p) { return p.doctorId === currentUser.doctorId; }),
+        onSave: handleSave,
+        onBack: handleLogout,
+        messages: messages.filter(function(m) { return docPatientIds.includes(m.patientId); }),
+        onMarkRead: markRead,
+        doctorId: currentUser.doctorId
+      });
+    }
     if (role === "messages") return /*#__PURE__*/React.createElement(MessagesScreen, {
       patients: currentUser.ward ? patients.filter(function(p) { return getWard(p.room) === currentUser.ward; }) : patients,
       messages: currentUser.ward ? messages.filter(function(m) {
