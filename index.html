@@ -2667,7 +2667,7 @@ function NurseBox(_ref_box) {
 function NurseHdr(_ref_hdr) {
   var title = _ref_hdr.title, back = _ref_hdr.back;
   return /*#__PURE__*/React.createElement("div", {
-    style: { background: "linear-gradient(135deg,#0d5c56,#0f766e)", padding: "16px 20px", color: "white", display: "flex", alignItems: "center", gap: 12, borderRadius: 20, margin: "14px 20px 0" }
+    style: { background: "linear-gradient(135deg,#0d5c56,#0f766e)", padding: "20px 20px", color: "white", display: "flex", alignItems: "center", gap: 12, borderRadius: 20, margin: "14px 20px 0" }
   }, /*#__PURE__*/React.createElement("button", {
     onClick: back,
     style: { background: "rgba(255,255,255,0.15)", border: "none", borderRadius: 8, padding: "6px 12px", color: "white", fontSize: 13, cursor: "pointer", fontWeight: 700 }
@@ -4084,7 +4084,7 @@ function PatientManage(_ref26) {
       padding: 14,
       borderRadius: 14,
       border: "none",
-      background: "linear-gradient(135deg,#065f46,#0d9488)",
+      background: "linear-gradient(135deg,#022c22,#065f46)",
       color: "white",
       fontSize: 14,
       fontWeight: 800,
@@ -4100,8 +4100,8 @@ function PatientManage(_ref26) {
     }
   }, "\uC785\uC6D0 \uD658\uC790 ", patients.length, "\uBA85 (\uB20C\uB7EC\uC11C \uC218\uC815)"), /*#__PURE__*/React.createElement("div", {
     style: {
-      display: "flex",
-      flexDirection: "column",
+      display: "grid",
+      gridTemplateColumns: "1fr 1fr",
       gap: 8
     }
   }, patients.map(function (p) {
@@ -4123,46 +4123,22 @@ function PatientManage(_ref26) {
         background: "white",
         borderRadius: 14,
         border: "1.5px solid #cbd5e1",
-        padding: "12px 14px",
-        display: "flex",
-        alignItems: "center",
-        gap: 12,
+        padding: "12px 10px",
         cursor: "pointer",
         textAlign: "left",
-        width: "100%"
+        boxShadow: "0 2px 6px rgba(0,0,0,0.06)"
       }
     }, /*#__PURE__*/React.createElement("div", {
-      style: {
-        flex: 1
-      }
-    }, /*#__PURE__*/React.createElement("div", {
-      style: {
-        display: "flex",
-        alignItems: "center",
-        gap: 8,
-        marginBottom: 2
-      }
-    }, /*#__PURE__*/React.createElement("span", {
-      style: {
-        fontSize: 14,
-        fontWeight: 800,
-        color: "#1a1a1a"
-      }
-    }, p.name), /*#__PURE__*/React.createElement("span", {
-      style: {
-        fontSize: 11,
-        color: "#94a3b8"
-      }
-    }, p.age, "\uC138 \xB7 ", p.gender)), /*#__PURE__*/React.createElement("div", {
-      style: {
-        fontSize: 12,
-        color: "#64748b"
-      }
-    }, getWard(p.room), " \xB7 ", getDoctorTitle(p.doctorId))), /*#__PURE__*/React.createElement("span", {
-      style: {
-        fontSize: 12,
-        color: "#94a3b8"
-      }
+      style: { fontSize: 14, fontWeight: 800, color: "#1a1a1a", marginBottom: 3 }
+    }, p.name),
+    /*#__PURE__*/React.createElement("div", {
+      style: { fontSize: 11, color: "#64748b", marginBottom: 2 }
+    }, p.age, "\uC138 · ", p.gender),
+    /*#__PURE__*/React.createElement("div", {
+      style: { fontSize: 11, color: "#0d9488", fontWeight: 600 }
+    }, getWard(p.room)),
+    /*#__PURE__*/React.createElement("div", {
+      style: { fontSize: 10, color: "#94a3b8", marginTop: 4, textAlign: "right" }
     }, "\uC218\uC815 \u203A"));
   })))));
   if (view === "register") return /*#__PURE__*/React.createElement("div", {
@@ -6652,13 +6628,17 @@ function App() {
       });
     }
     if (role === "nurse") return /*#__PURE__*/React.createElement(NurseScreen, {
-      patients: patients,
+      patients: patients.filter(function(p) { return !currentUser.ward || p.ward === currentUser.ward; }),
       onSave: handleSave,
       onBack: handleLogout,
-      messages: messages,
+      messages: messages.filter(function(m) {
+        var mp = patients.find(function(p) { return p.id === m.patientId; });
+        return !currentUser.ward || (mp && mp.ward === currentUser.ward);
+      }),
       onMarkRead: markRead,
       onAddPatient: handleAddPatient,
-      onUpdatePatient: handleUpdatePatient
+      onUpdatePatient: handleUpdatePatient,
+      nurseWard: currentUser.ward
     });
     if (role === "doctor") return /*#__PURE__*/React.createElement(DoctorScreen, {
       patients: patients.filter(function (p) {
@@ -6671,8 +6651,11 @@ function App() {
       doctorId: currentUser.doctorId
     });
     if (role === "messages") return /*#__PURE__*/React.createElement(MessagesScreen, {
-      patients: patients,
-      messages: messages,
+      patients: currentUser.ward ? patients.filter(function(p) { return p.ward === currentUser.ward; }) : patients,
+      messages: currentUser.ward ? messages.filter(function(m) {
+        var mp = patients.find(function(p) { return p.id === m.patientId; });
+        return mp && mp.ward === currentUser.ward;
+      }) : messages,
       onBack: handleLogout,
       onMarkRead: markRead
     });
