@@ -164,10 +164,11 @@ var DOCTORS = [{
 }];
 var getWard = function getWard(room) {
   var n = parseInt(room);
+  if (isNaN(n)) return "";
   if (n >= 301 && n <= 309) return "믿음병동";
-  if (n >= 310 && n <= 318) return "소망병동";
-  if (n >= 201 && n <= 211) return "사랑병동";
-  if (n >= 501 && n <= 509) return "행복병동";
+  if (n >= 310 && n <= 399) return "소망병동";
+  if (Math.floor(n / 100) === 2) return "사랑병동";
+  if (Math.floor(n / 100) === 5) return "행복병동";
   return "";
 };
 var getDoctorTitle = function getDoctorTitle(id) {
