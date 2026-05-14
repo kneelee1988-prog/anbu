@@ -1854,7 +1854,7 @@ function AdminScreen(_ref11) {
       marginBottom: 4
     }
   }, /*#__PURE__*/React.createElement("button", {
-    onClick: onLogout,
+    onClick: onBack,
     style: {
       background: "rgba(255,255,255,0.15)",
       border: "none",
@@ -1865,7 +1865,19 @@ function AdminScreen(_ref11) {
       cursor: "pointer",
       fontWeight: 700
     }
-  }, "\u2190 \uB85C\uADF8\uC544\uC6C3"), /*#__PURE__*/React.createElement("div", {
+  }, "\u2190 \uC5ED\uD560 \uC120\uD0DD"), /*#__PURE__*/React.createElement("button", {
+    onClick: onLogout,
+    style: {
+      background: "rgba(255,255,255,0.1)",
+      border: "1px solid rgba(255,255,255,0.2)",
+      borderRadius: 8,
+      padding: "4px 10px",
+      color: "rgba(255,255,255,0.7)",
+      fontSize: 11,
+      cursor: "pointer",
+      fontWeight: 600
+    }
+  }, "\uB85C\uADF8\uC544\uC6C3"), /*#__PURE__*/React.createElement("div", {
     style: {
       flex: 1
     }
@@ -6563,6 +6575,9 @@ function App() {
     setLoginType(null);
     setAppScreen("roleSelect");
   };
+  var handleBackToRole = function handleBackToRole() {
+    setAppScreen("roleSelect");
+  };
   if (!onboarded) return /*#__PURE__*/React.createElement(OnboardingScreen, {
     onDone: function onDone() {
       try { localStorage.setItem('anbu_onboarded', '1'); } catch(e) {}
@@ -6661,7 +6676,7 @@ function App() {
     });
     if (role === "admin") return /*#__PURE__*/React.createElement(AdminScreen, {
       patients: patients,
-      onBack: handleLogout,
+      onBack: handleBackToRole,
       onLogout: handleLogout,
       notices: notices,
       onLoadNotices: loadNotices
