@@ -4721,19 +4721,18 @@ function DoctorScreen(_ref32) {
       justifyContent: "center"
     }
   }, /*#__PURE__*/React.createElement("div", {
-    style: {
-      width: "100%",
-      maxWidth: 390,
-      
-    }
+    style: { width: "100%", maxWidth: 390 }
+  }, /*#__PURE__*/React.createElement("div", {
+    style: { padding: "16px 16px 0" }
   }, /*#__PURE__*/React.createElement("div", {
     style: {
       background: "linear-gradient(135deg,#1e3a5f,#2d6a9f)",
-      padding: "14px 20px",
+      padding: "20px 20px",
       color: "white",
       display: "flex",
       alignItems: "center",
-      gap: 12
+      gap: 12,
+      borderRadius: 20
     }
   }, /*#__PURE__*/React.createElement("button", {
     onClick: function onClick() {
@@ -4750,14 +4749,10 @@ function DoctorScreen(_ref32) {
       fontWeight: 700
     }
   }, "\u2190 \uBAA9\uB85D"), /*#__PURE__*/React.createElement("div", {
+    style: { fontSize: 16, fontWeight: 800 }
+  }, "\uD83D\uDCAC \uBCF4\uD638\uC790 \uD55C\uB9C8\uB514"))), /*#__PURE__*/React.createElement("div", {
     style: {
-      fontSize: 16,
-      fontWeight: 800
-    }
-  }, "\uD83D\uDCAC \uBCF4\uD638\uC790 \uD55C\uB9C8\uB514")), /*#__PURE__*/React.createElement("div", {
-    style: {
-      padding: "14px 20px",
-      
+      padding: "14px 16px",
       display: "flex",
       flexDirection: "column",
       gap: 10
@@ -5531,7 +5526,7 @@ function DoctorScreen(_ref32) {
     }
   }, pendingList.length > 0 && /*#__PURE__*/React.createElement(React.Fragment, null,
     /*#__PURE__*/React.createElement(SectionHeader, { icon: "\uD83D\uDD50", label: "\uAC80\uD1A0 \uB300\uAE30", count: pendingList.length, color: "#713f12", bg: "#fffbeb" }),
-    /*#__PURE__*/React.createElement("div", { style: { display: "grid", gridTemplateColumns: "1fr 1fr", gap: 6 } },
+    /*#__PURE__*/React.createElement("div", { style: { display: "grid", gridTemplateColumns: "1fr", gap: 6 } },
       pendingList.map(function(p, i) { return PatientCard(p, i + 1); })
     )
   ),
@@ -5544,7 +5539,7 @@ function DoctorScreen(_ref32) {
         /*#__PURE__*/React.createElement("div", {
           style: { fontSize: 12, fontWeight: 800, color: "#1e3a5f", background: "#e8f0fe", borderRadius: 8, padding: "5px 12px", margin: "6px 0 4px" }
         }, ward.replace("\uBCD1\uB3D9",""), " \xB7 ", wp.length, "\uBA85"),
-        /*#__PURE__*/React.createElement("div", { style: { display: "grid", gridTemplateColumns: "1fr 1fr", gap: 6 } },
+        /*#__PURE__*/React.createElement("div", { style: { display: "grid", gridTemplateColumns: "1fr", gap: 6 } },
           wp.map(function(p, i) { return PatientCard(p, i + 1); })
         )
       );
@@ -5559,7 +5554,7 @@ function DoctorScreen(_ref32) {
         /*#__PURE__*/React.createElement("div", {
           style: { fontSize: 12, fontWeight: 800, color: "#166534", background: "#dcfce7", borderRadius: 8, padding: "5px 12px", margin: "6px 0 4px" }
         }, ward.replace("\uBCD1\uB3D9",""), " \xB7 ", wp.length, "\uBA85"),
-        /*#__PURE__*/React.createElement("div", { style: { display: "grid", gridTemplateColumns: "1fr 1fr", gap: 6 } },
+        /*#__PURE__*/React.createElement("div", { style: { display: "grid", gridTemplateColumns: "1fr", gap: 6 } },
           wp.map(function(p, i) { return PatientCard(p, i + 1); })
         )
       );
