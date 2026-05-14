@@ -4263,7 +4263,7 @@ function PatientManage(_ref26) {
       setView("list");
     },
     style: {
-      width: "100%",
+      width: "calc(100% - 40px)",
       padding: 15,
       borderRadius: 14,
       border: "none",
@@ -4272,7 +4272,8 @@ function PatientManage(_ref26) {
       fontSize: 15,
       fontWeight: 800,
       cursor: reg.name && reg.room ? "pointer" : "default",
-      marginBottom: 24
+      margin: "0 20px 24px",
+      boxSizing: "border-box"
     }
   }, "\uB4F1\uB85D\uD558\uAE30"))));
   var curWard = edit.ward || getWard(editTarget && editTarget.room || "") || "믿음병동";
