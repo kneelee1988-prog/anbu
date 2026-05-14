@@ -1850,7 +1850,7 @@ function AdminScreen(_ref11) {
     style: {
       display: "flex",
       alignItems: "center",
-      gap: 10,
+      justifyContent: "space-between",
       marginBottom: 4
     }
   }, /*#__PURE__*/React.createElement("button", {
@@ -1865,7 +1865,15 @@ function AdminScreen(_ref11) {
       cursor: "pointer",
       fontWeight: 700
     }
-  }, "\u2190 \uC5ED\uD560 \uC120\uD0DD"), /*#__PURE__*/React.createElement("button", {
+  }, "\u2190 \uC5ED\uD560 \uC120\uD0DD"),
+  /*#__PURE__*/React.createElement("div", {
+    style: { textAlign: "center" }
+  }, /*#__PURE__*/React.createElement("div", {
+    style: { fontSize: 11, opacity: 0.7 }
+  }, "\uC548\uBD80 \xB7 \uAD00\uB9AC\uC790"), /*#__PURE__*/React.createElement("div", {
+    style: { fontSize: 17, fontWeight: 800 }
+  }, "\uD83C\uDFE5 \uC774\uC694\uC131 \uBCD1\uC6D0\uC7A5")),
+  /*#__PURE__*/React.createElement("button", {
     onClick: onLogout,
     style: {
       background: "rgba(255,255,255,0.1)",
@@ -1877,21 +1885,8 @@ function AdminScreen(_ref11) {
       cursor: "pointer",
       fontWeight: 600
     }
-  }, "\uB85C\uADF8\uC544\uC6C3"), /*#__PURE__*/React.createElement("div", {
-    style: {
-      flex: 1
-    }
-  }, /*#__PURE__*/React.createElement("div", {
-    style: {
-      fontSize: 11,
-      opacity: 0.7
-    }
-  }, "\uC548\uBD80 \xB7 \uAD00\uB9AC\uC790"), /*#__PURE__*/React.createElement("div", {
-    style: {
-      fontSize: 17,
-      fontWeight: 800
-    }
-  }, "\uD83C\uDFE5 \uC774\uC694\uC131 \uBCD1\uC6D0\uC7A5")))), /*#__PURE__*/React.createElement("div", {
+  }, "\uB85C\uADF8\uC544\uC6C3"))),
+  /*#__PURE__*/React.createElement("div", {
     style: {
       margin: "12px 20px 0",
       display: "flex",
