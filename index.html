@@ -4047,7 +4047,8 @@ function PatientManage(_ref26) {
           doctorId: p.doctorId,
           guardianType: p.guardianType,
           guardianName: p.guardianName || "",
-          guardianPhone: p.guardianPhone || ""
+          guardianPhone: p.guardianPhone || "",
+          dnr: p.dnr !== undefined ? p.dnr : null
         });
         setView("edit");
       },
@@ -4377,6 +4378,24 @@ function PatientManage(_ref26) {
         label: r
       };
     })
+  }))), /*#__PURE__*/React.createElement(NurseBox, {
+    title: "\uD83D\uDCCB DNR \uC5EC\uBD80"
+  }, /*#__PURE__*/React.createElement("div", {
+    style: { display: "flex", gap: 8 }
+  }, [{ label: "\uB3D9\uC758", value: true, activeColor: "#15803d", activeBg: "#dcfce7" },
+     { label: "\uBE44\uB3D9\uC758", value: false, activeColor: "#dc2626", activeBg: "#fee2e2" }].map(function(opt) {
+    var isActive = edit.dnr === opt.value;
+    return /*#__PURE__*/React.createElement("button", {
+      key: opt.label,
+      onClick: function() { setE("dnr", isActive ? null : opt.value); },
+      style: {
+        flex: 1, padding: "10px 0", borderRadius: 10,
+        border: "1.5px solid " + (isActive ? opt.activeColor : "#e2e8f0"),
+        fontSize: 13, fontWeight: 700, cursor: "pointer",
+        background: isActive ? opt.activeBg : "white",
+        color: isActive ? opt.activeColor : "#94a3b8"
+      }
+    }, opt.label);
   }))), /*#__PURE__*/React.createElement(NurseBox, {
     title: "\uD83E\uDE7A \uC8FC\uCE58\uC758 \uBCC0\uACBD"
   }, /*#__PURE__*/React.createElement(NurseFL, {
@@ -6036,6 +6055,7 @@ function App() {
                 gender: p.gender,
                 room: p.room,
                 ward: p.ward || getWard(p.room),
+                dnr: p.dnr !== undefined ? p.dnr : null,
                 doctorId: p.doctor_id,
                 guardianType: p.guardian_type,
                 guardianRelation: p.guardian_relation,
@@ -6329,7 +6349,8 @@ function App() {
                 guardian_phone: p.guardianPhone,
                 days: 1,
                 alert: false,
-                alert_msg: ""
+                alert_msg: "",
+                dnr: p.dnr === null ? null : p.dnr
               })
             });
           case 1:
@@ -6391,7 +6412,8 @@ function App() {
                 guardian_type: updates.guardianType,
                 guardian_relation: updates.guardianRelation,
                 guardian_name: updates.guardianName,
-                guardian_phone: updates.guardianPhone
+                guardian_phone: updates.guardianPhone,
+                dnr: updates.dnr !== undefined ? updates.dnr : null
               })
             });
           case 3:
