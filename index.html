@@ -859,7 +859,7 @@ var SLIDES = [{
   title: "安否",
   sub: "안부",
   meaning: "잘 지내고 있는지에 대한 소식",
-  desc: "간호사와 의사가 함께 기록하고 검토하며,\n보호자가 확인하는 [케어 연속성 플랫폼]",
+  desc: "간호사와 의사가 함께 기록하고 검토하며,\n보호자가 확인하는\n[케어 연속성 플랫폼]",
   color: "#1e3a5f"
 }, {
   icon: "👨‍👩‍👧",
@@ -958,6 +958,19 @@ function OnboardingScreen(_ref0) {
       letterSpacing: 1
     }
   }, slide.title),
+  slide.meaning && /*#__PURE__*/React.createElement("div", {
+    style: {
+      display: "inline-block",
+      background: "rgba(255,255,255,0.15)",
+      borderRadius: 20,
+      padding: "4px 16px",
+      fontSize: 13,
+      fontWeight: 700,
+      color: "rgba(255,255,255,0.85)",
+      marginBottom: 10,
+      letterSpacing: 2
+    }
+  }, "\u5B89\u5426"),
   /*#__PURE__*/React.createElement("div", {
     style: {
       fontSize: slide.meaning ? 28 : 22,
