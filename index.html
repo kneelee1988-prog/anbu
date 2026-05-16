@@ -1678,7 +1678,10 @@ function LoginScreen(_ref1) {
       cursor: loading ? "default" : "pointer",
       marginTop: 8
     }
-  }, loading ? "확인 중..." : "로그인")));
+  }, loading ? "확인 중..." : "로그인"), loginType === "guardian" && /*#__PURE__*/React.createElement("button", {
+    onClick: function() { return onBack("signup"); },
+    style: { width: "100%", padding: "12px 0", borderRadius: 14, border: "1.5px solid rgba(255,255,255,0.25)", background: "transparent", color: "rgba(255,255,255,0.7)", fontSize: 14, fontWeight: 600, cursor: "pointer", marginTop: 10 }
+  }, "\uCC98\uC74C\uC774\uC138\uC694? \uD68C\uC6D0\uAC00\uC785 \uD558\uAE30")));
 }
 
 // ── 관리자 화면 ───────────────────────────────────────────────
@@ -1719,6 +1722,28 @@ function AdminScreen(_ref11) {
       return _objectSpread(_objectSpread({}, f), {}, _defineProperty({}, k, v));
     });
   };
+  var _req = useState([]), _reqa = _slicedToArray(_req, 2), requests = _reqa[0], setRequests = _reqa[1];
+  var loadRequests = function() {
+    fetch(SUPABASE_URL+"/rest/v1/guardian_requests?status=eq.pending&order=created_at.desc", {
+      headers:{apikey:SUPABASE_KEY, Authorization:"Bearer "+SUPABASE_KEY}
+    }).then(function(r){return r.json();}).then(function(data){if(Array.isArray(data))setRequests(data);}).catch(function(){});
+  };
+  var handleApprove = function(req) {
+    fetch(SUPABASE_URL+"/rest/v1/guardian_requests?id=eq."+req.id, {
+      method:"PATCH", headers:{apikey:SUPABASE_KEY, Authorization:"Bearer "+SUPABASE_KEY, "Content-Type":"application/json"},
+      body:JSON.stringify({status:"approved"})
+    }).then(function(){return fetch(SUPABASE_URL+"/rest/v1/users", {
+      method:"POST", headers:{apikey:SUPABASE_KEY, Authorization:"Bearer "+SUPABASE_KEY, "Content-Type":"application/json"},
+      body:JSON.stringify({name:req.name, role:"guardian", phone:req.phone, password:req.phone.slice(-4), status:"active"})
+    });}).then(function(){loadRequests();});
+  };
+  var handleReject = function(id) {
+    fetch(SUPABASE_URL+"/rest/v1/guardian_requests?id=eq."+id, {
+      method:"PATCH", headers:{apikey:SUPABASE_KEY, Authorization:"Bearer "+SUPABASE_KEY, "Content-Type":"application/json"},
+      body:JSON.stringify({status:"rejected"})
+    }).then(function(){loadRequests();});
+  };
+  useEffect(function(){if(tab==="approval")loadRequests();},[tab]);
   var loadUsers = /*#__PURE__*/function () {
     var _ref12 = _asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee4() {
       var res, data, _t5;
@@ -1915,7 +1940,7 @@ function AdminScreen(_ref11) {
       gap: 3,
       border: "1.5px solid #cbd5e1"
     }
-  }, [["users", "👥 직원 계정"], ["patients", "🏥 환자 현황"], ["notices", "📢 공지사항"]].map(function (_ref15) {
+  }, [["users", "👥 직원 계정"], ["patients", "🏥 환자 현황"], ["notices", "📢 공지사항"], ["approval", "⏳ 가입승인"]].map(function (_ref15) {
     var _ref16 = _slicedToArray(_ref15, 2),
       t = _ref16[0],
       l = _ref16[1];
@@ -2332,6 +2357,74 @@ function AdminScreen(_ref11) {
       );
     })
   ));
+  if (tab === "approval") return /*#__PURE__*/React.createElement("div", { style: { padding: "12px 16px" } },
+    /*#__PURE__*/React.createElement("div", { style: { fontSize: 13, fontWeight: 800, color: "#1e3a5f", marginBottom: 12 } }, "\u23F3 \uAC00\uC785 \uC2B9\uC778 \uB300\uAE30 ", requests.length, "\uAC74"),
+    requests.length === 0
+      ? /*#__PURE__*/React.createElement("div", { style: { textAlign: "center", padding: "40px 20px", color: "#94a3b8", fontSize: 13 } }, "\uB300\uAE30 \uC911\uC778 \uAC00\uC785 \uC2E0\uCCAD\uC774 \uC5C6\uC5B4\uC694")
+      : requests.map(function(req) {
+          return /*#__PURE__*/React.createElement("div", { key: req.id, style: { background: "white", borderRadius: 14, padding: "14px 16px", border: "1.5px solid #e2e8f0", marginBottom: 10 } },
+            /*#__PURE__*/React.createElement("div", { style: { fontSize: 15, fontWeight: 800, color: "#1a1a1a", marginBottom: 4 } }, req.name, req.relation ? " ("+req.relation+")" : ""),
+            /*#__PURE__*/React.createElement("div", { style: { fontSize: 12, color: "#64748b", marginBottom: 2 } }, "\uD83D\uDCDE ", req.phone),
+            /*#__PURE__*/React.createElement("div", { style: { fontSize: 12, color: "#64748b", marginBottom: 2 } }, "\uD83D\uDC74 \uC5B4\uB974\uC2E0: ", req.patient_name, req.patient_room ? " \xB7 "+req.patient_room : ""),
+            /*#__PURE__*/React.createElement("div", { style: { fontSize: 11, color: "#94a3b8", marginBottom: 12 } }, req.created_at ? req.created_at.slice(0,10)+" \uC2E0\uCCAD" : ""),
+            /*#__PURE__*/React.createElement("div", { style: { display: "flex", gap: 8 } },
+              /*#__PURE__*/React.createElement("button", { onClick: function(){return handleApprove(req);}, style: { flex:1, padding:"9px 0", borderRadius:10, border:"none", background:"#dcfce7", color:"#16a34a", fontSize:13, fontWeight:800, cursor:"pointer" } }, "\u2705 \uC2B9\uC778"),
+              /*#__PURE__*/React.createElement("button", { onClick: function(){return handleReject(req.id);}, style: { flex:1, padding:"9px 0", borderRadius:10, border:"none", background:"#fee2e2", color:"#dc2626", fontSize:13, fontWeight:800, cursor:"pointer" } }, "\u274C \uAC70\uBD80")
+            )
+          );
+        })
+  );
+}
+
+// ── 보호자 회원가입 ────────────────────────────────────────────
+function GuardianSignupScreen(_ref_gs) {
+  var onBack = _ref_gs.onBack, onDone = _ref_gs.onDone;
+  var _f = useState({name:"",phone:"",patientName:"",patientRoom:"",relation:""}),
+    _fa = _slicedToArray(_f, 2), form = _fa[0], setForm = _fa[1];
+  var _l = useState(false), _la = _slicedToArray(_l, 2), loading = _la[0], setLoading = _la[1];
+  var _e = useState(""), _ea = _slicedToArray(_e, 2), error = _ea[0], setError = _ea[1];
+  var _d = useState(false), _da = _slicedToArray(_d, 2), done = _da[0], setDone = _da[1];
+  var setF = function(k,v) { setForm(function(f) { return _objectSpread(_objectSpread({},f),{},_defineProperty({},k,v)); }); };
+  var inputStyle = { width:"100%", padding:"12px 14px", borderRadius:12, border:"1.5px solid rgba(255,255,255,0.2)", background:"rgba(255,255,255,0.1)", color:"white", fontSize:14, outline:"none", boxSizing:"border-box", fontFamily:"inherit" };
+  var submit = function() {
+    if (!form.name.trim()||!form.phone.trim()||!form.patientName.trim()) return setError("\uC774\uB984, \uC5F0\uB77D\uCC98, \uC5B4\uB974\uC2E0 \uC131\uD568\uC740 \uD544\uC218\uC5D0\uC694.");
+    setLoading(true);
+    fetch(SUPABASE_URL+"/rest/v1/guardian_requests", {
+      method:"POST",
+      headers:{apikey:SUPABASE_KEY, Authorization:"Bearer "+SUPABASE_KEY, "Content-Type":"application/json"},
+      body:JSON.stringify({name:form.name, phone:form.phone, patient_name:form.patientName, patient_room:form.patientRoom, relation:form.relation, status:"pending"})
+    }).then(function() { setLoading(false); setDone(true); })
+    .catch(function() { setLoading(false); setError("\uC624\uB958\uAC00 \uBC1C\uC0DD\uD588\uC5B4\uC694. \uB2E4\uC2DC \uC2DC\uB3C4\uD574\uC8FC\uC138\uC694."); });
+  };
+  var bg = { fontFamily:"'Noto Sans KR',sans-serif", background:"linear-gradient(160deg,#0f2744,#1a56db)", minHeight:"100vh", display:"flex", justifyContent:"center", padding:24 };
+  if (done) return /*#__PURE__*/React.createElement("div", { style:_objectSpread(_objectSpread({},bg),{alignItems:"center"}) },
+    /*#__PURE__*/React.createElement("div", { style:{textAlign:"center",color:"white"} },
+      /*#__PURE__*/React.createElement("div", { style:{fontSize:56,marginBottom:20} }, "\u2705"),
+      /*#__PURE__*/React.createElement("div", { style:{fontSize:20,fontWeight:800,marginBottom:10} }, "\uAC00\uC785 \uC2E0\uCCAD \uC644\uB8CC"),
+      /*#__PURE__*/React.createElement("div", { style:{fontSize:14,color:"rgba(255,255,255,0.7)",lineHeight:1.8,marginBottom:30,whiteSpace:"pre-line"} }, "\uAD00\uB9AC\uC790 \uC2B9\uC778 \uD6C4 \uB85C\uADF8\uC778\uD558\uC2E4 \uC218 \uC788\uC5B4\uC694.\n\uC2B9\uC778\uAE4C\uC9C0 \uC7A0\uC2DC \uC2DC\uAC04\uC774 \uAC78\uB9B4 \uC218 \uC788\uC5B4\uC694."),
+      /*#__PURE__*/React.createElement("button", { onClick:onDone, style:{padding:"12px 32px",borderRadius:14,border:"none",background:"white",color:"#1e3a5f",fontSize:15,fontWeight:800,cursor:"pointer"} }, "\uB85C\uADF8\uC778 \uD654\uBA74\uC73C\uB85C")
+    )
+  );
+  return /*#__PURE__*/React.createElement("div", { style:bg },
+    /*#__PURE__*/React.createElement("div", { style:{width:"100%",maxWidth:340,paddingTop:20} },
+      /*#__PURE__*/React.createElement("button", { onClick:onBack, style:{background:"rgba(255,255,255,0.15)",border:"none",borderRadius:20,padding:"6px 14px",color:"white",fontSize:13,cursor:"pointer",fontWeight:700,marginBottom:24} }, "\u2190 \uB3CC\uC544\uAC00\uAE30"),
+      /*#__PURE__*/React.createElement("div", { style:{fontSize:22,fontWeight:900,color:"white",marginBottom:6} }, "\uBCF4\uD638\uC790 \uD68C\uC6D0\uAC00\uC785"),
+      /*#__PURE__*/React.createElement("div", { style:{fontSize:13,color:"rgba(255,255,255,0.6)",marginBottom:28,lineHeight:1.6} }, "\uAC00\uC785 \uC2E0\uCCAD \uD6C4 \uAD00\uB9AC\uC790 \uC2B9\uC778\uC774 \uC644\uB8CC\uB418\uBA74\n\uB85C\uADF8\uC778\uD558\uC2E4 \uC218 \uC788\uC5B4\uC694."),
+      [
+        {label:"\uBCF4\uD638\uC790 \uC131\uD568 *", key:"name", placeholder:"\uC608) \uAE40\uCCA0\uC218", type:"text"},
+        {label:"\uC5F0\uB77D\uCC98 *", key:"phone", placeholder:"\uC608) 01012345678", type:"tel"},
+        {label:"\uC5B4\uB974\uC2E0 \uC131\uD568 *", key:"patientName", placeholder:"\uC608) \uAE40\uC21C\uC790", type:"text"},
+        {label:"\uAD00\uACC4 (\uC120\uD0DD)", key:"relation", placeholder:"\uC608) \uC544\uB4E4, \uB538, \uBC30\uC6B0\uC790", type:"text"}
+      ].map(function(field) {
+        return /*#__PURE__*/React.createElement("div", { key:field.key, style:{marginBottom:14} },
+          /*#__PURE__*/React.createElement("div", { style:{fontSize:12,color:"rgba(255,255,255,0.7)",fontWeight:700,marginBottom:6} }, field.label),
+          /*#__PURE__*/React.createElement("input", { type:field.type, value:form[field.key], onChange:function(e){return setF(field.key,e.target.value);}, placeholder:field.placeholder, style:inputStyle })
+        );
+      }),
+      error && /*#__PURE__*/React.createElement("div", { style:{background:"rgba(239,68,68,0.15)",borderRadius:10,padding:"10px 14px",fontSize:13,color:"#fca5a5",marginBottom:14} }, "\u26A0\uFE0F ", error),
+      /*#__PURE__*/React.createElement("button", { onClick:submit, disabled:loading, style:{width:"100%",padding:"14px 0",borderRadius:14,border:"none",background:loading?"rgba(255,255,255,0.2)":"white",color:loading?"rgba(255,255,255,0.5)":"#1e3a5f",fontSize:15,fontWeight:800,cursor:loading?"default":"pointer",marginTop:8} }, loading?"\uC2E0\uCCAD \uC911...":"\uAC00\uC785 \uC2E0\uCCAD\uD558\uAE30")
+    )
+  );
 }
 
 // ── 역할 선택 ─────────────────────────────────────────────────
@@ -6676,11 +6769,17 @@ function App() {
   if (appScreen === "login") return /*#__PURE__*/React.createElement(LoginScreen, {
     loginType: loginType,
     onLogin: handleLoginSuccess,
-    onBack: function onBack() {
+    onBack: function onBack(action) {
+      if (action === "signup") return setAppScreen("signup");
       return setAppScreen("roleSelect");
     },
     patients: patients
   });
+  if (appScreen === "signup") return /*#__PURE__*/React.createElement(GuardianSignupScreen, {
+    onBack: function() { return setAppScreen("login"); },
+    onDone: function() { return setAppScreen("login"); }
+  });
+
   if (appScreen === "app" && currentUser) {
     var role = currentUser.role;
     if (role === "guardian") {
