@@ -5018,6 +5018,10 @@ function DoctorScreen(_ref32) {
     _useState64 = _slicedToArray(_useState63, 2),
     commentMode = _useState64[0],
     setCommentMode = _useState64[1];
+  var _useState_emotion = useState(""),
+    _useState_emotiona = _slicedToArray(_useState_emotion, 2),
+    emotionComment = _useState_emotiona[0],
+    setEmotionComment = _useState_emotiona[1];
   var total = patients.length;
   var doneCount = patients.filter(function (p) {
     return p.record;
@@ -5055,6 +5059,7 @@ function DoctorScreen(_ref32) {
     var rec = _objectSpread(_objectSpread({}, selected.record || {}), {}, {
       doctorComment: comment,
       doctorCommentDate: now(),
+      emotionComment: emotionComment,
       scenarioTypes: scenarioTypes,
       warningSubs: warningSubs,
       treatingSubs: treatingSubs,
@@ -5071,6 +5076,7 @@ function DoctorScreen(_ref32) {
       setSaved(false);
       setSelected(null);
       setComment("");
+      setEmotionComment("");
       setScenarioTypes([]);
       setWarningSubs([]);
       setTreatingSubs([]);
@@ -5132,6 +5138,7 @@ function DoctorScreen(_ref32) {
       onClick: function onClick() {
         setSelected(p);
         setComment(r && r.doctorComment || "");
+        setEmotionComment(r && r.emotionComment || "");
         setScenarioTypes(r && r.scenarioTypes || []);
         setWarningSubs(r && r.warningSubs || []);
         setTreatingSubs(r && r.treatingSubs || []);
@@ -5162,6 +5169,12 @@ function DoctorScreen(_ref32) {
         /*#__PURE__*/React.createElement("span", { style: { fontSize: 12, color: "#64748b", fontWeight: 600 } }, p.age, "\uC138 \xB7 ", p.gender),
         (p.dnr === true || p.dnr === "true") && /*#__PURE__*/React.createElement("span", { style: { fontSize: 10, fontWeight: 800, background: "#dcfce7", color: "#15803d", borderRadius: 4, padding: "2px 6px" } }, "DNR\uB3D9\uC758"),
         (p.dnr === false || p.dnr === "false") && /*#__PURE__*/React.createElement("span", { style: { fontSize: 10, fontWeight: 800, background: "#fee2e2", color: "#dc2626", borderRadius: 4, padding: "2px 6px" } }, "DNR\uBE44\uB3D9\uC758")
+      ),
+      r.emotionComment && /*#__PURE__*/React.createElement("div", { style: { background: "linear-gradient(135deg,#4c1d95,#7c3aed)", borderRadius: 14, overflow: "hidden", marginBottom: 10, boxShadow: "0 4px 14px rgba(76,29,149,0.2)" } },
+        /*#__PURE__*/React.createElement("div", { style: { padding: "16px 18px" } },
+          /*#__PURE__*/React.createElement("div", { style: { fontSize: 11, color: "rgba(255,255,255,0.7)", fontWeight: 700, marginBottom: 8 } }, "\uD83D\uDC9C \uC8FC\uCE58\uC758 \uC120\uC0DD\uB2D8\uC758 \uD55C \uB9C8\uB514"),
+          /*#__PURE__*/React.createElement("div", { style: { fontSize: 14, color: "white", lineHeight: 1.9, fontWeight: 500 } }, r.emotionComment)
+        )
       ),
       /*#__PURE__*/React.createElement("div", { style: { fontSize: 13, color: "#475569", fontWeight: 600, marginBottom: r ? 4 : 0 } }, getWard(p.room), " \xB7 \uC785\uC6D0 ", p.days, "\uC77C\uC9F8"),
       p.alert && /*#__PURE__*/React.createElement("div", { style: { fontSize: 12, color: "#ef4444", fontWeight: 700, marginBottom: 2 } }, "\u26A0\uFE0F ", p.alertMsg),
@@ -5711,7 +5724,33 @@ function DoctorScreen(_ref32) {
         color: "#166534",
         lineHeight: 1.6
       }
-    }, comment)))), saved ? /*#__PURE__*/React.createElement("div", {
+    }, comment)))),
+    /*#__PURE__*/React.createElement("div", {
+      style: { background: "white", borderRadius: 16, overflow: "hidden", border: "1.5px solid #e9d5ff", marginBottom: 12 }
+    },
+      /*#__PURE__*/React.createElement("div", { style: { background: "linear-gradient(135deg,#4c1d95,#7c3aed)", padding: "10px 14px" } },
+        /*#__PURE__*/React.createElement("span", { style: { fontSize: 12, fontWeight: 800, color: "white" } }, "💜 보호자께 드리는 한 마디 (1개 선택)")
+      ),
+      /*#__PURE__*/React.createElement("div", { style: { padding: "12px 14px", display: "flex", flexDirection: "column", gap: 8 } },
+        [
+          "희망을 잃지 않고 치료해가지만 앞으로 상태가 더 나빠질 가능성이 있어서 조금 걱정이 됩니다.",
+          "급격히 상태가 나빠질 가능성이 있어 매우 걱정이 큽니다.",
+          "현재 치료에 잘 반응하고 있지만 앞으로 상태가 어떻게 변할지 몰라 긴장하고 있습니다.",
+          "지금 이 순간도 최선을 다해 곁에서 돌보고 있습니다.",
+          "쉽지 않은 상황이지만 포기하지 않고 함께 해나가겠습니다.",
+          "오늘도 편안하게 지내실 수 있도록 최선을 다하고 있습니다.",
+          "어르신을 병원에 입원시킬 때에는 많은 고민을 하셨고 여기저기 많이 찾아 보시면서 이것 저것 알아보기도 하셨을 것입니다. 어르신에게 가장 잘 맞는 병원이 저희 병원으로 확신하고 찾아오신 것은 잘 하신 것이라 생각합니다. 입원치료를 받는 동안 우리의 목적은 덜 아프고 조금이라도 맑은 정신이 있을 때가 있어서 현실감을 갖도록 도와드리고 식사도 조금 더 잘하고 움직임도 조금 더 늘려서, 언제 돌아가실지 아무도 모르는 그 순간까지 맑은 정신으로 덜 아프고 식사 잘하면서 지내시도록 하는 것이 우리의 목표라 할 수 있습니다. 보호자 분들도 함께 해주신다면 정말 저희에게도 힘이 많이 되겠습니다."
+        ].map(function(v) {
+          var sel = emotionComment === v;
+          return /*#__PURE__*/React.createElement("button", {
+            key: v,
+            onClick: function() { setEmotionComment(sel ? "" : v); },
+            style: { textAlign: "left", padding: "10px 14px", borderRadius: 12, border: "1.5px solid " + (sel ? "#7c3aed" : "#e9d5ff"), cursor: "pointer", fontSize: 12, fontWeight: sel ? 700 : 500, background: sel ? "#f5f3ff" : "white", color: sel ? "#4c1d95" : "#334155", lineHeight: 1.7 }
+          }, sel ? "💜 " : "", v);
+        })
+      )
+    ),
+    saved ? /*#__PURE__*/React.createElement("div", {
       style: {
         background: "#f0fdf4",
         borderRadius: 14,
