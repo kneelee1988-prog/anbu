@@ -2790,6 +2790,15 @@ function GuardianScreen(_ref19) {
           style: { width: "100%", padding: 14, borderRadius: 12, border: "none", background: (msg.trim()||visitDate)?"linear-gradient(135deg,#1a3358,#2a5298)":"#e2e8f0", color: (msg.trim()||visitDate)?"white":"#aaa", fontSize: 14, fontWeight: 800, cursor: (msg.trim()||visitDate)?"pointer":"default" }
         }, "전달하기")
       )
+    ),
+    /*#__PURE__*/React.createElement("div", {
+      style: { margin: "16px 20px 24px", background: "rgba(255,255,255,0.12)", borderRadius: 16, padding: "16px 18px", border: "1px solid rgba(255,255,255,0.2)" }
+    },
+      /*#__PURE__*/React.createElement("div", { style: { fontSize: 13, color: "rgba(255,255,255,0.85)", lineHeight: 2, fontWeight: 500, textAlign: "center" } },
+        "어르신에 대하여 면밀하게 지속적으로 관찰 및 케어 중입니다.",
+        /*#__PURE__*/React.createElement("br", null),
+        "위급상황이나 급격한 변동상황이 발생할 시 직접 연락드리겠습니다."
+      )
     )
   )));
 }
@@ -2928,6 +2937,63 @@ function NurseScreen(_ref22) {
     _useStateModala = _slicedToArray(_useStateModal, 2),
     showPresetModal = _useStateModala[0],
     setShowPresetModal = _useStateModala[1];
+  var _useStateYesterday = useState(null),
+    _useStateYesterdaya = _slicedToArray(_useStateYesterday, 2),
+    yesterdayRecord = _useStateYesterdaya[0],
+    setYesterdayRecord = _useStateYesterdaya[1];
+  var _useStateLoadedYesterday = useState(false),
+    _useStateLoadedYesterdaya = _slicedToArray(_useStateLoadedYesterday, 2),
+    loadedYesterday = _useStateLoadedYesterdaya[0],
+    setLoadedYesterday = _useStateLoadedYesterdaya[1];
+
+  var loadYesterdayRecord = function(patientId) {
+    var yesterday = new Date();
+    yesterday.setDate(yesterday.getDate() - 1);
+    var yStr = yesterday.getFullYear() + "-" + String(yesterday.getMonth()+1).padStart(2,"0") + "-" + String(yesterday.getDate()).padStart(2,"0");
+    fetch(SUPABASE_URL + "/rest/v1/records?patient_id=eq." + patientId + "&date=eq." + yStr + "&limit=1", {
+      headers: { apikey: SUPABASE_KEY, Authorization: "Bearer " + SUPABASE_KEY }
+    }).then(function(r) { return r.json(); }).then(function(data) {
+      if (Array.isArray(data) && data.length > 0) setYesterdayRecord(data[0]);
+      else setYesterdayRecord(null);
+    }).catch(function() { setYesterdayRecord(null); });
+  };
+
+  var applyYesterdayRecord = function() {
+    if (!yesterdayRecord) return;
+    setForm(function(f) {
+      return _objectSpread(_objectSpread({}, f), {}, {
+        consciousness: yesterdayRecord.consciousness || f.consciousness,
+        consciousness_comm: yesterdayRecord.consciousness_comm || f.consciousness_comm,
+        vitals: yesterdayRecord.vitals || [],
+        meal_amount: yesterdayRecord.meal_amount || f.meal_amount,
+        meal_type: yesterdayRecord.meal_type || f.meal_type,
+        meal_issues: yesterdayRecord.meal_issues || [],
+        sleep_hours: yesterdayRecord.sleep_hours || f.sleep_hours,
+        sleep_wakeups: yesterdayRecord.sleep_wakeups || f.sleep_wakeups,
+        sleep_nap: yesterdayRecord.sleep_nap || false,
+        sleep_abnormal: yesterdayRecord.sleep_abnormal || false,
+        mobility: yesterdayRecord.mobility || f.mobility,
+        fall_risk: yesterdayRecord.fall_risk || f.fall_risk,
+        programs: yesterdayRecord.programs || [],
+        urine: yesterdayRecord.urine || f.urine,
+        urine_catheter: yesterdayRecord.urine_catheter || false,
+        bowel: yesterdayRecord.bowel || f.bowel,
+        excretion_issues: yesterdayRecord.excretion_issues || [],
+        moods: yesterdayRecord.moods || [],
+        mental: yesterdayRecord.mental || [],
+        skin: yesterdayRecord.skin || f.skin,
+        hygiene: yesterdayRecord.hygiene || f.hygiene,
+        bedsore: yesterdayRecord.bedsore || f.bedsore,
+        medication: yesterdayRecord.medication || f.medication,
+        painad: yesterdayRecord.painad !== undefined ? yesterdayRecord.painad : f.painad,
+        care_items: yesterdayRecord.care_items || [],
+        oriental: yesterdayRecord.oriental || false,
+        oriental_items: yesterdayRecord.oriental_items || [],
+        note: "" // 특이사항은 초기화
+      });
+    });
+    setLoadedYesterday(true);
+  };
   var _useState37 = useState(null),
     _useState38 = _slicedToArray(_useState37, 2),
     detailPatient = _useState38[0],
@@ -2955,9 +3021,14 @@ function NurseScreen(_ref22) {
     var d = new Date();
     return d.getMonth() + 1 + "월 " + d.getDate() + "일 " + d.getHours() + ":" + String(d.getMinutes()).padStart(2, "0");
   };
+  var todayDate = function todayDate() {
+    var d = new Date();
+    return d.getFullYear() + "-" + String(d.getMonth()+1).padStart(2,"0") + "-" + String(d.getDate()).padStart(2,"0");
+  };
   var handleSave = function handleSave() {
     onSave(selected.id, _objectSpread(_objectSpread({}, form), {}, {
       updatedAt: now(),
+      date: todayDate(),
       pending: true,
       sentToGuardian: false
     }));
@@ -3052,7 +3123,7 @@ function NurseScreen(_ref22) {
       key: p.id,
       onClick: function onClick() {
         if (sentToday) { setDetailPatient(p); }
-        else { setSelected(p); setForm(initForm()); goScreen("input"); }
+        else { setSelected(p); setForm(initForm()); setLoadedYesterday(false); setYesterdayRecord(null); loadYesterdayRecord(p.id); goScreen("input"); }
       },
       style: {
         background: sentToday ? "#f0fdf4" : isPending ? "#fffbeb" : "white",
@@ -3634,9 +3705,23 @@ function NurseScreen(_ref22) {
   }, "\u26A0\uFE0F \uC5B4\uC81C \uD2B9\uC774\uC0AC\uD56D: ", selected.alertMsg), /*#__PURE__*/React.createElement("div", {
     style: {
       padding: "14px 20px 0",
-      
     }
-  }, /*#__PURE__*/React.createElement(Sec, {
+  },
+  /*#__PURE__*/React.createElement("div", { style: { marginBottom: 12 } },
+    loadedYesterday
+      ? /*#__PURE__*/React.createElement("div", { style: { background: "#dcfce7", borderRadius: 12, padding: "10px 14px", fontSize: 13, color: "#166534", fontWeight: 700, textAlign: "center" } },
+          "✅ 어제 기록을 불러왔어요. 변동사항만 수정하세요."
+        )
+      : yesterdayRecord
+        ? /*#__PURE__*/React.createElement("button", {
+            onClick: applyYesterdayRecord,
+            style: { width: "100%", padding: "14px 0", borderRadius: 14, border: "2px solid #0d5c56", background: "white", color: "#0d5c56", fontSize: 14, fontWeight: 800, cursor: "pointer" }
+          }, "📋 어제와 비교하여 별다른 변동사항이 없는 상태입니다")
+        : /*#__PURE__*/React.createElement("div", { style: { background: "#f8fafc", borderRadius: 12, padding: "10px 14px", fontSize: 12, color: "#94a3b8", textAlign: "center" } },
+            "어제 기록이 없어요. 직접 입력해주세요."
+          )
+  ),
+  /*#__PURE__*/React.createElement(Sec, {
     title: "\uD83E\uDDE0 \uC758\uC2DD\uC218\uC900"
   }, /*#__PURE__*/React.createElement(BtnRow, null, ["명료", "졸림", "혼미", "반혼수", "혼수"].map(function (v) {
     return /*#__PURE__*/React.createElement(Btn, {
