@@ -461,6 +461,7 @@ var initForm = function initForm() {
     urine: "",
     urine_catheter: false,
     bowel: "",
+    excretion_issues: [],
     medication: "",
     painad: null,
     moods: [],
@@ -3753,37 +3754,42 @@ function NurseScreen(_ref22) {
     color: "#94a3b8",
     small: true
   }))), /*#__PURE__*/React.createElement(Sec, {
-    title: "\uD83D\uDCA7 \uC18C\uBCC0"
-  }, /*#__PURE__*/React.createElement(BtnRow, null, ["정상", "감소", "농축", "실금"].map(function (v) {
+    title: "\uD83D\uDEBD \uBC30\uBCC0\uAD00\uB828 \uC0C1\uD669"
+  }, /*#__PURE__*/React.createElement(Lbl, { text: "\uC18C\uBCC0" }), /*#__PURE__*/React.createElement(BtnRow, null, ["\uC815\uC0C1", "\uAC10\uC18C", "\uB18D\uCD95", "\uC2E4\uAE08"].map(function (v) {
     return /*#__PURE__*/React.createElement(Btn, {
-      key: v,
-      label: v,
+      key: v, label: v,
       active: form.urine === v,
-      onClick: function onClick() {
-        return set("urine", v);
-      },
-      color: v === "정상" ? "#166534" : "#7f1d1d",
+      onClick: function onClick() { return set("urine", v); },
+      color: v === "\uC815\uC0C1" ? "#166534" : "#7f1d1d",
       small: true
     });
   })), /*#__PURE__*/React.createElement(BtnRow, null, /*#__PURE__*/React.createElement(Btn, {
     label: "\uCE74\uD14C\uD130 \uC0AC\uC6A9 \uC911",
     active: form.urine_catheter,
-    onClick: function onClick() {
-      return set("urine_catheter", !form.urine_catheter);
-    },
-    color: "#713f12",
-    small: true
-  }))), /*#__PURE__*/React.createElement(Sec, {
-    title: "\uD83D\uDEBD \uB300\uBCC0"
-  }, /*#__PURE__*/React.createElement(BtnRow, null, ["정상", "변비", "설사", "묽은 변", "실금", "관장"].map(function (v) {
+    onClick: function onClick() { return set("urine_catheter", !form.urine_catheter); },
+    color: "#713f12", small: true
+  })), /*#__PURE__*/React.createElement(Lbl, { text: "\uB300\uBCC0" }), /*#__PURE__*/React.createElement(BtnRow, null, ["\uC815\uC0C1", "\uBCC0\uBE44", "\uC124\uC0AC", "\uBD88\uADFC \uBCC0", "\uC2E4\uAE08", "\uAD00\uC7A5"].map(function (v) {
     return /*#__PURE__*/React.createElement(Btn, {
-      key: v,
-      label: v,
+      key: v, label: v,
       active: form.bowel === v,
+      onClick: function onClick() { return set("bowel", v); },
+      color: v === "\uC815\uC0C1" ? "#166534" : "#7f1d1d",
+      small: true
+    });
+  })), /*#__PURE__*/React.createElement(Lbl, { text: "\uBC30\uBCC0 \uD2B9\uC774\uC0AC\uD56D (\uBCF5\uC218 \uC120\uD0DD)" }), /*#__PURE__*/React.createElement(BtnRow, null, [
+    "\uD601\uB1B8", "\uD601\uBCC0", "\uBD80\uC815 \uCD9C\uD601",
+    "\uC18C\uBCC0 \uC9C0\uB9BC", "\uCE68\uC0C1 \uBC30\uB1B8",
+    "\uB300\uBCC0 \uC9C0\uB9BC", "\uD574\uB2F9 \uC0AC\uD56D \uC5C6\uC74C"
+  ].map(function(v) {
+    return /*#__PURE__*/React.createElement(Btn, {
+      key: v, label: v,
+      active: Array.isArray(form.excretion_issues) && form.excretion_issues.includes(v),
       onClick: function onClick() {
-        return set("bowel", v);
+        var cur = Array.isArray(form.excretion_issues) ? form.excretion_issues : [];
+        var next = cur.includes(v) ? cur.filter(function(x) { return x !== v; }) : cur.concat(v);
+        return set("excretion_issues", next);
       },
-      color: v === "정상" ? "#166534" : "#7f1d1d",
+      color: v === "\uD574\uB2F9 \uC0AC\uD56D \uC5C6\uC74C" ? "#166534" : "#7f1d1d",
       small: true
     });
   }))), /*#__PURE__*/React.createElement(Sec, {
@@ -6428,6 +6434,7 @@ function App() {
                           urine: r.urine,
                           urine_catheter: r.urine_catheter,
                           bowel: r.bowel,
+                          excretion_issues: r.excretion_issues || [],
                           medication: r.medication,
                           painad: r.painad,
                           moods: r.moods || [],
@@ -6565,6 +6572,7 @@ function App() {
               urine: record.urine,
               urine_catheter: record.urine_catheter,
               bowel: record.bowel,
+              excretion_issues: record.excretion_issues || [],
               medication: record.medication,
               painad: record.painad,
               moods: record.moods,
