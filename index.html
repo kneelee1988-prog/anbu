@@ -2879,6 +2879,22 @@ function NurseScreen(_ref22) {
     _useState30 = _slicedToArray(_useState29, 2),
     screen = _useState30[0],
     setScreen = _useState30[1];
+
+  var goScreen = function(s) {
+    window.history.pushState({ nurseScreen: s }, "");
+    setScreen(s);
+  };
+
+  useEffect(function() {
+    var handler = function(e) {
+      if (e.state && e.state.nurseScreen) {
+        setScreen(e.state.nurseScreen);
+        if (e.state.nurseScreen === "list") { setSelected(null); }
+      }
+    };
+    window.addEventListener("popstate", handler);
+    return function() { window.removeEventListener("popstate", handler); };
+  }, []);
   var _useState31 = useState(null),
     _useState32 = _slicedToArray(_useState31, 2),
     selected = _useState32[0],
@@ -2924,7 +2940,7 @@ function NurseScreen(_ref22) {
       pending: true,
       sentToGuardian: false
     }));
-    setScreen("list");
+    goScreen("list");
   };
   var handleSkip = function handleSkip() {
     onSave(selected.id, _objectSpread(_objectSpread({}, initForm()), {}, {
@@ -2950,7 +2966,7 @@ function NurseScreen(_ref22) {
       pending: true,
       sentToGuardian: false
     }));
-    setScreen("list");
+    goScreen("list");
   };
   var PRESET_NOTES = ["전반적으로 안정적인 하루였습니다.", "식사량이 평소보다 줄었습니다.", "수면 중 자주 깨어 불안해하셨습니다.", "보행 시 불안정한 모습이 관찰됩니다.", "통증을 호소하셨으나 처치 후 안정됐습니다.", "섬망 증상이 관찰되었습니다.", "기침이 잦아 관찰 중입니다.", "발열이 있어 처치 중입니다.", "가족 면회 후 기분이 좋아보이셨습니다.", "프로그램 참여 시 즐거워하셨습니다.", "경관식 잘 진행되었습니다.", "욕창 처치 시행하였습니다.", "체위 변경 2시간마다 시행하였습니다.", "낙상 위험으로 침대 난간 올려두었습니다."];
   var sortAlert = function sortAlert(arr) {
@@ -2978,7 +2994,7 @@ function NurseScreen(_ref22) {
       key: p.id,
       onClick: function onClick() {
         if (sentToday) { setDetailPatient(p); }
-        else { setSelected(p); setForm(initForm()); setScreen("input"); }
+        else { setSelected(p); setForm(initForm()); goScreen("input"); }
       },
       style: {
         background: sentToday ? "#f0fdf4" : isPending ? "#fffbeb" : "white",
@@ -3264,7 +3280,7 @@ function NurseScreen(_ref22) {
   }, /*#__PURE__*/React.createElement("button", {
     onClick: function onClick() {
       if (onMarkRead) onMarkRead();
-      setScreen("messages");
+      goScreen("messages");
     },
     style: {
       flex: 2,
@@ -3282,7 +3298,7 @@ function NurseScreen(_ref22) {
     }
   }, /*#__PURE__*/React.createElement("span", null, "\uD83D\uDCAC \uBCF4\uD638\uC790 \uD55C\uB9C8\uB514 ", unread > 0 ? "🔔" : ""), /*#__PURE__*/React.createElement("span", null, unread > 0 ? "🔴 " + unread + "건" : "없음")), /*#__PURE__*/React.createElement("button", {
     onClick: function onClick() {
-      return setScreen("manage");
+      return goScreen("manage");
     },
     style: {
       flex: 1,
@@ -3345,7 +3361,7 @@ function NurseScreen(_ref22) {
     }
   }, /*#__PURE__*/React.createElement("button", {
     onClick: function onClick() {
-      return setScreen("list");
+      return goScreen("list");
     },
     style: {
       background: "rgba(255,255,255,0.15)",
@@ -3441,7 +3457,7 @@ function NurseScreen(_ref22) {
   if (screen === "manage") return /*#__PURE__*/React.createElement(PatientManage, {
     patients: patients,
     onBack: function onBack() {
-      return setScreen("list");
+      return goScreen("list");
     },
     onAddPatient: onAddPatient,
     onUpdatePatient: onUpdatePatient
@@ -3476,7 +3492,7 @@ function NurseScreen(_ref22) {
     }
   }, /*#__PURE__*/React.createElement("button", {
     onClick: function onClick() {
-      return setScreen("list");
+      return goScreen("list");
     },
     style: {
       background: "rgba(255,255,255,0.15)",
@@ -4036,7 +4052,7 @@ function NurseScreen(_ref22) {
     }
   }, "\uC800\uC7A5 \uD6C4 \uC8FC\uCE58\uC758\uAC00 \uAC80\uD1A0\uD558\uACE0 \uBCF4\uD638\uC790\uC5D0\uAC8C \uC804\uB2EC\uD574\uC694"), /*#__PURE__*/React.createElement("button", {
     onClick: function onClick() {
-      return setScreen("list");
+      return goScreen("list");
     },
     style: {
       width: "100%",
@@ -6237,16 +6253,13 @@ function App() {
   }, []);
 
   // 뒤로가기 처리
-  var appScreenRef = React.useRef(appScreen);
-  React.useEffect(function() { appScreenRef.current = appScreen; }, [appScreen]);
-
   React.useEffect(function() {
     window.history.replaceState({ screen: "roleSelect" }, "");
     var handler = function(e) {
       var prev = (e.state && e.state.screen) ? e.state.screen : "roleSelect";
       setAppScreen(prev);
       if (e.state && e.state.loginType) setLoginType(e.state.loginType);
-      if (prev === "roleSelect" || prev === "login") setCurrentUser(null);
+      // 로그아웃은 하지 않음 - 로그인 상태 유지
     };
     window.addEventListener("popstate", handler);
     return function() { window.removeEventListener("popstate", handler); };
