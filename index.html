@@ -448,6 +448,7 @@ var initForm = function initForm() {
     meal_amount: "",
     meal_type: "",
     meal_refused: false,
+    meal_issues: [],
     meal_aspiration: false,
     sleep_hours: "",
     sleep_wakeups: "",
@@ -3579,7 +3580,7 @@ function NurseScreen(_ref22) {
     "\uD608\uC555 \uC800\uD558",
     "\uC0B0\uC18C \uD3EC\uD654\uB3C4 \uC800\uD558",
     "\uB9E5\uBC15\uC218 \uC774\uC0C1",
-    "\uD638\uD761\uACE4\uB09C \uC9D5\uD6C4"
+    "\uD638\uD761\uACE4\uB780 \uC9D5\uD6C4"
   ].map(function(v) {
     return /*#__PURE__*/React.createElement(Btn, {
       key: v,
@@ -3622,17 +3623,31 @@ function NurseScreen(_ref22) {
       },
       small: true
     });
-  })), /*#__PURE__*/React.createElement(Lbl, {
-    text: "\uC2DD\uC0AC \uAC70\uBD80"
-  }), /*#__PURE__*/React.createElement(BtnRow, null, /*#__PURE__*/React.createElement(Btn, {
-    label: "\uC2DD\uC0AC \uAC70\uBD80",
-    active: form.meal_refused,
-    onClick: function onClick() {
-      return set("meal_refused", !form.meal_refused);
-    },
-    color: "#7f1d1d",
-    small: true
-  }))), /*#__PURE__*/React.createElement(Sec, {
+  }), /*#__PURE__*/React.createElement(Lbl, {
+    text: "\uC2DD\uC0AC\uC640 \uAD00\uB828\uB41C \uBB38\uC81C (\uBCF5\uC218 \uC120\uD0DD)"
+  }), /*#__PURE__*/React.createElement(BtnRow, null, [
+    "\uC2DD\uC0AC \uAC70\uBD80",
+    "\uC0BC\uD0B4\uC7A5\uC560",
+    "\uC798 \uBABB \uC0BC\uD0A4\uACE0 \uC0AC\uB808 \uC790\uC8FC \uB4E4\uB9BC",
+    "\uC218\uBD84 \uC12D\uCDE8 \uAC70\uBD80",
+    "\uBC25\uBCF4\uB2E4 \uAC04\uC2DD\uC744 \uB354 \uB9CE\uC774 \uB4DC\uC2EC",
+    "\uD1A0\uD568",
+    "\uC2DD\uD0D0",
+    "\uD601\uB2F9 \uC870\uC808 \uC704\uD574 \uC2DD\uC774 \uC870\uC808 \uD544\uC694"
+  ].map(function(v) {
+    return /*#__PURE__*/React.createElement(Btn, {
+      key: v,
+      label: v,
+      active: Array.isArray(form.meal_issues) && form.meal_issues.includes(v),
+      onClick: function onClick() {
+        var cur = Array.isArray(form.meal_issues) ? form.meal_issues : [];
+        var next = cur.includes(v) ? cur.filter(function(x) { return x !== v; }) : cur.concat(v);
+        return set("meal_issues", next);
+      },
+      color: "#7f1d1d",
+      small: true
+    });
+  })))), /*#__PURE__*/React.createElement(Sec, {
     title: "\uD83C\uDF19 \uC218\uBA74"
   }, /*#__PURE__*/React.createElement(Lbl, {
     text: "\uC218\uBA74 \uC2DC\uAC04"
@@ -6400,6 +6415,7 @@ function App() {
                           meal_amount: r.meal_amount,
                           meal_type: r.meal_type,
                           meal_refused: r.meal_refused,
+                          meal_issues: r.meal_issues || [],
                           meal_aspiration: r.meal_aspiration,
                           sleep_hours: r.sleep_hours,
                           sleep_wakeups: r.sleep_wakeups,
@@ -6536,6 +6552,7 @@ function App() {
               meal_amount: record.meal_amount,
               meal_type: record.meal_type,
               meal_refused: record.meal_refused,
+              meal_issues: record.meal_issues || [],
               meal_aspiration: record.meal_aspiration,
               sleep_hours: record.sleep_hours,
               sleep_wakeups: record.sleep_wakeups,
