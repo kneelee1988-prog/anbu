@@ -3834,82 +3834,6 @@ function NurseScreen(_ref22) {
       small: true
     });
   }))), /*#__PURE__*/React.createElement(Sec, {
-    title: "\uD83D\uDC8A \uD1B5\uC99D (PAINAD)"
-  }, /*#__PURE__*/React.createElement("div", {
-    style: {
-      fontSize: 12,
-      color: "#64748b",
-      marginBottom: 10
-    }
-  }, "0 = \uD1B5\uC99D \uC5C6\uC74C \xB7 10 = \uADF9\uC2EC\uD55C \uD1B5\uC99D"), /*#__PURE__*/React.createElement("div", {
-    style: {
-      display: "flex",
-      flexDirection: "column",
-      gap: 5
-    }
-  }, [{
-    n: 0,
-    desc: "통증 없음 — 편안한 호흡, 이완된 표정"
-  }, {
-    n: 1,
-    desc: "통증 거의 없음 — 약간 힘든 호흡"
-  }, {
-    n: 2,
-    desc: "경미 — 가끔 찡그림"
-  }, {
-    n: 3,
-    desc: "경미~중등도 — 간헐적 신음, 긴장"
-  }, {
-    n: 4,
-    desc: "중등도 — 반복적 신음, 주먹 쥠"
-  }, {
-    n: 5,
-    desc: "중등도~심함 — 자주 신음"
-  }, {
-    n: 6,
-    desc: "심함 — 반복적 울음, 달래기 어려움"
-  }, {
-    n: 7,
-    desc: "매우 심함 — 지속적 울음·경직"
-  }, {
-    n: 8,
-    desc: "극심 — 극도 긴장, 달래도 무반응"
-  }, {
-    n: 9,
-    desc: "극심 — 통증으로 반응 불가"
-  }, {
-    n: 10,
-    desc: "최고 극심 — 극도 고통 상태"
-  }].map(function (_ref23) {
-    var n = _ref23.n,
-      desc = _ref23.desc;
-    return /*#__PURE__*/React.createElement("button", {
-      key: n,
-      onClick: function onClick() {
-        return set("painad", n);
-      },
-      style: {
-        textAlign: "left",
-        padding: "7px 12px",
-        borderRadius: 10,
-        border: "none",
-        cursor: "pointer",
-        background: form.painad === n ? n <= 2 ? "#166534" : n <= 6 ? "#713f12" : "#7f1d1d" : "#f8fafc",
-        color: form.painad === n ? "white" : "#334155"
-      }
-    }, /*#__PURE__*/React.createElement("span", {
-      style: {
-        fontSize: 13,
-        fontWeight: 800,
-        marginRight: 8
-      }
-    }, n, "\uC810"), /*#__PURE__*/React.createElement("span", {
-      style: {
-        fontSize: 11,
-        opacity: form.painad === n ? 0.9 : 0.7
-      }
-    }, desc));
-  }))), /*#__PURE__*/React.createElement(Sec, {
     title: "\uD83E\uDDF4 \uD53C\uBD80 \xB7 \uC704\uC0DD \xB7 \uC695\uCC3D"
   }, /*#__PURE__*/React.createElement(Lbl, {
     text: "\uD53C\uBD80 \uC0C1\uD0DC"
@@ -3988,6 +3912,82 @@ function NurseScreen(_ref22) {
       color: "#0369a1",
       small: true
     });
+  }))), /*#__PURE__*/React.createElement(Sec, {
+    title: "\uD83D\uDC8A \uD1B5\uC99D (PAINAD)"
+  }, /*#__PURE__*/React.createElement("div", {
+    style: {
+      fontSize: 12,
+      color: "#64748b",
+      marginBottom: 10
+    }
+  }, "0 = \uD1B5\uC99D \uC5C6\uC74C \xB7 10 = \uADF9\uC2EC\uD55C \uD1B5\uC99D"), /*#__PURE__*/React.createElement("div", {
+    style: {
+      display: "flex",
+      flexDirection: "column",
+      gap: 5
+    }
+  }, [{
+    n: 0,
+    desc: "통증 없음 — 편안한 호흡, 이완된 표정"
+  }, {
+    n: 1,
+    desc: "통증 거의 없음 — 약간 힘든 호흡"
+  }, {
+    n: 2,
+    desc: "경미 — 가끔 찡그림"
+  }, {
+    n: 3,
+    desc: "경미~중등도 — 간헐적 신음, 긴장"
+  }, {
+    n: 4,
+    desc: "중등도 — 반복적 신음, 주먹 쥠"
+  }, {
+    n: 5,
+    desc: "중등도~심함 — 자주 신음"
+  }, {
+    n: 6,
+    desc: "심함 — 반복적 울음, 달래기 어려움"
+  }, {
+    n: 7,
+    desc: "매우 심함 — 지속적 울음·경직"
+  }, {
+    n: 8,
+    desc: "극심 — 극도 긴장, 달래도 무반응"
+  }, {
+    n: 9,
+    desc: "극심 — 통증으로 반응 불가"
+  }, {
+    n: 10,
+    desc: "최고 극심 — 극도 고통 상태"
+  }].map(function (_ref23) {
+    var n = _ref23.n,
+      desc = _ref23.desc;
+    return /*#__PURE__*/React.createElement("button", {
+      key: n,
+      onClick: function onClick() {
+        return set("painad", n);
+      },
+      style: {
+        textAlign: "left",
+        padding: "7px 12px",
+        borderRadius: 10,
+        border: "none",
+        cursor: "pointer",
+        background: form.painad === n ? n <= 2 ? "#166534" : n <= 6 ? "#713f12" : "#7f1d1d" : "#f8fafc",
+        color: form.painad === n ? "white" : "#334155"
+      }
+    }, /*#__PURE__*/React.createElement("span", {
+      style: {
+        fontSize: 13,
+        fontWeight: 800,
+        marginRight: 8
+      }
+    }, n, "\uC810"), /*#__PURE__*/React.createElement("span", {
+      style: {
+        fontSize: 11,
+        opacity: form.painad === n ? 0.9 : 0.7
+      }
+    }, desc));
   }))), /*#__PURE__*/React.createElement(Sec, {
     title: "\uD83D\uDCDD \uD2B9\uC774\uC0AC\uD56D \uBA54\uBAA8"
   }, /*#__PURE__*/React.createElement("div", {
