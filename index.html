@@ -6256,7 +6256,7 @@ function App() {
     return function() { clearTimeout(t1); clearTimeout(t2); };
   }, []);
 
-  // 뒤로가기 처리 - history 대신 내부 스택으로 관리
+  // 뒤로가기 처리 - 내부 스택으로 관리
   var screenStackRef = React.useRef([]);
 
   var navigateTo = function(screen, extra) {
@@ -6267,18 +6267,18 @@ function App() {
 
   React.useEffect(function() {
     var handler = function(e) {
-      // 더미 히스토리 다시 push해서 계속 뒤로가기 가능하게
       window.history.pushState(null, "");
+      // 로그인 상태면 뒤로가기해도 앱 화면 유지
+      if (currentUser) return;
       if (screenStackRef.current.length > 0) {
         var prev = screenStackRef.current.pop();
         setAppScreen(prev);
       }
     };
     window.addEventListener("popstate", handler);
-    // 더미 히스토리를 계속 유지해서 popstate가 항상 발생하도록
     window.history.pushState(null, "");
     return function() { window.removeEventListener("popstate", handler); };
-  }, []);
+  }, [currentUser]);
   // 로딩 안전장치: 8초 후에도 loading이면 강제 해제
   useEffect(function() {
     var t = setTimeout(function() { setLoading(false); }, 8000);
