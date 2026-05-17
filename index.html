@@ -3793,6 +3793,24 @@ function NurseScreen(_ref22) {
       small: true
     });
   }))), /*#__PURE__*/React.createElement(Sec, {
+    title: "\uD83D\uDE0A \uAE30\uBD84 \uBC0F \uD589\uB3D9 (\uBCF5\uC218 \uC120\uD0DD)"
+  }, /*#__PURE__*/React.createElement(BtnRow, null, [
+    "\uC548\uC815", "\uBD88\uC548", "\uCD08\uC870", "\uBB34\uAE30\uB825", "\uC758\uC695\uC800\uD558", "\uBB34\uAC10\uB3D9",
+    "\uC6B0\uC6B8\uAC10", "\uC7A0\uC790\uB294 \uC2DC\uAC04\uC774 \uB9CE\uC74C", "\uC790\uD3EC\uC790\uAE30\uD568",
+    "\uB9CC\uC0AC \uADC0\uCC2E\uC544\uD568", "\uBB34\uD45C\uC815", "\uB290\uB9B0 \uBC18\uC751",
+    "\uC9DC\uC99D", "\uC2E0\uACBD\uC9C8\uC801\uC778 \uBC18\uC751", "\uD0C0 \uD658\uC790\uC5D0\uAC8C \uC2DC\uBE44 \uAC78",
+    "\uACE0\uC9D1\uC2A4\uB7EC\uC6C0", "\uBC18\uBCF5\uC801 \uD589\uB3D9", "\uBCC0\uB355\uC774 \uC2EC\uD568",
+    "\uAC15\uBC15\uC99D", "\uAC74\uAC15 \uC5FC\uB824\uC99D", "\uC870\uAE09\uC99D",
+    "\uC0B0\uB9CC\uD568", "\uD45C\uC815\uC774 \uBC1D\uC544\uC9D4", "\uAE30\uBD84\uC774 \uB4E4\uB728"
+  ].map(function(v) {
+    return /*#__PURE__*/React.createElement(Btn, {
+      key: v, label: v,
+      active: form.moods.includes(v),
+      onClick: function onClick() { return toggle("moods", v); },
+      color: v === "\uC548\uC815" || v === "\uD45C\uC815\uC774 \uBC1D\uC544\uC9D4" || v === "\uAE30\uBD84\uC774 \uB4E4\uB728" ? "#166534" : "#7f1d1d",
+      small: true
+    });
+  }))), /*#__PURE__*/React.createElement(Sec, {
     title: "\uD83D\uDC8A \uD22C\uC57D \uC0C1\uD0DC"
   }, /*#__PURE__*/React.createElement(BtnRow, null, ["정상 투약", "투약 거부", "투약 일시중단", "약물 토함"].map(function (v) {
     return /*#__PURE__*/React.createElement(Btn, {
@@ -3881,19 +3899,6 @@ function NurseScreen(_ref22) {
         opacity: form.painad === n ? 0.9 : 0.7
       }
     }, desc));
-  }))), /*#__PURE__*/React.createElement(Sec, {
-    title: "\uD83D\uDE0A \uAE30\uBD84 (\uBCF5\uC218 \uC120\uD0DD)"
-  }, /*#__PURE__*/React.createElement(BtnRow, null, ["안정", "불안", "초조", "무기력", "우울", "들뜸", "수시로 변함", "의욕저하", "무감동"].map(function (v) {
-    return /*#__PURE__*/React.createElement(Btn, {
-      key: v,
-      label: v,
-      active: form.moods.includes(v),
-      onClick: function onClick() {
-        return toggle("moods", v);
-      },
-      color: v === "안정" ? "#166534" : "#7f1d1d",
-      small: true
-    });
   }))), /*#__PURE__*/React.createElement(Sec, {
     title: "\uD83E\uDDE9 \uC815\uC2E0 \uBC0F \uC774\uC0C1\uD589\uB3D9 \uC0C1\uD0DC (\uBCF5\uC218 \uC120\uD0DD)"
   }, /*#__PURE__*/React.createElement(BtnRow, null, ["이상 없음", "섬망", "환청", "환시", "혼잣말", "야간 혼돈", "망상", "배회", "공격성", "케어 저항", "충동적행동", "인지저하", "반복적 소리지름"].map(function (v) {
