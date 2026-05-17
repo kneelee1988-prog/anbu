@@ -3279,20 +3279,35 @@ function NurseScreen(_ref22) {
     }), /*#__PURE__*/React.createElement(Row, {
       label: "\uD1B5\uC99D",
       value: r && r.painad !== null ? r.painad + "점" : "—"
-    }), /*#__PURE__*/React.createElement(Row, {
-      label: "\uAE30\uBD84",
-      value: r && r.moods && r.moods.join(", ")
-    }), /*#__PURE__*/React.createElement(Row, {
-      label: "\uC815\uC2E0 \uC0C1\uD0DC",
-      value: r && r.mental && r.mental.join(", ")
-    }), /*#__PURE__*/React.createElement(Row, {
+    })),
+    r && r.moods && r.moods.length > 0 && /*#__PURE__*/React.createElement("div", {
+      style: { padding: "6px 0", borderBottom: "1px solid #f1f5f9" }
+    },
+      /*#__PURE__*/React.createElement("div", { style: { fontSize: 12, color: "#64748b", fontWeight: 700, marginBottom: 5 } }, "기분"),
+      /*#__PURE__*/React.createElement("div", { style: { display: "flex", flexWrap: "wrap", gap: 4 } },
+        r.moods.map(function(m) {
+          return /*#__PURE__*/React.createElement("span", { key: m, style: { fontSize: 11, fontWeight: 700, padding: "3px 10px", borderRadius: 20, background: m === "안정" || m === "표정이 밝아짐" || m === "기분이 들뜸" ? "#dcfce7" : "#fef2f2", color: m === "안정" || m === "표정이 밝아짐" || m === "기분이 들뜸" ? "#166534" : "#7f1d1d" } }, m);
+        })
+      )
+    ),
+    r && r.mental && r.mental.length > 0 && /*#__PURE__*/React.createElement("div", {
+      style: { padding: "6px 0", borderBottom: "1px solid #f1f5f9" }
+    },
+      /*#__PURE__*/React.createElement("div", { style: { fontSize: 12, color: "#64748b", fontWeight: 700, marginBottom: 5 } }, "정신 상태"),
+      /*#__PURE__*/React.createElement("div", { style: { display: "flex", flexWrap: "wrap", gap: 4 } },
+        r.mental.map(function(m) {
+          return /*#__PURE__*/React.createElement("span", { key: m, style: { fontSize: 11, fontWeight: 700, padding: "3px 10px", borderRadius: 20, background: m === "이상 없음" ? "#dcfce7" : "#fef2f2", color: m === "이상 없음" ? "#166534" : "#7f1d1d" } }, m);
+        })
+      )
+    ),
+    /*#__PURE__*/React.createElement(Row, {
       label: "\uC695\uCC3D",
       value: r && r.bedsore,
       vc: r && r.bedsore === "없음" ? "#166534" : "#ef4444"
     }), /*#__PURE__*/React.createElement(Row, {
       label: "\uD55C\uBC29 \uCE58\uB8CC",
       value: r && r.oriental === true ? "시행" : r && r.oriental === false ? "미시행" : "—"
-    }), )), r && r.doctorComment && /*#__PURE__*/React.createElement("div", {
+    }))), r && r.doctorComment && /*#__PURE__*/React.createElement("div", {
       style: {
         background: "linear-gradient(135deg,#eff6ff,#dbeafe)",
         borderRadius: 14,
@@ -3312,7 +3327,7 @@ function NurseScreen(_ref22) {
         color: "#1e3a5f",
         lineHeight: 1.7
       }
-    }, r.doctorComment)))));
+    }, r.doctorComment))));
   }
   if (screen === "list") return /*#__PURE__*/React.createElement("div", {
     style: {
