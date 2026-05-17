@@ -444,6 +444,7 @@ var PATIENTS = [{
 var initForm = function initForm() {
   return {
     consciousness: "",
+    vitals: [],
     meal_amount: "",
     meal_type: "",
     meal_refused: false,
@@ -3566,6 +3567,33 @@ function NurseScreen(_ref22) {
       small: true
     });
   }))), /*#__PURE__*/React.createElement(Sec, {
+    title: "\uD83D\uDC93 \uC0DD\uCCB4\uD65C\uB825\uC9D5\uD6C4"
+  }, /*#__PURE__*/React.createElement(BtnRow, null, [
+    "\uC0DD\uCCB4 \uD65C\uB825 \uC9D5\uD6C4(\uD601\uC555,\uB9E5\uBC15\uC218,\uD638\uD761\uC218,\uCCB4\uC628) \uC548\uC815",
+    "\uC77C\uD68C\uC131 \uBBF8\uC5F4",
+    "\uAC04\uD597\uC801 \uBBF8\uC5F4",
+    "\uC78A\uC740 \uBBF8\uC5F4",
+    "\uC77C\uD68C\uC131 \uACE0\uC5F4",
+    "\uBC18\uBCF5\uC801 \uACE0\uC5F4",
+    "\uD601\uC555 \uC0C1\uC2B9",
+    "\uD601\uC555 \uC800\uD558",
+    "\uC0B0\uC18C \uD3EC\uD654\uB3C4 \uC800\uD558",
+    "\uB9E5\uBC15\uC218 \uC774\uC0C1",
+    "\uD638\uD761 \uACE4\uB780"
+  ].map(function(v) {
+    return /*#__PURE__*/React.createElement(Btn, {
+      key: v,
+      label: v,
+      active: Array.isArray(form.vitals) && form.vitals.includes(v),
+      onClick: function onClick() {
+        var cur = Array.isArray(form.vitals) ? form.vitals : [];
+        var next = cur.includes(v) ? cur.filter(function(x) { return x !== v; }) : cur.concat(v);
+        return set("vitals", next);
+      },
+      color: v.includes("\uC548\uC815") ? "#166534" : v.includes("\uBBF8\uC5F4") ? "#713f12" : "#7f1d1d",
+      small: true
+    });
+  }))), /*#__PURE__*/React.createElement(Sec, {
     title: "\uD83C\uDF5A \uC2DD\uC0AC"
   }, /*#__PURE__*/React.createElement(Lbl, {
     text: "\uC2DD\uC0AC\uB7C9"
@@ -6368,6 +6396,7 @@ function App() {
                         record: {
                           recordId: r.id,
                           consciousness: r.consciousness,
+                          vitals: r.vitals || [],
                           meal_amount: r.meal_amount,
                           meal_type: r.meal_type,
                           meal_refused: r.meal_refused,
@@ -6503,6 +6532,7 @@ function App() {
             dbData = {
               patient_id: patientId,
               consciousness: record.consciousness,
+              vitals: record.vitals || [],
               meal_amount: record.meal_amount,
               meal_type: record.meal_type,
               meal_refused: record.meal_refused,
