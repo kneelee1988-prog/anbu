@@ -3898,21 +3898,6 @@ function NurseScreen(_ref22) {
     color: "#94a3b8",
     small: true
   }))), /*#__PURE__*/React.createElement(Sec, {
-    title: "\uD83D\uDEC1 \uC77C\uC0C1 \uCF00\uC5B4 (\uBCF5\uC218 \uC120\uD0DD)"
-  }, /*#__PURE__*/React.createElement(BtnRow, null, [
-    "\uBAA9\uC695", "\uAD6C\uAC15\uCF00\uC5B4", "\uD658\uC758\uAD50\uCCB4", "\uC2DC\uD2B8\uAD50\uCCB4",
-    "\uACBD\uAD00\uC2DD\uD29C\uBE0C\uAD50\uCCB4", "\uC5BC\uC74C\uD329", "\uC0B0\uC18C\uACF5\uAE09", "\uB124\uBB3C\uB77C\uC774\uC800",
-    "\uCCB4\uC704\uBCC0\uACBD", "\uC190\uBC1C\uD1B1\uAD00\uB9AC", "\uBA74\uB3C4", "\uBA38\uB9AC\uAC10\uAE30"
-  ].map(function(v) {
-    return /*#__PURE__*/React.createElement(Btn, {
-      key: v,
-      label: v,
-      active: form.care_items.includes(v),
-      onClick: function onClick() { return toggle("care_items", v); },
-      color: "#0369a1",
-      small: true
-    });
-  }))), /*#__PURE__*/React.createElement(Sec, {
     title: "\uD83D\uDC8A \uD1B5\uC99D (PAINAD)"
   }, /*#__PURE__*/React.createElement("div", {
     style: {
@@ -3988,6 +3973,21 @@ function NurseScreen(_ref22) {
         opacity: form.painad === n ? 0.9 : 0.7
       }
     }, desc));
+  }))), /*#__PURE__*/React.createElement(Sec, {
+    title: "\uD83D\uDEC1 \uC77C\uC0C1 \uCF00\uC5B4 (\uBCF5\uC218 \uC120\uD0DD)"
+  }, /*#__PURE__*/React.createElement(BtnRow, null, [
+    "\uBAA9\uC695", "\uAD6C\uAC15\uCF00\uC5B4", "\uD658\uC758\uAD50\uCCB4", "\uC2DC\uD2B8\uAD50\uCCB4",
+    "\uACBD\uAD00\uC2DD\uD29C\uBE0C\uAD50\uCCB4", "\uC5BC\uC74C\uD329", "\uC0B0\uC18C\uACF5\uAE09", "\uB124\uBB3C\uB77C\uC774\uC800",
+    "\uCCB4\uC704\uBCC0\uACBD", "\uC190\uBC1C\uD1B1\uAD00\uB9AC", "\uBA74\uB3C4", "\uBA38\uB9AC\uAC10\uAE30"
+  ].map(function(v) {
+    return /*#__PURE__*/React.createElement(Btn, {
+      key: v,
+      label: v,
+      active: form.care_items.includes(v),
+      onClick: function onClick() { return toggle("care_items", v); },
+      color: "#0369a1",
+      small: true
+    });
   }))), /*#__PURE__*/React.createElement(Sec, {
     title: "\uD83D\uDCDD \uD2B9\uC774\uC0AC\uD56D \uBA54\uBAA8"
   }, /*#__PURE__*/React.createElement("div", {
