@@ -4990,6 +4990,22 @@ function DoctorScreen(_ref32) {
     _useState58 = _slicedToArray(_useState57, 2),
     treatingSubs = _useState58[0],
     setTreatingSubs = _useState58[1];
+  var _useState_clinicals = useState([]),
+    _useState_clinicalsa = _slicedToArray(_useState_clinicals, 2),
+    clinicals = _useState_clinicalsa[0],
+    setClinicals = _useState_clinicalsa[1];
+  var _useState_treatments = useState([]),
+    _useState_treatmentsa = _slicedToArray(_useState_treatments, 2),
+    treatments = _useState_treatmentsa[0],
+    setTreatments = _useState_treatmentsa[1];
+  var _useState_consultations = useState([]),
+    _useState_consultationsa = _slicedToArray(_useState_consultations, 2),
+    consultations = _useState_consultationsa[0],
+    setConsultations = _useState_consultationsa[1];
+  var _useState_nextWatch = useState([]),
+    _useState_nextWatcha = _slicedToArray(_useState_nextWatch, 2),
+    nextWatch = _useState_nextWatcha[0],
+    setNextWatch = _useState_nextWatcha[1];
   var _useState59 = useState(false),
     _useState60 = _slicedToArray(_useState59, 2),
     saved = _useState60[0],
@@ -5042,6 +5058,10 @@ function DoctorScreen(_ref32) {
       scenarioTypes: scenarioTypes,
       warningSubs: warningSubs,
       treatingSubs: treatingSubs,
+      clinicals: clinicals,
+      treatments: treatments,
+      consultations: consultations,
+      nextWatch: nextWatch,
       pending: false,
       sentToGuardian: true
     });
@@ -5054,9 +5074,27 @@ function DoctorScreen(_ref32) {
       setScenarioTypes([]);
       setWarningSubs([]);
       setTreatingSubs([]);
+      setClinicals([]);
+      setTreatments([]);
+      setConsultations([]);
+      setNextWatch([]);
     }, 1500);
   };
-  var DOCTOR_PRESETS = ["전반적으로 안정적입니다.", "수면 패턴이 불규칙하여 지켜보고 있습니다.", "식욕이 다소 저하되어 영양 보충 중입니다.", "발열로 인해 치료 중입니다.", "폐렴 소견으로 항생제 치료를 시작했습니다.", "전반적인 상태가 호전되고 있습니다.", "인지 기능이 다소 저하되어 관찰 중입니다.", "다음 진료 시 자세히 상담하겠습니다."];
+  var DOCTOR_PRESETS = [
+    "현재 상태에 대해 면밀히 관찰 중입니다.",
+    "경과를 지켜보며 필요 시 연락드리겠습니다.",
+    "폐렴으로 항생제 치료 중이며 경과를 관찰하고 있습니다.",
+    "발열로 처치 중이며 변화 시 바로 연락드리겠습니다.",
+    "수면 패턴이 불규칙하여 지켜보고 있습니다.",
+    "식욕 저하로 영양 보충을 시행하고 있습니다.",
+    "혈압 변동이 있어 약물 조절 중입니다.",
+    "산소포화도 저하로 산소 공급 중입니다.",
+    "인지 기능 변화를 관찰 중이며 처치하고 있습니다.",
+    "이상행동으로 약물치료를 시작하였습니다.",
+    "검사 결과를 확인하고 필요한 처치를 시행하였습니다.",
+    "보호자와 현재 상태에 대해 상담을 시행하였습니다.",
+    "다음 진료 시 자세히 확인하겠습니다."
+  ];
   var Row = function Row(_ref33) {
     var label = _ref33.label,
       value = _ref33.value,
@@ -5097,6 +5135,10 @@ function DoctorScreen(_ref32) {
         setScenarioTypes(r && r.scenarioTypes || []);
         setWarningSubs(r && r.warningSubs || []);
         setTreatingSubs(r && r.treatingSubs || []);
+        setClinicals(r && r.clinicals || []);
+        setTreatments(r && r.treatments || []);
+        setConsultations(r && r.consultations || []);
+        setNextWatch(r && r.nextWatch || []);
       },
       style: {
         background: "white",
@@ -5470,172 +5512,75 @@ function DoctorScreen(_ref32) {
         lineHeight: 1.7,
         fontWeight: 600
       }
-    }, r.note)), /*#__PURE__*/React.createElement("div", {
-      style: {
-        background: "white",
-        borderRadius: 16,
-        overflow: "hidden",
-        border: "1.5px solid #cbd5e1",
-        marginBottom: 12
-      }
-    }, /*#__PURE__*/React.createElement("div", {
-      style: {
-        background: "#1e3a5f",
-        padding: "5px 14px"
-      }
-    }, /*#__PURE__*/React.createElement("span", {
-      style: {
-        fontSize: 12,
-        fontWeight: 800,
-        color: "#f0f9ff"
-      }
-    }, "\uD83D\uDD04 \uD658\uC790 \uC0C1\uD0DC \uBCC0\uACBD (\uBCF5\uC218 \uC120\uD0DD \uAC00\uB2A5)")), /*#__PURE__*/React.createElement("div", {
-      style: {
-        padding: "10px 14px"
-      }
-    }, /*#__PURE__*/React.createElement("div", {
-      style: {
-        display: "flex",
-        flexWrap: "wrap",
-        gap: 8,
-        marginBottom: 10
-      }
-    }, [{
-      v: "stable",
-      l: "✅ 안정",
-      bg: "#f0fdf4",
-      c: "#166534"
-    }, {
-      v: "warning",
-      l: "⚠️ 이상 징후",
-      bg: "#fffbeb",
-      c: "#713f12"
-    }, {
-      v: "treating",
-      l: "🔴 치료 중",
-      bg: "#fef2f2",
-      c: "#7f1d1d"
-    }, {
-      v: "recovering",
-      l: "🔵 회복 중",
-      bg: "#eff6ff",
-      c: "#1e40af"
-    }].map(function (s) {
-      var sel = scenarioTypes.includes(s.v);
-      return /*#__PURE__*/React.createElement("button", {
-        key: s.v,
-        onClick: function onClick() {
-          return setScenarioTypes(sel ? scenarioTypes.filter(function (x) {
-            return x !== s.v;
-          }) : [].concat(_toConsumableArray(scenarioTypes), [s.v]));
-        },
-        style: {
-          padding: "8px 14px",
-          borderRadius: 10,
-          border: "none",
-          cursor: "pointer",
-          fontSize: 12,
-          fontWeight: 700,
-          background: sel ? s.c : s.bg,
-          color: sel ? "white" : s.c
-        }
-      }, sel ? "✓ " : "", s.l);
-    })), scenarioTypes.includes("warning") && /*#__PURE__*/React.createElement("div", {
-      style: {
-        background: "#fffbeb",
-        borderRadius: 10,
-        padding: "10px 12px",
-        border: "1px solid #fcd34d",
-        marginBottom: 8
-      }
-    }, /*#__PURE__*/React.createElement("div", {
-      style: {
-        fontSize: 11,
-        color: "#713f12",
-        fontWeight: 700,
-        marginBottom: 8
-      }
-    }, "\u26A0\uFE0F \uC774\uC0C1 \uC9D5\uD6C4 \uC885\uB958 (\uBCF5\uC218 \uC120\uD0DD)"), /*#__PURE__*/React.createElement("div", {
-      style: {
-        display: "flex",
-        flexWrap: "wrap",
-        gap: 6
-      }
-    }, ["발열", "호흡 이상", "혈압 이상", "식욕 저하", "의식저하", "섬망", "산소포화도 저하", "낙상", "통증 호소", "부종", "기타"].map(function (v) {
-      var sel = warningSubs.includes(v);
-      return /*#__PURE__*/React.createElement("button", {
-        key: v,
-        onClick: function onClick() {
-          return setWarningSubs(sel ? warningSubs.filter(function (x) {
-            return x !== v;
-          }) : [].concat(_toConsumableArray(warningSubs), [v]));
-        },
-        style: {
-          padding: "5px 10px",
-          borderRadius: 8,
-          border: "none",
-          cursor: "pointer",
-          fontSize: 11,
-          fontWeight: 700,
-          background: sel ? "#713f12" : "white",
-          color: sel ? "white" : "#713f12"
-        }
-      }, sel ? "✓ " : "", v);
-    })), warningSubs.length > 0 && /*#__PURE__*/React.createElement("div", {
-      style: {
-        marginTop: 8,
-        fontSize: 11,
-        color: "#713f12",
-        fontWeight: 600
-      }
-    }, "\uC120\uD0DD\uB428: ", warningSubs.join(", "))), scenarioTypes.includes("treating") && /*#__PURE__*/React.createElement("div", {
-      style: {
-        background: "#fef2f2",
-        borderRadius: 10,
-        padding: "10px 12px",
-        border: "1px solid #fca5a5"
-      }
-    }, /*#__PURE__*/React.createElement("div", {
-      style: {
-        fontSize: 11,
-        color: "#7f1d1d",
-        fontWeight: 700,
-        marginBottom: 8
-      }
-    }, "\uD83D\uDD34 \uCE58\uB8CC \uC885\uB958 (\uBCF5\uC218 \uC120\uD0DD)"), /*#__PURE__*/React.createElement("div", {
-      style: {
-        display: "flex",
-        flexWrap: "wrap",
-        gap: 6
-      }
-    }, ["폐렴", "요로감염", "패혈증", "욕창 처치", "골절", "탈수", "심부전", "뇌졸중", "섬망", "불면증", "불안증", "우울", "기타"].map(function (v) {
-      var sel = treatingSubs.includes(v);
-      return /*#__PURE__*/React.createElement("button", {
-        key: v,
-        onClick: function onClick() {
-          return setTreatingSubs(sel ? treatingSubs.filter(function (x) {
-            return x !== v;
-          }) : [].concat(_toConsumableArray(treatingSubs), [v]));
-        },
-        style: {
-          padding: "5px 10px",
-          borderRadius: 8,
-          border: "none",
-          cursor: "pointer",
-          fontSize: 11,
-          fontWeight: 700,
-          background: sel ? "#7f1d1d" : "white",
-          color: sel ? "white" : "#7f1d1d"
-        }
-      }, sel ? "✓ " : "", v);
-    })), treatingSubs.length > 0 && /*#__PURE__*/React.createElement("div", {
-      style: {
-        marginTop: 8,
-        fontSize: 11,
-        color: "#7f1d1d",
-        fontWeight: 600
-      }
-    }, "\uC120\uD0DD\uB428: ", treatingSubs.join(", "))))), /*#__PURE__*/React.createElement("div", {
+    }, r.note)),
+    /*#__PURE__*/React.createElement("div", {
+      style: { background: "white", borderRadius: 16, overflow: "hidden", border: "1.5px solid #cbd5e1", marginBottom: 12 }
+    },
+      /*#__PURE__*/React.createElement("div", { style: { background: "#1e3a5f", padding: "10px 14px" } },
+        /*#__PURE__*/React.createElement("span", { style: { fontSize: 12, fontWeight: 800, color: "#f0f9ff" } }, "\uD83E\uDE7A \uC784\uC0C1 \uC18C\uACAC (\uBCF5\uC218 \uC120\uD0DD)")
+      ),
+      /*#__PURE__*/React.createElement("div", { style: { padding: "12px 14px" } },
+        /*#__PURE__*/React.createElement("div", { style: { fontSize: 11, color: "#64748b", fontWeight: 700, marginBottom: 8 } }, "[ \uAC10\uC5FC / \uD638\uD761\uAE30 ]"),
+        /*#__PURE__*/React.createElement("div", { style: { display: "flex", flexWrap: "wrap", gap: 6, marginBottom: 12 } },
+          ["\uD3D0\uB834 \uC18C\uACAC", "\uD328\uD601\uC99D \uC758\uC2EC", "\uC694\uB85C\uAC10\uC5FC", "\uD3D0\uBD80\uC885", "\uACE0\uC5F4 \uC9C0\uC18D", "\uAE30\uCE68\xB7\uAC00\uB798 \uC9C0\uC18D", "\uC0B0\uC18C\uD3EC\uD654\uB3C4 \uC800\uD558"].map(function(v) {
+            var sel = clinicals.includes(v);
+            return /*#__PURE__*/React.createElement("button", { key: v, onClick: function() { setClinicals(sel ? clinicals.filter(function(x){return x!==v;}) : clinicals.concat(v)); }, style: { padding: "6px 12px", borderRadius: 20, border: "none", cursor: "pointer", fontSize: 12, fontWeight: 700, background: sel ? "#7f1d1d" : "#fef2f2", color: sel ? "white" : "#7f1d1d" } }, sel ? "\u2713 " : "", v);
+          })
+        ),
+        /*#__PURE__*/React.createElement("div", { style: { fontSize: 11, color: "#64748b", fontWeight: 700, marginBottom: 8 } }, "[ \uC21C\uD658 / \uC758\uC2DD ]"),
+        /*#__PURE__*/React.createElement("div", { style: { display: "flex", flexWrap: "wrap", gap: 6, marginBottom: 12 } },
+          ["Vital sign \uBD88\uC548\uC815", "\uD608\uC555 \uC774\uC0C1", "\uC758\uC2DD \uC800\uD558", "\uBD80\uC885 \uC18C\uACAC"].map(function(v) {
+            var sel = clinicals.includes(v);
+            return /*#__PURE__*/React.createElement("button", { key: v, onClick: function() { setClinicals(sel ? clinicals.filter(function(x){return x!==v;}) : clinicals.concat(v)); }, style: { padding: "6px 12px", borderRadius: 20, border: "none", cursor: "pointer", fontSize: 12, fontWeight: 700, background: sel ? "#7f1d1d" : "#fef2f2", color: sel ? "white" : "#7f1d1d" } }, sel ? "\u2713 " : "", v);
+          })
+        ),
+        /*#__PURE__*/React.createElement("div", { style: { fontSize: 11, color: "#64748b", fontWeight: 700, marginBottom: 8 } }, "[ \uC778\uC9C0 / \uD589\uB3D9 ]"),
+        /*#__PURE__*/React.createElement("div", { style: { display: "flex", flexWrap: "wrap", gap: 6, marginBottom: 12 } },
+          ["\uC774\uC0C1\uD589\uB3D9 \u2014 \uC57D\uBB3C\uCE58\uB8CC \uC911", "\uC12F\uB9DD \uC18C\uACAC", "\uC778\uC9C0\uC800\uD558 \uC9C4\uD589"].map(function(v) {
+            var sel = clinicals.includes(v);
+            return /*#__PURE__*/React.createElement("button", { key: v, onClick: function() { setClinicals(sel ? clinicals.filter(function(x){return x!==v;}) : clinicals.concat(v)); }, style: { padding: "6px 12px", borderRadius: 20, border: "none", cursor: "pointer", fontSize: 12, fontWeight: 700, background: sel ? "#7f1d1d" : "#fef2f2", color: sel ? "white" : "#7f1d1d" } }, sel ? "\u2713 " : "", v);
+          })
+        ),
+        /*#__PURE__*/React.createElement("div", { style: { fontSize: 11, color: "#64748b", fontWeight: 700, marginBottom: 8 } }, "[ \uAC80\uC0AC / \uCC98\uCE58 ]"),
+        /*#__PURE__*/React.createElement("div", { style: { display: "flex", flexWrap: "wrap", gap: 6 } },
+          ["Lab \uC774\uC0C1\uC18C\uACAC \uCC98\uCE58 \uC911", "\uAC80\uC0AC\uACB0\uACFC \uC124\uBA85 \uC2DC\uD589", "\uC54C\uBD80\uBBFC \uD22C\uC5EC", "\uC218\uD601 \uC2DC\uD589", "\uC218\uD601 \uAD8C\uC720 \uC911", "L-Tube insertion \uC2DC\uD589", "\uC601\uC591\uC81C \uD22C\uC5EC \uC911", "\uC5D1\uC2A4\uB808\uC774 \uC2DC\uD589", "\uD608\uC561\uAC80\uC0AC \uC2DC\uD589"].map(function(v) {
+            var sel = clinicals.includes(v);
+            return /*#__PURE__*/React.createElement("button", { key: v, onClick: function() { setClinicals(sel ? clinicals.filter(function(x){return x!==v;}) : clinicals.concat(v)); }, style: { padding: "6px 12px", borderRadius: 20, border: "none", cursor: "pointer", fontSize: 12, fontWeight: 700, background: sel ? "#7f1d1d" : "#fef2f2", color: sel ? "white" : "#7f1d1d" } }, sel ? "\u2713 " : "", v);
+          })
+        )
+      )
+    ),
+    /*#__PURE__*/React.createElement("div", {
+      style: { background: "white", borderRadius: 16, overflow: "hidden", border: "1.5px solid #cbd5e1", marginBottom: 12 }
+    },
+      /*#__PURE__*/React.createElement("div", { style: { background: "#0d5c56", padding: "10px 14px" } },
+        /*#__PURE__*/React.createElement("span", { style: { fontSize: 12, fontWeight: 800, color: "#f0f9ff" } }, "\uD83D\uDC8A \uD604\uC7AC \uCE58\uB8CC \uBC0F \uB300\uC751 (\uBCF5\uC218 \uC120\uD0DD)")
+      ),
+      /*#__PURE__*/React.createElement("div", { style: { padding: "12px 14px" } },
+        /*#__PURE__*/React.createElement("div", { style: { display: "flex", flexWrap: "wrap", gap: 6 } },
+          ["\uD56D\uC0DD\uC81C \uCE58\uB8CC \uC911", "\uD56D\uBC14\uC774\uB7EC\uC2A4\uC81C \uD22C\uC5EC \uC911", "\uD574\uC5F4\uC81C \uCC98\uCE58 \uC911", "\uC0B0\uC18C \uACF5\uAE09 \uC911", "\uC218\uC561 \uCE58\uB8CC \uC911", "\uD608\uC555\uC57D \uC870\uC808 \uC911", "\uC778\uC288\uB9B0 \uC870\uC808 \uC911", "\uC9C4\uD1B5\uC81C \uD22C\uC5EC \uC911", "\uD56D\uC815\uC2E0\uBCD1\uC57D \uD22C\uC5EC \uC911", "\uD56D\uBD88\uC548\uC81C \uD22C\uC5EC \uC911", "\uC2DD\uC774 \uAC70\uBD80 \u2014 \uC601\uC591\uC81C \uB300\uCCB4", "\uD22C\uC57D \uAC70\uBD80 \u2014 \uC124\uB4DD \uC911", "\uC695\uCC3D \uCC98\uCE58 \uC911", "\uB3C4\uB1B0\uAD00 \uAD00\uB9AC \uC911", "\uBCF4\uD638\uC790 \uC0C1\uB2F4 \uC2DC\uD589"].map(function(v) {
+            var sel = treatments.includes(v);
+            return /*#__PURE__*/React.createElement("button", { key: v, onClick: function() { setTreatments(sel ? treatments.filter(function(x){return x!==v;}) : treatments.concat(v)); }, style: { padding: "6px 12px", borderRadius: 20, border: "none", cursor: "pointer", fontSize: 12, fontWeight: 700, background: sel ? "#0d5c56" : "#f0fdf4", color: sel ? "white" : "#0d5c56" } }, sel ? "\u2713 " : "", v);
+          })
+        )
+      )
+    ),
+    /*#__PURE__*/React.createElement("div", {
+      style: { background: "white", borderRadius: 16, overflow: "hidden", border: "1.5px solid #cbd5e1", marginBottom: 12 }
+    },
+      /*#__PURE__*/React.createElement("div", { style: { background: "#713f12", padding: "10px 14px" } },
+        /*#__PURE__*/React.createElement("span", { style: { fontSize: 12, fontWeight: 800, color: "#fff" } }, "\uD83D\uDC40 \uB2E4\uC74C \uAD00\uCC30 \uD3EC\uC778\uD2B8 (\uBCF5\uC218 \uC120\uD0DD)")
+      ),
+      /*#__PURE__*/React.createElement("div", { style: { padding: "12px 14px" } },
+        /*#__PURE__*/React.createElement("div", { style: { display: "flex", flexWrap: "wrap", gap: 6 } },
+          ["\uBC1C\uC5F4 \uACBD\uACFC \uAD00\uCC30", "\uC0B0\uC18C\uD3EC\uD654\uB3C4 \uBAA8\uB2C8\uD130\uB9C1", "\uD608\uC555 \uBCC0\uB3D9 \uAD00\uCC30", "\uC2DD\uC0AC\uB7C9 \uBCC0\uD654 \uAD00\uCC30", "\uC758\uC2DD \uBCC0\uD654 \uAD00\uCC30", "\uC774\uC0C1\uD589\uB3D9 \uBCC0\uD654 \uAD00\uCC30", "\uBC30\uBCC0 \uC0C1\uD0DC \uAD00\uCC30", "\uBD80\uC885 \uBCC0\uD654 \uAD00\uCC30", "\uD22C\uC57D \uBC18\uC751 \uAD00\uCC30", "Lab \uACB0\uACFC \uD655\uC778 \uC608\uC815"].map(function(v) {
+            var sel = nextWatch.includes(v);
+            return /*#__PURE__*/React.createElement("button", { key: v, onClick: function() { setNextWatch(sel ? nextWatch.filter(function(x){return x!==v;}) : nextWatch.concat(v)); }, style: { padding: "6px 12px", borderRadius: 20, border: "none", cursor: "pointer", fontSize: 12, fontWeight: 700, background: sel ? "#713f12" : "#fffbeb", color: sel ? "white" : "#713f12" } }, sel ? "\u2713 " : "", v);
+          })
+        )
+      )
+    ),
+    /*#__PURE__*/React.createElement("div", {
       style: {
         background: "white",
         borderRadius: 16,
