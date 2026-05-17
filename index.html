@@ -2744,6 +2744,15 @@ function GuardianScreen(_ref19) {
       /*#__PURE__*/React.createElement("div", { style: { fontSize: 44, marginBottom: 12 } }, "\u23F3"),
       /*#__PURE__*/React.createElement("div", { style: { fontSize: 15, fontWeight: 600 } }, "아직 오늘 상태가 입력되지 않았어요")
     ),
+    tab === "today" && /*#__PURE__*/React.createElement("div", {
+      style: { margin: "16px 0 8px", background: "rgba(255,255,255,0.1)", borderRadius: 16, padding: "16px 18px", border: "1px solid rgba(255,255,255,0.18)" }
+    },
+      /*#__PURE__*/React.createElement("div", { style: { fontSize: 13, color: "rgba(255,255,255,0.88)", lineHeight: 2, fontWeight: 500, textAlign: "center" } },
+        "어르신에 대하여 면밀하게 지속적으로 관찰 및 케어 중입니다.",
+        /*#__PURE__*/React.createElement("br", null),
+        "위급상황이나 급격한 변동상황이 발생할 시 직접 연락드리겠습니다."
+      )
+    ),
     tab === "message" && /*#__PURE__*/React.createElement("div", { style: { background: "white", borderRadius: 16, padding: 20, border: "1px solid #e8ecf0", boxShadow: "0 2px 8px rgba(0,0,0,0.06)" } },
       /*#__PURE__*/React.createElement("div", { style: { fontSize: 15, fontWeight: 800, color: "#1a3358", marginBottom: 14 } }, getTitle(patient), " 한마디"),
       sent ? /*#__PURE__*/React.createElement("div", { style: { background: "#f0fdf4", borderRadius: 12, padding: 20, textAlign: "center", color: "#15803d", fontWeight: 700, fontSize: 15 } }, "\u2705 메시지가 전달됐어요") :
