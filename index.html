@@ -2880,16 +2880,20 @@ function NurseScreen(_ref22) {
     screen = _useState30[0],
     setScreen = _useState30[1];
 
+  var nurseStackRef = React.useRef([]);
+
   var goScreen = function(s) {
-    window.history.pushState({ nurseScreen: s }, "");
+    nurseStackRef.current.push(screen);
     setScreen(s);
   };
 
   useEffect(function() {
     var handler = function(e) {
-      if (e.state && e.state.nurseScreen) {
-        setScreen(e.state.nurseScreen);
-        if (e.state.nurseScreen === "list") { setSelected(null); }
+      window.history.pushState(null, "");
+      if (nurseStackRef.current.length > 0) {
+        var prev = nurseStackRef.current.pop();
+        setScreen(prev);
+        if (prev === "list") setSelected(null);
       }
     };
     window.addEventListener("popstate", handler);
@@ -6252,26 +6256,29 @@ function App() {
     return function() { clearTimeout(t1); clearTimeout(t2); };
   }, []);
 
-  // 뒤로가기 처리
-  React.useEffect(function() {
-    window.history.replaceState({ screen: "roleSelect" }, "");
-    var handler = function(e) {
-      var prev = (e.state && e.state.screen) ? e.state.screen : "roleSelect";
-      setAppScreen(prev);
-      if (e.state && e.state.loginType) setLoginType(e.state.loginType);
-      // 로그아웃은 하지 않음 - 로그인 상태 유지
-    };
-    window.addEventListener("popstate", handler);
-    return function() { window.removeEventListener("popstate", handler); };
-  }, []);
+  // 뒤로가기 처리 - history 대신 내부 스택으로 관리
+  var screenStackRef = React.useRef([]);
 
   var navigateTo = function(screen, extra) {
-    var state = { screen: screen };
-    if (extra) state = _objectSpread(state, extra);
-    window.history.pushState(state, "");
+    screenStackRef.current.push(appScreen);
     setAppScreen(screen);
     if (extra && extra.loginType) setLoginType(extra.loginType);
   };
+
+  React.useEffect(function() {
+    var handler = function(e) {
+      // 더미 히스토리 다시 push해서 계속 뒤로가기 가능하게
+      window.history.pushState(null, "");
+      if (screenStackRef.current.length > 0) {
+        var prev = screenStackRef.current.pop();
+        setAppScreen(prev);
+      }
+    };
+    window.addEventListener("popstate", handler);
+    // 더미 히스토리를 계속 유지해서 popstate가 항상 발생하도록
+    window.history.pushState(null, "");
+    return function() { window.removeEventListener("popstate", handler); };
+  }, []);
   // 로딩 안전장치: 8초 후에도 loading이면 강제 해제
   useEffect(function() {
     var t = setTimeout(function() { setLoading(false); }, 8000);
