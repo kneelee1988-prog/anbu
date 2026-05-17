@@ -444,6 +444,7 @@ var PATIENTS = [{
 var initForm = function initForm() {
   return {
     consciousness: "",
+    consciousness_comm: "",
     vitals: [],
     meal_amount: "",
     meal_type: "",
@@ -3568,6 +3569,14 @@ function NurseScreen(_ref22) {
       color: v === "명료" ? "#166534" : v === "졸림" ? "#713f12" : "#7f1d1d",
       small: true
     });
+  })), /*#__PURE__*/React.createElement(Lbl, { text: "의사소통" }), /*#__PURE__*/React.createElement(BtnRow, null, ["의사소통 가능", "의사소통 어려움", "의사소통 불가"].map(function(v) {
+    return /*#__PURE__*/React.createElement(Btn, {
+      key: v, label: v,
+      active: form.consciousness_comm === v,
+      onClick: function onClick() { return set("consciousness_comm", v); },
+      color: v === "의사소통 가능" ? "#166534" : v === "의사소통 어려움" ? "#713f12" : "#7f1d1d",
+      small: true
+    });
   }))), /*#__PURE__*/React.createElement(Sec, {
     title: "\uD83D\uDC93 \uC0DD\uCCB4\uD65C\uB825\uC9D5\uD6C4"
   }, /*#__PURE__*/React.createElement(BtnRow, null, [
@@ -3581,7 +3590,13 @@ function NurseScreen(_ref22) {
     "\uD608\uC555 \uC800\uD558",
     "\uC0B0\uC18C \uD3EC\uD654\uB3C4 \uC800\uD558",
     "\uB9E5\uBC15\uC218 \uC774\uC0C1",
-    "\uD638\uD761\uACE4\uB780 \uC9D5\uD6C4"
+    "\uD638\uD761\uACE4\uB780 \uC9D5\uD6C4",
+    "부종 (다리/발목/전신)",
+    "기침 잦음",
+    "가래 많음",
+    "구토",
+    "오심 (구역감)",
+    "체중 감소"
   ].map(function(v) {
     return /*#__PURE__*/React.createElement(Btn, {
       key: v,
@@ -3801,7 +3816,7 @@ function NurseScreen(_ref22) {
     "짜증", "신경질적인 반응", "타 환자에게 시비 검",
     "고집스러움", "반복적 행동", "변덕이 심함",
     "강박증", "건강 염려증", "조급증",
-    "산만함", "표정이 밝아짐", "기분이 들뜸"
+    "산만함", "표정이 밝아짐", "기분이 들뜸", "면회 후 상태 변화 악화"
   ].map(function(v) {
     return /*#__PURE__*/React.createElement(Btn, {
       key: v, label: v,
@@ -3977,7 +3992,7 @@ function NurseScreen(_ref22) {
     title: "\uD83D\uDEC1 \uC77C\uC0C1 \uCF00\uC5B4 (\uBCF5\uC218 \uC120\uD0DD)"
   }, /*#__PURE__*/React.createElement(BtnRow, null, [
     "구강청결 유지(드라이문트겔과 스프레이 사용)",
-    "양치를 스스로 가능",
+    "양치 스스로 함",
     "양치 보조",
     "손톱 발톱 관리함",
     "목욕",
@@ -3991,7 +4006,9 @@ function NurseScreen(_ref22) {
     "머리감기",
     "점안액 투여",
     "인공 눈물 투여",
-    "식이 보조 함"
+    "식이 보조 함",
+    "침대 난간 올림",
+    "흡인 예방 체위 유지"
   ].map(function(v) {
     return /*#__PURE__*/React.createElement(Btn, {
       key: v,
@@ -6432,6 +6449,7 @@ function App() {
                         record: {
                           recordId: r.id,
                           consciousness: r.consciousness,
+                          consciousness_comm: r.consciousness_comm || "",
                           vitals: r.vitals || [],
                           meal_amount: r.meal_amount,
                           meal_type: r.meal_type,
@@ -6570,6 +6588,7 @@ function App() {
             dbData = {
               patient_id: patientId,
               consciousness: record.consciousness,
+              consciousness_comm: record.consciousness_comm || "",
               vitals: record.vitals || [],
               meal_amount: record.meal_amount,
               meal_type: record.meal_type,
