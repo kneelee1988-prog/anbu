@@ -3811,6 +3811,16 @@ function NurseScreen(_ref22) {
       small: true
     });
   }))), /*#__PURE__*/React.createElement(Sec, {
+    title: "🧩 정신 및 이상행동 양상 (복수 선택)"
+  }, /*#__PURE__*/React.createElement(BtnRow, null, ["이상 없음", "섬망", "환청", "환시", "혼잣말", "야간 혼돈", "망상", "배회", "공격성", "케어 저항", "충동적행동", "인지저하", "반복적 소리지름"].map(function (v) {
+    return /*#__PURE__*/React.createElement(Btn, {
+      key: v, label: v,
+      active: form.mental.includes(v),
+      onClick: function onClick() { return toggle("mental", v); },
+      color: v === "이상 없음" ? "#166534" : "#7f1d1d",
+      small: true
+    });
+  }))), /*#__PURE__*/React.createElement(Sec, {
     title: "\uD83D\uDC8A \uD22C\uC57D \uC0C1\uD0DC"
   }, /*#__PURE__*/React.createElement(BtnRow, null, ["정상 투약", "투약 거부", "투약 일시중단", "약물 토함"].map(function (v) {
     return /*#__PURE__*/React.createElement(Btn, {
@@ -3899,19 +3909,6 @@ function NurseScreen(_ref22) {
         opacity: form.painad === n ? 0.9 : 0.7
       }
     }, desc));
-  }))), /*#__PURE__*/React.createElement(Sec, {
-    title: "\uD83E\uDDE9 \uC815\uC2E0 \uBC0F \uC774\uC0C1\uD589\uB3D9 \uC0C1\uD0DC (\uBCF5\uC218 \uC120\uD0DD)"
-  }, /*#__PURE__*/React.createElement(BtnRow, null, ["이상 없음", "섬망", "환청", "환시", "혼잣말", "야간 혼돈", "망상", "배회", "공격성", "케어 저항", "충동적행동", "인지저하", "반복적 소리지름"].map(function (v) {
-    return /*#__PURE__*/React.createElement(Btn, {
-      key: v,
-      label: v,
-      active: form.mental.includes(v),
-      onClick: function onClick() {
-        return toggle("mental", v);
-      },
-      color: v === "이상 없음" ? "#166534" : "#7f1d1d",
-      small: true
-    });
   }))), /*#__PURE__*/React.createElement(Sec, {
     title: "\uD83E\uDDF4 \uD53C\uBD80 \xB7 \uC704\uC0DD \xB7 \uC695\uCC3D"
   }, /*#__PURE__*/React.createElement(Lbl, {
