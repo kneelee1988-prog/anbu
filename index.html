@@ -2745,9 +2745,9 @@ function GuardianScreen(_ref19) {
       /*#__PURE__*/React.createElement("div", { style: { fontSize: 15, fontWeight: 600 } }, "아직 오늘 상태가 입력되지 않았어요")
     ),
     tab === "today" && /*#__PURE__*/React.createElement("div", {
-      style: { margin: "16px 0 8px", background: "rgba(255,255,255,0.1)", borderRadius: 16, padding: "16px 18px", border: "1px solid rgba(255,255,255,0.18)" }
+      style: { margin: "16px 0 8px", background: "linear-gradient(135deg,#1a3358,#2a5298)", borderRadius: 16, padding: "16px 18px", boxShadow: "0 4px 12px rgba(26,51,88,0.15)" }
     },
-      /*#__PURE__*/React.createElement("div", { style: { fontSize: 13, color: "rgba(255,255,255,0.88)", lineHeight: 2, fontWeight: 500, textAlign: "center" } },
+      /*#__PURE__*/React.createElement("div", { style: { fontSize: 13, color: "white", lineHeight: 2, fontWeight: 500, textAlign: "center" } },
         "어르신에 대하여 면밀하게 지속적으로 관찰 및 케어 중입니다.",
         /*#__PURE__*/React.createElement("br", null),
         "위급상황이나 급격한 변동상황이 발생할 시 직접 연락드리겠습니다."
@@ -3292,17 +3292,7 @@ function NurseScreen(_ref22) {
     }), /*#__PURE__*/React.createElement(Row, {
       label: "\uD55C\uBC29 \uCE58\uB8CC",
       value: r && r.oriental === true ? "시행" : r && r.oriental === false ? "미시행" : "—"
-    }), r && r.note && /*#__PURE__*/React.createElement("div", {
-      style: {
-        marginTop: 6,
-        padding: "8px 10px",
-        background: "#f8fafc",
-        borderRadius: 10,
-        fontSize: 12,
-        color: "#444",
-        lineHeight: 1.6
-      }
-    }, "\uD83D\uDCDD ", r.note))), r && r.doctorComment && /*#__PURE__*/React.createElement("div", {
+    }), )), r && r.doctorComment && /*#__PURE__*/React.createElement("div", {
       style: {
         background: "linear-gradient(135deg,#eff6ff,#dbeafe)",
         borderRadius: 14,
