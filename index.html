@@ -5377,9 +5377,63 @@ function DoctorScreen(_ref32) {
     }, getWard(selected.room), " \xB7 \uC785\uC6D0 ", selected.days, "\uC77C\uC9F8")))), /*#__PURE__*/React.createElement("div", {
       style: {
         padding: "12px 20px 0",
-        
       }
-    }, r ? /*#__PURE__*/React.createElement("div", {
+    },
+    r && (function() {
+      var alerts = [];
+      // 생체활력 이상
+      var vitalAlerts = (r.vitals || []).filter(function(v) { return v !== "생체 활력 징후(혈압,맥박수,호흡수,체온) 안정"; });
+      if (vitalAlerts.length > 0) alerts.push({ label: "생체활력 이상", items: vitalAlerts, color: "#7f1d1d", bg: "#fef2f2" });
+      // 의식/소통
+      var consciousness = [];
+      if (r.consciousness && r.consciousness !== "명료") consciousness.push(r.consciousness);
+      if (r.consciousness_comm && r.consciousness_comm !== "의사소통 가능") consciousness.push(r.consciousness_comm);
+      if (consciousness.length > 0) alerts.push({ label: "의식/소통", items: consciousness, color: "#7f1d1d", bg: "#fef2f2" });
+      // 식사 문제
+      if (r.meal_amount === "거의 안 드심" || r.meal_amount === "안 드심") alerts.push({ label: "식사", items: [r.meal_amount].concat(r.meal_issues || []), color: "#713f12", bg: "#fffbeb" });
+      else if ((r.meal_issues || []).length > 0) alerts.push({ label: "식사 문제", items: r.meal_issues, color: "#713f12", bg: "#fffbeb" });
+      // 배변 이상
+      var excretion = [];
+      if (r.urine && r.urine !== "정상") excretion.push("소변 " + r.urine);
+      if (r.bowel && r.bowel !== "정상") excretion.push("대변 " + r.bowel);
+      if ((r.excretion_issues || []).length > 0) excretion = excretion.concat(r.excretion_issues.filter(function(v){ return v !== "해당 사항 없음"; }));
+      if (excretion.length > 0) alerts.push({ label: "배변 이상", items: excretion, color: "#713f12", bg: "#fffbeb" });
+      // 정신/이상행동
+      var mentalAlerts = (r.mental || []).filter(function(v) { return v !== "이상 없음"; });
+      if (mentalAlerts.length > 0) alerts.push({ label: "정신·이상행동", items: mentalAlerts, color: "#7f1d1d", bg: "#fef2f2" });
+      // 통증
+      if (r.painad >= 4) alerts.push({ label: "통증", items: [r.painad + "점 — 중등도 이상"], color: "#7f1d1d", bg: "#fef2f2" });
+      // 투약 문제
+      if (r.medication && r.medication !== "정상 투약") alerts.push({ label: "투약", items: [r.medication], color: "#7f1d1d", bg: "#fef2f2" });
+      // 욕창
+      if (r.bedsore && r.bedsore !== "없음") alerts.push({ label: "욕창", items: [r.bedsore], color: "#7f1d1d", bg: "#fef2f2" });
+      // 기분 이상
+      var moodAlerts = (r.moods || []).filter(function(v) { return !["안정","표정이 밝아짐","기분이 들뜸"].includes(v); });
+      if (moodAlerts.length > 0) alerts.push({ label: "기분·행동", items: moodAlerts, color: "#713f12", bg: "#fffbeb" });
+      // 특이사항
+      if (r.note) alerts.push({ label: "간호사 특이사항", items: [r.note], color: "#0d5c56", bg: "#f0fdf4" });
+
+      if (alerts.length === 0) return /*#__PURE__*/React.createElement("div", {
+        style: { background: "#f0fdf4", borderRadius: 14, padding: "12px 16px", marginBottom: 12, border: "1px solid #86efac" }
+      }, /*#__PURE__*/React.createElement("span", { style: { fontSize: 13, color: "#166534", fontWeight: 700 } }, "✅ 간호사 체크 — 특이 이상 소견 없음"));
+
+      return /*#__PURE__*/React.createElement("div", {
+        style: { background: "white", borderRadius: 16, overflow: "hidden", border: "1.5px solid #fca5a5", marginBottom: 12 }
+      },
+        /*#__PURE__*/React.createElement("div", { style: { background: "linear-gradient(135deg,#7f1d1d,#b91c1c)", padding: "10px 14px", display: "flex", alignItems: "center", gap: 8 } },
+          /*#__PURE__*/React.createElement("span", { style: { fontSize: 12, fontWeight: 800, color: "white" } }, "⚠️ 간호사 주요 체크 — 임상 검토 필요")
+        ),
+        /*#__PURE__*/React.createElement("div", { style: { padding: "12px 14px", display: "flex", flexDirection: "column", gap: 8 } },
+          alerts.map(function(a, i) {
+            return /*#__PURE__*/React.createElement("div", { key: i, style: { display: "flex", alignItems: "flex-start", gap: 8 } },
+              /*#__PURE__*/React.createElement("span", { style: { fontSize: 11, fontWeight: 800, color: a.color, background: a.bg, padding: "2px 8px", borderRadius: 20, flexShrink: 0, marginTop: 1 } }, a.label),
+              /*#__PURE__*/React.createElement("span", { style: { fontSize: 12, color: "#334155", lineHeight: 1.6, fontWeight: 500 } }, a.items.join(" · "))
+            );
+          })
+        )
+      );
+    })(),
+    r ? /*#__PURE__*/React.createElement("div", {
       style: {
         background: "white",
         borderRadius: 16,
