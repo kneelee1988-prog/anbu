@@ -6605,7 +6605,7 @@ function App() {
           case 0:
             _context8.p = 0;
             _context8.n = 1;
-            return fetch("".concat(SUPABASE_URL, "/rest/v1/patients?select=*&discharged=eq.false"), {
+            return fetch("".concat(SUPABASE_URL, "/rest/v1/patients?select=*&discharged=neq.true"), {
               headers: {
                 apikey: SUPABASE_KEY,
                 Authorization: "Bearer " + SUPABASE_KEY
