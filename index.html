@@ -935,6 +935,7 @@ var SLIDES = [{
 function OnboardingScreen(_ref0) {
   var onDone = _ref0.onDone,
     alreadySeen = _ref0.alreadySeen;
+  useEffect(function() { if (alreadySeen) onDone(); }, []);
   var _useState = useState(0),
     _useState2 = _slicedToArray(_useState, 2),
     idx = _useState2[0],
@@ -6613,7 +6614,7 @@ function App() {
     setIntroFading = _useState_fadea[1];
   useEffect(function() {
     var t1 = setTimeout(function() { setIntroFading(true); }, 2000);
-    var t2 = setTimeout(function() { setShowIntro(false); setOnboarded(false); }, 3500);
+    var t2 = setTimeout(function() { setShowIntro(false); }, 3500);
     return function() { clearTimeout(t1); clearTimeout(t2); };
   }, []);
 
