@@ -1779,7 +1779,10 @@ function AdminScreen(_ref11) {
   var loadRequests = function() {
     fetch(SUPABASE_URL+"/rest/v1/guardian_requests?status=eq.pending&order=created_at.desc", {
       headers:{apikey:SUPABASE_KEY, Authorization:"Bearer "+SUPABASE_KEY}
-    }).then(function(r){return r.json();}).then(function(data){if(Array.isArray(data))setRequests(data);}).catch(function(){});
+    }).then(function(r){return r.json();}).then(function(data){
+      console.log("guardian_requests 결과:", JSON.stringify(data));
+      if(Array.isArray(data))setRequests(data);
+    }).catch(function(e){ console.error("guardian_requests 에러:", e); });
   };
   var handleApprove = function(req) {
     fetch(SUPABASE_URL+"/rest/v1/guardian_requests?id=eq."+req.id, {
@@ -5097,6 +5100,50 @@ function DoctorScreen(_ref32) {
     var d = new Date();
     return d.getMonth() + 1 + "월 " + d.getDate() + "일";
   };
+  var SOLAPI_KEY = "NCSXBC7WDZJCDYGP";
+  var SOLAPI_SECRET = "L4RTVMR1T8KQYR2MJ1MSEOUFBMWQFZBP";
+  var SOLAPI_FROM = "01053655001";
+
+  var sendSMS = function sendSMS(to, patientName) {
+    if (!to) return;
+    var phone = to.replace(/[^0-9]/g, "");
+    if (phone.length < 10) return;
+    var date = new Date().toISOString();
+    var salt = Math.random().toString(36).substring(2, 12);
+    var sigStr = date + salt;
+    // HMAC-SHA256 signature using SubtleCrypto
+    var enc = new TextEncoder();
+    crypto.subtle.importKey("raw", enc.encode(SOLAPI_SECRET), { name: "HMAC", hash: "SHA-256" }, false, ["sign"])
+      .then(function(key) {
+        return crypto.subtle.sign("HMAC", key, enc.encode(sigStr));
+      })
+      .then(function(sig) {
+        var hashArr = Array.from(new Uint8Array(sig));
+        var signature = hashArr.map(function(b) { return b.toString(16).padStart(2, "0"); }).join("");
+        return fetch("https://api.solapi.com/messages/v4/send", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "Authorization": "HMAC-SHA256 apiKey=" + SOLAPI_KEY + ", date=" + date + ", salt=" + salt + ", signature=" + signature
+          },
+          body: JSON.stringify({
+            message: {
+              to: phone,
+              from: SOLAPI_FROM,
+              text: "[안부] " + patientName + " 어르신의 오늘 상태가 업데이트됐습니다.\n확인해주세요 👉 https://kneelee1988-prog.github.io/anbu"
+            }
+          })
+        });
+      })
+      .then(function(res) { return res.json(); })
+      .then(function(data) {
+        console.log("SMS 발송 결과:", data);
+      })
+      .catch(function(err) {
+        console.error("SMS 발송 실패:", err);
+      });
+  };
+
   var handleSend = function handleSend() {
     var rec = _objectSpread(_objectSpread({}, selected.record || {}), {}, {
       doctorComment: comment,
@@ -5113,6 +5160,11 @@ function DoctorScreen(_ref32) {
       sentToGuardian: true
     });
     onSave(selected.id, rec);
+    // SMS 발송
+    var guardianPhone = selected.guardian_phone || selected.guardianPhone;
+    if (guardianPhone) {
+      sendSMS(guardianPhone, selected.name);
+    }
     setSaved(true);
     setTimeout(function () {
       setSaved(false);
