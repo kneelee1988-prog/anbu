@@ -7133,6 +7133,7 @@ function App() {
     navigateTo("login", { loginType: type });
   };
   var handleLoginSuccess = function handleLoginSuccess(user) {
+    console.log("[DEBUG] handleLoginSuccess called, user=", JSON.stringify(user));
     setCurrentUser(user);
     navigateTo("app");
   };
@@ -7228,6 +7229,7 @@ function App() {
 
   if (appScreen === "app" && currentUser) {
     var role = currentUser.role;
+    console.log("[DEBUG] appScreen=app, role=", role, "currentUser=", JSON.stringify(currentUser));
     if (role === "guardian") {
       var guardianPatient = patients.filter(function (p) {
         return p.id === currentUser.patientId;
@@ -7280,6 +7282,7 @@ function App() {
       onLoadNotices: loadNotices
     });
   }
+  console.log("[DEBUG] return null - appScreen=", appScreen, "currentUser=", currentUser, "loading=", loading, "showIntro=", showIntro, "onboarded=", onboarded);
   return null;
 }
 
