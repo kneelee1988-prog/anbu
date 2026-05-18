@@ -936,6 +936,7 @@ function OnboardingScreen(_ref0) {
   var onDone = _ref0.onDone,
     alreadySeen = _ref0.alreadySeen;
   useEffect(function() { if (alreadySeen) onDone(); }, []);
+  if (alreadySeen) return null;
   var _useState = useState(0),
     _useState2 = _slicedToArray(_useState, 2),
     idx = _useState2[0],
@@ -1820,7 +1821,7 @@ function AdminScreen(_ref11) {
             return res.json();
           case 2:
             data = _context4.v;
-            console.log("[DEBUG] users data:", JSON.stringify(data).slice(0,200)); if (Array.isArray(data)) setUsers(data); else setUsers([]);
+            if (Array.isArray(data)) setUsers(data);
             _context4.n = 4;
             break;
           case 3:
@@ -2234,7 +2235,7 @@ function AdminScreen(_ref11) {
       flexDirection: "column",
       gap: 8
     }
-  }, (Array.isArray(users) ? users : []).map(function (u) {
+  }, users.map(function (u) {
     return /*#__PURE__*/React.createElement("div", {
       key: u.id,
       style: {
@@ -7133,7 +7134,6 @@ function App() {
     navigateTo("login", { loginType: type });
   };
   var handleLoginSuccess = function handleLoginSuccess(user) {
-    console.log("[DEBUG] handleLoginSuccess called, user=", JSON.stringify(user));
     setCurrentUser(user);
     navigateTo("app");
   };
@@ -7229,7 +7229,6 @@ function App() {
 
   if (appScreen === "app" && currentUser) {
     var role = currentUser.role;
-    console.log("[DEBUG] appScreen=app, role=", role, "currentUser=", JSON.stringify(currentUser));
     if (role === "guardian") {
       var guardianPatient = patients.filter(function (p) {
         return p.id === currentUser.patientId;
@@ -7274,24 +7273,14 @@ function App() {
       onBack: handleLogout,
       onMarkRead: markRead
     });
-    if (role === "admin") {
-      try {
-        return /*#__PURE__*/React.createElement(AdminScreen, {
-          patients: patients,
-          onBack: handleBackToRole,
-          onLogout: handleLogout,
-          notices: notices,
-          onLoadNotices: loadNotices
-        });
-      } catch(e) {
-        console.error("[DEBUG] AdminScreen 크래시:", e);
-        return /*#__PURE__*/React.createElement("div", {
-          style: { padding: 40, color: "red", fontSize: 14, fontFamily: "sans-serif" }
-        }, "AdminScreen 오류: " + e.message);
-      }
-    }
+    if (role === "admin") return /*#__PURE__*/React.createElement(AdminScreen, {
+      patients: patients,
+      onBack: handleBackToRole,
+      onLogout: handleLogout,
+      notices: notices,
+      onLoadNotices: loadNotices
+    });
   }
-  console.log("[DEBUG] return null - appScreen=", appScreen, "currentUser=", currentUser, "loading=", loading, "showIntro=", showIntro, "onboarded=", onboarded);
   return null;
 }
 
