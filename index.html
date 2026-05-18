@@ -7144,7 +7144,7 @@ function App() {
   var handleBackToRole = function handleBackToRole() {
     navigateTo("roleSelect");
   };
-  if (showIntro) return /*#__PURE__*/React.createElement("div", {
+  if (showIntro && !currentUser) return /*#__PURE__*/React.createElement("div", {
     style: {
       fontFamily: "'Noto Sans KR',sans-serif",
       background: "white",
@@ -7169,7 +7169,7 @@ function App() {
       style: { width: 240, height: "auto" }
     })
   ));
-  if (!onboarded) return /*#__PURE__*/React.createElement(OnboardingScreen, {
+  if (!onboarded && !currentUser) return /*#__PURE__*/React.createElement(OnboardingScreen, {
     onDone: function onDone() {
       try { localStorage.setItem('anbu_onboarded', '1'); } catch(e) {}
       return setOnboarded(true);
