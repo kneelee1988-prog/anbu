@@ -1780,7 +1780,6 @@ function AdminScreen(_ref11) {
     fetch(SUPABASE_URL+"/rest/v1/guardian_requests?status=eq.pending&order=created_at.desc", {
       headers:{apikey:SUPABASE_KEY, Authorization:"Bearer "+SUPABASE_KEY}
     }).then(function(r){return r.json();}).then(function(data){
-      console.log("guardian_requests 결과:", JSON.stringify(data));
       if(Array.isArray(data))setRequests(data);
     }).catch(function(e){ console.error("guardian_requests 에러:", e); });
   };
@@ -2415,20 +2414,20 @@ function AdminScreen(_ref11) {
         /*#__PURE__*/React.createElement("div", { style: { fontSize: 11, color: "#94a3b8", marginTop: 6 } }, n.created_at ? n.created_at.slice(0,10) : "")
       );
     })
-  )));
-  if (tab === "approval") return /*#__PURE__*/React.createElement("div", { style: { padding: "12px 16px" } },
-    /*#__PURE__*/React.createElement("div", { style: { fontSize: 13, fontWeight: 800, color: "#1e3a5f", marginBottom: 12 } }, "\u23F3 \uAC00\uC785 \uC2B9\uC778 \uB300\uAE30 ", requests.length, "\uAC74"),
+  ))),
+  tab === "approval" && /*#__PURE__*/React.createElement("div", { style: { padding: "12px 16px" } },
+    /*#__PURE__*/React.createElement("div", { style: { fontSize: 13, fontWeight: 800, color: "#1e3a5f", marginBottom: 12 } }, "⏳ 가입 승인 대기 ", requests.length, "건"),
     requests.length === 0
-      ? /*#__PURE__*/React.createElement("div", { style: { textAlign: "center", padding: "40px 20px", color: "#94a3b8", fontSize: 13 } }, "\uB300\uAE30 \uC911\uC778 \uAC00\uC785 \uC2E0\uCCAD\uC774 \uC5C6\uC5B4\uC694")
+      ? /*#__PURE__*/React.createElement("div", { style: { textAlign: "center", padding: "40px 20px", color: "#94a3b8", fontSize: 13 } }, "대기 중인 가입 신청이 없어요")
       : requests.map(function(req) {
           return /*#__PURE__*/React.createElement("div", { key: req.id, style: { background: "white", borderRadius: 14, padding: "14px 16px", border: "1.5px solid #e2e8f0", marginBottom: 10 } },
             /*#__PURE__*/React.createElement("div", { style: { fontSize: 15, fontWeight: 800, color: "#1a1a1a", marginBottom: 4 } }, req.name, req.relation ? " ("+req.relation+")" : ""),
-            /*#__PURE__*/React.createElement("div", { style: { fontSize: 12, color: "#64748b", marginBottom: 2 } }, "\uD83D\uDCDE ", req.phone),
-            /*#__PURE__*/React.createElement("div", { style: { fontSize: 12, color: "#64748b", marginBottom: 2 } }, "\uD83D\uDC74 \uC5B4\uB974\uC2E0: ", req.patient_name, req.patient_birth ? " \xB7 "+req.patient_birth : ""),
-            /*#__PURE__*/React.createElement("div", { style: { fontSize: 11, color: "#94a3b8", marginBottom: 12 } }, req.created_at ? req.created_at.slice(0,10)+" \uC2E0\uCCAD" : ""),
+            /*#__PURE__*/React.createElement("div", { style: { fontSize: 12, color: "#64748b", marginBottom: 2 } }, "📞 ", req.phone),
+            /*#__PURE__*/React.createElement("div", { style: { fontSize: 12, color: "#64748b", marginBottom: 2 } }, "👴 어르신: ", req.patient_name, req.patient_birth ? " · "+req.patient_birth : ""),
+            /*#__PURE__*/React.createElement("div", { style: { fontSize: 11, color: "#94a3b8", marginBottom: 12 } }, req.created_at ? req.created_at.slice(0,10)+" 신청" : ""),
             /*#__PURE__*/React.createElement("div", { style: { display: "flex", gap: 8 } },
-              /*#__PURE__*/React.createElement("button", { onClick: function(){return handleApprove(req);}, style: { flex:1, padding:"9px 0", borderRadius:10, border:"none", background:"#dcfce7", color:"#16a34a", fontSize:13, fontWeight:800, cursor:"pointer" } }, "\u2705 \uC2B9\uC778"),
-              /*#__PURE__*/React.createElement("button", { onClick: function(){return handleReject(req.id);}, style: { flex:1, padding:"9px 0", borderRadius:10, border:"none", background:"#fee2e2", color:"#dc2626", fontSize:13, fontWeight:800, cursor:"pointer" } }, "\u274C \uAC70\uBD80")
+              /*#__PURE__*/React.createElement("button", { onClick: function(){return handleApprove(req);}, style: { flex:1, padding:"9px 0", borderRadius:10, border:"none", background:"#dcfce7", color:"#16a34a", fontSize:13, fontWeight:800, cursor:"pointer" } }, "✅ 승인"),
+              /*#__PURE__*/React.createElement("button", { onClick: function(){return handleReject(req.id);}, style: { flex:1, padding:"9px 0", borderRadius:10, border:"none", background:"#fee2e2", color:"#dc2626", fontSize:13, fontWeight:800, cursor:"pointer" } }, "❌ 거부")
             )
           );
         })
