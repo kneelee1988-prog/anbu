@@ -7176,7 +7176,7 @@ function App() {
     },
     alreadySeen: function() { try { return localStorage.getItem('anbu_onboarded') === '1'; } catch(e) { return false; } }()
   });
-  if (loading) return /*#__PURE__*/React.createElement("div", {
+  if (loading && !currentUser) return /*#__PURE__*/React.createElement("div", {
     style: {
       fontFamily: "'Noto Sans KR',sans-serif",
       minHeight: "100vh",
