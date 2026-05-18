@@ -7274,13 +7274,22 @@ function App() {
       onBack: handleLogout,
       onMarkRead: markRead
     });
-    if (role === "admin") return /*#__PURE__*/React.createElement(AdminScreen, {
-      patients: patients,
-      onBack: handleBackToRole,
-      onLogout: handleLogout,
-      notices: notices,
-      onLoadNotices: loadNotices
-    });
+    if (role === "admin") {
+      try {
+        return /*#__PURE__*/React.createElement(AdminScreen, {
+          patients: patients,
+          onBack: handleBackToRole,
+          onLogout: handleLogout,
+          notices: notices,
+          onLoadNotices: loadNotices
+        });
+      } catch(e) {
+        console.error("[DEBUG] AdminScreen 크래시:", e);
+        return /*#__PURE__*/React.createElement("div", {
+          style: { padding: 40, color: "red", fontSize: 14, fontFamily: "sans-serif" }
+        }, "AdminScreen 오류: " + e.message);
+      }
+    }
   }
   console.log("[DEBUG] return null - appScreen=", appScreen, "currentUser=", currentUser, "loading=", loading, "showIntro=", showIntro, "onboarded=", onboarded);
   return null;
