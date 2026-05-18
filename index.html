@@ -7196,7 +7196,10 @@ function App() {
       nurseWard: currentUser.ward
     });
     if (role === "doctor") {
+      console.log("currentUser.doctorId:", currentUser.doctorId);
+      console.log("all patients doctorIds:", patients.map(function(p){return p.name+":"+p.doctorId;}));
       var docPatientIds = patients.filter(function(p) { return p.doctorId === currentUser.doctorId; }).map(function(p) { return p.id; });
+      console.log("filtered patients:", docPatientIds.length);
       return /*#__PURE__*/React.createElement(DoctorScreen, {
         patients: patients.filter(function (p) { return p.doctorId === currentUser.doctorId; }),
         onSave: handleSave,
