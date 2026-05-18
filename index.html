@@ -5212,7 +5212,7 @@ function DoctorScreen(_ref32) {
         (p.dnr === true || p.dnr === "true") && /*#__PURE__*/React.createElement("span", { style: { fontSize: 10, fontWeight: 800, background: "#dcfce7", color: "#15803d", borderRadius: 4, padding: "2px 6px" } }, "DNR\uB3D9\uC758"),
         (p.dnr === false || p.dnr === "false") && /*#__PURE__*/React.createElement("span", { style: { fontSize: 10, fontWeight: 800, background: "#fee2e2", color: "#dc2626", borderRadius: 4, padding: "2px 6px" } }, "DNR\uBE44\uB3D9\uC758")
       ),
-      r.emotionComment && /*#__PURE__*/React.createElement("div", { style: { background: "linear-gradient(135deg,#4c1d95,#7c3aed)", borderRadius: 14, overflow: "hidden", marginBottom: 10, boxShadow: "0 4px 14px rgba(76,29,149,0.2)" } },
+      r && r.emotionComment && /*#__PURE__*/React.createElement("div", { style: { background: "linear-gradient(135deg,#4c1d95,#7c3aed)", borderRadius: 14, overflow: "hidden", marginBottom: 10, boxShadow: "0 4px 14px rgba(76,29,149,0.2)" } },
         /*#__PURE__*/React.createElement("div", { style: { padding: "16px 18px" } },
           /*#__PURE__*/React.createElement("div", { style: { fontSize: 11, color: "rgba(255,255,255,0.7)", fontWeight: 700, marginBottom: 8 } }, "\uD83D\uDC9C \uC8FC\uCE58\uC758 \uC120\uC0DD\uB2D8\uC758 \uD55C \uB9C8\uB514"),
           /*#__PURE__*/React.createElement("div", { style: { fontSize: 14, color: "white", lineHeight: 1.9, fontWeight: 500 } }, r.emotionComment)
@@ -7196,10 +7196,7 @@ function App() {
       nurseWard: currentUser.ward
     });
     if (role === "doctor") {
-      console.log("currentUser.doctorId:", currentUser.doctorId);
-      console.log("all patients doctorIds:", patients.map(function(p){return p.name+":"+p.doctorId;}));
       var docPatientIds = patients.filter(function(p) { return p.doctorId === currentUser.doctorId; }).map(function(p) { return p.id; });
-      console.log("filtered patients:", docPatientIds.length);
       return /*#__PURE__*/React.createElement(DoctorScreen, {
         patients: patients.filter(function (p) { return p.doctorId === currentUser.doctorId; }),
         onSave: handleSave,
