@@ -1820,7 +1820,7 @@ function AdminScreen(_ref11) {
             return res.json();
           case 2:
             data = _context4.v;
-            if (Array.isArray(data)) setUsers(data);
+            console.log("[DEBUG] users data:", JSON.stringify(data).slice(0,200)); if (Array.isArray(data)) setUsers(data); else setUsers([]);
             _context4.n = 4;
             break;
           case 3:
@@ -2234,7 +2234,7 @@ function AdminScreen(_ref11) {
       flexDirection: "column",
       gap: 8
     }
-  }, users.map(function (u) {
+  }, (Array.isArray(users) ? users : []).map(function (u) {
     return /*#__PURE__*/React.createElement("div", {
       key: u.id,
       style: {
@@ -2304,7 +2304,139 @@ function AdminScreen(_ref11) {
         color: u.active ? "#ef4444" : "#16a34a"
       }
     }, u.active ? "비활성화" : "활성화"));
-  }))), null
+  }))), tab === "patients" && /*#__PURE__*/React.createElement("div", {
+    style: {
+      display: "flex",
+      flexDirection: "column",
+      gap: 8
+    }
+  }, /*#__PURE__*/React.createElement("div", {
+    style: {
+      fontSize: 12,
+      color: "#64748b",
+      fontWeight: 700,
+      marginBottom: 4
+    }
+  }, "\uC804\uCCB4 \uC785\uC6D0 \uD658\uC790 ", patients.length, "\uBA85"), patients.map(function (p) {
+    return /*#__PURE__*/React.createElement("div", {
+      key: p.id,
+      style: {
+        background: "white",
+        borderRadius: 14,
+        padding: "12px 14px",
+        border: "1.5px solid #cbd5e1"
+      }
+    }, /*#__PURE__*/React.createElement("div", {
+      style: {
+        display: "flex",
+        alignItems: "center",
+        gap: 8,
+        marginBottom: 2
+      }
+    }, /*#__PURE__*/React.createElement("span", {
+      style: {
+        fontSize: 14,
+        fontWeight: 800,
+        color: "#1a1a1a"
+      }
+    }, p.name), /*#__PURE__*/React.createElement("span", {
+      style: {
+        fontSize: 11,
+        color: "#94a3b8"
+      }
+    }, p.age, "\uC138 \xB7 ", p.gender), p.record && p.record.sentToGuardian && /*#__PURE__*/React.createElement("span", {
+      style: {
+        fontSize: 10,
+        fontWeight: 700,
+        background: "#f0fdf4",
+        color: "#16a34a",
+        borderRadius: 20,
+        padding: "1px 7px"
+      }
+    }, "\uC804\uC1A1\uC644\uB8CC"), p.alert && /*#__PURE__*/React.createElement("span", {
+      style: {
+        fontSize: 10,
+        fontWeight: 700,
+        background: "#fef2f2",
+        color: "#ef4444",
+        borderRadius: 20,
+        padding: "1px 7px"
+      }
+    }, "\u26A0\uFE0F\uC8FC\uC758")), /*#__PURE__*/React.createElement("div", {
+      style: {
+        fontSize: 12,
+        color: "#64748b"
+      }
+    }, getWard(p.room), " \xB7 ", getDoctorTitle(p.doctorId)));
+  }))), tab === "notices" && /*#__PURE__*/React.createElement(React.Fragment, null,
+    /*#__PURE__*/React.createElement("div", { style: { background: "white", borderRadius: 16, padding: 16, border: "1.5px solid #cbd5e1", marginBottom: 14 } },
+      /*#__PURE__*/React.createElement("div", { style: { fontSize: 14, fontWeight: 800, color: "#1e3a5f", marginBottom: 14 } }, "\uD83D\uDCE2 \uC0C8 \uACF5\uC9C0\uC0AC\uD56D \uC791\uC131"),
+      /*#__PURE__*/React.createElement("div", { style: { fontSize: 12, color: "#64748b", fontWeight: 600, marginBottom: 6 } }, "\uC81C\uBAA9"),
+      /*#__PURE__*/React.createElement("input", {
+        value: newNotice.title,
+        onChange: function(e) { setNewNotice(function(f) { return _objectSpread(_objectSpread({}, f), {}, { title: e.target.value }); }); },
+        placeholder: "\uC608) \uB3C5\uAC10 \uC608\uBC29\uC811\uC885 \uC548\uB0B4",
+        style: { width: "100%", padding: "10px 12px", borderRadius: 10, border: "1px solid #e2e8f0", fontSize: 13, outline: "none", boxSizing: "border-box", marginBottom: 12 }
+      }),
+      /*#__PURE__*/React.createElement("div", { style: { fontSize: 12, color: "#64748b", fontWeight: 600, marginBottom: 6 } }, "\uB0B4\uC6A9"),
+      /*#__PURE__*/React.createElement("textarea", {
+        value: newNotice.content,
+        onChange: function(e) { setNewNotice(function(f) { return _objectSpread(_objectSpread({}, f), {}, { content: e.target.value }); }); },
+        placeholder: "\uACF5\uC9C0 \uB0B4\uC6A9\uC744 \uC785\uB825\uD558\uC138\uC694",
+        style: { width: "100%", height: 120, padding: "10px 12px", borderRadius: 10, border: "1px solid #e2e8f0", fontSize: 13, outline: "none", resize: "none", fontFamily: "inherit", boxSizing: "border-box", lineHeight: 1.7 }
+      }),
+      /*#__PURE__*/React.createElement("button", {
+        onClick: function() {
+          if (!newNotice.title.trim() || !newNotice.content.trim()) return;
+          fetch(SUPABASE_URL + "/rest/v1/notices", {
+            method: "POST",
+            headers: { apikey: SUPABASE_KEY, Authorization: "Bearer " + SUPABASE_KEY, "Content-Type": "application/json" },
+            body: JSON.stringify({ title: newNotice.title, content: newNotice.content, is_active: true })
+          }).then(function() {
+            setNewNotice({ title: "", content: "" });
+            if (onLoadNotices) onLoadNotices();
+          });
+        },
+        style: { marginTop: 12, width: "100%", padding: 13, borderRadius: 10, border: "none", background: newNotice.title.trim() && newNotice.content.trim() ? "#1e3a5f" : "#e2e8f0", color: newNotice.title.trim() && newNotice.content.trim() ? "white" : "#aaa", fontSize: 14, fontWeight: 800, cursor: "pointer" }
+      }, "\uACF5\uC9C0 \uB4F1\uB85D")
+    ),
+    notices.length > 0 && /*#__PURE__*/React.createElement("div", { style: { fontSize: 12, color: "#64748b", fontWeight: 700, marginBottom: 8 } }, "\uB4F1\uB85D\uB41C \uACF5\uC9C0 " + notices.length + "\uAC74"),
+    notices.map(function(n) {
+      return /*#__PURE__*/React.createElement("div", { key: n.id, style: { background: "white", borderRadius: 14, padding: "14px 16px", border: "1.5px solid #e2e8f0", marginBottom: 10 } },
+        /*#__PURE__*/React.createElement("div", { style: { display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: 8, marginBottom: 6 } },
+          /*#__PURE__*/React.createElement("div", { style: { fontSize: 14, fontWeight: 800, color: "#1a1a1a" } }, n.title),
+          /*#__PURE__*/React.createElement("button", {
+            onClick: function() {
+              fetch(SUPABASE_URL + "/rest/v1/notices?id=eq." + n.id, {
+                method: "PATCH",
+                headers: { apikey: SUPABASE_KEY, Authorization: "Bearer " + SUPABASE_KEY, "Content-Type": "application/json" },
+                body: JSON.stringify({ is_active: false })
+              }).then(function() { if (onLoadNotices) onLoadNotices(); });
+            },
+            style: { background: "#fef2f2", border: "none", borderRadius: 8, padding: "4px 10px", fontSize: 11, color: "#ef4444", fontWeight: 700, cursor: "pointer", flexShrink: 0 }
+          }, "\uC0AD\uC81C")
+        ),
+        /*#__PURE__*/React.createElement("div", { style: { fontSize: 12, color: "#475569", lineHeight: 1.7, whiteSpace: "pre-wrap" } }, n.content),
+        /*#__PURE__*/React.createElement("div", { style: { fontSize: 11, color: "#94a3b8", marginTop: 6 } }, n.created_at ? n.created_at.slice(0,10) : "")
+      );
+    })
+  ))),
+  tab === "approval" && /*#__PURE__*/React.createElement("div", { style: { padding: "12px 16px" } },
+    /*#__PURE__*/React.createElement("div", { style: { fontSize: 13, fontWeight: 800, color: "#1e3a5f", marginBottom: 12 } }, "\u23F3 \uAC00\uC785 \uC2B9\uC778 \uB300\uAE30 ", requests.length, "\uAC74"),
+    requests.length === 0
+      ? /*#__PURE__*/React.createElement("div", { style: { textAlign: "center", padding: "40px 20px", color: "#94a3b8", fontSize: 13 } }, "\uB300\uAE30 \uC911\uC778 \uAC00\uC785 \uC2E0\uCCAD\uC774 \uC5C6\uC5B4\uC694")
+      : requests.map(function(req) {
+          return /*#__PURE__*/React.createElement("div", { key: req.id, style: { background: "white", borderRadius: 14, padding: "14px 16px", border: "1.5px solid #e2e8f0", marginBottom: 10 } },
+            /*#__PURE__*/React.createElement("div", { style: { fontSize: 15, fontWeight: 800, color: "#1a1a1a", marginBottom: 4 } }, req.name, req.relation ? " (" + req.relation + ")" : ""),
+            /*#__PURE__*/React.createElement("div", { style: { fontSize: 12, color: "#64748b", marginBottom: 2 } }, "\uD83D\uDCDE ", req.phone),
+            /*#__PURE__*/React.createElement("div", { style: { fontSize: 12, color: "#64748b", marginBottom: 2 } }, "\uD83D\uDC74 \uC5B4\uB974\uC2E0: ", req.patient_name),
+            /*#__PURE__*/React.createElement("div", { style: { fontSize: 11, color: "#94a3b8", marginBottom: 12 } }, req.created_at ? req.created_at.slice(0, 10) + " \uC2E0\uCCAD" : ""),
+            /*#__PURE__*/React.createElement("div", { style: { display: "flex", gap: 8 } },
+              /*#__PURE__*/React.createElement("button", { onClick: function() { handleApprove(req); }, style: { flex: 1, padding: "9px 0", borderRadius: 10, border: "none", background: "#dcfce7", color: "#16a34a", fontSize: 13, fontWeight: 800, cursor: "pointer" } }, "\u2705 \uC2B9\uC778"),
+              /*#__PURE__*/React.createElement("button", { onClick: function() { handleReject(req.id); }, style: { flex: 1, padding: "9px 0", borderRadius: 10, border: "none", background: "#fee2e2", color: "#dc2626", fontSize: 13, fontWeight: 800, cursor: "pointer" } }, "\u274C \uAC70\uBD80")
+            )
+          );
+        })
   );
 }
 
