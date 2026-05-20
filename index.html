@@ -716,8 +716,10 @@ var Btn = function Btn(_ref3) {
 };
 var BtnRow = function BtnRow(_ref4) {
   var children = _ref4.children;
+  var count = React.Children.count(children);
+  var cols = count <= 3 ? count : count === 4 ? 4 : count === 5 ? 5 : count === 6 ? 3 : 3;
   return /*#__PURE__*/React.createElement("div", {
-    style: { display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 6, marginBottom: 10 }
+    style: { display: "grid", gridTemplateColumns: "repeat(" + cols + ", 1fr)", gap: 6, marginBottom: 10 }
   }, children);
 };
 var BtnGrid = function BtnGrid(_ref4g) {
@@ -7525,8 +7527,10 @@ var Btn = function Btn(_ref3) {
 };
 var BtnRow = function BtnRow(_ref4) {
   var children = _ref4.children;
+  var count = React.Children.count(children);
+  var cols = count <= 3 ? count : count === 4 ? 4 : count === 5 ? 5 : count === 6 ? 3 : 3;
   return /*#__PURE__*/React.createElement("div", {
-    style: { display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 6, marginBottom: 10 }
+    style: { display: "grid", gridTemplateColumns: "repeat(" + cols + ", 1fr)", gap: 6, marginBottom: 10 }
   }, children);
 };
 var BtnGrid = function BtnGrid(_ref4g) {
@@ -14333,8 +14337,10 @@ var Btn = function Btn(_ref3) {
 };
 var BtnRow = function BtnRow(_ref4) {
   var children = _ref4.children;
+  var count = React.Children.count(children);
+  var cols = count <= 3 ? count : count === 4 ? 4 : count === 5 ? 5 : count === 6 ? 3 : 3;
   return /*#__PURE__*/React.createElement("div", {
-    style: { display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 6, marginBottom: 10 }
+    style: { display: "grid", gridTemplateColumns: "repeat(" + cols + ", 1fr)", gap: 6, marginBottom: 10 }
   }, children);
 };
 var BtnGrid = function BtnGrid(_ref4g) {
@@ -21140,8 +21146,10 @@ var Btn = function Btn(_ref3) {
 };
 var BtnRow = function BtnRow(_ref4) {
   var children = _ref4.children;
+  var count = React.Children.count(children);
+  var cols = count <= 3 ? count : count === 4 ? 4 : count === 5 ? 5 : count === 6 ? 3 : 3;
   return /*#__PURE__*/React.createElement("div", {
-    style: { display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 6, marginBottom: 10 }
+    style: { display: "grid", gridTemplateColumns: "repeat(" + cols + ", 1fr)", gap: 6, marginBottom: 10 }
   }, children);
 };
 var BtnGrid = function BtnGrid(_ref4g) {
