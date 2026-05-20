@@ -720,7 +720,7 @@ var BtnRow = function BtnRow(_ref4) {
     style: { display: "flex", flexWrap: "wrap", gap: 6, marginBottom: 10 }
   }, React.Children.map(children, function(child, i) {
     return /*#__PURE__*/React.createElement("div", {
-      key: i, style: { flex: "1 1 calc(50% - 3px)", maxWidth: "calc(50% - 3px)", minWidth: 0, display: "flex" }
+      key: i, style: { flex: "1 1 calc(33.333% - 4px)", maxWidth: "calc(33.333% - 4px)", minWidth: 0, display: "flex" }
     }, child);
   }));
 };
@@ -729,7 +729,7 @@ var BtnGrid = function BtnGrid(_ref4g) {
     cols = _ref4g.cols;
   var items = React.Children.count(children);
   // 항목 수에 따라 자동 열 수 결정
-  var autoCols = cols || 2;
+  var autoCols = cols || 3;
   // 항목 수가 열 수로 나누어지지 않을 때 (마지막 줄이 비는 경우)
   // flex로 처리해서 마지막 줄도 균등하게
   var lastRowCount = items % autoCols;
@@ -2456,7 +2456,7 @@ function NurseBox(_ref_box) {
 function NurseHdr(_ref_hdr) {
   var title = _ref_hdr.title, back = _ref_hdr.back;
   return /*#__PURE__*/React.createElement("div", {
-    style: { background: "linear-gradient(135deg,#0d5c56,#0f766e)", padding: "20px 20px", color: "white", display: "flex", alignItems: "center", gap: 12, borderRadius: 20, margin: "14px 20px 0" }
+    style: { background: "linear-gradient(135deg,#0d5c56,#0f766e)", padding: "20px 20px", color: "white", display: "flex", alignItems: "center", gap: 12, borderRadius: 20, margin: "14px 16px 0" }
   }, /*#__PURE__*/React.createElement("button", {
     onClick: back,
     style: { background: "rgba(255,255,255,0.15)", border: "none", borderRadius: 8, padding: "6px 12px", color: "white", fontSize: 13, cursor: "pointer", fontWeight: 700 }
@@ -2754,7 +2754,7 @@ function NurseScreen(_ref22) {
         display: "flex",
         alignItems: "center",
         gap: 12,
-      borderRadius: 20, margin: "14px 20px 0"
+      borderRadius: 20, margin: "14px 16px 0"
       }
     }, /*#__PURE__*/React.createElement("button", {
       onClick: function onClick() {
@@ -3234,7 +3234,7 @@ function NurseScreen(_ref22) {
       position: "sticky",
       top: 0,
       zIndex: 10,
-      borderRadius: 20, margin: "14px 20px 0"
+      borderRadius: 20, margin: "14px 16px 0"
     }
   }, /*#__PURE__*/React.createElement("button", {
     onClick: function onClick() {
@@ -3280,7 +3280,7 @@ function NurseScreen(_ref22) {
   }, "\uC774\uC0C1\uC5C6\uC74C")), selected && selected.alert && /*#__PURE__*/React.createElement("div", {
     style: {
       background: "#fef2f2",
-      margin: "0 20px",
+      margin: "0 16px",
       padding: "10px 16px",
       fontSize: 12,
       color: "#ef4444",
@@ -3291,7 +3291,7 @@ function NurseScreen(_ref22) {
     }
   }, "\u26A0\uFE0F \uC5B4\uC81C \uD2B9\uC774\uC0AC\uD56D: ", selected.alertMsg), /*#__PURE__*/React.createElement("div", {
     style: {
-      padding: "14px 20px 0",
+      padding: "14px 16px 0",
     }
   },
   /*#__PURE__*/React.createElement("div", { style: { marginBottom: 12 } },
@@ -4989,7 +4989,7 @@ function DoctorScreen(_ref32) {
         display: "flex",
         alignItems: "center",
         gap: 12,
-      borderRadius: 20, margin: "14px 20px 0"
+      borderRadius: 20, margin: "14px 16px 0"
       }
     }, /*#__PURE__*/React.createElement("button", {
       onClick: function onClick() {
@@ -5505,7 +5505,7 @@ function DoctorScreen(_ref32) {
       background: "linear-gradient(135deg,#1e3a5f,#2d5a8e)",
       padding: "16px 20px",
       color: "white",
-      borderRadius: 20, margin: "14px 20px 0"
+      borderRadius: 20, margin: "14px 16px 0"
     }
   }, /*#__PURE__*/React.createElement("div", {
     style: {
@@ -7554,7 +7554,7 @@ var BtnRow = function BtnRow(_ref4) {
     style: { display: "flex", flexWrap: "wrap", gap: 6, marginBottom: 10 }
   }, React.Children.map(children, function(child, i) {
     return /*#__PURE__*/React.createElement("div", {
-      key: i, style: { flex: "1 1 calc(50% - 3px)", maxWidth: "calc(50% - 3px)", minWidth: 0, display: "flex" }
+      key: i, style: { flex: "1 1 calc(33.333% - 4px)", maxWidth: "calc(33.333% - 4px)", minWidth: 0, display: "flex" }
     }, child);
   }));
 };
@@ -7563,7 +7563,7 @@ var BtnGrid = function BtnGrid(_ref4g) {
     cols = _ref4g.cols;
   var items = React.Children.count(children);
   // 항목 수에 따라 자동 열 수 결정
-  var autoCols = cols || 2;
+  var autoCols = cols || 3;
   // 항목 수가 열 수로 나누어지지 않을 때 (마지막 줄이 비는 경우)
   // flex로 처리해서 마지막 줄도 균등하게
   var lastRowCount = items % autoCols;
@@ -9290,7 +9290,7 @@ function NurseBox(_ref_box) {
 function NurseHdr(_ref_hdr) {
   var title = _ref_hdr.title, back = _ref_hdr.back;
   return /*#__PURE__*/React.createElement("div", {
-    style: { background: "linear-gradient(135deg,#0d5c56,#0f766e)", padding: "20px 20px", color: "white", display: "flex", alignItems: "center", gap: 12, borderRadius: 20, margin: "14px 20px 0" }
+    style: { background: "linear-gradient(135deg,#0d5c56,#0f766e)", padding: "20px 20px", color: "white", display: "flex", alignItems: "center", gap: 12, borderRadius: 20, margin: "14px 16px 0" }
   }, /*#__PURE__*/React.createElement("button", {
     onClick: back,
     style: { background: "rgba(255,255,255,0.15)", border: "none", borderRadius: 8, padding: "6px 12px", color: "white", fontSize: 13, cursor: "pointer", fontWeight: 700 }
@@ -9588,7 +9588,7 @@ function NurseScreen(_ref22) {
         display: "flex",
         alignItems: "center",
         gap: 12,
-      borderRadius: 20, margin: "14px 20px 0"
+      borderRadius: 20, margin: "14px 16px 0"
       }
     }, /*#__PURE__*/React.createElement("button", {
       onClick: function onClick() {
@@ -10068,7 +10068,7 @@ function NurseScreen(_ref22) {
       position: "sticky",
       top: 0,
       zIndex: 10,
-      borderRadius: 20, margin: "14px 20px 0"
+      borderRadius: 20, margin: "14px 16px 0"
     }
   }, /*#__PURE__*/React.createElement("button", {
     onClick: function onClick() {
@@ -10114,7 +10114,7 @@ function NurseScreen(_ref22) {
   }, "\uC774\uC0C1\uC5C6\uC74C")), selected && selected.alert && /*#__PURE__*/React.createElement("div", {
     style: {
       background: "#fef2f2",
-      margin: "0 20px",
+      margin: "0 16px",
       padding: "10px 16px",
       fontSize: 12,
       color: "#ef4444",
@@ -10125,7 +10125,7 @@ function NurseScreen(_ref22) {
     }
   }, "\u26A0\uFE0F \uC5B4\uC81C \uD2B9\uC774\uC0AC\uD56D: ", selected.alertMsg), /*#__PURE__*/React.createElement("div", {
     style: {
-      padding: "14px 20px 0",
+      padding: "14px 16px 0",
     }
   },
   /*#__PURE__*/React.createElement("div", { style: { marginBottom: 12 } },
@@ -11823,7 +11823,7 @@ function DoctorScreen(_ref32) {
         display: "flex",
         alignItems: "center",
         gap: 12,
-      borderRadius: 20, margin: "14px 20px 0"
+      borderRadius: 20, margin: "14px 16px 0"
       }
     }, /*#__PURE__*/React.createElement("button", {
       onClick: function onClick() {
@@ -12339,7 +12339,7 @@ function DoctorScreen(_ref32) {
       background: "linear-gradient(135deg,#1e3a5f,#2d5a8e)",
       padding: "16px 20px",
       color: "white",
-      borderRadius: 20, margin: "14px 20px 0"
+      borderRadius: 20, margin: "14px 16px 0"
     }
   }, /*#__PURE__*/React.createElement("div", {
     style: {
@@ -14387,7 +14387,7 @@ var BtnRow = function BtnRow(_ref4) {
     style: { display: "flex", flexWrap: "wrap", gap: 6, marginBottom: 10 }
   }, React.Children.map(children, function(child, i) {
     return /*#__PURE__*/React.createElement("div", {
-      key: i, style: { flex: "1 1 calc(50% - 3px)", maxWidth: "calc(50% - 3px)", minWidth: 0, display: "flex" }
+      key: i, style: { flex: "1 1 calc(33.333% - 4px)", maxWidth: "calc(33.333% - 4px)", minWidth: 0, display: "flex" }
     }, child);
   }));
 };
@@ -14396,7 +14396,7 @@ var BtnGrid = function BtnGrid(_ref4g) {
     cols = _ref4g.cols;
   var items = React.Children.count(children);
   // 항목 수에 따라 자동 열 수 결정
-  var autoCols = cols || 2;
+  var autoCols = cols || 3;
   // 항목 수가 열 수로 나누어지지 않을 때 (마지막 줄이 비는 경우)
   // flex로 처리해서 마지막 줄도 균등하게
   var lastRowCount = items % autoCols;
@@ -16123,7 +16123,7 @@ function NurseBox(_ref_box) {
 function NurseHdr(_ref_hdr) {
   var title = _ref_hdr.title, back = _ref_hdr.back;
   return /*#__PURE__*/React.createElement("div", {
-    style: { background: "linear-gradient(135deg,#0d5c56,#0f766e)", padding: "20px 20px", color: "white", display: "flex", alignItems: "center", gap: 12, borderRadius: 20, margin: "14px 20px 0" }
+    style: { background: "linear-gradient(135deg,#0d5c56,#0f766e)", padding: "20px 20px", color: "white", display: "flex", alignItems: "center", gap: 12, borderRadius: 20, margin: "14px 16px 0" }
   }, /*#__PURE__*/React.createElement("button", {
     onClick: back,
     style: { background: "rgba(255,255,255,0.15)", border: "none", borderRadius: 8, padding: "6px 12px", color: "white", fontSize: 13, cursor: "pointer", fontWeight: 700 }
@@ -16419,7 +16419,7 @@ function NurseScreen(_ref22) {
         display: "flex",
         alignItems: "center",
         gap: 12,
-      borderRadius: 20, margin: "14px 20px 0"
+      borderRadius: 20, margin: "14px 16px 0"
       }
     }, /*#__PURE__*/React.createElement("button", {
       onClick: function onClick() {
@@ -16899,7 +16899,7 @@ function NurseScreen(_ref22) {
       position: "sticky",
       top: 0,
       zIndex: 10,
-      borderRadius: 20, margin: "14px 20px 0"
+      borderRadius: 20, margin: "14px 16px 0"
     }
   }, /*#__PURE__*/React.createElement("button", {
     onClick: function onClick() {
@@ -16945,7 +16945,7 @@ function NurseScreen(_ref22) {
   }, "\uC774\uC0C1\uC5C6\uC74C")), selected && selected.alert && /*#__PURE__*/React.createElement("div", {
     style: {
       background: "#fef2f2",
-      margin: "0 20px",
+      margin: "0 16px",
       padding: "10px 16px",
       fontSize: 12,
       color: "#ef4444",
@@ -16956,7 +16956,7 @@ function NurseScreen(_ref22) {
     }
   }, "\u26A0\uFE0F \uC5B4\uC81C \uD2B9\uC774\uC0AC\uD56D: ", selected.alertMsg), /*#__PURE__*/React.createElement("div", {
     style: {
-      padding: "14px 20px 0",
+      padding: "14px 16px 0",
     }
   },
   /*#__PURE__*/React.createElement("div", { style: { marginBottom: 12 } },
@@ -18623,7 +18623,7 @@ function DoctorScreen(_ref32) {
         display: "flex",
         alignItems: "center",
         gap: 12,
-      borderRadius: 20, margin: "14px 20px 0"
+      borderRadius: 20, margin: "14px 16px 0"
       }
     }, /*#__PURE__*/React.createElement("button", {
       onClick: function onClick() {
@@ -19139,7 +19139,7 @@ function DoctorScreen(_ref32) {
       background: "linear-gradient(135deg,#1e3a5f,#2d5a8e)",
       padding: "16px 20px",
       color: "white",
-      borderRadius: 20, margin: "14px 20px 0"
+      borderRadius: 20, margin: "14px 16px 0"
     }
   }, /*#__PURE__*/React.createElement("div", {
     style: {
