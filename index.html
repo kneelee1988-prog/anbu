@@ -717,42 +717,16 @@ var Btn = function Btn(_ref3) {
 var BtnRow = function BtnRow(_ref4) {
   var children = _ref4.children;
   return /*#__PURE__*/React.createElement("div", {
-    style: { display: "flex", flexWrap: "wrap", gap: 6, marginBottom: 10 }
-  }, React.Children.map(children, function(child, i) {
-    return /*#__PURE__*/React.createElement("div", {
-      key: i, style: { flex: "1 1 calc(33.333% - 4px)", maxWidth: "calc(33.333% - 4px)", minWidth: 0, display: "flex" }
-    }, child);
-  }));
+    style: { display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 6, marginBottom: 10 }
+  }, children);
 };
 var BtnGrid = function BtnGrid(_ref4g) {
   var children = _ref4g.children,
     cols = _ref4g.cols;
-  var items = React.Children.count(children);
-  // 항목 수에 따라 자동 열 수 결정
   var autoCols = cols || 3;
-  // 항목 수가 열 수로 나누어지지 않을 때 (마지막 줄이 비는 경우)
-  // flex로 처리해서 마지막 줄도 균등하게
-  var lastRowCount = items % autoCols;
-  var useStretch = lastRowCount === 0; // 딱 맞으면 grid
-  if (useStretch) {
-    return /*#__PURE__*/React.createElement("div", {
-      style: { display: "grid", gridTemplateColumns: "repeat(" + autoCols + ", 1fr)", gap: 6, marginBottom: 10 }
-    }, children);
-  }
-  // 마지막 줄이 남으면 flex로 중앙 정렬
   return /*#__PURE__*/React.createElement("div", {
-    style: { display: "flex", flexWrap: "wrap", gap: 6, marginBottom: 10 }
-  }, React.Children.map(children, function(child, i) {
-    var isLastRow = i >= items - lastRowCount;
-    return /*#__PURE__*/React.createElement("div", {
-      key: i,
-      style: {
-        flex: isLastRow ? "1 1 calc(" + (100 / autoCols) + "% - 6px)" : "1 1 calc(" + (100 / autoCols) + "% - 6px)",
-        maxWidth: "calc(" + (100 / autoCols) + "% - 4px)",
-        minWidth: 0
-      }
-    }, child);
-  }));
+    style: { display: "grid", gridTemplateColumns: "repeat(" + autoCols + ", 1fr)", gap: 6, marginBottom: 10 }
+  }, children);
 };
 var Lbl = function Lbl(_ref5) {
   var text = _ref5.text;
@@ -7552,42 +7526,16 @@ var Btn = function Btn(_ref3) {
 var BtnRow = function BtnRow(_ref4) {
   var children = _ref4.children;
   return /*#__PURE__*/React.createElement("div", {
-    style: { display: "flex", flexWrap: "wrap", gap: 6, marginBottom: 10 }
-  }, React.Children.map(children, function(child, i) {
-    return /*#__PURE__*/React.createElement("div", {
-      key: i, style: { flex: "1 1 calc(33.333% - 4px)", maxWidth: "calc(33.333% - 4px)", minWidth: 0, display: "flex" }
-    }, child);
-  }));
+    style: { display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 6, marginBottom: 10 }
+  }, children);
 };
 var BtnGrid = function BtnGrid(_ref4g) {
   var children = _ref4g.children,
     cols = _ref4g.cols;
-  var items = React.Children.count(children);
-  // 항목 수에 따라 자동 열 수 결정
   var autoCols = cols || 3;
-  // 항목 수가 열 수로 나누어지지 않을 때 (마지막 줄이 비는 경우)
-  // flex로 처리해서 마지막 줄도 균등하게
-  var lastRowCount = items % autoCols;
-  var useStretch = lastRowCount === 0; // 딱 맞으면 grid
-  if (useStretch) {
-    return /*#__PURE__*/React.createElement("div", {
-      style: { display: "grid", gridTemplateColumns: "repeat(" + autoCols + ", 1fr)", gap: 6, marginBottom: 10 }
-    }, children);
-  }
-  // 마지막 줄이 남으면 flex로 중앙 정렬
   return /*#__PURE__*/React.createElement("div", {
-    style: { display: "flex", flexWrap: "wrap", gap: 6, marginBottom: 10 }
-  }, React.Children.map(children, function(child, i) {
-    var isLastRow = i >= items - lastRowCount;
-    return /*#__PURE__*/React.createElement("div", {
-      key: i,
-      style: {
-        flex: isLastRow ? "1 1 calc(" + (100 / autoCols) + "% - 6px)" : "1 1 calc(" + (100 / autoCols) + "% - 6px)",
-        maxWidth: "calc(" + (100 / autoCols) + "% - 4px)",
-        minWidth: 0
-      }
-    }, child);
-  }));
+    style: { display: "grid", gridTemplateColumns: "repeat(" + autoCols + ", 1fr)", gap: 6, marginBottom: 10 }
+  }, children);
 };
 var Lbl = function Lbl(_ref5) {
   var text = _ref5.text;
@@ -14386,42 +14334,16 @@ var Btn = function Btn(_ref3) {
 var BtnRow = function BtnRow(_ref4) {
   var children = _ref4.children;
   return /*#__PURE__*/React.createElement("div", {
-    style: { display: "flex", flexWrap: "wrap", gap: 6, marginBottom: 10 }
-  }, React.Children.map(children, function(child, i) {
-    return /*#__PURE__*/React.createElement("div", {
-      key: i, style: { flex: "1 1 calc(33.333% - 4px)", maxWidth: "calc(33.333% - 4px)", minWidth: 0, display: "flex" }
-    }, child);
-  }));
+    style: { display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 6, marginBottom: 10 }
+  }, children);
 };
 var BtnGrid = function BtnGrid(_ref4g) {
   var children = _ref4g.children,
     cols = _ref4g.cols;
-  var items = React.Children.count(children);
-  // 항목 수에 따라 자동 열 수 결정
   var autoCols = cols || 3;
-  // 항목 수가 열 수로 나누어지지 않을 때 (마지막 줄이 비는 경우)
-  // flex로 처리해서 마지막 줄도 균등하게
-  var lastRowCount = items % autoCols;
-  var useStretch = lastRowCount === 0; // 딱 맞으면 grid
-  if (useStretch) {
-    return /*#__PURE__*/React.createElement("div", {
-      style: { display: "grid", gridTemplateColumns: "repeat(" + autoCols + ", 1fr)", gap: 6, marginBottom: 10 }
-    }, children);
-  }
-  // 마지막 줄이 남으면 flex로 중앙 정렬
   return /*#__PURE__*/React.createElement("div", {
-    style: { display: "flex", flexWrap: "wrap", gap: 6, marginBottom: 10 }
-  }, React.Children.map(children, function(child, i) {
-    var isLastRow = i >= items - lastRowCount;
-    return /*#__PURE__*/React.createElement("div", {
-      key: i,
-      style: {
-        flex: isLastRow ? "1 1 calc(" + (100 / autoCols) + "% - 6px)" : "1 1 calc(" + (100 / autoCols) + "% - 6px)",
-        maxWidth: "calc(" + (100 / autoCols) + "% - 4px)",
-        minWidth: 0
-      }
-    }, child);
-  }));
+    style: { display: "grid", gridTemplateColumns: "repeat(" + autoCols + ", 1fr)", gap: 6, marginBottom: 10 }
+  }, children);
 };
 var Lbl = function Lbl(_ref5) {
   var text = _ref5.text;
@@ -21219,42 +21141,16 @@ var Btn = function Btn(_ref3) {
 var BtnRow = function BtnRow(_ref4) {
   var children = _ref4.children;
   return /*#__PURE__*/React.createElement("div", {
-    style: { display: "flex", flexWrap: "wrap", gap: 6, marginBottom: 10 }
-  }, React.Children.map(children, function(child, i) {
-    return /*#__PURE__*/React.createElement("div", {
-      key: i, style: { flex: "1 1 calc(33.333% - 4px)", maxWidth: "calc(33.333% - 4px)", minWidth: 0, display: "flex" }
-    }, child);
-  }));
+    style: { display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 6, marginBottom: 10 }
+  }, children);
 };
 var BtnGrid = function BtnGrid(_ref4g) {
   var children = _ref4g.children,
     cols = _ref4g.cols;
-  var items = React.Children.count(children);
-  // 항목 수에 따라 자동 열 수 결정
   var autoCols = cols || 3;
-  // 항목 수가 열 수로 나누어지지 않을 때 (마지막 줄이 비는 경우)
-  // flex로 처리해서 마지막 줄도 균등하게
-  var lastRowCount = items % autoCols;
-  var useStretch = lastRowCount === 0; // 딱 맞으면 grid
-  if (useStretch) {
-    return /*#__PURE__*/React.createElement("div", {
-      style: { display: "grid", gridTemplateColumns: "repeat(" + autoCols + ", 1fr)", gap: 6, marginBottom: 10 }
-    }, children);
-  }
-  // 마지막 줄이 남으면 flex로 중앙 정렬
   return /*#__PURE__*/React.createElement("div", {
-    style: { display: "flex", flexWrap: "wrap", gap: 6, marginBottom: 10 }
-  }, React.Children.map(children, function(child, i) {
-    var isLastRow = i >= items - lastRowCount;
-    return /*#__PURE__*/React.createElement("div", {
-      key: i,
-      style: {
-        flex: isLastRow ? "1 1 calc(" + (100 / autoCols) + "% - 6px)" : "1 1 calc(" + (100 / autoCols) + "% - 6px)",
-        maxWidth: "calc(" + (100 / autoCols) + "% - 4px)",
-        minWidth: 0
-      }
-    }, child);
-  }));
+    style: { display: "grid", gridTemplateColumns: "repeat(" + autoCols + ", 1fr)", gap: 6, marginBottom: 10 }
+  }, children);
 };
 var Lbl = function Lbl(_ref5) {
   var text = _ref5.text;
