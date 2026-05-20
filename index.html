@@ -729,7 +729,7 @@ var BtnGrid = function BtnGrid(_ref4g) {
     cols = _ref4g.cols;
   var items = React.Children.count(children);
   // 항목 수에 따라 자동 열 수 결정
-  var autoCols = cols || (items <= 2 ? 2 : items === 3 ? 3 : items === 4 ? 2 : items <= 6 ? 3 : 3);
+  var autoCols = cols || 2;
   // 항목 수가 열 수로 나누어지지 않을 때 (마지막 줄이 비는 경우)
   // flex로 처리해서 마지막 줄도 균등하게
   var lastRowCount = items % autoCols;
@@ -7563,7 +7563,7 @@ var BtnGrid = function BtnGrid(_ref4g) {
     cols = _ref4g.cols;
   var items = React.Children.count(children);
   // 항목 수에 따라 자동 열 수 결정
-  var autoCols = cols || (items <= 2 ? 2 : items === 3 ? 3 : items === 4 ? 2 : items <= 6 ? 3 : 3);
+  var autoCols = cols || 2;
   // 항목 수가 열 수로 나누어지지 않을 때 (마지막 줄이 비는 경우)
   // flex로 처리해서 마지막 줄도 균등하게
   var lastRowCount = items % autoCols;
@@ -14396,7 +14396,7 @@ var BtnGrid = function BtnGrid(_ref4g) {
     cols = _ref4g.cols;
   var items = React.Children.count(children);
   // 항목 수에 따라 자동 열 수 결정
-  var autoCols = cols || (items <= 2 ? 2 : items === 3 ? 3 : items === 4 ? 2 : items <= 6 ? 3 : 3);
+  var autoCols = cols || 2;
   // 항목 수가 열 수로 나누어지지 않을 때 (마지막 줄이 비는 경우)
   // flex로 처리해서 마지막 줄도 균등하게
   var lastRowCount = items % autoCols;
