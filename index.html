@@ -9086,7 +9086,7 @@ function GuardianScreen(_ref19) {
       /*#__PURE__*/React.createElement("div", { style: { fontSize: 26, fontWeight: 900, marginBottom: 4, letterSpacing: -0.5 } }, patient && patient.name, " ", getTitle(patient)),
       /*#__PURE__*/React.createElement("div", { style: { fontSize: 13, opacity: 0.7, marginBottom: 18, fontWeight: 500 } }, getWard(patient && patient.room), " · ", getDoctorTitle(patient && patient.doctorId)),
       /*#__PURE__*/React.createElement("div", { style: { display: "flex", gap: 8 } },
-        [{label:"입원",value:(patient&&patient.days)+"일째"},{label:"의식",value:r?r.consciousness||"—":"—"},{label:"식사",value:r?r.meal_amount==="잘 드심"?"양호":r.meal_amount==="절반"?"보통":r.meal_amount?"저하":"—":"—"},{label:"기분",value:r?r.moods&&r.moods.length>0?r.moods[0]:"—":"—"}].map(function(item) {
+        [{label:"의식",value:r?r.consciousness||"—":"—"},{label:"수면",value:r?r.sleep_hours||"—":"—"},{label:"활동",value:r?r.mobility||"—":"—"},{label:"특이사항",value:r?r.condition||"—":"—"}].map(function(item) {
           return /*#__PURE__*/React.createElement("div", { key: item.label, style: { flex: 1, background: "rgba(255,255,255,0.12)", borderRadius: 12, padding: "10px 6px", textAlign: "center", border: "1px solid rgba(255,255,255,0.1)" } },
             /*#__PURE__*/React.createElement("div", { style: { fontSize: 9, opacity: 0.65, marginBottom: 4, letterSpacing: 0.5 } }, item.label),
             /*#__PURE__*/React.createElement("div", { style: { fontSize: 13, fontWeight: 800 } }, item.value)
@@ -15928,7 +15928,7 @@ function GuardianScreen(_ref19) {
       /*#__PURE__*/React.createElement("div", { style: { fontSize: 26, fontWeight: 900, marginBottom: 4, letterSpacing: -0.5 } }, patient && patient.name, " ", getTitle(patient)),
       /*#__PURE__*/React.createElement("div", { style: { fontSize: 13, opacity: 0.7, marginBottom: 18, fontWeight: 500 } }, getWard(patient && patient.room), " · ", getDoctorTitle(patient && patient.doctorId)),
       /*#__PURE__*/React.createElement("div", { style: { display: "flex", gap: 8 } },
-        [{label:"입원",value:(patient&&patient.days)+"일째"},{label:"의식",value:r?r.consciousness||"—":"—"},{label:"식사",value:r?r.meal_amount==="잘 드심"?"양호":r.meal_amount==="절반"?"보통":r.meal_amount?"저하":"—":"—"},{label:"기분",value:r?r.moods&&r.moods.length>0?r.moods[0]:"—":"—"}].map(function(item) {
+        [{label:"의식",value:r?r.consciousness||"—":"—"},{label:"수면",value:r?r.sleep_hours||"—":"—"},{label:"활동",value:r?r.mobility||"—":"—"},{label:"특이사항",value:r?r.condition||"—":"—"}].map(function(item) {
           return /*#__PURE__*/React.createElement("div", { key: item.label, style: { flex: 1, background: "rgba(255,255,255,0.12)", borderRadius: 12, padding: "10px 6px", textAlign: "center", border: "1px solid rgba(255,255,255,0.1)" } },
             /*#__PURE__*/React.createElement("div", { style: { fontSize: 9, opacity: 0.65, marginBottom: 4, letterSpacing: 0.5 } }, item.label),
             /*#__PURE__*/React.createElement("div", { style: { fontSize: 13, fontWeight: 800 } }, item.value)
