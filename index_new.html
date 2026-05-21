@@ -1,0 +1,1269 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>안부 - 입원 환자 케어 플랫폼</title>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+    body { font-family: 'Noto Sans KR', sans-serif; background: #e2e8f0; min-height: 100vh; display: flex; justify-content: center; }
+    #root { min-height: 100vh; width: 100%; max-width: 480px; background: #f0f4f8; box-shadow: 0 0 40px rgba(0,0,0,0.15); }
+
+    /* 공통 */
+    .screen { min-height: 100vh; display: flex; flex-direction: column; }
+    .card { background: white; border-radius: 16px; padding: 20px; box-shadow: 0 2px 12px rgba(0,0,0,0.08); }
+    .btn { width: 100%; padding: 16px; border: none; border-radius: 12px; font-size: 16px; font-weight: 700; font-family: 'Noto Sans KR', sans-serif; cursor: pointer; transition: all 0.15s; text-align: center; display: flex; align-items: center; justify-content: center; }
+    .btn:active { transform: scale(0.98); }
+    .btn-primary { background: white; color: #1e3a5f; }
+    .btn-secondary { background: rgba(255,255,255,0.15); color: white; border: 1px solid rgba(255,255,255,0.3); }
+    .btn-dark { background: #1e3a5f; color: white; }
+    .btn-green { background: #dcfce7; color: #166534; }
+    .btn-red { background: #fee2e2; color: #991b1b; }
+    .input { width: 100%; padding: 14px 16px; border: 1.5px solid #e2e8f0; border-radius: 12px; font-size: 15px; font-family: 'Noto Sans KR', sans-serif; outline: none; transition: border 0.2s; background: white; }
+    .input:focus { border-color: #3b82f6; }
+    .select { width: 100%; padding: 14px 16px; border: 1.5px solid #e2e8f0; border-radius: 12px; font-size: 15px; font-family: 'Noto Sans KR', sans-serif; outline: none; background: white; }
+    .label { font-size: 14px; font-weight: 600; color: #374151; margin-bottom: 8px; display: block; }
+    .field { margin-bottom: 16px; }
+    .error-msg { background: #fee2e2; color: #991b1b; padding: 12px 16px; border-radius: 10px; font-size: 14px; margin-bottom: 16px; }
+    .tag { display: inline-block; padding: 3px 10px; border-radius: 20px; font-size: 12px; font-weight: 600; }
+    .tag-red { background: #fee2e2; color: #dc2626; }
+    .tag-green { background: #dcfce7; color: #16a34a; }
+    .tag-blue { background: #dbeafe; color: #1d4ed8; }
+    .tag-gray { background: #f1f5f9; color: #64748b; }
+    .tag-yellow { background: #fef9c3; color: #854d0e; }
+    .divider { height: 1px; background: #e2e8f0; margin: 16px 0; }
+    .back-btn { background: none; border: none; font-size: 14px; color: rgba(255,255,255,0.8); cursor: pointer; font-family: 'Noto Sans KR', sans-serif; padding: 4px 0; }
+    .loading { text-align: center; padding: 40px; color: #94a3b8; font-size: 14px; }
+    .empty { text-align: center; padding: 60px 20px; color: #94a3b8; }
+    .empty-icon { font-size: 48px; margin-bottom: 16px; }
+    .section-title { font-size: 13px; font-weight: 700; color: #64748b; margin: 20px 0 10px; display: flex; align-items: center; gap: 6px; }
+    .badge { background: #ef4444; color: white; border-radius: 20px; font-size: 11px; font-weight: 700; padding: 1px 7px; }
+
+    /* 탭 */
+    .tabs { display: flex; background: #f1f5f9; border-radius: 10px; padding: 4px; margin-bottom: 20px; }
+    .tab { flex: 1; padding: 8px; text-align: center; font-size: 13px; font-weight: 600; color: #64748b; border-radius: 8px; cursor: pointer; transition: all 0.2s; border: none; background: none; font-family: 'Noto Sans KR', sans-serif; }
+    .tab.active { background: white; color: #1e3a5f; box-shadow: 0 1px 4px rgba(0,0,0,0.1); }
+
+    /* 헤더 */
+    .header { padding: 16px 20px 20px; }
+    .header-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px; }
+    .logout-btn { background: rgba(255,255,255,0.2); border: none; color: white; font-size: 13px; font-weight: 600; padding: 6px 12px; border-radius: 8px; cursor: pointer; font-family: 'Noto Sans KR', sans-serif; }
+
+    /* 환자 카드 */
+    .patient-card { background: white; border-radius: 14px; padding: 16px; margin-bottom: 10px; box-shadow: 0 1px 6px rgba(0,0,0,0.06); cursor: pointer; transition: all 0.15s; border: 1.5px solid transparent; }
+    .patient-card:active { transform: scale(0.99); }
+    .patient-card.warning { border-color: #fbbf24; }
+    .patient-name { font-size: 16px; font-weight: 700; color: #1e3a5f; }
+    .patient-info { font-size: 13px; color: #64748b; margin-top: 3px; }
+
+    /* 스크롤 */
+    .scroll-area { flex: 1; overflow-y: auto; padding: 0 20px 100px; -webkit-overflow-scrolling: touch; }
+
+    /* 체크 그리드 */
+    .check-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+    .check-item { background: #f8fafc; border: 1.5px solid #e2e8f0; border-radius: 10px; padding: 10px 12px; cursor: pointer; transition: all 0.15s; }
+    .check-item.selected { background: #eff6ff; border-color: #3b82f6; }
+    .check-item-label { font-size: 12px; color: #64748b; margin-bottom: 4px; }
+    .check-item-value { font-size: 14px; font-weight: 600; color: #1e293b; }
+
+    /* 관계 태그 선택 */
+    .relation-tags { display: flex; flex-wrap: wrap; gap: 8px; }
+    .relation-tag { padding: 8px 14px; border-radius: 20px; font-size: 14px; font-weight: 500; border: 1.5px solid #e2e8f0; background: white; cursor: pointer; transition: all 0.15s; font-family: 'Noto Sans KR', sans-serif; }
+    .relation-tag.selected { background: #1e3a5f; color: white; border-color: #1e3a5f; }
+
+    /* 스위치 */
+    .toggle-row { display: flex; justify-content: space-between; align-items: center; padding: 12px 0; border-bottom: 1px solid #f1f5f9; }
+    .toggle-label { font-size: 15px; color: #374151; font-weight: 500; }
+    .toggle { width: 44px; height: 24px; background: #e2e8f0; border-radius: 12px; position: relative; cursor: pointer; transition: background 0.2s; border: none; }
+    .toggle.on { background: #3b82f6; }
+    .toggle::after { content: ''; position: absolute; width: 20px; height: 20px; background: white; border-radius: 50%; top: 2px; left: 2px; transition: left 0.2s; box-shadow: 0 1px 3px rgba(0,0,0,0.2); }
+    .toggle.on::after { left: 22px; }
+
+    /* 메시지 카드 */
+    .msg-card { background: white; border-radius: 14px; padding: 16px; margin-bottom: 10px; box-shadow: 0 1px 6px rgba(0,0,0,0.06); border-left: 3px solid #e2e8f0; }
+    .msg-card.unread { border-left-color: #3b82f6; }
+    .msg-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 8px; }
+    .msg-sender { font-size: 14px; font-weight: 700; color: #1e3a5f; }
+    .msg-time { font-size: 12px; color: #94a3b8; }
+    .msg-body { font-size: 14px; color: #374151; line-height: 1.5; }
+    .msg-meta { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 8px; }
+  </style>
+</head>
+<body>
+<div id="root"></div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
+<script>
+"use strict";
+const { useState, useEffect, useCallback } = React;
+
+// ── 설정 ──────────────────────────────────────────────────────
+const ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImltdWxxd3Fwd2pwamd1YmxtaHhiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg1OTcyNjYsImV4cCI6MjA5NDE3MzI2Nn0.rFV99EsG8CRXfMcYecOl8ERDY7QkHoaYtMRSyk1AfyA";
+const SUPABASE_URL = "https://imulqwqpwjpjgublmhxb.supabase.co";
+const FN_URL = "https://imulqwqpwjpjgublmhxb.supabase.co/functions/v1/bright-worker";
+
+// ── API 호출 (모든 요청은 Edge Function 통해서) ───────────────
+async function api(action, params = {}) {
+  const res = await fetch(FN_URL, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "Authorization": "Bearer " + ANON_KEY,
+      "apikey": ANON_KEY
+    },
+    body: JSON.stringify({ action, ...params })
+  });
+  return res.json();
+}
+
+// 공지사항만 직접 조회 (RLS에서 anon 허용)
+async function getNotices() {
+  const res = await fetch(`${SUPABASE_URL}/rest/v1/notices?is_active=eq.true&order=created_at.desc`, {
+    headers: { apikey: ANON_KEY, Authorization: "Bearer " + ANON_KEY }
+  });
+  return res.json();
+}
+
+// ── 유틸 ──────────────────────────────────────────────────────
+const today = () => new Date().toISOString().slice(0, 10);
+const now = () => new Date().toISOString();
+const fmtDate = (s) => {
+  if (!s) return "";
+  const d = new Date(s);
+  return `${d.getMonth()+1}월 ${d.getDate()}일 ${String(d.getHours()).padStart(2,"0")}:${String(d.getMinutes()).padStart(2,"0")}`;
+};
+const getWard = (room) => room || "";
+const admitDays = (admittedAt) => {
+  if (!admittedAt) return 0;
+  const diff = new Date() - new Date(admittedAt);
+  return Math.floor(diff / (1000*60*60*24)) + 1;
+};
+
+// ── 온보딩 화면 ───────────────────────────────────────────────
+function OnboardingScreen({ onDone }) {
+  const slides = [
+    { icon: "🏥", title: "안부에 오신 것을\n환영합니다", desc: "천안쌍용요양병원\n입원 환자 케어 연결 플랫폼" },
+    { icon: "👨‍👩‍👧", title: "가족과 함께\n환자를 돌봐요", desc: "보호자는 매일 어르신의\n상태를 확인할 수 있어요" },
+    { icon: "👩‍⚕️", title: "의료진과\n소통해요", desc: "간호사와 의사가 입력한\n케어 기록을 실시간으로 확인해요" },
+  ];
+  const [idx, setIdx] = useState(0);
+  const s = slides[idx];
+  return React.createElement("div", { className: "screen", style: { background: "linear-gradient(160deg,#0f172a,#1e3a5f)", justifyContent: "center", alignItems: "center", padding: 32, gap: 40 } },
+    React.createElement("div", { style: { textAlign: "center" } },
+      React.createElement("div", { style: { fontSize: 72, marginBottom: 24 } }, s.icon),
+      React.createElement("div", { style: { fontSize: 26, fontWeight: 800, color: "white", whiteSpace: "pre-line", lineHeight: 1.3, marginBottom: 16 } }, s.title),
+      React.createElement("div", { style: { fontSize: 15, color: "rgba(255,255,255,0.7)", whiteSpace: "pre-line", lineHeight: 1.6 } }, s.desc)
+    ),
+    React.createElement("div", { style: { display: "flex", gap: 8, justifyContent: "center" } },
+      slides.map((_, i) => React.createElement("div", { key: i, style: { width: i === idx ? 24 : 8, height: 8, borderRadius: 4, background: i === idx ? "white" : "rgba(255,255,255,0.3)", transition: "all 0.3s" } }))
+    ),
+    React.createElement("div", { style: { width: "100%", maxWidth: 360 } },
+      idx < slides.length - 1
+        ? React.createElement("button", { className: "btn btn-primary", onClick: () => setIdx(idx+1) }, "다음")
+        : React.createElement("button", { className: "btn btn-primary", onClick: onDone }, "시작하기")
+    )
+  );
+}
+
+// ── 역할 선택 화면 ────────────────────────────────────────────
+function RoleSelectScreen({ onSelect }) {
+  const [notices, setNotices] = useState([]);
+  useEffect(() => { getNotices().then(d => Array.isArray(d) && setNotices(d)); }, []);
+
+  const roles = [
+    { key: "guardian", icon: "👨‍👩‍👧", title: "보호자", desc: "오늘 하루 가족의 상태를 확인하세요" },
+    { key: "nurse", icon: "👩‍⚕️", title: "간호사", desc: "환자 상태 입력" },
+    { key: "doctor", icon: "🩺", title: "의사", desc: "담당 환자 현황 확인" },
+    { key: "messages", icon: "💬", title: "가족에게 한마디", desc: "면회 일정 및 메시지 확인" },
+    { key: "admin", icon: "👑", title: "관리자", desc: "직원 계정 및 환자 관리" },
+  ];
+
+  return React.createElement("div", { className: "screen", style: { background: "linear-gradient(160deg,#0f172a,#1e3a5f)" } },
+    React.createElement("div", { style: { padding: "60px 24px 24px", textAlign: "center" } },
+      React.createElement("div", { style: { fontSize: 32, fontWeight: 900, color: "white", letterSpacing: "-0.5px" } }, "안부"),
+      React.createElement("div", { style: { fontSize: 13, color: "rgba(255,255,255,0.6)", marginTop: 4 } }, "천안쌍용요양병원"),
+      React.createElement("div", { style: { fontSize: 12, color: "rgba(255,255,255,0.4)", marginTop: 2 } }, "입원 환자 케어 연결 플랫폼")
+    ),
+    React.createElement("div", { style: { flex: 1, padding: "0 20px 40px", display: "flex", flexDirection: "column", gap: 10 } },
+      roles.map(r => React.createElement("div", {
+        key: r.key,
+        onClick: () => onSelect(r.key),
+        style: { background: "rgba(255,255,255,0.08)", border: "1px solid rgba(255,255,255,0.12)", borderRadius: 16, padding: "16px 20px", cursor: "pointer", display: "flex", alignItems: "center", gap: 16, transition: "all 0.15s" }
+      },
+        React.createElement("div", { style: { fontSize: 28, width: 44, height: 44, background: "rgba(255,255,255,0.1)", borderRadius: 12, display: "flex", alignItems: "center", justifyContent: "center" } }, r.icon),
+        React.createElement("div", null,
+          React.createElement("div", { style: { fontSize: 16, fontWeight: 700, color: "white" } }, r.title),
+          React.createElement("div", { style: { fontSize: 12, color: "rgba(255,255,255,0.5)", marginTop: 2 } }, r.desc)
+        ),
+        React.createElement("div", { style: { marginLeft: "auto", color: "rgba(255,255,255,0.4)", fontSize: 18 } }, "›")
+      )),
+      notices.length > 0 && React.createElement("div", {
+        onClick: () => onSelect("notices"),
+        style: { background: "rgba(239,68,68,0.15)", border: "1px solid rgba(239,68,68,0.3)", borderRadius: 16, padding: "16px 20px", cursor: "pointer", display: "flex", alignItems: "center", gap: 16 }
+      },
+        React.createElement("div", { style: { fontSize: 28, width: 44, height: 44, background: "rgba(239,68,68,0.2)", borderRadius: 12, display: "flex", alignItems: "center", justifyContent: "center" } }, "📢"),
+        React.createElement("div", null,
+          React.createElement("div", { style: { fontSize: 16, fontWeight: 700, color: "white", display: "flex", alignItems: "center", gap: 8 } },
+            "공지사항",
+            React.createElement("span", { className: "badge" }, `NEW ${notices.length}`)
+          ),
+          React.createElement("div", { style: { fontSize: 12, color: "rgba(255,255,255,0.5)", marginTop: 2 } }, `최신 ${notices.length}건`)
+        ),
+        React.createElement("div", { style: { marginLeft: "auto", color: "rgba(255,255,255,0.4)", fontSize: 18 } }, "›")
+      )
+    ),
+    React.createElement("div", { style: { textAlign: "center", padding: "0 0 24px", color: "rgba(255,255,255,0.3)", fontSize: 12 } },
+      "Powered by (주)디어다샘버"
+    )
+  );
+}
+
+// ── 공지사항 화면 ─────────────────────────────────────────────
+function NoticesScreen({ onBack }) {
+  const [notices, setNotices] = useState([]);
+  useEffect(() => { getNotices().then(d => Array.isArray(d) && setNotices(d)); }, []);
+  return React.createElement("div", { className: "screen", style: { background: "linear-gradient(160deg,#0f172a,#1e3a5f)" } },
+    React.createElement("div", { className: "header" },
+      React.createElement("button", { className: "back-btn", onClick: onBack }, "← 돌아가기"),
+      React.createElement("div", { style: { fontSize: 20, fontWeight: 800, color: "white", marginTop: 8 } }, "📢 공지사항")
+    ),
+    React.createElement("div", { className: "scroll-area" },
+      notices.length === 0
+        ? React.createElement("div", { className: "empty" }, React.createElement("div", { className: "empty-icon" }, "📭"), "공지사항이 없어요")
+        : notices.map(n => React.createElement("div", { key: n.id, className: "card", style: { marginBottom: 12 } },
+            React.createElement("div", { style: { fontWeight: 700, fontSize: 16, color: "#1e3a5f", marginBottom: 8 } }, n.title),
+            React.createElement("div", { style: { fontSize: 14, color: "#374151", lineHeight: 1.6 } }, n.content),
+            React.createElement("div", { style: { fontSize: 12, color: "#94a3b8", marginTop: 10 } }, n.created_at?.slice(0,10))
+          ))
+    )
+  );
+}
+
+// ── 로그인 화면 ───────────────────────────────────────────────
+function LoginScreen({ loginType, onLogin, onBack, onSignup }) {
+  const [form, setForm] = useState({ identifier: "", password: "", patientName: "", birthdate: "", phone: "" });
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+
+  const set = (k, v) => setForm(f => ({ ...f, [k]: v }));
+
+  const bgColors = {
+    guardian: "linear-gradient(160deg,#1e3a5f,#2563eb)",
+    nurse: "linear-gradient(160deg,#064e3b,#059669)",
+    doctor: "linear-gradient(160deg,#1e1b4b,#4338ca)",
+    messages: "linear-gradient(160deg,#1e3a5f,#0891b2)",
+    admin: "linear-gradient(160deg,#1c1917,#44403c)",
+  };
+  const titles = { guardian: "👨‍👩‍👧 보호자 로그인", nurse: "👩‍⚕️ 간호사 로그인", doctor: "🩺 의사 로그인", messages: "💬 보호자 한마디", admin: "👑 관리자 로그인" };
+  const WARDS = ["믿음병동", "소망병동", "사랑병동", "행복병동"];
+  const DOCTORS = ["이요성", "김성민", "박지원", "최동훈", "정한솔"];
+
+  const handleLogin = async () => {
+    setError(""); setLoading(true);
+    try {
+      let result;
+      if (loginType === "guardian") {
+        if (!form.patientName || !form.birthdate || !form.phone) { setError("모든 항목을 입력해주세요."); return; }
+        result = await api("guardian_login", { patientName: form.patientName, birthdate: form.birthdate, phone: form.phone });
+        if (result.error) { setError(result.error); return; }
+        onLogin({ role: "guardian", patient: result.patient, guardianRole: result.guardianRole, phone: form.phone });
+      } else {
+        const role = loginType === "messages" ? (form.msgRole || "nurse") : loginType;
+        const identifier = role === "nurse" ? (form.ward || WARDS[0]) : form.identifier;
+        if (!identifier || !form.password) { setError("모든 항목을 입력해주세요."); return; }
+        result = await api("staff_login", { identifier, password: form.password, role });
+        if (result.error) { setError(result.error); return; }
+        onLogin({ ...result.user, loginAs: loginType });
+      }
+    } catch(e) { setError("오류가 발생했습니다. 다시 시도해주세요."); }
+    finally { setLoading(false); }
+  };
+
+  return React.createElement("div", { className: "screen", style: { background: bgColors[loginType] || bgColors.guardian } },
+    React.createElement("div", { className: "header", style: { paddingTop: 48 } },
+      React.createElement("button", { className: "back-btn", onClick: onBack }, "← 역할 선택"),
+      React.createElement("div", { style: { fontSize: 24, fontWeight: 800, color: "white", marginTop: 12 } }, titles[loginType]),
+      React.createElement("div", { style: { fontSize: 13, color: "rgba(255,255,255,0.6)", marginTop: 4 } }, "안부 · 입원 환자 케어 플랫폼")
+    ),
+    React.createElement("div", { style: { flex: 1, padding: "0 24px 40px" } },
+      error && React.createElement("div", { className: "error-msg" }, error),
+
+      // 보호자 로그인
+      loginType === "guardian" && React.createElement(React.Fragment, null,
+        React.createElement("div", { className: "field" },
+          React.createElement("label", { className: "label", style: { color: "rgba(255,255,255,0.8)" } }, "어르신 성함"),
+          React.createElement("input", { className: "input", placeholder: "예) 김순자", value: form.patientName, onChange: e => set("patientName", e.target.value) })
+        ),
+        React.createElement("div", { className: "field" },
+          React.createElement("label", { className: "label", style: { color: "rgba(255,255,255,0.8)" } }, "어르신 생년월일"),
+          React.createElement("input", { className: "input", placeholder: "예) 19460315", value: form.birthdate, onChange: e => set("birthdate", e.target.value), maxLength: 8 })
+        ),
+        React.createElement("div", { className: "field" },
+          React.createElement("label", { className: "label", style: { color: "rgba(255,255,255,0.8)" } }, "보호자 전화번호"),
+          React.createElement("input", { className: "input", placeholder: "예) 01012345678", value: form.phone, onChange: e => set("phone", e.target.value), type: "tel" })
+        )
+      ),
+
+      // 간호사 로그인
+      loginType === "nurse" && React.createElement(React.Fragment, null,
+        React.createElement("div", { className: "field" },
+          React.createElement("label", { className: "label", style: { color: "rgba(255,255,255,0.8)" } }, "병동 선택"),
+          React.createElement("select", { className: "select", value: form.ward || WARDS[0], onChange: e => set("ward", e.target.value) },
+            WARDS.map(w => React.createElement("option", { key: w, value: w }, w))
+          )
+        ),
+        React.createElement("div", { className: "field" },
+          React.createElement("label", { className: "label", style: { color: "rgba(255,255,255,0.8)" } }, "비밀번호"),
+          React.createElement("input", { className: "input", type: "password", placeholder: "비밀번호 입력", value: form.password, onChange: e => set("password", e.target.value) })
+        )
+      ),
+
+      // 의사/관리자 로그인
+      (loginType === "doctor" || loginType === "admin") && React.createElement(React.Fragment, null,
+        React.createElement("div", { className: "field" },
+          React.createElement("label", { className: "label", style: { color: "rgba(255,255,255,0.8)" } }, loginType === "admin" ? "관리자 이름" : "의사 이름"),
+          React.createElement("select", { className: "select", value: form.identifier, onChange: e => set("identifier", e.target.value) },
+            React.createElement("option", { value: "" }, "이름 선택"),
+            (loginType === "admin" ? ["이요성"] : DOCTORS).map(n => React.createElement("option", { key: n, value: n }, n))
+          )
+        ),
+        React.createElement("div", { className: "field" },
+          React.createElement("label", { className: "label", style: { color: "rgba(255,255,255,0.8)" } }, "비밀번호"),
+          React.createElement("input", { className: "input", type: "password", placeholder: "비밀번호 입력", value: form.password, onChange: e => set("password", e.target.value) })
+        )
+      ),
+
+      // 한마디 로그인 (간호사/의사 선택)
+      loginType === "messages" && React.createElement(React.Fragment, null,
+        React.createElement("div", { className: "card", style: { marginBottom: 16 } },
+          React.createElement("div", { style: { display: "flex", gap: 8, marginBottom: 16 } },
+            ["nurse","doctor"].map(r => React.createElement("button", {
+              key: r, onClick: () => set("msgRole", r),
+              style: { flex: 1, padding: "10px", borderRadius: 8, border: "1.5px solid", borderColor: (form.msgRole||"nurse") === r ? "#1e3a5f" : "#e2e8f0", background: (form.msgRole||"nurse") === r ? "#1e3a5f" : "white", color: (form.msgRole||"nurse") === r ? "white" : "#64748b", fontWeight: 600, fontSize: 14, cursor: "pointer", fontFamily: "'Noto Sans KR',sans-serif" }
+            }, r === "nurse" ? "👩‍⚕️ 간호사" : "🩺 의사"))
+          ),
+          (form.msgRole||"nurse") === "nurse"
+            ? React.createElement("select", { className: "select", value: form.ward || WARDS[0], onChange: e => set("ward", e.target.value) },
+                WARDS.map(w => React.createElement("option", { key: w, value: w }, w)))
+            : React.createElement("select", { className: "select", value: form.identifier, onChange: e => set("identifier", e.target.value) },
+                React.createElement("option", { value: "" }, "이름 선택"),
+                DOCTORS.map(n => React.createElement("option", { key: n, value: n }, n)))
+        ),
+        React.createElement("div", { className: "field" },
+          React.createElement("label", { className: "label", style: { color: "rgba(255,255,255,0.8)" } }, "비밀번호"),
+          React.createElement("input", { className: "input", type: "password", placeholder: "비밀번호 입력", value: form.password, onChange: e => set("password", e.target.value) })
+        )
+      ),
+
+      React.createElement("button", { className: "btn btn-primary", onClick: handleLogin, disabled: loading, style: { marginTop: 8 } }, loading ? "확인 중..." : "로그인"),
+      loginType === "guardian" && React.createElement("button", { className: "btn btn-secondary", onClick: onSignup, style: { marginTop: 12 } }, "처음이세요? 회원가입 하기")
+    )
+  );
+}
+
+// ── 보호자 회원가입 ───────────────────────────────────────────
+function GuardianSignupScreen({ onBack, onDone }) {
+  const [form, setForm] = useState({ name: "", phone: "", patientName: "", patientBirthdate: "", relation: "" });
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+  const set = (k, v) => setForm(f => ({ ...f, [k]: v }));
+  const RELATIONS = ["자녀", "배우자", "형제", "부모", "조부모", "사위", "며느리", "사촌", "행정담당직원", "지인"];
+
+  const handleSubmit = async () => {
+    if (!form.name || !form.phone || !form.patientName || !form.patientBirthdate) { setError("필수 항목을 모두 입력해주세요."); return; }
+    setLoading(true); setError("");
+    try {
+      const result = await api("guardian_signup", { name: form.name, phone: form.phone, patientName: form.patientName, patientBirthdate: form.patientBirthdate, relation: form.relation });
+      if (result.error) { setError(result.error); return; }
+      alert("가입 신청이 완료됐어요!\n관리자 승인 후 로그인하실 수 있어요.");
+      onDone();
+    } catch(e) { setError("오류가 발생했습니다."); }
+    finally { setLoading(false); }
+  };
+
+  return React.createElement("div", { className: "screen", style: { background: "#f8fafc" } },
+    React.createElement("div", { style: { padding: "48px 24px 24px" } },
+      React.createElement("button", { onClick: onBack, style: { background: "#f1f5f9", border: "none", borderRadius: 8, padding: "8px 14px", fontSize: 14, cursor: "pointer", fontFamily: "'Noto Sans KR',sans-serif", marginBottom: 20 } }, "← 돌아가기"),
+      React.createElement("div", { style: { fontSize: 24, fontWeight: 800, color: "#1e3a5f" } }, "보호자 회원가입"),
+      React.createElement("div", { style: { fontSize: 13, color: "#64748b", marginTop: 4 } }, "가입 신청 후 관리자 승인이 완료되면 로그인하실 수 있어요.")
+    ),
+    React.createElement("div", { className: "scroll-area", style: { paddingTop: 0 } },
+      error && React.createElement("div", { className: "error-msg" }, error),
+
+      React.createElement("div", { className: "card", style: { marginBottom: 12 } },
+        React.createElement("div", { style: { fontWeight: 700, color: "#1e3a5f", marginBottom: 16 } }, "보호자 정보"),
+        React.createElement("div", { className: "field" },
+          React.createElement("label", { className: "label" }, "성함 *"),
+          React.createElement("input", { className: "input", placeholder: "예) 김철수", value: form.name, onChange: e => set("name", e.target.value) })
+        ),
+        React.createElement("div", { className: "field" },
+          React.createElement("label", { className: "label" }, "연락처 *"),
+          React.createElement("input", { className: "input", placeholder: "예) 01012345678", value: form.phone, onChange: e => set("phone", e.target.value), type: "tel" })
+        )
+      ),
+
+      React.createElement("div", { className: "card", style: { marginBottom: 12 } },
+        React.createElement("div", { style: { fontWeight: 700, color: "#1e3a5f", marginBottom: 16 } }, "어르신 정보"),
+        React.createElement("div", { className: "field" },
+          React.createElement("label", { className: "label" }, "성함 *"),
+          React.createElement("input", { className: "input", placeholder: "예) 김순자", value: form.patientName, onChange: e => set("patientName", e.target.value) })
+        ),
+        React.createElement("div", { className: "field" },
+          React.createElement("label", { className: "label" }, "생년월일 *"),
+          React.createElement("input", { className: "input", placeholder: "예) 19460315", value: form.patientBirthdate, onChange: e => set("patientBirthdate", e.target.value), maxLength: 8 })
+        )
+      ),
+
+      React.createElement("div", { className: "card", style: { marginBottom: 24 } },
+        React.createElement("div", { style: { fontWeight: 700, color: "#1e3a5f", marginBottom: 12 } }, "관계 (선택)"),
+        React.createElement("div", { className: "relation-tags" },
+          RELATIONS.map(r => React.createElement("button", {
+            key: r, className: `relation-tag ${form.relation === r ? "selected" : ""}`,
+            onClick: () => set("relation", form.relation === r ? "" : r)
+          }, r))
+        )
+      ),
+
+      React.createElement("button", { className: "btn btn-dark", onClick: handleSubmit, disabled: loading }, loading ? "신청 중..." : "가입 신청하기")
+    )
+  );
+}
+
+// ── 보호자 화면 ───────────────────────────────────────────────
+function GuardianScreen({ user, onBack }) {
+  const [tab, setTab] = useState("today");
+  const [record, setRecord] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [msgForm, setMsgForm] = useState({ visitDate: "", visitTime: "", body: "" });
+  const [sending, setSending] = useState(false);
+  const patient = user.patient;
+
+  useEffect(() => {
+    api("get_today_record", { patientId: patient.id, phone: user.phone })
+      .then(d => setRecord(d.record))
+      .finally(() => setLoading(false));
+  }, []);
+
+  const sendMsg = async () => {
+    if (!msgForm.body && !msgForm.visitDate) { alert("메시지 또는 면회 예정일을 입력해주세요."); return; }
+    setSending(true);
+    try {
+      await api("send_message", { patientId: patient.id, phone: user.phone, senderName: user.name || "보호자", relation: user.relation, visitDate: msgForm.visitDate, visitTime: msgForm.visitTime, body: msgForm.body });
+      alert("전송됐어요!");
+      setMsgForm({ visitDate: "", visitTime: "", body: "" });
+    } catch(e) { alert("전송 실패했어요."); }
+    finally { setSending(false); }
+  };
+
+  const infoItems = record ? [
+    { label: "의식수준", value: record.consciousness },
+    { label: "식사량", value: record.meal },
+    { label: "수면", value: record.sleep },
+    { label: "이동", value: record.mobility },
+    { label: "낙상위험", value: record.fall_risk },
+    { label: "소변", value: record.urine },
+    { label: "대변", value: record.stool },
+    { label: "통증", value: record.pain != null ? `${record.pain}점` : null },
+  ].filter(i => i.value) : [];
+
+  return React.createElement("div", { className: "screen", style: { background: "#f0f4f8" } },
+    // 헤더
+    React.createElement("div", { style: { background: "linear-gradient(135deg,#1e3a5f,#2563eb)", padding: "48px 20px 24px" } },
+      React.createElement("div", { style: { display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 16 } },
+        React.createElement("button", { className: "back-btn", onClick: onBack }, "← 역할 선택"),
+        React.createElement("div", { style: { fontSize: 12, color: "rgba(255,255,255,0.5)" } }, "안부 · 천안쌍용요양병원")
+      ),
+      React.createElement("div", { style: { fontSize: 22, fontWeight: 800, color: "white" } }, `${patient.name}님`),
+      React.createElement("div", { style: { fontSize: 13, color: "rgba(255,255,255,0.7)", marginTop: 4 } }, `${patient.room} · 입원 ${admitDays(patient.admitted_at)}일째`),
+      record?.doctor_comment && React.createElement("div", { style: { background: "rgba(255,255,255,0.1)", borderRadius: 10, padding: "10px 14px", marginTop: 12, fontSize: 13, color: "rgba(255,255,255,0.9)" } },
+        "🩺 ", record.doctor_comment
+      )
+    ),
+
+    // 탭
+    React.createElement("div", { style: { padding: "0 20px", marginTop: 16 } },
+      React.createElement("div", { className: "tabs" },
+        React.createElement("button", { className: `tab ${tab==="today"?"active":""}`, onClick: () => setTab("today") }, "오늘의 안부"),
+        React.createElement("button", { className: `tab ${tab==="message"?"active":""}`, onClick: () => setTab("message") }, "어머니께 한마디")
+      )
+    ),
+
+    React.createElement("div", { className: "scroll-area" },
+      tab === "today" && (
+        loading ? React.createElement("div", { className: "loading" }, "불러오는 중...")
+        : !record ? React.createElement("div", { className: "empty" }, React.createElement("div", { className: "empty-icon" }, "⏳"), "아직 오늘 상태가 입력되지 않았어요",
+            React.createElement("div", { style: { fontSize: 13, color: "#94a3b8", marginTop: 8, lineHeight: 1.6 } }, "어르신에 대하여 면밀하게 지속적으로 관찰 및 케어 중입니다.")
+          )
+        : React.createElement(React.Fragment, null,
+            React.createElement("div", { className: "card", style: { marginBottom: 12 } },
+              React.createElement("div", { style: { fontWeight: 700, color: "#1e3a5f", marginBottom: 14, fontSize: 15 } }, "📋 오늘 상태 요약"),
+              React.createElement("div", { style: { display: "grid", gridTemplateColumns: "1fr 1fr", gap: "8px 0" } },
+                infoItems.map((item, i) => React.createElement("div", { key: i, style: { padding: "6px 0", borderBottom: "1px solid #f1f5f9" } },
+                  React.createElement("div", { style: { fontSize: 11, color: "#94a3b8" } }, item.label),
+                  React.createElement("div", { style: { fontSize: 14, fontWeight: 600, color: "#1e293b", marginTop: 2 } }, item.value)
+                ))
+              ),
+              record.mental && React.createElement("div", { style: { marginTop: 12, padding: "10px 12px", background: "#fff7ed", borderRadius: 8 } },
+                React.createElement("div", { style: { fontSize: 11, color: "#9a3412", fontWeight: 600 } }, "정신상태"),
+                React.createElement("div", { style: { fontSize: 13, color: "#7c2d12", marginTop: 3 } }, record.mental)
+              ),
+              record.nurse_note && React.createElement("div", { style: { marginTop: 12, padding: "10px 12px", background: "#f0f9ff", borderRadius: 8 } },
+                React.createElement("div", { style: { fontSize: 11, color: "#0369a1", fontWeight: 600 } }, "간호사 특이사항"),
+                React.createElement("div", { style: { fontSize: 13, color: "#0c4a6e", marginTop: 3, lineHeight: 1.6 } }, record.nurse_note)
+              ),
+              record.updated_at && React.createElement("div", { style: { fontSize: 12, color: "#94a3b8", marginTop: 12, textAlign: "right" } }, `${fmtDate(record.updated_at)} 간호사 입력`)
+            ),
+            record.doctor_findings?.length > 0 && React.createElement("div", { className: "card" },
+              React.createElement("div", { style: { fontWeight: 700, color: "#1e3a5f", marginBottom: 10 } }, "🩺 임상 소견"),
+              React.createElement("div", { style: { display: "flex", flexWrap: "wrap", gap: 6 } },
+                record.doctor_findings.map((f, i) => React.createElement("span", { key: i, className: "tag tag-blue" }, f))
+              )
+            )
+          )
+      ),
+
+      tab === "message" && React.createElement("div", { className: "card" },
+        React.createElement("div", { style: { fontWeight: 700, color: "#1e3a5f", marginBottom: 16 } }, "💬 어머니께 한마디"),
+        React.createElement("div", { className: "field" },
+          React.createElement("label", { className: "label" }, "면회 예정일"),
+          React.createElement("input", { className: "input", type: "date", value: msgForm.visitDate, onChange: e => setMsgForm(f => ({...f, visitDate: e.target.value})) })
+        ),
+        React.createElement("div", { className: "field" },
+          React.createElement("label", { className: "label" }, "면회 시간"),
+          React.createElement("input", { className: "input", type: "time", value: msgForm.visitTime, onChange: e => setMsgForm(f => ({...f, visitTime: e.target.value})) })
+        ),
+        React.createElement("div", { className: "field" },
+          React.createElement("label", { className: "label" }, "메시지"),
+          React.createElement("textarea", { className: "input", rows: 4, placeholder: "어머니께 전하고 싶은 말을 적어주세요", value: msgForm.body, onChange: e => setMsgForm(f => ({...f, body: e.target.value})), style: { resize: "none", lineHeight: 1.6 } })
+        ),
+        React.createElement("button", { className: "btn btn-dark", onClick: sendMsg, disabled: sending }, sending ? "전송 중..." : "전송하기")
+      )
+    )
+  );
+}
+
+// ── 간호사 화면 ───────────────────────────────────────────────
+function NurseScreen({ user, onBack }) {
+  const [tab, setTab] = useState("patients");
+  const [patients, setPatients] = useState([]);
+  const [messages, setMessages] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [selected, setSelected] = useState(null);
+
+  useEffect(() => {
+    Promise.all([
+      api("get_patients", { ward: user.ward }),
+      api("get_messages", { ward: user.ward })
+    ]).then(([pd, md]) => {
+      setPatients(pd.patients || []);
+      setMessages(md.messages || []);
+    }).finally(() => setLoading(false));
+  }, []);
+
+  const unread = messages.filter(m => !m.is_read).length;
+
+  if (selected) return React.createElement(NurseRecordScreen, {
+    patient: selected, user,
+    onBack: () => setSelected(null),
+    onSaved: () => api("get_patients", { ward: user.ward }).then(d => setPatients(d.patients || []))
+  });
+
+  return React.createElement("div", { className: "screen", style: { background: "#f0f4f8" } },
+    React.createElement("div", { style: { background: "linear-gradient(135deg,#064e3b,#059669)", padding: "48px 20px 20px" } },
+      React.createElement("div", { className: "header-top" },
+        React.createElement("button", { className: "back-btn", onClick: onBack }, "← 역할 선택"),
+        React.createElement("button", { className: "logout-btn", onClick: onBack }, "로그아웃 →")
+      ),
+      React.createElement("div", { style: { fontSize: 11, color: "rgba(255,255,255,0.5)", marginTop: 8 } }, `안부 · 천안쌍용요양병원 · ${user.ward}`),
+      React.createElement("div", { style: { display: "flex", justifyContent: "space-between", alignItems: "flex-end", marginTop: 4 } },
+        React.createElement("div", { style: { fontSize: 18, fontWeight: 800, color: "white" } }, "오늘 상태 입력"),
+        React.createElement("div", { style: { fontSize: 13, color: "rgba(255,255,255,0.7)" } }, `${patients.length}명`)
+      ),
+      React.createElement("div", { style: { display: "flex", gap: 8, marginTop: 12 } },
+        React.createElement("button", { onClick: () => setTab("patients"), style: { flex: 1, padding: "8px", background: tab==="patients"?"white":"rgba(255,255,255,0.15)", border: "none", borderRadius: 8, color: tab==="patients"?"#064e3b":"white", fontWeight: 600, fontSize: 13, cursor: "pointer", fontFamily: "'Noto Sans KR',sans-serif" } }, "환자관리"),
+        React.createElement("button", { onClick: () => setTab("messages"), style: { flex: 1, padding: "8px", background: tab==="messages"?"white":"rgba(255,255,255,0.15)", border: "none", borderRadius: 8, color: tab==="messages"?"#064e3b":"white", fontWeight: 600, fontSize: 13, cursor: "pointer", fontFamily: "'Noto Sans KR',sans-serif", display: "flex", alignItems: "center", justifyContent: "center", gap: 6 } },
+          "보호자 한마디", unread > 0 && React.createElement("span", { className: "badge" }, unread)
+        )
+      )
+    ),
+    React.createElement("div", { className: "scroll-area", style: { paddingTop: 16 } },
+      loading ? React.createElement("div", { className: "loading" }, "불러오는 중...")
+      : tab === "patients" ? patients.map(p => React.createElement(PatientListItem, { key: p.id, patient: p, onClick: () => setSelected(p) }))
+      : React.createElement(MessagesList, { messages, patients, onMarkRead: async (id) => { await api("mark_message_read", { messageId: id }); setMessages(ms => ms.map(m => m.id===id?{...m,is_read:true}:m)); } })
+    )
+  );
+}
+
+// 환자 목록 아이템
+function PatientListItem({ patient, onClick }) {
+  return React.createElement("div", { className: "patient-card", onClick },
+    React.createElement("div", { style: { display: "flex", justifyContent: "space-between", alignItems: "flex-start" } },
+      React.createElement("div", null,
+        React.createElement("div", { className: "patient-name" }, patient.name),
+        React.createElement("div", { className: "patient-info" }, `${patient.age}세 · ${patient.gender} · ${patient.room} · 입원 ${admitDays(patient.admitted_at)}일째`)
+      ),
+      React.createElement("div", { style: { fontSize: 18, color: "#94a3b8" } }, "›")
+    )
+  );
+}
+
+// ── 간호사 기록 입력 화면 ─────────────────────────────────────
+function NurseRecordScreen({ patient, user, onBack, onSaved }) {
+  const OPTS = {
+    consciousness: ["명료","졸림","혼미","반혼수","혼수"],
+    meal: ["전량","3/4","절반","1/4","소량","거부"],
+    sleep: ["8시간이상","6~8시간","4~6시간","4시간미만"],
+    mobility: ["독립보행","지팡이","보행기","휠체어","침대안정"],
+    fall_risk: ["낮음","보통","높음"],
+    urine: ["정상","빈뇨","실금","유치도뇨","핍뇨"],
+    stool: ["정상","변비","설사","실금","장루"],
+    vomit: ["정상투약","일부거부","전부거부","정맥투약"],
+    skin: ["정상","건조","발적","부종","상처"],
+    hygiene: ["좋음","보통","나쁨"],
+    bath: ["없음","1단계","2단계","3단계","4단계"],
+    oriental: ["없음","시행","시행중"],
+  };
+  const MOOD_OPTS = ["초조","무감동","잠자는 시간이 많음","우울감","만사귀찮아함","느린 반응","면회 후 상태변화 악화"];
+  const MENTAL_OPTS = ["인지저하","공격성","충동적행동","야간 혼돈","섬망"];
+
+  const [form, setForm] = useState({ consciousness:"", meal:"", sleep:"", mobility:"", fall_risk:"", urine:"", stool:"", vomit:"", pain:0, mood:[], mental:[], skin:"", hygiene:"", bath:"", oriental:"", nurse_note:"" });
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+  const set = (k, v) => setForm(f => ({...f, [k]: v}));
+  const toggleArr = (k, v) => setForm(f => ({ ...f, [k]: f[k].includes(v) ? f[k].filter(x=>x!==v) : [...f[k], v] }));
+
+  useEffect(() => {
+    api("get_today_record", { patientId: patient.id, phone: "staff" })
+      .then(d => { if (d.record) setForm(r => ({ ...r, ...d.record, mood: d.record.mood ? d.record.mood.split("·").map(s=>s.trim()).filter(Boolean) : [], mental: d.record.mental ? d.record.mental.split("·").map(s=>s.trim()).filter(Boolean) : [] })); })
+      .finally(() => setLoading(false));
+  }, []);
+
+  const handleSave = async () => {
+    setSaving(true);
+    try {
+      const data = { ...form, mood: form.mood.join(" · "), mental: form.mental.join(" · "), nurse_name: user.name || user.ward, updated_at: now() };
+      await api("save_record", { patientId: patient.id, date: today(), recordData: data });
+      onSaved();
+      alert("저장됐어요!");
+      onBack();
+    } catch(e) { alert("저장 실패"); }
+    finally { setSaving(false); }
+  };
+
+  const Section = ({ title, children }) => React.createElement("div", { className: "card", style: { marginBottom: 12 } },
+    React.createElement("div", { style: { fontWeight: 700, color: "#1e3a5f", marginBottom: 14, fontSize: 15 } }, title),
+    children
+  );
+
+  const BtnGroup = ({ field, opts }) => React.createElement("div", { style: { display: "flex", flexWrap: "wrap", gap: 6 } },
+    opts.map(o => React.createElement("button", {
+      key: o, onClick: () => set(field, o),
+      style: { padding: "7px 12px", borderRadius: 8, border: "1.5px solid", borderColor: form[field]===o?"#3b82f6":"#e2e8f0", background: form[field]===o?"#eff6ff":"white", color: form[field]===o?"#1d4ed8":"#374151", fontSize: 13, fontWeight: 600, cursor: "pointer", fontFamily: "'Noto Sans KR',sans-serif" }
+    }, o))
+  );
+
+  if (loading) return React.createElement("div", { className: "loading", style: { paddingTop: 80 } }, "불러오는 중...");
+
+  return React.createElement("div", { className: "screen", style: { background: "#f0f4f8" } },
+    React.createElement("div", { style: { background: "linear-gradient(135deg,#064e3b,#059669)", padding: "48px 20px 20px" } },
+      React.createElement("button", { className: "back-btn", onClick: onBack }, "← 목록"),
+      React.createElement("div", { style: { fontSize: 18, fontWeight: 800, color: "white", marginTop: 8 } }, `${patient.name} ${patient.age}세 · ${patient.gender}`),
+      React.createElement("div", { style: { fontSize: 13, color: "rgba(255,255,255,0.7)" } }, `${patient.room} · 입원 ${admitDays(patient.admitted_at)}일째`)
+    ),
+    React.createElement("div", { className: "scroll-area", style: { paddingTop: 16 } },
+      Section({ title: "의식 · 식사 · 수면",
+        children: React.createElement(React.Fragment, null,
+          ["consciousness","meal","sleep"].map(f => React.createElement("div", { key: f, style: { marginBottom: 12 } },
+            React.createElement("div", { style: { fontSize: 12, color: "#64748b", marginBottom: 6 } }, {consciousness:"의식수준",meal:"식사량",sleep:"수면"}[f]),
+            React.createElement(BtnGroup, { field: f, opts: OPTS[f] })
+          ))
+        )
+      }),
+      Section({ title: "이동 · 낙상 · 배변",
+        children: React.createElement(React.Fragment, null,
+          ["mobility","fall_risk","urine","stool"].map(f => React.createElement("div", { key: f, style: { marginBottom: 12 } },
+            React.createElement("div", { style: { fontSize: 12, color: "#64748b", marginBottom: 6 } }, {mobility:"이동방법",fall_risk:"낙상위험",urine:"소변",stool:"대변"}[f]),
+            React.createElement(BtnGroup, { field: f, opts: OPTS[f] })
+          ))
+        )
+      }),
+      Section({ title: "통증 (PAINAD)",
+        children: React.createElement("div", { style: { display: "flex", gap: 8, flexWrap: "wrap" } },
+          [0,1,2,3,4,5,6,7,8,9,10].map(n => React.createElement("button", {
+            key: n, onClick: () => set("pain", n),
+            style: { width: 40, height: 40, borderRadius: 8, border: "1.5px solid", borderColor: form.pain===n?"#3b82f6":"#e2e8f0", background: form.pain===n?"#eff6ff":"white", color: form.pain===n?"#1d4ed8":"#374151", fontWeight: 700, fontSize: 14, cursor: "pointer", fontFamily: "'Noto Sans KR',sans-serif" }
+          }, n))
+        )
+      }),
+      Section({ title: "기분 · 행동",
+        children: React.createElement("div", { style: { display: "flex", flexWrap: "wrap", gap: 6 } },
+          MOOD_OPTS.map(o => React.createElement("button", {
+            key: o, onClick: () => toggleArr("mood", o),
+            style: { padding: "7px 12px", borderRadius: 8, border: "1.5px solid", borderColor: form.mood.includes(o)?"#3b82f6":"#e2e8f0", background: form.mood.includes(o)?"#eff6ff":"white", color: form.mood.includes(o)?"#1d4ed8":"#374151", fontSize: 13, fontWeight: 600, cursor: "pointer", fontFamily: "'Noto Sans KR',sans-serif" }
+          }, o))
+        )
+      }),
+      Section({ title: "정신상태",
+        children: React.createElement("div", { style: { display: "flex", flexWrap: "wrap", gap: 6 } },
+          MENTAL_OPTS.map(o => React.createElement("button", {
+            key: o, onClick: () => toggleArr("mental", o),
+            style: { padding: "7px 12px", borderRadius: 8, border: "1.5px solid", borderColor: form.mental.includes(o)?"#ef4444":"#e2e8f0", background: form.mental.includes(o)?"#fee2e2":"white", color: form.mental.includes(o)?"#b91c1c":"#374151", fontSize: 13, fontWeight: 600, cursor: "pointer", fontFamily: "'Noto Sans KR',sans-serif" }
+          }, o))
+        )
+      }),
+      Section({ title: "피부 · 위생 · 욕창 · 한방",
+        children: React.createElement(React.Fragment, null,
+          ["skin","hygiene","bath","oriental"].map(f => React.createElement("div", { key: f, style: { marginBottom: 12 } },
+            React.createElement("div", { style: { fontSize: 12, color: "#64748b", marginBottom: 6 } }, {skin:"피부",hygiene:"위생",bath:"욕창",oriental:"한방치료"}[f]),
+            React.createElement(BtnGroup, { field: f, opts: OPTS[f] })
+          ))
+        )
+      }),
+      React.createElement("div", { className: "card", style: { marginBottom: 24 } },
+        React.createElement("div", { style: { fontWeight: 700, color: "#1e3a5f", marginBottom: 12 } }, "간호사 특이사항"),
+        React.createElement("textarea", { className: "input", rows: 5, placeholder: "특이사항을 입력하세요", value: form.nurse_note, onChange: e => set("nurse_note", e.target.value), style: { resize: "none", lineHeight: 1.6 } })
+      ),
+      React.createElement("button", { className: "btn btn-dark", onClick: handleSave, disabled: saving }, saving ? "저장 중..." : "💾 저장하기")
+    )
+  );
+}
+
+// ── 의사 화면 ─────────────────────────────────────────────────
+function DoctorScreen({ user, onBack }) {
+  const [tab, setTab] = useState("patients");
+  const [patients, setPatients] = useState([]);
+  const [messages, setMessages] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [selected, setSelected] = useState(null);
+
+  useEffect(() => {
+    Promise.all([
+      api("get_patients", { doctorId: user.doctor_id }),
+      api("get_messages", { doctorId: user.doctor_id })
+    ]).then(([pd, md]) => {
+      setPatients(pd.patients || []);
+      setMessages(md.messages || []);
+    }).finally(() => setLoading(false));
+  }, []);
+
+  const unread = messages.filter(m => !m.is_read).length;
+
+  if (selected) return React.createElement(DoctorReviewScreen, {
+    patient: selected, user, onBack: () => setSelected(null)
+  });
+
+  const pending = patients.filter(p => !p._reviewed);
+
+  return React.createElement("div", { className: "screen", style: { background: "#f0f4f8" } },
+    React.createElement("div", { style: { background: "linear-gradient(135deg,#1e1b4b,#4338ca)", padding: "48px 20px 20px" } },
+      React.createElement("div", { className: "header-top" },
+        React.createElement("button", { className: "back-btn", onClick: onBack }, "← 역할 선택"),
+        React.createElement("button", { className: "logout-btn", onClick: onBack }, "로그아웃 →")
+      ),
+      React.createElement("div", { style: { fontSize: 11, color: "rgba(255,255,255,0.5)", marginTop: 8 } }, `안부 · 천안쌍용요양병원 · ${user.name} 원장`),
+      React.createElement("div", { style: { display: "flex", justifyContent: "space-between", alignItems: "flex-end", marginTop: 4 } },
+        React.createElement("div", { style: { fontSize: 18, fontWeight: 800, color: "white" } }, "환자 현황"),
+        React.createElement("div", { style: { fontSize: 13, color: "rgba(255,255,255,0.7)" } }, `담당 ${patients.length}명`)
+      ),
+      React.createElement("div", { style: { display: "flex", gap: 8, marginTop: 12 } },
+        React.createElement("button", { onClick: () => setTab("patients"), style: { flex: 1, padding: "8px", background: tab==="patients"?"white":"rgba(255,255,255,0.15)", border: "none", borderRadius: 8, color: tab==="patients"?"#1e1b4b":"white", fontWeight: 600, fontSize: 13, cursor: "pointer", fontFamily: "'Noto Sans KR',sans-serif" } }, "환자목록"),
+        React.createElement("button", { onClick: () => setTab("messages"), style: { flex: 1, padding: "8px", background: tab==="messages"?"white":"rgba(255,255,255,0.15)", border: "none", borderRadius: 8, color: tab==="messages"?"#1e1b4b":"white", fontWeight: 600, fontSize: 13, cursor: "pointer", fontFamily: "'Noto Sans KR',sans-serif", display: "flex", alignItems: "center", justifyContent: "center", gap: 6 } },
+          "보호자 한마디", unread > 0 && React.createElement("span", { className: "badge" }, unread)
+        )
+      )
+    ),
+    React.createElement("div", { className: "scroll-area", style: { paddingTop: 16 } },
+      loading ? React.createElement("div", { className: "loading" }, "불러오는 중...")
+      : tab === "patients" ? patients.map(p => React.createElement(PatientListItem, { key: p.id, patient: p, onClick: () => setSelected(p) }))
+      : React.createElement(MessagesList, { messages, patients, onMarkRead: async (id) => { await api("mark_message_read", { messageId: id }); setMessages(ms => ms.map(m => m.id===id?{...m,is_read:true}:m)); } })
+    )
+  );
+}
+
+// ── 의사 검토 화면 ────────────────────────────────────────────
+function DoctorReviewScreen({ patient, user, onBack }) {
+  const FINDINGS = {
+    "감염/호흡기": ["폐렴 소견","폐혈증 의심","요로감염","폐부종","고열 지속","기침·가래 지속","산소포화도 저하"],
+    "순환/의식": ["혈압 이상","부정맥","의식저하","뇌졸중 의심","부종 악화"],
+    "소화/영양": ["식욕부진 지속","흡인 위험","복통·복부팽만","체중감소","영양불량"],
+    "통증/근골격": ["통증 조절 필요","낙상 위험 증가","욕창 악화","관절 구축 진행"],
+    "정신/행동": ["섬망 악화","우울증 의심","수면장애","공격적 행동"],
+    "처치/검사": ["Lab 이상소견 처치 중","검사결과 설명 시행","알부민 투여","수혈 시행","수혈 권유 중","L-Tube insertion 시행","영양제 투여 중","엑스레이 시행","혈액검사 시행"],
+  };
+
+  const [record, setRecord] = useState(null);
+  const [findings, setFindings] = useState([]);
+  const [comment, setComment] = useState("");
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+
+  useEffect(() => {
+    api("get_today_record", { patientId: patient.id, phone: "staff" })
+      .then(d => { if (d.record) { setRecord(d.record); setFindings(d.record.doctor_findings || []); setComment(d.record.doctor_comment || ""); } })
+      .finally(() => setLoading(false));
+  }, []);
+
+  const toggleFinding = (f) => setFindings(fs => fs.includes(f) ? fs.filter(x=>x!==f) : [...fs, f]);
+
+  const handleSave = async () => {
+    setSaving(true);
+    try {
+      await api("save_record", { patientId: patient.id, date: today(), recordData: { doctor_findings: findings, doctor_comment: comment, doctor_id: user.doctor_id, reviewed_at: now() } });
+      alert("저장됐어요!");
+      onBack();
+    } catch(e) { alert("저장 실패"); }
+    finally { setSaving(false); }
+  };
+
+  if (loading) return React.createElement("div", { className: "loading", style: { paddingTop: 80 } }, "불러오는 중...");
+
+  return React.createElement("div", { className: "screen", style: { background: "#f0f4f8" } },
+    React.createElement("div", { style: { background: "linear-gradient(135deg,#1e1b4b,#4338ca)", padding: "48px 20px 20px" } },
+      React.createElement("button", { className: "back-btn", onClick: onBack }, "← 목록"),
+      React.createElement("div", { style: { fontSize: 18, fontWeight: 800, color: "white", marginTop: 8 } }, `${patient.name} ${patient.age}세 · ${patient.gender}`),
+      React.createElement("div", { style: { fontSize: 13, color: "rgba(255,255,255,0.7)" } }, `${patient.room} · 입원 ${admitDays(patient.admitted_at)}일째`)
+    ),
+    React.createElement("div", { className: "scroll-area", style: { paddingTop: 16 } },
+      record ? React.createElement("div", { className: "card", style: { marginBottom: 12 } },
+        React.createElement("div", { style: { fontWeight: 700, color: "#1e3a5f", marginBottom: 12 } }, "📋 간호사 입력 요약"),
+        React.createElement("div", { style: { display: "grid", gridTemplateColumns: "1fr 1fr", gap: "6px 0" } },
+          [["의식",record.consciousness],["식사",record.meal],["수면",record.sleep],["이동",record.mobility],["통증",`${record.pain}점`],["낙상",record.fall_risk]].filter(([,v])=>v).map(([k,v]) =>
+            React.createElement("div", { key: k, style: { padding: "4px 0" } },
+              React.createElement("div", { style: { fontSize: 11, color: "#94a3b8" } }, k),
+              React.createElement("div", { style: { fontSize: 13, fontWeight: 600, color: "#1e293b" } }, v)
+            )
+          )
+        ),
+        record.mental && React.createElement("div", { style: { marginTop: 10, padding: "8px 10px", background: "#fff7ed", borderRadius: 8, fontSize: 13, color: "#7c2d12" } }, `정신: ${record.mental}`),
+        record.nurse_note && React.createElement("div", { style: { marginTop: 8, padding: "8px 10px", background: "#f0f9ff", borderRadius: 8, fontSize: 13, color: "#0c4a6e", lineHeight: 1.5 } }, record.nurse_note)
+      ) : React.createElement("div", { className: "empty" }, "아직 간호사 기록이 없어요"),
+
+      React.createElement("div", { className: "card", style: { marginBottom: 12 } },
+        React.createElement("div", { style: { fontWeight: 700, color: "#1e3a5f", marginBottom: 14 } }, "🩺 임상 소견 (복수 선택)"),
+        Object.entries(FINDINGS).map(([cat, items]) => React.createElement("div", { key: cat, style: { marginBottom: 14 } },
+          React.createElement("div", { style: { fontSize: 12, color: "#64748b", fontWeight: 600, marginBottom: 6 } }, `[ ${cat} ]`),
+          React.createElement("div", { style: { display: "flex", flexWrap: "wrap", gap: 6 } },
+            items.map(f => React.createElement("button", {
+              key: f, onClick: () => toggleFinding(f),
+              style: { padding: "6px 10px", borderRadius: 8, border: "1.5px solid", borderColor: findings.includes(f)?"#3b82f6":"#e2e8f0", background: findings.includes(f)?"#eff6ff":"white", color: findings.includes(f)?"#1d4ed8":"#374151", fontSize: 12, fontWeight: 600, cursor: "pointer", fontFamily: "'Noto Sans KR',sans-serif" }
+            }, f))
+          )
+        ))
+      ),
+
+      React.createElement("div", { className: "card", style: { marginBottom: 24 } },
+        React.createElement("div", { style: { fontWeight: 700, color: "#1e3a5f", marginBottom: 12 } }, "의사 코멘트 (보호자에게 전달)"),
+        React.createElement("textarea", { className: "input", rows: 4, placeholder: "보호자에게 전달할 내용을 입력하세요", value: comment, onChange: e => setComment(e.target.value), style: { resize: "none", lineHeight: 1.6 } })
+      ),
+      React.createElement("button", { className: "btn btn-dark", onClick: handleSave, disabled: saving }, saving ? "저장 중..." : "💾 저장 및 전달")
+    )
+  );
+}
+
+// ── 메시지 목록 컴포넌트 ──────────────────────────────────────
+function MessagesList({ messages, patients, onMarkRead }) {
+  const getPatient = (id) => patients.find(p => p.id === id);
+  const thisWeek = messages.filter(m => { const d = new Date(m.created_at); const now2 = new Date(); const diff = (now2 - d) / (1000*60*60*24); return diff <= 7 && m.visit_date; });
+  const general = messages.filter(m => !thisWeek.includes(m));
+
+  const MsgCard = ({ m }) => {
+    const p = getPatient(m.patient_id);
+    return React.createElement("div", { className: `msg-card ${!m.is_read?"unread":""}`, onClick: () => !m.is_read && onMarkRead(m.id) },
+      React.createElement("div", { className: "msg-header" },
+        React.createElement("div", null,
+          React.createElement("div", { className: "msg-sender" }, `${m.sender_name} ${m.relation?`(${m.relation})`:""}`)
+        ),
+        React.createElement("div", { className: "msg-time" }, fmtDate(m.created_at))
+      ),
+      p && React.createElement("div", { style: { fontSize: 12, color: "#64748b", marginBottom: 6 } }, `${p.name} 어르신 · ${p.room}`),
+      m.visit_date && React.createElement("div", { style: { background: "#f0f9ff", borderRadius: 8, padding: "8px 10px", marginBottom: 8, fontSize: 13, color: "#0369a1", fontWeight: 600 } },
+        `📅 면회 예정: ${m.visit_date}${m.visit_time?" "+m.visit_time:""}`
+      ),
+      m.body && React.createElement("div", { className: "msg-body" }, m.body),
+      p && React.createElement("div", { style: { fontSize: 12, color: "#94a3b8", marginTop: 8 } }, `✓ ${p.name} 어르신께 전달해주세요`)
+    );
+  };
+
+  if (messages.length === 0) return React.createElement("div", { className: "empty" }, React.createElement("div", { className: "empty-icon" }, "💬"), "메시지가 없어요");
+
+  return React.createElement(React.Fragment, null,
+    thisWeek.length > 0 && React.createElement(React.Fragment, null,
+      React.createElement("div", { className: "section-title" }, "📅 이번 주 면회 예정"),
+      thisWeek.map(m => React.createElement(MsgCard, { key: m.id, m }))
+    ),
+    general.length > 0 && React.createElement(React.Fragment, null,
+      React.createElement("div", { className: "section-title" }, "💬 일반 메시지"),
+      general.map(m => React.createElement(MsgCard, { key: m.id, m }))
+    )
+  );
+}
+
+// ── 가족에게 한마디 화면 ──────────────────────────────────────
+function MessagesScreen({ user, onBack }) {
+  const [patients, setPatients] = useState([]);
+  const [messages, setMessages] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [filterWard, setFilterWard] = useState("전체");
+  const WARDS = ["전체","믿음병동","소망병동","사랑병동","행복병동"];
+
+  useEffect(() => {
+    Promise.all([
+      api("get_patients", user.role==="nurse" ? { ward: user.ward } : { doctorId: user.doctor_id }),
+      api("get_messages", user.role==="nurse" ? { ward: user.ward } : { doctorId: user.doctor_id })
+    ]).then(([pd, md]) => { setPatients(pd.patients||[]); setMessages(md.messages||[]); })
+    .finally(() => setLoading(false));
+  }, []);
+
+  const unread = messages.filter(m => !m.is_read).length;
+  const done = messages.filter(m => m.is_read).length;
+  const filtered = filterWard === "전체" ? messages : messages.filter(m => { const p = patients.find(p=>p.id===m.patient_id); return p?.room === filterWard; });
+
+  return React.createElement("div", { className: "screen", style: { background: "#f0f4f8" } },
+    React.createElement("div", { style: { background: "linear-gradient(135deg,#1e3a5f,#0891b2)", padding: "48px 20px 20px" } },
+      React.createElement("div", { className: "header-top" },
+        React.createElement("button", { className: "back-btn", onClick: onBack }, "← 역할 선택"),
+        React.createElement("button", { className: "logout-btn", onClick: onBack }, "로그아웃 →")
+      ),
+      React.createElement("div", { style: { display: "flex", gap: 12, marginTop: 12 } },
+        React.createElement("div", { style: { background: "rgba(255,255,255,0.15)", borderRadius: 10, padding: "10px 16px", textAlign: "center" } },
+          React.createElement("div", { style: { fontSize: 20, fontWeight: 800, color: "white" } }, messages.length),
+          React.createElement("div", { style: { fontSize: 11, color: "rgba(255,255,255,0.6)" } }, "전체")
+        ),
+        React.createElement("div", { style: { background: "rgba(239,68,68,0.3)", borderRadius: 10, padding: "10px 16px", textAlign: "center" } },
+          React.createElement("div", { style: { fontSize: 20, fontWeight: 800, color: "white" } }, unread),
+          React.createElement("div", { style: { fontSize: 11, color: "rgba(255,255,255,0.6)" } }, "미확인")
+        ),
+        React.createElement("div", { style: { background: "rgba(34,197,94,0.3)", borderRadius: 10, padding: "10px 16px", textAlign: "center" } },
+          React.createElement("div", { style: { fontSize: 20, fontWeight: 800, color: "white" } }, done),
+          React.createElement("div", { style: { fontSize: 11, color: "rgba(255,255,255,0.6)" } }, "완료")
+        )
+      ),
+      React.createElement("div", { style: { display: "flex", gap: 6, marginTop: 12, overflowX: "auto", paddingBottom: 4 } },
+        WARDS.map(w => React.createElement("button", {
+          key: w, onClick: () => setFilterWard(w),
+          style: { padding: "6px 12px", borderRadius: 20, border: "none", background: filterWard===w?"white":"rgba(255,255,255,0.2)", color: filterWard===w?"#1e3a5f":"white", fontWeight: 600, fontSize: 13, cursor: "pointer", whiteSpace: "nowrap", fontFamily: "'Noto Sans KR',sans-serif" }
+        }, w))
+      )
+    ),
+    React.createElement("div", { className: "scroll-area", style: { paddingTop: 16 } },
+      loading ? React.createElement("div", { className: "loading" }, "불러오는 중...")
+      : React.createElement(MessagesList, { messages: filtered, patients, onMarkRead: async (id) => { await api("mark_message_read", { messageId: id }); setMessages(ms => ms.map(m => m.id===id?{...m,is_read:true}:m)); } })
+    )
+  );
+}
+
+// ── 관리자 화면 ───────────────────────────────────────────────
+function AdminScreen({ user, onBack }) {
+  const [tab, setTab] = useState("staff");
+  const [staff, setStaff] = useState([]);
+  const [patients, setPatients] = useState([]);
+  const [notices, setNotices] = useState([]);
+  const [requests, setRequests] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  const loadAll = () => {
+    setLoading(true);
+    Promise.all([
+      api("get_staff"),
+      api("get_patients", {}),
+      api("get_notices"),
+      api("get_requests")
+    ]).then(([sd, pd, nd, rd]) => {
+      setStaff(sd.staff||[]);
+      setPatients(pd.patients||[]);
+      setNotices(nd.notices||[]);
+      setRequests(rd.requests||[]);
+    }).finally(() => setLoading(false));
+  };
+
+  useEffect(() => { loadAll(); }, []);
+
+  const pendingCount = requests.length;
+
+  return React.createElement("div", { className: "screen", style: { background: "#f0f4f8" } },
+    React.createElement("div", { style: { background: "linear-gradient(135deg,#1c1917,#44403c)", padding: "48px 20px 16px" } },
+      React.createElement("div", { className: "header-top" },
+        React.createElement("button", { className: "back-btn", onClick: onBack }, "← 역할선택"),
+        React.createElement("button", { className: "logout-btn", onClick: onBack }, "로그아웃 →")
+      ),
+      React.createElement("div", { style: { fontSize: 11, color: "rgba(255,255,255,0.5)", marginTop: 8 } }, "안부 · 관리자"),
+      React.createElement("div", { style: { fontSize: 18, fontWeight: 800, color: "white" } }, `${user.name} 병원장`),
+      React.createElement("div", { style: { display: "flex", gap: 6, marginTop: 12, overflowX: "auto" } },
+        [["staff","직원 계정"],["patients","환자 현황"],["notices","공지사항"],["requests","가입승인"]].map(([k,v]) =>
+          React.createElement("button", {
+            key: k, onClick: () => setTab(k),
+            style: { padding: "8px 14px", borderRadius: 8, border: "none", background: tab===k?"white":"rgba(255,255,255,0.15)", color: tab===k?"#1c1917":"white", fontWeight: 700, fontSize: 13, cursor: "pointer", whiteSpace: "nowrap", fontFamily: "'Noto Sans KR',sans-serif", display: "flex", alignItems: "center", gap: 4 }
+          }, v, k==="requests" && pendingCount > 0 && React.createElement("span", { className: "badge" }, pendingCount))
+        )
+      )
+    ),
+    React.createElement("div", { className: "scroll-area", style: { paddingTop: 16 } },
+      loading ? React.createElement("div", { className: "loading" }, "불러오는 중...")
+      : tab === "staff" ? React.createElement(AdminStaffTab, { staff, onRefresh: loadAll })
+      : tab === "patients" ? React.createElement(AdminPatientsTab, { patients, onRefresh: loadAll })
+      : tab === "notices" ? React.createElement(AdminNoticesTab, { notices, onRefresh: loadAll })
+      : React.createElement(AdminRequestsTab, { requests, onApprove: async (id, approve) => { await api("handle_request", { requestId: id, approve }); loadAll(); } })
+    )
+  );
+}
+
+function AdminStaffTab({ staff, onRefresh }) {
+  const [showForm, setShowForm] = useState(false);
+  const [form, setForm] = useState({ name: "", role: "nurse", ward: "믿음병동", doctorId: "", password: "" });
+  const [saving, setSaving] = useState(false);
+  const set = (k, v) => setForm(f => ({...f, [k]: v}));
+  const WARDS = ["믿음병동","소망병동","사랑병동","행복병동"];
+
+  const handleAdd = async () => {
+    if (!form.name || !form.password) { alert("이름과 비밀번호를 입력해주세요."); return; }
+    setSaving(true);
+    try {
+      await api("add_staff", form);
+      setShowForm(false);
+      setForm({ name: "", role: "nurse", ward: "믿음병동", doctorId: "", password: "" });
+      onRefresh();
+    } catch(e) { alert("오류가 발생했습니다."); }
+    finally { setSaving(false); }
+  };
+
+  const roleLabel = { admin: "관리자", doctor: "의사", nurse: "간호사" };
+  const roleColor = { admin: "tag-yellow", doctor: "tag-blue", nurse: "tag-green" };
+
+  return React.createElement(React.Fragment, null,
+    React.createElement("button", { className: "btn btn-dark", onClick: () => setShowForm(!showForm), style: { marginBottom: 12 } }, showForm ? "✕ 닫기" : "+ 직원 계정 추가"),
+    showForm && React.createElement("div", { className: "card", style: { marginBottom: 12 } },
+      React.createElement("div", { style: { fontWeight: 700, color: "#1e3a5f", marginBottom: 16 } }, "신규 직원 등록"),
+      React.createElement("div", { className: "field" },
+        React.createElement("label", { className: "label" }, "역할"),
+        React.createElement("select", { className: "select", value: form.role, onChange: e => set("role", e.target.value) },
+          React.createElement("option", { value: "nurse" }, "간호사"),
+          React.createElement("option", { value: "doctor" }, "의사"),
+          React.createElement("option", { value: "admin" }, "관리자")
+        )
+      ),
+      React.createElement("div", { className: "field" },
+        React.createElement("label", { className: "label" }, "이름"),
+        React.createElement("input", { className: "input", placeholder: "이름 입력", value: form.name, onChange: e => set("name", e.target.value) })
+      ),
+      form.role === "nurse" && React.createElement("div", { className: "field" },
+        React.createElement("label", { className: "label" }, "병동"),
+        React.createElement("select", { className: "select", value: form.ward, onChange: e => set("ward", e.target.value) },
+          WARDS.map(w => React.createElement("option", { key: w, value: w }, w))
+        )
+      ),
+      form.role === "doctor" && React.createElement("div", { className: "field" },
+        React.createElement("label", { className: "label" }, "의사 ID (예: doc6)"),
+        React.createElement("input", { className: "input", placeholder: "예) doc6", value: form.doctorId, onChange: e => set("doctorId", e.target.value) })
+      ),
+      React.createElement("div", { className: "field" },
+        React.createElement("label", { className: "label" }, "비밀번호"),
+        React.createElement("input", { className: "input", type: "password", placeholder: "비밀번호 설정", value: form.password, onChange: e => set("password", e.target.value) })
+      ),
+      React.createElement("button", { className: "btn btn-dark", onClick: handleAdd, disabled: saving }, saving ? "등록 중..." : "등록하기")
+    ),
+    React.createElement("div", { style: { fontSize: 13, color: "#64748b", marginBottom: 8 } }, `전체 직원 ${staff.length}명`),
+    staff.map(s => React.createElement("div", { key: s.id, className: "card", style: { marginBottom: 8, display: "flex", justifyContent: "space-between", alignItems: "center" } },
+      React.createElement("div", { style: { display: "flex", alignItems: "center", gap: 10 } },
+        React.createElement("div", null,
+          React.createElement("div", { style: { display: "flex", alignItems: "center", gap: 6 } },
+            React.createElement("span", { style: { fontWeight: 700, color: "#1e3a5f" } }, s.name),
+            React.createElement("span", { className: `tag ${roleColor[s.role]}` }, roleLabel[s.role])
+          ),
+          React.createElement("div", { style: { fontSize: 12, color: s.active ? "#16a34a" : "#94a3b8", marginTop: 2 } }, s.active ? "● 활성" : "● 비활성", s.ward ? ` · ${s.ward}` : "")
+        )
+      ),
+      s.role !== "admin" && React.createElement("button", {
+        onClick: () => api("toggle_staff", { userId: s.id, active: !s.active }).then(onRefresh),
+        style: { padding: "6px 12px", borderRadius: 8, border: "1.5px solid", borderColor: s.active?"#fee2e2":"#dcfce7", background: s.active?"#fee2e2":"#dcfce7", color: s.active?"#991b1b":"#166534", fontWeight: 600, fontSize: 13, cursor: "pointer", fontFamily: "'Noto Sans KR',sans-serif" }
+      }, s.active ? "비활성화" : "활성화")
+    ))
+  );
+}
+
+function AdminPatientsTab({ patients, onRefresh }) {
+  const [showForm, setShowForm] = useState(false);
+  const [form, setForm] = useState({ name: "", birthdate: "", age: "", gender: "여", room: "믿음병동", doctor_id: "doc1", admitted_at: today() });
+  const [saving, setSaving] = useState(false);
+  const set = (k, v) => setForm(f => ({...f, [k]: v}));
+  const WARDS = ["믿음병동","소망병동","사랑병동","행복병동"];
+  const DOCTORS = [["doc1","이요성"],["doc2","김성민"],["doc3","박지원"],["doc4","최동훈"],["doc5","정한솔"]];
+
+  const handleAdd = async () => {
+    if (!form.name || !form.birthdate) { alert("이름과 생년월일을 입력해주세요."); return; }
+    setSaving(true);
+    try {
+      await api("add_patient", { patient: { ...form, age: parseInt(form.age)||0 } });
+      setShowForm(false);
+      onRefresh();
+    } catch(e) { alert("오류"); }
+    finally { setSaving(false); }
+  };
+
+  return React.createElement(React.Fragment, null,
+    React.createElement("button", { className: "btn btn-dark", onClick: () => setShowForm(!showForm), style: { marginBottom: 12 } }, showForm ? "✕ 닫기" : "+ 환자 추가"),
+    showForm && React.createElement("div", { className: "card", style: { marginBottom: 12 } },
+      React.createElement("div", { style: { fontWeight: 700, color: "#1e3a5f", marginBottom: 16 } }, "신규 환자 등록"),
+      [["name","이름","텍스트","예) 김순자"],["birthdate","생년월일","텍스트","예) 19460315"],["age","나이","숫자","예) 78"]].map(([k,l,,p]) =>
+        React.createElement("div", { key: k, className: "field" },
+          React.createElement("label", { className: "label" }, l),
+          React.createElement("input", { className: "input", placeholder: p, value: form[k], onChange: e => set(k, e.target.value) })
+        )
+      ),
+      React.createElement("div", { className: "field" },
+        React.createElement("label", { className: "label" }, "성별"),
+        React.createElement("select", { className: "select", value: form.gender, onChange: e => set("gender", e.target.value) },
+          React.createElement("option", { value: "여" }, "여"),
+          React.createElement("option", { value: "남" }, "남")
+        )
+      ),
+      React.createElement("div", { className: "field" },
+        React.createElement("label", { className: "label" }, "병동"),
+        React.createElement("select", { className: "select", value: form.room, onChange: e => set("room", e.target.value) },
+          WARDS.map(w => React.createElement("option", { key: w, value: w }, w))
+        )
+      ),
+      React.createElement("div", { className: "field" },
+        React.createElement("label", { className: "label" }, "담당 의사"),
+        React.createElement("select", { className: "select", value: form.doctor_id, onChange: e => set("doctor_id", e.target.value) },
+          DOCTORS.map(([id, name]) => React.createElement("option", { key: id, value: id }, name))
+        )
+      ),
+      React.createElement("div", { className: "field" },
+        React.createElement("label", { className: "label" }, "입원일"),
+        React.createElement("input", { className: "input", type: "date", value: form.admitted_at, onChange: e => set("admitted_at", e.target.value) })
+      ),
+      React.createElement("button", { className: "btn btn-dark", onClick: handleAdd, disabled: saving }, saving ? "등록 중..." : "등록하기")
+    ),
+    React.createElement("div", { style: { fontSize: 13, color: "#64748b", marginBottom: 8 } }, `전체 입원 환자 ${patients.length}명`),
+    patients.map(p => React.createElement("div", { key: p.id, className: "card", style: { marginBottom: 8 } },
+      React.createElement("div", { style: { fontWeight: 700, color: "#1e3a5f" } }, p.name),
+      React.createElement("div", { style: { fontSize: 13, color: "#64748b", marginTop: 2 } }, `${p.age}세 · ${p.gender} · ${p.room} · 입원 ${admitDays(p.admitted_at)}일째`)
+    ))
+  );
+}
+
+function AdminNoticesTab({ notices, onRefresh }) {
+  const [form, setForm] = useState({ title: "", content: "" });
+  const [saving, setSaving] = useState(false);
+
+  const handleSave = async () => {
+    if (!form.title || !form.content) { alert("제목과 내용을 입력해주세요."); return; }
+    setSaving(true);
+    try {
+      await api("save_notice", form);
+      setForm({ title: "", content: "" });
+      onRefresh();
+    } finally { setSaving(false); }
+  };
+
+  return React.createElement(React.Fragment, null,
+    React.createElement("div", { className: "card", style: { marginBottom: 12 } },
+      React.createElement("div", { style: { fontWeight: 700, color: "#1e3a5f", marginBottom: 16 } }, "📢 새 공지사항 작성"),
+      React.createElement("div", { className: "field" },
+        React.createElement("label", { className: "label" }, "제목"),
+        React.createElement("input", { className: "input", placeholder: "예) 독감 예방접종 안내", value: form.title, onChange: e => setForm(f=>({...f,title:e.target.value})) })
+      ),
+      React.createElement("div", { className: "field" },
+        React.createElement("label", { className: "label" }, "내용"),
+        React.createElement("textarea", { className: "input", rows: 4, placeholder: "공지 내용을 입력하세요", value: form.content, onChange: e => setForm(f=>({...f,content:e.target.value})), style: { resize: "none", lineHeight: 1.6 } })
+      ),
+      React.createElement("button", { className: "btn btn-dark", onClick: handleSave, disabled: saving }, saving ? "등록 중..." : "공지 등록")
+    ),
+    React.createElement("div", { style: { fontSize: 13, color: "#64748b", marginBottom: 8 } }, `등록된 공지 ${notices.length}건`),
+    notices.map(n => React.createElement("div", { key: n.id, className: "card", style: { marginBottom: 8 } },
+      React.createElement("div", { style: { display: "flex", justifyContent: "space-between", alignItems: "flex-start" } },
+        React.createElement("div", { style: { fontWeight: 700, color: "#1e3a5f", marginBottom: 6 } }, n.title),
+        React.createElement("button", { onClick: () => api("delete_notice", { id: n.id }).then(onRefresh), style: { background: "#fee2e2", border: "none", color: "#991b1b", borderRadius: 6, padding: "4px 8px", fontSize: 12, cursor: "pointer", fontFamily: "'Noto Sans KR',sans-serif" } }, "삭제")
+      ),
+      React.createElement("div", { style: { fontSize: 14, color: "#374151", lineHeight: 1.5 } }, n.content),
+      React.createElement("div", { style: { fontSize: 12, color: "#94a3b8", marginTop: 8 } }, n.created_at?.slice(0,10))
+    ))
+  );
+}
+
+function AdminRequestsTab({ requests, onApprove }) {
+  if (requests.length === 0) return React.createElement("div", { className: "empty" }, React.createElement("div", { className: "empty-icon" }, "🎉"), "대기 중인 가입 신청이 없어요");
+
+  return React.createElement(React.Fragment, null,
+    React.createElement("div", { style: { fontSize: 13, color: "#64748b", marginBottom: 8 } }, `가입 승인 대기 ${requests.length}건`),
+    requests.map(r => React.createElement("div", { key: r.id, className: "card", style: { marginBottom: 12 } },
+      React.createElement("div", { style: { fontWeight: 700, color: "#1e3a5f", marginBottom: 6 } }, `${r.name}${r.relation?` (${r.relation})`:""}`),
+      React.createElement("div", { style: { fontSize: 13, color: "#64748b" } }, `📞 ${r.phone}`),
+      React.createElement("div", { style: { fontSize: 13, color: "#64748b" } }, `👴 어르신: ${r.patient_name}`),
+      React.createElement("div", { style: { fontSize: 12, color: "#94a3b8", marginTop: 4 } }, `${r.created_at?.slice(0,10)} 신청`),
+      React.createElement("div", { style: { display: "flex", gap: 8, marginTop: 12 } },
+        React.createElement("button", { className: "btn btn-green", onClick: () => onApprove(r.id, true), style: { flex: 1 } }, "✅ 승인"),
+        React.createElement("button", { className: "btn btn-red", onClick: () => onApprove(r.id, false), style: { flex: 1 } }, "✕ 거부")
+      )
+    ))
+  );
+}
+
+// ── 메인 앱 ───────────────────────────────────────────────────
+function App() {
+  const [screen, setScreen] = useState("splash");
+  const [role, setRole] = useState(null);
+  const [currentUser, setCurrentUser] = useState(null);
+
+  useEffect(() => {
+    // 온보딩 확인
+    const seen = localStorage.getItem("anbu_onboarded");
+    setScreen(seen ? "roleSelect" : "onboarding");
+  }, []);
+
+  const handleOnboardDone = () => {
+    localStorage.setItem("anbu_onboarded", "1");
+    setScreen("roleSelect");
+  };
+
+  const handleRoleSelect = (r) => {
+    if (r === "notices") { setRole("notices"); setScreen("notices"); return; }
+    setRole(r);
+    setScreen("login");
+  };
+
+  const handleLogin = (user) => {
+    setCurrentUser(user);
+    setScreen("app");
+  };
+
+  const handleLogout = () => {
+    setCurrentUser(null);
+    setRole(null);
+    setScreen("roleSelect");
+  };
+
+  if (screen === "splash") return React.createElement("div", { style: { minHeight: "100vh", background: "linear-gradient(160deg,#0f172a,#1e3a5f)", display: "flex", alignItems: "center", justifyContent: "center" } },
+    React.createElement("div", { style: { fontSize: 32, fontWeight: 900, color: "white" } }, "안부")
+  );
+
+  if (screen === "onboarding") return React.createElement(OnboardingScreen, { onDone: handleOnboardDone });
+  if (screen === "notices") return React.createElement(NoticesScreen, { onBack: () => setScreen("roleSelect") });
+  if (screen === "roleSelect") return React.createElement(RoleSelectScreen, { onSelect: handleRoleSelect });
+  if (screen === "login") return React.createElement(LoginScreen, {
+    loginType: role,
+    onLogin: handleLogin,
+    onBack: () => setScreen("roleSelect"),
+    onSignup: () => setScreen("signup")
+  });
+  if (screen === "signup") return React.createElement(GuardianSignupScreen, {
+    onBack: () => setScreen("login"),
+    onDone: () => setScreen("login")
+  });
+
+  if (screen === "app" && currentUser) {
+    if (currentUser.role === "guardian") return React.createElement(GuardianScreen, { user: currentUser, onBack: handleLogout });
+    if (currentUser.role === "nurse") return React.createElement(NurseScreen, { user: currentUser, onBack: handleLogout });
+    if (currentUser.role === "doctor") return React.createElement(DoctorScreen, { user: currentUser, onBack: handleLogout });
+    if (currentUser.loginAs === "messages") return React.createElement(MessagesScreen, { user: currentUser, onBack: handleLogout });
+    if (currentUser.role === "admin") return React.createElement(AdminScreen, { user: currentUser, onBack: handleLogout });
+  }
+
+  return null;
+}
+
+ReactDOM.createRoot(document.getElementById("root")).render(React.createElement(App));
+</script>
+</body>
+</html>
