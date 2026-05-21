@@ -551,6 +551,7 @@ function NurseScreen({ user, onBack }) {
   const [loading, setLoading] = useState(true);
   const [selected, setSelected] = useState(null);
   const [selectMode, setSelectMode] = useState(null); // null | 'choose' | 'edit'
+  const [noChangePopup, setNoChangePopup] = useState(null); // { name, message, ward }
 
   useEffect(() => {
     Promise.all([
@@ -594,14 +595,42 @@ function NurseScreen({ user, onBack }) {
           no_change: true
         }
       });
-      alert(`${selected.name}님 — 변화 없음으로 저장됐어요!`);
-      setSelected(null);
-      setSelectMode(null);
+      // 랜덤 메시지 선택
+      const MESSAGES = [
+        { title: "오늘도 평온한 하루를 보내셨어요 🌿", body: "큰 변화 없이 안정적인 날들이 이어지는 것이 회복의 과정입니다. 가족분의 관심이 어르신께 큰 힘이 되고 있어요." },
+        { title: "어르신, 오늘도 잘 지내고 계세요 ☀️", body: "어제와 비슷한 안정적인 상태를 유지하고 계십니다. 꾸준한 안정이 건강 유지에 가장 중요해요." },
+        { title: "오늘도 케어팀이 함께하고 있어요 💚", body: "어르신의 상태를 면밀히 관찰하며 최선을 다해 돌보고 있습니다. 걱정하지 마세요." },
+        { title: "안정적인 하루가 쌓이고 있어요 🌸", body: "매일 꾸준히 안정적인 상태를 유지하시는 것이 건강에 가장 좋은 신호입니다." },
+        { title: "오늘도 편안하게 지내고 계세요 🌙", body: "어르신이 안정적으로 지내고 계십니다. 보호자분의 따뜻한 관심이 어르신께 큰 위안이 됩니다." },
+        { title: "케어팀이 늘 곁에 있어요 🤝", body: "오늘도 변화 없이 안정적인 하루를 보내셨습니다. 이상 징후가 생기면 즉시 연락드리겠습니다." },
+        { title: "건강한 일상이 계속되고 있어요 🌱", body: "특별한 변화 없이 하루를 잘 보내셨습니다. 규칙적인 케어가 어르신 건강을 지켜드리고 있어요." },
+        { title: "오늘도 어르신 곁을 지켰어요 🏥", body: "어르신의 상태가 안정적으로 유지되고 있습니다. 가족분들도 오늘 하루 편안하게 보내세요." },
+        { title: "평온한 하루, 감사한 하루예요 🙏", body: "어르신이 오늘도 무탈하게 지내고 계세요. 작은 안정이 쌓여 건강한 내일이 됩니다." },
+        { title: "오늘 하루도 잘 돌봐드렸어요 💙", body: "특이사항 없이 안정적으로 하루를 마쳤습니다. 어르신의 건강을 위해 항상 최선을 다하겠습니다." },
+      ];
+      const msg = MESSAGES[Math.floor(Math.random() * MESSAGES.length)];
+      setNoChangePopup({ name: selected.name, message: msg, ward: user.ward || user.name });
       api("get_patients", { ward: user.ward }).then(d => setPatients(d.patients || []));
     } catch(e) {
       alert("저장 실패. 다시 시도해주세요.");
     }
   };
+
+  // 변화없음 팝업
+  if (noChangePopup) return React.createElement("div", { className: "screen", style: { background: "linear-gradient(160deg,#0f172a,#1e3a5f)", justifyContent: "center", alignItems: "center", padding: 32 } },
+    React.createElement("div", { style: { background: "white", borderRadius: 24, padding: "32px 28px", textAlign: "center", boxShadow: "0 8px 40px rgba(0,0,0,0.3)", maxWidth: 380, width: "100%" } },
+      React.createElement("div", { style: { fontSize: 56, marginBottom: 16 } }, "💚"),
+      React.createElement("div", { style: { fontSize: 11, fontWeight: 700, color: "#059669", letterSpacing: 1, marginBottom: 8 } }, `${noChangePopup.ward} 케어팀`),
+      React.createElement("div", { style: { fontSize: 17, fontWeight: 800, color: "#1e3a5f", lineHeight: 1.4, marginBottom: 16 } }, noChangePopup.message.title),
+      React.createElement("div", { style: { background: "#f0fdf4", borderRadius: 12, padding: "16px 18px", marginBottom: 20 } },
+        React.createElement("div", { style: { fontSize: 14, color: "#374151", lineHeight: 1.8 } }, noChangePopup.message.body)
+      ),
+      React.createElement("div", { style: { fontSize: 13, color: "#94a3b8", marginBottom: 24 } }, `${noChangePopup.name} 어르신 · ${today()}`),
+      React.createElement("button", { className: "btn btn-dark",
+        onClick: () => { setNoChangePopup(null); setSelected(null); setSelectMode(null); }
+      }, "확인했어요")
+    )
+  );
 
   // 변화없음/변화있음 선택 화면
   if (selected && selectMode === "choose") return React.createElement("div", { className: "screen", style: { background: "#f0f4f8" } },
