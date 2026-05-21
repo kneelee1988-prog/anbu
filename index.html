@@ -610,39 +610,57 @@ function PatientListItem({ patient, onClick }) {
 
 // ── 간호사 기록 입력 화면 ─────────────────────────────────────
 function NurseRecordScreen({ patient, user, onBack, onSaved }) {
-  const OPTS = {
-    consciousness: ["명료","졸림","혼미","반혼수","혼수"],
-    meal: ["전량","3/4","절반","1/4","소량","거부"],
-    sleep: ["8시간이상","6~8시간","4~6시간","4시간미만"],
-    mobility: ["독립보행","지팡이","보행기","휠체어","침대안정"],
-    fall_risk: ["낮음","보통","높음"],
-    urine: ["정상","빈뇨","실금","유치도뇨","핍뇨"],
-    stool: ["정상","변비","설사","실금","장루"],
-    vomit: ["정상투약","일부거부","전부거부","정맥투약"],
-    skin: ["정상","건조","발적","부종","상처"],
-    hygiene: ["좋음","보통","나쁨"],
-    bath: ["없음","1단계","2단계","3단계","4단계"],
-    oriental: ["없음","시행","시행중"],
+  const emptyForm = {
+    consciousness:"", meal_amount:"", meal_type:"",
+    sleep_hours:"", sleep_wakeups:"", sleep_nap:false, sleep_abnormal:false,
+    mobility:"", walk_count:"", fall_risk:"",
+    programs:[],
+    urine:"", urine_catheter:false,
+    bowel:"", excretion_issues:[],
+    mood:[], mental:[],
+    medication:"",
+    skin:"", hygiene:"", bedsore:"",
+    oriental:null, oriental_items:[],
+    pain:0,
+    nurse_note:""
   };
-  const MOOD_OPTS = ["초조","무감동","잠자는 시간이 많음","우울감","만사귀찮아함","느린 반응","면회 후 상태변화 악화"];
-  const MENTAL_OPTS = ["인지저하","공격성","충동적행동","야간 혼돈","섬망"];
 
-  const [form, setForm] = useState({ consciousness:"", meal:"", sleep:"", mobility:"", fall_risk:"", urine:"", stool:"", vomit:"", pain:0, mood:[], mental:[], skin:"", hygiene:"", bath:"", oriental:"", nurse_note:"" });
+  const [form, setForm] = useState(emptyForm);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const set = (k, v) => setForm(f => ({...f, [k]: v}));
-  const toggleArr = (k, v) => setForm(f => ({ ...f, [k]: f[k].includes(v) ? f[k].filter(x=>x!==v) : [...f[k], v] }));
+  const toggle = (k, v) => setForm(f => ({ ...f, [k]: f[k].includes(v) ? f[k].filter(x=>x!==v) : [...f[k], v] }));
 
   useEffect(() => {
     api("get_today_record", { patientId: patient.id, phone: "staff" })
-      .then(d => { if (d.record) setForm(r => ({ ...r, ...d.record, mood: d.record.mood ? d.record.mood.split("·").map(s=>s.trim()).filter(Boolean) : [], mental: d.record.mental ? d.record.mental.split("·").map(s=>s.trim()).filter(Boolean) : [] })); })
+      .then(d => {
+        if (d.record) {
+          const r = d.record;
+          setForm(f => ({ ...f, ...r,
+            programs: Array.isArray(r.programs) ? r.programs : (r.programs ? r.programs.split(",") : []),
+            mood: Array.isArray(r.mood) ? r.mood : (r.mood ? r.mood.split("·").map(s=>s.trim()).filter(Boolean) : []),
+            mental: Array.isArray(r.mental) ? r.mental : (r.mental ? r.mental.split("·").map(s=>s.trim()).filter(Boolean) : []),
+            excretion_issues: Array.isArray(r.excretion_issues) ? r.excretion_issues : (r.excretion_issues ? r.excretion_issues.split("·").map(s=>s.trim()).filter(Boolean) : []),
+            oriental_items: Array.isArray(r.oriental_items) ? r.oriental_items : (r.oriental_items ? r.oriental_items.split(",") : []),
+          }));
+        }
+      })
       .finally(() => setLoading(false));
   }, []);
 
   const handleSave = async () => {
     setSaving(true);
     try {
-      const data = { ...form, mood: form.mood.join(" · "), mental: form.mental.join(" · "), nurse_name: user.name || user.ward, updated_at: now() };
+      const data = {
+        ...form,
+        mood: form.mood.join(" · "),
+        mental: form.mental.join(" · "),
+        excretion_issues: form.excretion_issues.join(" · "),
+        programs: form.programs.join(","),
+        oriental_items: form.oriental_items.join(","),
+        nurse_name: user.name || user.ward,
+        updated_at: now()
+      };
       await api("save_record", { patientId: patient.id, date: today(), recordData: data });
       onSaved();
       alert("저장됐어요!");
@@ -651,17 +669,31 @@ function NurseRecordScreen({ patient, user, onBack, onSaved }) {
     finally { setSaving(false); }
   };
 
-  const Section = ({ title, children }) => React.createElement("div", { className: "card", style: { marginBottom: 12 } },
-    React.createElement("div", { style: { fontWeight: 700, color: "#1e3a5f", marginBottom: 14, fontSize: 15 } }, title),
-    children
+  // 공통 컴포넌트
+  const Sec = ({ title, accent, children }) => React.createElement("div", {
+    style: { background: "white", borderRadius: 14, marginBottom: 12, overflow: "hidden", boxShadow: "0 1px 6px rgba(0,0,0,0.06)" }
+  },
+    React.createElement("div", { style: { background: accent || "linear-gradient(135deg,#1e3a5f,#2563eb)", padding: "10px 16px", fontSize: 13, fontWeight: 700, color: "white" } }, title),
+    React.createElement("div", { style: { padding: "14px 16px" } }, children)
   );
 
-  const BtnGroup = ({ field, opts }) => React.createElement("div", { style: { display: "flex", flexWrap: "wrap", gap: 6 } },
-    opts.map(o => React.createElement("button", {
-      key: o, onClick: () => set(field, o),
-      style: { padding: "7px 12px", borderRadius: 8, border: "1.5px solid", borderColor: form[field]===o?"#3b82f6":"#e2e8f0", background: form[field]===o?"#eff6ff":"white", color: form[field]===o?"#1d4ed8":"#374151", fontSize: 13, fontWeight: 600, cursor: "pointer", fontFamily: "'Noto Sans KR',sans-serif" }
-    }, o))
-  );
+  const Lbl = ({ text }) => React.createElement("div", { style: { fontSize: 12, color: "#64748b", fontWeight: 600, marginBottom: 6, marginTop: 10 } }, text);
+
+  const Btn = ({ label, active, onClick, color, small }) => React.createElement("button", {
+    onClick,
+    style: {
+      padding: small ? "6px 11px" : "8px 14px",
+      borderRadius: 8, border: "1.5px solid",
+      borderColor: active ? (color||"#1d4ed8") : "#e2e8f0",
+      background: active ? (color||"#1d4ed8") : "white",
+      color: active ? "white" : "#374151",
+      fontSize: 13, fontWeight: 600, cursor: "pointer",
+      fontFamily: "'Noto Sans KR',sans-serif", transition: "all 0.15s"
+    }
+  }, label);
+
+  const BtnRow = ({ children }) => React.createElement("div", { style: { display: "flex", flexWrap: "wrap", gap: 6, marginBottom: 4 } }, children);
+  const BtnGrid = ({ children }) => React.createElement("div", { style: { display: "grid", gridTemplateColumns: "1fr 1fr", gap: 6 } }, children);
 
   if (loading) return React.createElement("div", { className: "loading", style: { paddingTop: 80 } }, "불러오는 중...");
 
@@ -669,62 +701,275 @@ function NurseRecordScreen({ patient, user, onBack, onSaved }) {
     React.createElement("div", { style: { background: "linear-gradient(135deg,#064e3b,#059669)", padding: "48px 20px 20px" } },
       React.createElement("button", { className: "back-btn", onClick: onBack }, "← 목록"),
       React.createElement("div", { style: { fontSize: 18, fontWeight: 800, color: "white", marginTop: 8 } }, `${patient.name} ${patient.age}세 · ${patient.gender}`),
-      React.createElement("div", { style: { fontSize: 13, color: "rgba(255,255,255,0.7)" } }, `${patient.room} · 입원 ${admitDays(patient.admitted_at)}일째`)
+      React.createElement("div", { style: { fontSize: 13, color: "rgba(255,255,255,0.7)" } }, `${patient.room} · 입원 ${admitDays(patient.admitted_at)}일째`),
+      patient.dnr === true && React.createElement("span", { style: { fontSize: 11, fontWeight: 800, background: "#dcfce7", color: "#15803d", borderRadius: 4, padding: "2px 6px", marginTop: 6, display: "inline-block" } }, "DNR동의"),
+      patient.dnr === false && React.createElement("span", { style: { fontSize: 11, fontWeight: 800, background: "#fee2e2", color: "#dc2626", borderRadius: 4, padding: "2px 6px", marginTop: 6, display: "inline-block" } }, "DNR비동의")
     ),
     React.createElement("div", { className: "scroll-area", style: { paddingTop: 16 } },
-      Section({ title: "의식 · 식사 · 수면",
+
+      // 1. 의식
+      Sec({ title: "🧠 의식 수준", accent: "linear-gradient(135deg,#1e3a5f,#1d4ed8)",
+        children: React.createElement(BtnRow, null,
+          ["명료","졸림","혼미","반혼수","혼수"].map(v =>
+            React.createElement(Btn, { key: v, label: v, active: form.consciousness===v, onClick: () => set("consciousness", v),
+              color: v==="명료"?"#166534":v==="졸림"?"#713f12":"#7f1d1d" })
+          )
+        )
+      }),
+
+      // 2. 식사
+      Sec({ title: "🍽️ 식사", accent: "linear-gradient(135deg,#7c2d12,#c2410c)",
         children: React.createElement(React.Fragment, null,
-          ["consciousness","meal","sleep"].map(f => React.createElement("div", { key: f, style: { marginBottom: 12 } },
-            React.createElement("div", { style: { fontSize: 12, color: "#64748b", marginBottom: 6 } }, {consciousness:"의식수준",meal:"식사량",sleep:"수면"}[f]),
-            React.createElement(BtnGroup, { field: f, opts: OPTS[f] })
-          ))
+          React.createElement(Lbl, { text: "식사량" }),
+          React.createElement(BtnRow, null,
+            ["잘 드심","3/4","절반","1/4","소량","거부"].map(v =>
+              React.createElement(Btn, { key: v, label: v, small: true, active: form.meal_amount===v, onClick: () => set("meal_amount", v),
+                color: v==="잘 드심"?"#166534":v==="3/4"?"#166534":v==="절반"?"#713f12":"#7f1d1d" })
+            )
+          ),
+          React.createElement(Lbl, { text: "식사 형태" }),
+          React.createElement(BtnRow, null,
+            ["일반식","당뇨식","다진식","죽","유동식","경관식","TPN"].map(v =>
+              React.createElement(Btn, { key: v, label: v, small: true, active: form.meal_type===v, onClick: () => set("meal_type", v), color: "#0c4a6e" })
+            )
+          )
         )
       }),
-      Section({ title: "이동 · 낙상 · 배변",
+
+      // 3. 수면
+      Sec({ title: "😴 수면", accent: "linear-gradient(135deg,#1e1b4b,#4338ca)",
         children: React.createElement(React.Fragment, null,
-          ["mobility","fall_risk","urine","stool"].map(f => React.createElement("div", { key: f, style: { marginBottom: 12 } },
-            React.createElement("div", { style: { fontSize: 12, color: "#64748b", marginBottom: 6 } }, {mobility:"이동방법",fall_risk:"낙상위험",urine:"소변",stool:"대변"}[f]),
-            React.createElement(BtnGroup, { field: f, opts: OPTS[f] })
-          ))
+          React.createElement(Lbl, { text: "수면 시간" }),
+          React.createElement(BtnRow, null,
+            ["8시간 이상","6~8시간","4~6시간","4시간 미만"].map(v =>
+              React.createElement(Btn, { key: v, label: v, small: true, active: form.sleep_hours===v, onClick: () => set("sleep_hours", v),
+                color: v==="8시간 이상"?"#166534":v==="6~8시간"?"#166534":v==="4~6시간"?"#713f12":"#7f1d1d" })
+            )
+          ),
+          React.createElement(Lbl, { text: "중간 각성" }),
+          React.createElement(BtnRow, null,
+            ["없음","1회","2회","3회 이상"].map(v =>
+              React.createElement(Btn, { key: v, label: v, small: true, active: form.sleep_wakeups===v, onClick: () => set("sleep_wakeups", v),
+                color: v==="없음"?"#166534":"#7f1d1d" })
+            )
+          ),
+          React.createElement(BtnRow, null,
+            React.createElement(Btn, { label: "낮잠 있음", active: form.sleep_nap, onClick: () => set("sleep_nap", !form.sleep_nap), color: "#0c4a6e", small: true }),
+            React.createElement(Btn, { label: "수면 중 이상행동", active: form.sleep_abnormal, onClick: () => set("sleep_abnormal", !form.sleep_abnormal), color: "#7f1d1d", small: true })
+          )
         )
       }),
-      Section({ title: "통증 (PAINAD)",
-        children: React.createElement("div", { style: { display: "flex", gap: 8, flexWrap: "wrap" } },
-          [0,1,2,3,4,5,6,7,8,9,10].map(n => React.createElement("button", {
-            key: n, onClick: () => set("pain", n),
-            style: { width: 40, height: 40, borderRadius: 8, border: "1.5px solid", borderColor: form.pain===n?"#3b82f6":"#e2e8f0", background: form.pain===n?"#eff6ff":"white", color: form.pain===n?"#1d4ed8":"#374151", fontWeight: 700, fontSize: 14, cursor: "pointer", fontFamily: "'Noto Sans KR',sans-serif" }
-          }, n))
-        )
-      }),
-      Section({ title: "기분 · 행동",
-        children: React.createElement("div", { style: { display: "flex", flexWrap: "wrap", gap: 6 } },
-          MOOD_OPTS.map(o => React.createElement("button", {
-            key: o, onClick: () => toggleArr("mood", o),
-            style: { padding: "7px 12px", borderRadius: 8, border: "1.5px solid", borderColor: form.mood.includes(o)?"#3b82f6":"#e2e8f0", background: form.mood.includes(o)?"#eff6ff":"white", color: form.mood.includes(o)?"#1d4ed8":"#374151", fontSize: 13, fontWeight: 600, cursor: "pointer", fontFamily: "'Noto Sans KR',sans-serif" }
-          }, o))
-        )
-      }),
-      Section({ title: "정신상태",
-        children: React.createElement("div", { style: { display: "flex", flexWrap: "wrap", gap: 6 } },
-          MENTAL_OPTS.map(o => React.createElement("button", {
-            key: o, onClick: () => toggleArr("mental", o),
-            style: { padding: "7px 12px", borderRadius: 8, border: "1.5px solid", borderColor: form.mental.includes(o)?"#ef4444":"#e2e8f0", background: form.mental.includes(o)?"#fee2e2":"white", color: form.mental.includes(o)?"#b91c1c":"#374151", fontSize: 13, fontWeight: 600, cursor: "pointer", fontFamily: "'Noto Sans KR',sans-serif" }
-          }, o))
-        )
-      }),
-      Section({ title: "피부 · 위생 · 욕창 · 한방",
+
+      // 4. 활동
+      Sec({ title: "🚶 활동", accent: "linear-gradient(135deg,#78350f,#d97706)",
         children: React.createElement(React.Fragment, null,
-          ["skin","hygiene","bath","oriental"].map(f => React.createElement("div", { key: f, style: { marginBottom: 12 } },
-            React.createElement("div", { style: { fontSize: 12, color: "#64748b", marginBottom: 6 } }, {skin:"피부",hygiene:"위생",bath:"욕창",oriental:"한방치료"}[f]),
-            React.createElement(BtnGroup, { field: f, opts: OPTS[f] })
-          ))
+          React.createElement(Lbl, { text: "이동 방법" }),
+          React.createElement(BtnRow, null,
+            ["독립 보행","부축 보행","워커","휠체어","침상 안정"].map(v =>
+              React.createElement(Btn, { key: v, label: v, small: true, active: form.mobility===v, onClick: () => set("mobility", v),
+                color: v==="독립 보행"?"#166534":v==="부축 보행"?"#166534":"#713f12" })
+            )
+          ),
+          form.mobility && form.mobility !== "침상 안정" && React.createElement(React.Fragment, null,
+            React.createElement(Lbl, { text: "이동 횟수" }),
+            React.createElement(BtnRow, null,
+              ["1회","2회","3회","4회 이상"].map(v =>
+                React.createElement(Btn, { key: v, label: v, small: true, active: form.walk_count===v, onClick: () => set("walk_count", v), color: "#0c4a6e" })
+              )
+            )
+          ),
+          React.createElement(Lbl, { text: "낙상 위험" }),
+          React.createElement(BtnRow, null,
+            ["주의","높음","매우 높음"].map(v =>
+              React.createElement(Btn, { key: v, label: v, small: true, active: form.fall_risk===v, onClick: () => set("fall_risk", v), color: "#7f1d1d" })
+            )
+          ),
+          React.createElement(Lbl, { text: "프로그램 참여" }),
+          React.createElement(BtnRow, null,
+            ["그림그리기","음악치료","예배","생일잔치","공연"].map(v =>
+              React.createElement(Btn, { key: v, label: v, small: true,
+                active: form.programs.includes(v),
+                onClick: () => {
+                  const cur = form.programs.filter(x => x !== "미참여");
+                  set("programs", cur.includes(v) ? cur.filter(x=>x!==v) : [...cur, v]);
+                }, color: "#0d5c56" })
+            )
+          ),
+          React.createElement(BtnRow, null,
+            React.createElement(Btn, { label: "미참여", small: true,
+              active: form.programs.includes("미참여"),
+              onClick: () => set("programs", form.programs.includes("미참여") ? [] : ["미참여"]),
+              color: "#64748b" })
+          )
         )
       }),
-      React.createElement("div", { className: "card", style: { marginBottom: 24 } },
-        React.createElement("div", { style: { fontWeight: 700, color: "#1e3a5f", marginBottom: 12 } }, "간호사 특이사항"),
-        React.createElement("textarea", { className: "input", rows: 5, placeholder: "특이사항을 입력하세요", value: form.nurse_note, onChange: e => set("nurse_note", e.target.value), style: { resize: "none", lineHeight: 1.6 } })
+
+      // 5. 배변
+      Sec({ title: "🚽 배변 관련 상황", accent: "linear-gradient(135deg,#312e81,#7c3aed)",
+        children: React.createElement(React.Fragment, null,
+          React.createElement(Lbl, { text: "소변" }),
+          React.createElement(BtnRow, null,
+            ["정상","감소","농축","실금"].map(v =>
+              React.createElement(Btn, { key: v, label: v, small: true, active: form.urine===v, onClick: () => set("urine", v),
+                color: v==="정상"?"#166534":"#7f1d1d" })
+            )
+          ),
+          React.createElement(BtnRow, null,
+            React.createElement(Btn, { label: "카테터 사용 중", active: form.urine_catheter, onClick: () => set("urine_catheter", !form.urine_catheter), color: "#713f12", small: true })
+          ),
+          React.createElement(Lbl, { text: "대변" }),
+          React.createElement(BtnRow, null,
+            ["정상","변비","설사","묽은 변","실금","관장"].map(v =>
+              React.createElement(Btn, { key: v, label: v, small: true, active: form.bowel===v, onClick: () => set("bowel", v),
+                color: v==="정상"?"#166534":"#7f1d1d" })
+            )
+          ),
+          React.createElement(Lbl, { text: "배변 특이사항 (복수 선택)" }),
+          React.createElement(BtnGrid, null,
+            ["혈뇨","혈변","부정출혈","소변이 잘 안 나옴","소변 지림","침상배뇨","대변 지림","해당 사항 없음"].map(v =>
+              React.createElement(Btn, { key: v, label: v, small: true,
+                active: form.excretion_issues.includes(v),
+                onClick: () => toggle("excretion_issues", v),
+                color: v==="해당 사항 없음"?"#166534":"#7f1d1d" })
+            )
+          )
+        )
+      }),
+
+      // 6. 기분 및 행동
+      Sec({ title: "😊 기분 및 행동 (복수 선택)", accent: "linear-gradient(135deg,#065f46,#059669)",
+        children: React.createElement(BtnGrid, null,
+          ["안정","불안","초조","무기력","의욕저하","무감동",
+           "우울감","잠자는 시간이 많음","자포자기함",
+           "만사 귀찮아함","무표정","느린 반응",
+           "짜증","신경질적인 반응","타 환자에게 시비 검",
+           "고집스러움","반복적 행동","변덕이 심함",
+           "강박증","건강 염려증","조급증",
+           "산만함","표정이 밝아짐","기분이 들뜸","면회 후 상태 변화 악화"
+          ].map(v =>
+            React.createElement(Btn, { key: v, label: v, small: true,
+              active: form.mood.includes(v),
+              onClick: () => toggle("mood", v),
+              color: v==="안정"||v==="표정이 밝아짐"||v==="기분이 들뜸" ? "#166534" : "#713f12" })
+          )
+        )
+      }),
+
+      // 7. 정신 및 이상행동
+      Sec({ title: "🧩 정신 및 이상행동 양상 (복수 선택)", accent: "linear-gradient(135deg,#4c1d95,#7c3aed)",
+        children: React.createElement(BtnGrid, null,
+          ["이상 없음","섬망","환청","환시","혼잣말","야간 혼돈","망상","배회","공격성","케어 저항","충동적행동","인지저하","반복적 소리지름"].map(v =>
+            React.createElement(Btn, { key: v, label: v, small: true,
+              active: form.mental.includes(v),
+              onClick: () => toggle("mental", v),
+              color: v==="이상 없음"?"#166534":"#7f1d1d" })
+          )
+        )
+      }),
+
+      // 8. 투약
+      Sec({ title: "💊 투약 상태", accent: "linear-gradient(135deg,#0c4a6e,#0369a1)",
+        children: React.createElement(BtnRow, null,
+          ["정상 투약","투약 거부","투약 일시중단","약물 토함"].map(v =>
+            React.createElement(Btn, { key: v, label: v, active: form.medication===v, onClick: () => set("medication", v),
+              color: v==="정상 투약"?"#166534":"#7f1d1d" })
+          )
+        )
+      }),
+
+      // 9. 피부·위생·욕창
+      Sec({ title: "🧴 피부 · 위생 · 욕창", accent: "linear-gradient(135deg,#374151,#6b7280)",
+        children: React.createElement(React.Fragment, null,
+          React.createElement(Lbl, { text: "피부 상태" }),
+          React.createElement(BtnRow, null,
+            ["양호","건조","발진","상처","소양감"].map(v =>
+              React.createElement(Btn, { key: v, label: v, small: true, active: form.skin===v, onClick: () => set("skin", v),
+                color: v==="양호"?"#166534":"#7f1d1d" })
+            )
+          ),
+          React.createElement(Lbl, { text: "위생 상태" }),
+          React.createElement(BtnRow, null,
+            ["양호","보통","불량","위생관리거부"].map(v =>
+              React.createElement(Btn, { key: v, label: v, small: true, active: form.hygiene===v, onClick: () => set("hygiene", v),
+                color: v==="양호"?"#166534":v==="보통"?"#713f12":"#7f1d1d" })
+            )
+          ),
+          React.createElement(Lbl, { text: "욕창" }),
+          React.createElement(BtnRow, null,
+            ["없음","1단계","2단계","3단계","4단계"].map(v =>
+              React.createElement(Btn, { key: v, label: v, small: true, active: form.bedsore===v, onClick: () => set("bedsore", v),
+                color: v==="없음"?"#166534":"#7f1d1d" })
+            )
+          )
+        )
+      }),
+
+      // 10. 한방치료
+      Sec({ title: "🪡 한방 치료", accent: "linear-gradient(135deg,#064e3b,#059669)",
+        children: React.createElement(BtnRow, null,
+          ["침치료","뜸치료","부항"].map(v =>
+            React.createElement(Btn, { key: v, label: v, small: true,
+              active: form.oriental_items.includes(v),
+              onClick: () => { set("oriental", true); toggle("oriental_items", v); },
+              color: "#0d5c56" })
+          ),
+          React.createElement(Btn, { label: "미시행", small: true,
+            active: form.oriental === false,
+            onClick: () => { set("oriental", false); set("oriental_items", []); },
+            color: "#64748b" })
+        )
+      }),
+
+      // 11. 통증 PAINAD
+      Sec({ title: "💉 통증 (PAINAD)", accent: "linear-gradient(135deg,#7f1d1d,#b91c1c)",
+        children: React.createElement(React.Fragment, null,
+          React.createElement("div", { style: { fontSize: 12, color: "#64748b", marginBottom: 10 } }, "0 = 통증 없음 · 10 = 극심한 통증"),
+          React.createElement("div", { style: { display: "flex", flexDirection: "column", gap: 5 } },
+            [
+              {n:0, desc:"통증 없음 — 편안한 호흡, 이완된 표정"},
+              {n:1, desc:"통증 거의 없음 — 약간 힘든 호흡"},
+              {n:2, desc:"경미 — 가끔 찡그림"},
+              {n:3, desc:"경미~중등도 — 간헐적 신음, 긴장"},
+              {n:4, desc:"중등도 — 반복적 신음, 주먹 쥠"},
+              {n:5, desc:"중등도~심함 — 자주 신음"},
+              {n:6, desc:"심함 — 반복적 울음, 달래기 어려움"},
+              {n:7, desc:"매우 심함 — 지속적 울음·경직"},
+              {n:8, desc:"극심 — 극도 긴장, 달래도 무반응"},
+              {n:9, desc:"극심 — 통증으로 반응 불가"},
+              {n:10, desc:"최고 극심 — 극도 고통 상태"},
+            ].map(({n, desc}) =>
+              React.createElement("button", {
+                key: n, onClick: () => set("pain", n),
+                style: {
+                  textAlign: "left", padding: "8px 12px", borderRadius: 10,
+                  border: "1.5px solid", borderColor: form.pain===n?"#dc2626":"#e2e8f0",
+                  background: form.pain===n?"#fee2e2":"white",
+                  cursor: "pointer", fontFamily: "'Noto Sans KR',sans-serif",
+                  display: "flex", alignItems: "center", gap: 10
+                }
+              },
+                React.createElement("span", { style: { fontSize: 16, fontWeight: 800, color: form.pain===n?"#dc2626":"#94a3b8", minWidth: 24 } }, n),
+                React.createElement("span", { style: { fontSize: 12, color: form.pain===n?"#7f1d1d":"#64748b" } }, desc)
+              )
+            )
+          )
+        )
+      }),
+
+      // 12. 간호사 특이사항
+      React.createElement("div", { style: { background: "white", borderRadius: 14, marginBottom: 24, overflow: "hidden", boxShadow: "0 1px 6px rgba(0,0,0,0.06)" } },
+        React.createElement("div", { style: { background: "linear-gradient(135deg,#065f46,#0d9488)", padding: "10px 16px", fontSize: 13, fontWeight: 700, color: "white" } }, "📝 간호사 특이사항"),
+        React.createElement("div", { style: { padding: 16 } },
+          React.createElement("textarea", { className: "input", rows: 5,
+            placeholder: "특이사항을 입력하세요",
+            value: form.nurse_note, onChange: e => set("nurse_note", e.target.value),
+            style: { resize: "none", lineHeight: 1.6 } })
+        )
       ),
-      React.createElement("button", { className: "btn btn-dark", onClick: handleSave, disabled: saving }, saving ? "저장 중..." : "💾 저장하기")
+
+      React.createElement("button", { className: "btn btn-dark", onClick: handleSave, disabled: saving, style: { marginBottom: 20 } },
+        saving ? "저장 중..." : "💾 저장하기"
+      )
     )
   );
 }
