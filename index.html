@@ -693,7 +693,7 @@ function NurseRecordScreen({ patient, user, onBack, onSaved }) {
   }, label);
 
   const BtnRow = ({ children }) => React.createElement("div", { style: { display: "flex", flexWrap: "wrap", gap: 6, marginBottom: 4 } }, children);
-  const BtnGrid = ({ children }) => React.createElement("div", { style: { display: "grid", gridTemplateColumns: "1fr 1fr", gap: 6 } }, children);
+  const BtnGrid = ({ children }) => React.createElement("div", { style: { display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 6 } }, children);
 
   if (loading) return React.createElement("div", { className: "loading", style: { paddingTop: 80 } }, "불러오는 중...");
 
@@ -1088,7 +1088,7 @@ function DoctorReviewScreen({ patient, user, onBack }) {
         React.createElement("div", { style: { fontWeight: 700, color: "#1e3a5f", marginBottom: 14 } }, "🩺 임상 소견 (복수 선택)"),
         Object.entries(FINDINGS).map(([cat, items]) => React.createElement("div", { key: cat, style: { marginBottom: 14 } },
           React.createElement("div", { style: { fontSize: 12, color: "#64748b", fontWeight: 600, marginBottom: 6 } }, `[ ${cat} ]`),
-          React.createElement("div", { style: { display: "flex", flexWrap: "wrap", gap: 6 } },
+          React.createElement("div", { style: { display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 6 } },
             items.map(f => React.createElement("button", {
               key: f, onClick: () => toggleFinding(f),
               style: { padding: "6px 10px", borderRadius: 8, border: "1.5px solid", borderColor: findings.includes(f)?"#3b82f6":"#e2e8f0", background: findings.includes(f)?"#eff6ff":"white", color: findings.includes(f)?"#1d4ed8":"#374151", fontSize: 12, fontWeight: 600, cursor: "pointer", fontFamily: "'Noto Sans KR',sans-serif" }
@@ -1279,50 +1279,54 @@ function AdminStaffTab({ staff, onRefresh }) {
     React.createElement("button", { className: "btn btn-dark", onClick: () => setShowForm(!showForm), style: { marginBottom: 12 } }, showForm ? "✕ 닫기" : "+ 직원 계정 추가"),
     showForm && React.createElement("div", { className: "card", style: { marginBottom: 12 } },
       React.createElement("div", { style: { fontWeight: 700, color: "#1e3a5f", marginBottom: 16 } }, "신규 직원 등록"),
-      React.createElement("div", { className: "field" },
-        React.createElement("label", { className: "label" }, "역할"),
-        React.createElement("select", { className: "select", value: form.role, onChange: e => set("role", e.target.value) },
-          React.createElement("option", { value: "nurse" }, "간호사"),
-          React.createElement("option", { value: "doctor" }, "의사"),
-          React.createElement("option", { value: "admin" }, "관리자")
+      React.createElement("div", { style: { display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10 } },
+        React.createElement("div", { className: "field", style: { marginBottom: 0 } },
+          React.createElement("label", { className: "label" }, "역할"),
+          React.createElement("select", { className: "select", value: form.role, onChange: e => set("role", e.target.value) },
+            React.createElement("option", { value: "nurse" }, "간호사"),
+            React.createElement("option", { value: "doctor" }, "의사"),
+            React.createElement("option", { value: "admin" }, "관리자")
+          )
+        ),
+        React.createElement("div", { className: "field", style: { marginBottom: 0 } },
+          React.createElement("label", { className: "label" }, "이름"),
+          React.createElement("input", { className: "input", placeholder: "이름 입력", value: form.name, onChange: e => set("name", e.target.value) })
+        ),
+        form.role === "nurse" && React.createElement("div", { className: "field", style: { marginBottom: 0 } },
+          React.createElement("label", { className: "label" }, "병동"),
+          React.createElement("select", { className: "select", value: form.ward, onChange: e => set("ward", e.target.value) },
+            WARDS.map(w => React.createElement("option", { key: w, value: w }, w))
+          )
+        ),
+        form.role === "doctor" && React.createElement("div", { className: "field", style: { marginBottom: 0 } },
+          React.createElement("label", { className: "label" }, "의사 ID"),
+          React.createElement("input", { className: "input", placeholder: "예) doc6", value: form.doctorId, onChange: e => set("doctorId", e.target.value) })
+        ),
+        React.createElement("div", { className: "field", style: { marginBottom: 0 } },
+          React.createElement("label", { className: "label" }, "비밀번호"),
+          React.createElement("input", { className: "input", type: "password", placeholder: "비밀번호 설정", value: form.password, onChange: e => set("password", e.target.value) })
         )
       ),
-      React.createElement("div", { className: "field" },
-        React.createElement("label", { className: "label" }, "이름"),
-        React.createElement("input", { className: "input", placeholder: "이름 입력", value: form.name, onChange: e => set("name", e.target.value) })
-      ),
-      form.role === "nurse" && React.createElement("div", { className: "field" },
-        React.createElement("label", { className: "label" }, "병동"),
-        React.createElement("select", { className: "select", value: form.ward, onChange: e => set("ward", e.target.value) },
-          WARDS.map(w => React.createElement("option", { key: w, value: w }, w))
-        )
-      ),
-      form.role === "doctor" && React.createElement("div", { className: "field" },
-        React.createElement("label", { className: "label" }, "의사 ID (예: doc6)"),
-        React.createElement("input", { className: "input", placeholder: "예) doc6", value: form.doctorId, onChange: e => set("doctorId", e.target.value) })
-      ),
-      React.createElement("div", { className: "field" },
-        React.createElement("label", { className: "label" }, "비밀번호"),
-        React.createElement("input", { className: "input", type: "password", placeholder: "비밀번호 설정", value: form.password, onChange: e => set("password", e.target.value) })
-      ),
-      React.createElement("button", { className: "btn btn-dark", onClick: handleAdd, disabled: saving }, saving ? "등록 중..." : "등록하기")
+      React.createElement("button", { className: "btn btn-dark", onClick: handleAdd, disabled: saving, style: { marginTop: 14 } }, saving ? "등록 중..." : "등록하기")
     ),
     React.createElement("div", { style: { fontSize: 13, color: "#64748b", marginBottom: 8 } }, `전체 직원 ${staff.length}명`),
-    staff.map(s => React.createElement("div", { key: s.id, className: "card", style: { marginBottom: 8, display: "flex", justifyContent: "space-between", alignItems: "center" } },
-      React.createElement("div", { style: { display: "flex", alignItems: "center", gap: 10 } },
+    React.createElement("div", { style: { display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8 } },
+      staff.map(s => React.createElement("div", { key: s.id, className: "card", style: { marginBottom: 0, display: "flex", flexDirection: "column", gap: 8 } },
         React.createElement("div", null,
-          React.createElement("div", { style: { display: "flex", alignItems: "center", gap: 6 } },
-            React.createElement("span", { style: { fontWeight: 700, color: "#1e3a5f" } }, s.name),
+          React.createElement("div", { style: { display: "flex", alignItems: "center", gap: 6, flexWrap: "wrap" } },
+            React.createElement("span", { style: { fontWeight: 700, color: "#1e3a5f", fontSize: 14 } }, s.name),
             React.createElement("span", { className: `tag ${roleColor[s.role]}` }, roleLabel[s.role])
           ),
-          React.createElement("div", { style: { fontSize: 12, color: s.active ? "#16a34a" : "#94a3b8", marginTop: 2 } }, s.active ? "● 활성" : "● 비활성", s.ward ? ` · ${s.ward}` : "")
-        )
-      ),
-      s.role !== "admin" && React.createElement("button", {
-        onClick: () => api("toggle_staff", { userId: s.id, active: !s.active }).then(onRefresh),
-        style: { padding: "6px 12px", borderRadius: 8, border: "1.5px solid", borderColor: s.active?"#fee2e2":"#dcfce7", background: s.active?"#fee2e2":"#dcfce7", color: s.active?"#991b1b":"#166534", fontWeight: 600, fontSize: 13, cursor: "pointer", fontFamily: "'Noto Sans KR',sans-serif" }
-      }, s.active ? "비활성화" : "활성화")
-    ))
+          React.createElement("div", { style: { fontSize: 11, color: s.active ? "#16a34a" : "#94a3b8", marginTop: 3 } },
+            s.active ? "● 활성" : "● 비활성", s.ward ? ` · ${s.ward}` : ""
+          )
+        ),
+        s.role !== "admin" && React.createElement("button", {
+          onClick: () => api("toggle_staff", { userId: s.id, active: !s.active }).then(onRefresh),
+          style: { padding: "5px 0", borderRadius: 8, border: "1.5px solid", borderColor: s.active?"#fee2e2":"#dcfce7", background: s.active?"#fee2e2":"#dcfce7", color: s.active?"#991b1b":"#166534", fontWeight: 600, fontSize: 12, cursor: "pointer", fontFamily: "'Noto Sans KR',sans-serif", width: "100%" }
+        }, s.active ? "비활성화" : "활성화")
+      ))
+    )
   );
 }
 
@@ -1349,42 +1353,54 @@ function AdminPatientsTab({ patients, onRefresh }) {
     React.createElement("button", { className: "btn btn-dark", onClick: () => setShowForm(!showForm), style: { marginBottom: 12 } }, showForm ? "✕ 닫기" : "+ 환자 추가"),
     showForm && React.createElement("div", { className: "card", style: { marginBottom: 12 } },
       React.createElement("div", { style: { fontWeight: 700, color: "#1e3a5f", marginBottom: 16 } }, "신규 환자 등록"),
-      [["name","이름","텍스트","예) 김순자"],["birthdate","생년월일","텍스트","예) 19460315"],["age","나이","숫자","예) 78"]].map(([k,l,,p]) =>
-        React.createElement("div", { key: k, className: "field" },
-          React.createElement("label", { className: "label" }, l),
-          React.createElement("input", { className: "input", placeholder: p, value: form[k], onChange: e => set(k, e.target.value) })
+      React.createElement("div", { style: { display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10 } },
+        React.createElement("div", { className: "field", style: { marginBottom: 0 } },
+          React.createElement("label", { className: "label" }, "이름 *"),
+          React.createElement("input", { className: "input", placeholder: "예) 김순자", value: form.name, onChange: e => set("name", e.target.value) })
+        ),
+        React.createElement("div", { className: "field", style: { marginBottom: 0 } },
+          React.createElement("label", { className: "label" }, "생년월일 *"),
+          React.createElement("input", { className: "input", placeholder: "예) 19460315", value: form.birthdate, onChange: e => set("birthdate", e.target.value) })
+        ),
+        React.createElement("div", { className: "field", style: { marginBottom: 0 } },
+          React.createElement("label", { className: "label" }, "나이"),
+          React.createElement("input", { className: "input", placeholder: "예) 78", value: form.age, onChange: e => set("age", e.target.value) })
+        ),
+        React.createElement("div", { className: "field", style: { marginBottom: 0 } },
+          React.createElement("label", { className: "label" }, "성별"),
+          React.createElement("select", { className: "select", value: form.gender, onChange: e => set("gender", e.target.value) },
+            React.createElement("option", { value: "여" }, "여"),
+            React.createElement("option", { value: "남" }, "남")
+          )
+        ),
+        React.createElement("div", { className: "field", style: { marginBottom: 0 } },
+          React.createElement("label", { className: "label" }, "병동"),
+          React.createElement("select", { className: "select", value: form.room, onChange: e => set("room", e.target.value) },
+            WARDS.map(w => React.createElement("option", { key: w, value: w }, w))
+          )
+        ),
+        React.createElement("div", { className: "field", style: { marginBottom: 0 } },
+          React.createElement("label", { className: "label" }, "담당 의사"),
+          React.createElement("select", { className: "select", value: form.doctor_id, onChange: e => set("doctor_id", e.target.value) },
+            DOCTORS.map(([id, name]) => React.createElement("option", { key: id, value: id }, name))
+          )
+        ),
+        React.createElement("div", { className: "field", style: { marginBottom: 0, gridColumn: "1 / -1" } },
+          React.createElement("label", { className: "label" }, "입원일"),
+          React.createElement("input", { className: "input", type: "date", value: form.admitted_at, onChange: e => set("admitted_at", e.target.value) })
         )
       ),
-      React.createElement("div", { className: "field" },
-        React.createElement("label", { className: "label" }, "성별"),
-        React.createElement("select", { className: "select", value: form.gender, onChange: e => set("gender", e.target.value) },
-          React.createElement("option", { value: "여" }, "여"),
-          React.createElement("option", { value: "남" }, "남")
-        )
-      ),
-      React.createElement("div", { className: "field" },
-        React.createElement("label", { className: "label" }, "병동"),
-        React.createElement("select", { className: "select", value: form.room, onChange: e => set("room", e.target.value) },
-          WARDS.map(w => React.createElement("option", { key: w, value: w }, w))
-        )
-      ),
-      React.createElement("div", { className: "field" },
-        React.createElement("label", { className: "label" }, "담당 의사"),
-        React.createElement("select", { className: "select", value: form.doctor_id, onChange: e => set("doctor_id", e.target.value) },
-          DOCTORS.map(([id, name]) => React.createElement("option", { key: id, value: id }, name))
-        )
-      ),
-      React.createElement("div", { className: "field" },
-        React.createElement("label", { className: "label" }, "입원일"),
-        React.createElement("input", { className: "input", type: "date", value: form.admitted_at, onChange: e => set("admitted_at", e.target.value) })
-      ),
-      React.createElement("button", { className: "btn btn-dark", onClick: handleAdd, disabled: saving }, saving ? "등록 중..." : "등록하기")
+      React.createElement("button", { className: "btn btn-dark", onClick: handleAdd, disabled: saving, style: { marginTop: 14 } }, saving ? "등록 중..." : "등록하기")
     ),
     React.createElement("div", { style: { fontSize: 13, color: "#64748b", marginBottom: 8 } }, `전체 입원 환자 ${patients.length}명`),
-    patients.map(p => React.createElement("div", { key: p.id, className: "card", style: { marginBottom: 8 } },
-      React.createElement("div", { style: { fontWeight: 700, color: "#1e3a5f" } }, p.name),
-      React.createElement("div", { style: { fontSize: 13, color: "#64748b", marginTop: 2 } }, `${p.age}세 · ${p.gender} · ${p.room} · 입원 ${admitDays(p.admitted_at)}일째`)
-    ))
+    React.createElement("div", { style: { display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8 } },
+      patients.map(p => React.createElement("div", { key: p.id, className: "card", style: { marginBottom: 0 } },
+        React.createElement("div", { style: { fontWeight: 700, color: "#1e3a5f", fontSize: 14 } }, p.name),
+        React.createElement("div", { style: { fontSize: 12, color: "#64748b", marginTop: 3 } }, `${p.age}세 · ${p.gender}`),
+        React.createElement("div", { style: { fontSize: 12, color: "#64748b" } }, p.room),
+        React.createElement("div", { style: { fontSize: 12, color: "#94a3b8" } }, `입원 ${admitDays(p.admitted_at)}일째`)
+      ))
+    )
   );
 }
 
