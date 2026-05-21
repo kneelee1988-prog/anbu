@@ -517,22 +517,19 @@ function GuardianScreen({ user, onBack }) {
       React.createElement("div", { style: { fontSize: 22, fontWeight: 800, color: "white" } }, `${patient.name}님`),
       React.createElement("div", { style: { fontSize: 13, color: "rgba(255,255,255,0.7)", marginTop: 4 } }, `${patient.room} · 입원 ${admitDays(patient.admitted_at)}일째`),
 
+      // 주치의 코멘트 (이름 바로 아래)
+      record?.doctor_comment && React.createElement("div", { style: { background: "rgba(255,255,255,0.12)", borderRadius: 10, padding: "12px 14px", marginTop: 14, border: "1px solid rgba(255,255,255,0.2)" } },
+        React.createElement("div", { style: { fontSize: 10, fontWeight: 700, color: "rgba(255,255,255,0.55)", letterSpacing: 0.5, marginBottom: 5 } }, "주치의 코멘트"),
+        React.createElement("div", { style: { fontSize: 13, color: "white", lineHeight: 1.6 } }, record.doctor_comment)
+      ),
+
       // 의식/활동/식사/특이사항 요약 박스
-      record && React.createElement("div", { style: { display: "grid", gridTemplateColumns: "1fr 1fr 1fr 1fr", gap: 8, marginTop: 16 } },
+      record && React.createElement("div", { style: { display: "grid", gridTemplateColumns: "1fr 1fr 1fr 1fr", gap: 8, marginTop: 14 } },
         summaryItems.map((item, i) => React.createElement("div", { key: i, style: { background: "rgba(255,255,255,0.15)", borderRadius: 10, padding: "10px 8px", textAlign: "center" } },
           React.createElement("div", { style: { fontSize: 11, color: "rgba(255,255,255,0.6)", marginBottom: 4 } }, item.label),
           React.createElement("div", { style: { fontSize: 13, fontWeight: 800, color: item.highlight ? "#fbbf24" : "white", lineHeight: 1.2 } }, item.value || "—"),
           item.sub && React.createElement("div", { style: { fontSize: 10, color: "rgba(255,255,255,0.5)", marginTop: 3 } }, item.sub)
         ))
-      ),
-
-      record?.doctor_comment && React.createElement("div", { style: { background: "rgba(255,255,255,0.1)", borderRadius: 10, padding: "10px 14px", marginTop: 12, fontSize: 13, color: "rgba(255,255,255,0.9)" } },
-        "🩺 ", record.doctor_comment
-      ),
-
-      // 간호사 입력 완료 상태 표시
-      !loading && React.createElement("div", { style: { marginTop: 12, fontSize: 12, color: "rgba(255,255,255,0.6)", display: "flex", alignItems: "center", gap: 6 } },
-        record ? "🏥 간호사 입력 완료 · 주치의 검토 후 전달 예정이에요." : "⏳ 오늘 상태는 저녁 간호사 입력 후 확인하실 수 있어요."
       )
     ),
 
@@ -553,27 +550,42 @@ function GuardianScreen({ user, onBack }) {
         : React.createElement(React.Fragment, null,
             React.createElement("div", { className: "card", style: { marginBottom: 12 } },
               React.createElement("div", { style: { fontWeight: 700, color: "#1e3a5f", marginBottom: 14, fontSize: 15 } }, "📋 오늘 상태 요약"),
-              React.createElement("div", { style: { display: "grid", gridTemplateColumns: "1fr 1fr", gap: "8px 0" } },
-                infoItems.map((item, i) => React.createElement("div", { key: i, style: { padding: "6px 0", borderBottom: "1px solid #f1f5f9" } },
-                  React.createElement("div", { style: { fontSize: 11, color: "#94a3b8" } }, item.label),
-                  React.createElement("div", { style: { fontSize: 14, fontWeight: 600, color: "#1e293b", marginTop: 2 } }, item.value)
-                ))
+              React.createElement("div", { style: { display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 8, marginBottom: 12 } },
+                infoItems.map((item, i) => {
+                  const colors = [
+                    { bg: "#eff6ff", border: "#bfdbfe", label: "#1d4ed8", value: "#1e3a5f" },
+                    { bg: "#f0fdf4", border: "#bbf7d0", label: "#15803d", value: "#14532d" },
+                    { bg: "#fff7ed", border: "#fed7aa", label: "#c2410c", value: "#7c2d12" },
+                    { bg: "#faf5ff", border: "#e9d5ff", label: "#7c3aed", value: "#4c1d95" },
+                    { bg: "#f0f9ff", border: "#bae6fd", label: "#0369a1", value: "#0c4a6e" },
+                    { bg: "#fef2f2", border: "#fecaca", label: "#b91c1c", value: "#7f1d1d" },
+                  ];
+                  const c = colors[i % colors.length];
+                  return React.createElement("div", { key: i, style: { padding: "10px 10px", background: c.bg, borderRadius: 10, border: `1.5px solid ${c.border}` } },
+                    React.createElement("div", { style: { fontSize: 10, color: c.label, fontWeight: 700, marginBottom: 4 } }, item.label),
+                    React.createElement("div", { style: { fontSize: 14, fontWeight: 800, color: c.value } }, item.value)
+                  );
+                })
               ),
-              record.mental && React.createElement("div", { style: { marginTop: 12, padding: "10px 12px", background: "#fff7ed", borderRadius: 8 } },
-                React.createElement("div", { style: { fontSize: 11, color: "#9a3412", fontWeight: 600 } }, "정신상태"),
-                React.createElement("div", { style: { fontSize: 13, color: "#7c2d12", marginTop: 3 } }, record.mental)
+              (record.mental || record.bprs) && React.createElement("div", { style: { padding: "12px 14px", background: "#faf5ff", borderRadius: 10, border: "1.5px solid #e9d5ff", marginBottom: 10 } },
+                React.createElement("div", { style: { fontSize: 11, color: "#7c3aed", fontWeight: 700, marginBottom: 6 } }, "🧩 BPSD (치매 행동·심리 증상)"),
+                React.createElement("div", { style: { display: "flex", flexWrap: "wrap", gap: 5 } },
+                  (record.bprs || record.mental || "").split("·").map(s => s.trim()).filter(Boolean).map((s, i) =>
+                    React.createElement("span", { key: i, style: { background: "#ede9fe", color: "#5b21b6", borderRadius: 20, fontSize: 12, fontWeight: 600, padding: "3px 10px" } }, s)
+                  )
+                )
               ),
-              record.nurse_note && React.createElement("div", { style: { marginTop: 12, padding: "10px 12px", background: "#f0f9ff", borderRadius: 8 } },
-                React.createElement("div", { style: { fontSize: 11, color: "#0369a1", fontWeight: 600 } }, "간호사 일일 코멘트"),
-                React.createElement("div", { style: { fontSize: 13, color: "#0c4a6e", marginTop: 3, lineHeight: 1.6 } }, record.nurse_note)
+              record.nurse_note && React.createElement("div", { style: { padding: "10px 12px", background: "#f0f9ff", borderRadius: 8, marginBottom: 10 } },
+                React.createElement("div", { style: { fontSize: 11, color: "#0369a1", fontWeight: 600, marginBottom: 4 } }, "간호사 일일 코멘트"),
+                React.createElement("div", { style: { fontSize: 13, color: "#0c4a6e", lineHeight: 1.6 } }, record.nurse_note)
               ),
-              noChangeMsg && React.createElement("div", { style: { marginTop: 12, padding: "14px 16px", background: "linear-gradient(135deg,#f0fdf4,#dcfce7)", borderRadius: 10, border: "1px solid #86efac" } },
+              noChangeMsg && React.createElement("div", { style: { padding: "14px 16px", background: "linear-gradient(135deg,#f0fdf4,#dcfce7)", borderRadius: 10, border: "1px solid #86efac", marginBottom: 10 } },
                 React.createElement("div", { style: { fontSize: 11, color: "#15803d", fontWeight: 700, marginBottom: 6 } }, "💚 오늘의 케어 메시지"),
                 React.createElement("div", { style: { fontSize: 13, color: "#166534", lineHeight: 1.7 } }, noChangeMsg)
               ),
-              record.updated_at && React.createElement("div", { style: { fontSize: 12, color: "#94a3b8", marginTop: 12, textAlign: "right" } }, `${fmtDate(record.updated_at)} 간호사 입력`)
+              record.updated_at && React.createElement("div", { style: { fontSize: 12, color: "#94a3b8", marginTop: 4, textAlign: "right" } }, `${fmtDate(record.updated_at)} 간호사 입력`)
             ),
-            record.doctor_findings?.length > 0 && React.createElement("div", { className: "card" },
+            record.doctor_findings?.length > 0 && React.createElement("div", { className: "card", style: { marginBottom: 12 } },
               React.createElement("div", { style: { fontWeight: 700, color: "#1e3a5f", marginBottom: 10 } }, "🩺 임상 소견"),
               React.createElement("div", { style: { display: "flex", flexWrap: "wrap", gap: 6 } },
                 record.doctor_findings.map((f, i) => React.createElement("span", { key: i, className: "tag tag-blue" }, f))
@@ -1201,24 +1213,48 @@ function DoctorReviewScreen({ patient, user, onBack }) {
     "처치/검사":   { items: ["Lab 이상소견 처치 중","검사결과 설명 시행","알부민 투여","수혈 시행","수혈 권유 중","L-Tube insertion 시행","영양제 투여 중","엑스레이 시행","혈액검사 시행"], bg:"#f0f9ff", border:"#7dd3fc", activeBg:"#0369a1" },
   };
 
+  const BPSD_ITEMS = [
+    "인지저하","기억력 저하","지남력 장애","판단력 저하",
+    "우울감","불안","무기력","수면장애",
+    "환청","환시","망상","혼잣말",
+    "공격성","케어 저항","배회","반복행동",
+    "야간 혼돈","섬망","충동적 행동","이상 없음",
+  ];
+
   const [record, setRecord] = useState(null);
   const [findings, setFindings] = useState([]);
+  const [bprs, setBprs] = useState([]);
   const [comment, setComment] = useState("");
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
 
   useEffect(() => {
     api("get_today_record", { patientId: patient.id, phone: "staff" })
-      .then(d => { if (d.record) { setRecord(d.record); setFindings(d.record.doctor_findings || []); setComment(d.record.doctor_comment || ""); } })
+      .then(d => {
+        if (d.record) {
+          setRecord(d.record);
+          setFindings(d.record.doctor_findings || []);
+          setComment(d.record.doctor_comment || "");
+          const b = d.record.bprs;
+          setBprs(b ? (Array.isArray(b) ? b : b.split("·").map(s=>s.trim()).filter(Boolean)) : []);
+        }
+      })
       .finally(() => setLoading(false));
   }, []);
 
   const toggleFinding = (f) => setFindings(fs => fs.includes(f) ? fs.filter(x=>x!==f) : [...fs, f]);
+  const toggleBprs = (v) => setBprs(bs => bs.includes(v) ? bs.filter(x=>x!==v) : [...bs, v]);
 
   const handleSave = async () => {
     setSaving(true);
     try {
-      await api("save_record", { patientId: patient.id, date: today(), recordData: { doctor_findings: findings, doctor_comment: comment, doctor_id: user.doctor_id, reviewed_at: now() } });
+      await api("save_record", { patientId: patient.id, date: today(), recordData: {
+        doctor_findings: findings,
+        bprs: bprs.join(" · "),
+        doctor_comment: comment,
+        doctor_id: user.doctor_id,
+        reviewed_at: now()
+      }});
       alert("저장됐어요!");
       onBack();
     } catch(e) { alert("저장 실패"); }
@@ -1244,9 +1280,30 @@ function DoctorReviewScreen({ patient, user, onBack }) {
             )
           )
         ),
-        record.mental && React.createElement("div", { style: { marginTop: 10, padding: "8px 10px", background: "#fff7ed", borderRadius: 8, fontSize: 13, color: "#7c2d12" } }, `정신: ${record.mental}`),
+        record.mental && React.createElement("div", { style: { marginTop: 10, padding: "8px 10px", background: "#faf5ff", borderRadius: 8 } },
+          React.createElement("div", { style: { fontSize: 11, color: "#7c3aed", fontWeight: 700, marginBottom: 4 } }, "🧩 간호사 기록 - BPSD"),
+          React.createElement("div", { style: { fontSize: 13, color: "#4c1d95" } }, record.mental)
+        ),
         record.nurse_note && React.createElement("div", { style: { marginTop: 8, padding: "8px 10px", background: "#f0f9ff", borderRadius: 8, fontSize: 13, color: "#0c4a6e", lineHeight: 1.5 } }, React.createElement("span", { style: { fontSize: 11, fontWeight: 700, color: "#0369a1", display: "block", marginBottom: 3 } }, "간호사 일일 코멘트"), record.nurse_note)
       ) : React.createElement("div", { className: "empty" }, "아직 간호사 기록이 없어요"),
+
+      // BPSD 의사 입력
+      React.createElement("div", { style: { background: "#faf5ff", borderRadius: 14, marginBottom: 12, overflow: "hidden", boxShadow: "0 1px 6px rgba(0,0,0,0.06)" } },
+        React.createElement("div", { style: { background: "linear-gradient(135deg,#4c1d95,#7c3aed)", padding: "10px 16px", fontSize: 13, fontWeight: 700, color: "white" } }, "🧩 BPSD — 치매 행동·심리 증상 (복수 선택)"),
+        React.createElement("div", { style: { padding: 14 } },
+          React.createElement("div", { style: { display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 6 } },
+            BPSD_ITEMS.map(v => React.createElement("button", {
+              key: v, onClick: () => toggleBprs(v),
+              style: { padding: "7px 6px", borderRadius: 8, border: "1.5px solid",
+                borderColor: bprs.includes(v) ? "#7c3aed" : "#e9d5ff",
+                background: bprs.includes(v) ? "#7c3aed" : "white",
+                color: bprs.includes(v) ? "white" : "#374151",
+                fontSize: 12, fontWeight: 600, cursor: "pointer",
+                fontFamily: "'Noto Sans KR',sans-serif", lineHeight: 1.3 }
+            }, v))
+          )
+        )
+      ),
 
       React.createElement("div", { className: "card", style: { marginBottom: 12 } },
         React.createElement("div", { style: { fontWeight: 700, color: "#1e3a5f", marginBottom: 14 } }, "🩺 임상 소견 (복수 선택)"),
