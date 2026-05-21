@@ -1029,12 +1029,12 @@ function DoctorScreen({ user, onBack }) {
 // ── 의사 검토 화면 ────────────────────────────────────────────
 function DoctorReviewScreen({ patient, user, onBack }) {
   const FINDINGS = {
-    "감염/호흡기": ["폐렴 소견","폐혈증 의심","요로감염","폐부종","고열 지속","기침·가래 지속","산소포화도 저하"],
-    "순환/의식": ["혈압 이상","부정맥","의식저하","뇌졸중 의심","부종 악화"],
-    "소화/영양": ["식욕부진 지속","흡인 위험","복통·복부팽만","체중감소","영양불량"],
-    "통증/근골격": ["통증 조절 필요","낙상 위험 증가","욕창 악화","관절 구축 진행"],
-    "정신/행동": ["섬망 악화","우울증 의심","수면장애","공격적 행동"],
-    "처치/검사": ["Lab 이상소견 처치 중","검사결과 설명 시행","알부민 투여","수혈 시행","수혈 권유 중","L-Tube insertion 시행","영양제 투여 중","엑스레이 시행","혈액검사 시행"],
+    "감염/호흡기": { items: ["폐렴 소견","폐혈증 의심","요로감염","폐부종","고열 지속","기침·가래 지속","산소포화도 저하"], bg:"#f0fdf4", border:"#86efac", activeBg:"#16a34a" },
+    "순환/의식":   { items: ["혈압 이상","부정맥","의식저하","뇌졸중 의심","부종 악화"], bg:"#eff6ff", border:"#93c5fd", activeBg:"#1d4ed8" },
+    "소화/영양":   { items: ["식욕부진 지속","흡인 위험","복통·복부팽만","체중감소","영양불량"], bg:"#fff7ed", border:"#fdba74", activeBg:"#c2410c" },
+    "통증/근골격": { items: ["통증 조절 필요","낙상 위험 증가","욕창 악화","관절 구축 진행"], bg:"#fef2f2", border:"#fca5a5", activeBg:"#b91c1c" },
+    "정신/행동":   { items: ["섬망 악화","우울증 의심","수면장애","공격적 행동"], bg:"#faf5ff", border:"#c4b5fd", activeBg:"#7c3aed" },
+    "처치/검사":   { items: ["Lab 이상소견 처치 중","검사결과 설명 시행","알부민 투여","수혈 시행","수혈 권유 중","L-Tube insertion 시행","영양제 투여 중","엑스레이 시행","혈액검사 시행"], bg:"#f0f9ff", border:"#7dd3fc", activeBg:"#0369a1" },
   };
 
   const [record, setRecord] = useState(null);
@@ -1072,11 +1072,11 @@ function DoctorReviewScreen({ patient, user, onBack }) {
     React.createElement("div", { className: "scroll-area", style: { paddingTop: 16 } },
       record ? React.createElement("div", { className: "card", style: { marginBottom: 12 } },
         React.createElement("div", { style: { fontWeight: 700, color: "#1e3a5f", marginBottom: 12 } }, "📋 간호사 입력 요약"),
-        React.createElement("div", { style: { display: "grid", gridTemplateColumns: "1fr 1fr", gap: "6px 0" } },
-          [["의식",record.consciousness],["식사",record.meal],["수면",record.sleep],["이동",record.mobility],["통증",`${record.pain}점`],["낙상",record.fall_risk]].filter(([,v])=>v).map(([k,v]) =>
-            React.createElement("div", { key: k, style: { padding: "4px 0" } },
-              React.createElement("div", { style: { fontSize: 11, color: "#94a3b8" } }, k),
-              React.createElement("div", { style: { fontSize: 13, fontWeight: 600, color: "#1e293b" } }, v)
+        React.createElement("div", { style: { display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 8, marginBottom: 8 } },
+          [["의식",record.consciousness],["식사량",record.meal_amount],["식사형태",record.meal_type],["수면",record.sleep_hours],["이동",record.mobility],["낙상위험",record.fall_risk],["소변",record.urine],["대변",record.bowel],["통증",record.pain!=null?`${record.pain}점`:null],["피부",record.skin],["위생",record.hygiene],["욕창",record.bedsore],["투약",record.medication],["한방",record.oriental_items||null]].filter(([,v])=>v).map(([k,v]) =>
+            React.createElement("div", { key: k, style: { padding: "8px 10px", background: "#f8fafc", borderRadius: 8, border: "1px solid #e2e8f0" } },
+              React.createElement("div", { style: { fontSize: 11, color: "#94a3b8", fontWeight: 600 } }, k),
+              React.createElement("div", { style: { fontSize: 13, fontWeight: 700, color: "#1e293b", marginTop: 2 } }, v)
             )
           )
         ),
@@ -1086,12 +1086,12 @@ function DoctorReviewScreen({ patient, user, onBack }) {
 
       React.createElement("div", { className: "card", style: { marginBottom: 12 } },
         React.createElement("div", { style: { fontWeight: 700, color: "#1e3a5f", marginBottom: 14 } }, "🩺 임상 소견 (복수 선택)"),
-        Object.entries(FINDINGS).map(([cat, items]) => React.createElement("div", { key: cat, style: { marginBottom: 14 } },
-          React.createElement("div", { style: { fontSize: 12, color: "#64748b", fontWeight: 600, marginBottom: 6 } }, `[ ${cat} ]`),
+        Object.entries(FINDINGS).map(([cat, {items, bg, border, activeBg}]) => React.createElement("div", { key: cat, style: { marginBottom: 14, background: bg, borderRadius: 12, padding: "12px 12px 10px", border: `1.5px solid ${border}` } },
+          React.createElement("div", { style: { fontSize: 14, color: "#1e293b", fontWeight: 800, marginBottom: 10 } }, `■ ${cat}`),
           React.createElement("div", { style: { display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 6 } },
             items.map(f => React.createElement("button", {
               key: f, onClick: () => toggleFinding(f),
-              style: { padding: "6px 10px", borderRadius: 8, border: "1.5px solid", borderColor: findings.includes(f)?"#3b82f6":"#e2e8f0", background: findings.includes(f)?"#eff6ff":"white", color: findings.includes(f)?"#1d4ed8":"#374151", fontSize: 12, fontWeight: 600, cursor: "pointer", fontFamily: "'Noto Sans KR',sans-serif" }
+              style: { padding: "7px 6px", borderRadius: 8, border: "1.5px solid", borderColor: findings.includes(f)?activeBg:border, background: findings.includes(f)?activeBg:"white", color: findings.includes(f)?"white":"#374151", fontSize: 12, fontWeight: 600, cursor: "pointer", fontFamily: "'Noto Sans KR',sans-serif", lineHeight: 1.3 }
             }, f))
           )
         ))
