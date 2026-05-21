@@ -488,7 +488,7 @@ function GuardianScreen({ user, onBack }) {
     { label: "의식", value: record.consciousness },
     { label: "활동", value: record.mobility, sub: record.fall_risk ? `낙상 ${record.fall_risk}` : null },
     { label: "식사", value: record.meal_amount, sub: record.meal_type || null },
-    { label: "검토", value: record.reviewed_at ? "완료" : "대기중", highlight: !record.reviewed_at },
+    { label: "특이사항", value: (record.special_alerts && record.special_alerts.length > 0) ? "있음" : "없음", highlight: !!(record.special_alerts && record.special_alerts.length > 0) },
   ] : [];
 
   const infoItems = record ? [
@@ -579,6 +579,31 @@ function GuardianScreen({ user, onBack }) {
                 record.doctor_findings.map((f, i) => React.createElement("span", { key: i, className: "tag tag-blue" }, f))
               )
             ),
+            // 특이사항 (의사 검토 완료 후)
+            record?.reviewed_at && record?.special_alerts && record.special_alerts.length > 0 && React.createElement("div", { style: { marginBottom: 12, background: "white", borderRadius: 14, overflow: "hidden", boxShadow: "0 2px 12px rgba(0,0,0,0.08)" } },
+              (() => {
+                const alerts = typeof record.special_alerts === "string"
+                  ? record.special_alerts.split("·").map(s=>s.trim()).filter(Boolean)
+                  : record.special_alerts;
+                const bad = alerts.filter(a => !a.includes("회복") && !a.includes("됨") && !a.includes("상승") && !a.includes("안정") && !a.includes("호전") && !a.includes("증가") && !a.includes("감소") && !a.includes("개선") && !a.includes("치료중") && !a.includes("전반적"));
+                const good = alerts.filter(a => a.includes("회복") || a.includes("됨") || a.includes("상승") || a.includes("안정") || a.includes("호전") || a.includes("증가") || a.includes("감소") || a.includes("개선") || a.includes("치료중") || a.includes("전반적"));
+                return React.createElement(React.Fragment, null,
+                  bad.length > 0 && React.createElement(React.Fragment, null,
+                    React.createElement("div", { style: { background: "linear-gradient(135deg,#7f1d1d,#dc2626)", padding: "10px 16px", fontSize: 13, fontWeight: 700, color: "white" } }, "⚠️ 의사 소견 — 주의사항"),
+                    React.createElement("div", { style: { padding: "12px 16px", display: "flex", flexWrap: "wrap", gap: 6 } },
+                      bad.map((a,i) => React.createElement("span", { key: i, style: { background: "#fee2e2", color: "#b91c1c", borderRadius: 20, fontSize: 13, fontWeight: 700, padding: "4px 12px" } }, a))
+                    )
+                  ),
+                  good.length > 0 && React.createElement(React.Fragment, null,
+                    React.createElement("div", { style: { background: "linear-gradient(135deg,#064e3b,#16a34a)", padding: "10px 16px", fontSize: 13, fontWeight: 700, color: "white", marginTop: bad.length > 0 ? 1 : 0 } }, "✅ 의사 소견 — 호전사항"),
+                    React.createElement("div", { style: { padding: "12px 16px", display: "flex", flexWrap: "wrap", gap: 6 } },
+                      good.map((a,i) => React.createElement("span", { key: i, style: { background: "#dcfce7", color: "#15803d", borderRadius: 20, fontSize: 13, fontWeight: 700, padding: "4px 12px" } }, a))
+                    )
+                  )
+                );
+              })()
+            ),
+
             // 의사가 검토 완료한 경우에만 보호자에게 표시
             record?.reviewed_at && record?.doctor_comment && React.createElement("div", { style: { marginBottom: 12, background: "white", borderRadius: 14, overflow: "hidden", boxShadow: "0 2px 12px rgba(0,0,0,0.08)" } },
               React.createElement("div", { style: { background: "linear-gradient(135deg,#1e1b4b,#4338ca)", padding: "10px 16px", display: "flex", alignItems: "center", gap: 8 } },
@@ -1230,6 +1255,7 @@ function DoctorReviewScreen({ patient, user, onBack }) {
   const [record, setRecord] = useState(null);
   const [findings, setFindings] = useState([]);
   const [bprs, setBprs] = useState([]);
+  const [specialAlerts, setSpecialAlerts] = useState([]);
   const [comment, setComment] = useState("");
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -1243,6 +1269,8 @@ function DoctorReviewScreen({ patient, user, onBack }) {
           setComment(d.record.doctor_comment || "");
           const b = d.record.bprs;
           setBprs(b ? (Array.isArray(b) ? b : b.split("·").map(s=>s.trim()).filter(Boolean)) : []);
+          const sa = d.record.special_alerts;
+          setSpecialAlerts(sa ? (Array.isArray(sa) ? sa : sa.split("·").map(s=>s.trim()).filter(Boolean)) : []);
         }
       })
       .finally(() => setLoading(false));
@@ -1250,6 +1278,7 @@ function DoctorReviewScreen({ patient, user, onBack }) {
 
   const toggleFinding = (f) => setFindings(fs => fs.includes(f) ? fs.filter(x=>x!==f) : [...fs, f]);
   const toggleBprs = (v) => setBprs(bs => bs.includes(v) ? bs.filter(x=>x!==v) : [...bs, v]);
+  const toggleAlert = (v) => setSpecialAlerts(sa => sa.includes(v) ? sa.filter(x=>x!==v) : [...sa, v]);
 
   const handleSave = async () => {
     setSaving(true);
@@ -1257,6 +1286,7 @@ function DoctorReviewScreen({ patient, user, onBack }) {
       await api("save_record", { patientId: patient.id, date: today(), recordData: {
         doctor_findings: findings,
         bprs: bprs.join(" · "),
+        special_alerts: specialAlerts.join(" · "),
         doctor_comment: comment,
         doctor_id: user.doctor_id,
         reviewed_at: now()
@@ -1292,6 +1322,39 @@ function DoctorReviewScreen({ patient, user, onBack }) {
         ),
         record.nurse_note && React.createElement("div", { style: { marginTop: 8, padding: "8px 10px", background: "#f0f9ff", borderRadius: 8, fontSize: 13, color: "#0c4a6e", lineHeight: 1.5 } }, React.createElement("span", { style: { fontSize: 11, fontWeight: 700, color: "#0369a1", display: "block", marginBottom: 3 } }, "간호사 일일 코멘트"), record.nurse_note)
       ) : React.createElement("div", { className: "empty" }, "아직 간호사 기록이 없어요"),
+
+      // 의사 소견상 특이사항
+      React.createElement("div", { style: { background: "white", borderRadius: 14, marginBottom: 12, overflow: "hidden", boxShadow: "0 1px 6px rgba(0,0,0,0.06)" } },
+        React.createElement("div", { style: { background: "linear-gradient(135deg,#7f1d1d,#dc2626)", padding: "10px 16px", fontSize: 13, fontWeight: 700, color: "white" } }, "⚠️ 의사 소견상 특이사항 (보호자에게 전달)"),
+        React.createElement("div", { style: { padding: 14 } },
+          React.createElement("div", { style: { fontSize: 12, color: "#dc2626", fontWeight: 700, marginBottom: 8 } }, "▼ 악화 / 주의"),
+          React.createElement("div", { style: { display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 6, marginBottom: 14 } },
+            ["폐렴","패혈증","요로감염","급성호흡곤란","산소포화도저하","혈압저하","고열지속","원인미상고열","낙상","욕창악화","의식저하","부정맥","흡인위험","체중감소","탈수","부종악화"].map(v =>
+              React.createElement("button", { key: v, onClick: () => toggleAlert(v),
+                style: { padding: "7px 6px", borderRadius: 8, border: "1.5px solid",
+                  borderColor: specialAlerts.includes(v) ? "#dc2626" : "#fecaca",
+                  background: specialAlerts.includes(v) ? "#dc2626" : "#fff1f2",
+                  color: specialAlerts.includes(v) ? "white" : "#7f1d1d",
+                  fontSize: 12, fontWeight: 600, cursor: "pointer",
+                  fontFamily: "'Noto Sans KR',sans-serif", lineHeight: 1.3 }
+              }, v)
+            )
+          ),
+          React.createElement("div", { style: { fontSize: 12, color: "#15803d", fontWeight: 700, marginBottom: 8 } }, "▲ 호전 / 회복"),
+          React.createElement("div", { style: { display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 6 } },
+            ["폐렴회복","패혈증회복","요로감염회복","고열해열됨","산소포화도상승","혈압안정","낙상치료중","욕창호전","의식호전","식욕회복","체중증가","부종감소","통증감소","수면개선","활동증가","전반적호전"].map(v =>
+              React.createElement("button", { key: v, onClick: () => toggleAlert(v),
+                style: { padding: "7px 6px", borderRadius: 8, border: "1.5px solid",
+                  borderColor: specialAlerts.includes(v) ? "#16a34a" : "#bbf7d0",
+                  background: specialAlerts.includes(v) ? "#16a34a" : "#f0fdf4",
+                  color: specialAlerts.includes(v) ? "white" : "#166534",
+                  fontSize: 12, fontWeight: 600, cursor: "pointer",
+                  fontFamily: "'Noto Sans KR',sans-serif", lineHeight: 1.3 }
+              }, v)
+            )
+          )
+        )
+      ),
 
       // BPSD 의사 입력
       React.createElement("div", { style: { background: "#faf5ff", borderRadius: 14, marginBottom: 12, overflow: "hidden", boxShadow: "0 1px 6px rgba(0,0,0,0.06)" } },
