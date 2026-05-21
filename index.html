@@ -456,14 +456,26 @@ function GuardianScreen({ user, onBack }) {
     finally { setSending(false); }
   };
 
+  const summaryItems = record ? [
+    { label: "의식", value: record.consciousness },
+    { label: "활동", value: record.mobility, sub: record.fall_risk ? `낙상 ${record.fall_risk}` : null },
+    { label: "식사", value: record.meal_amount, sub: record.meal_type || null },
+    { label: "특이사항", value: record.nurse_note ? "있음" : "없음", highlight: !!record.nurse_note },
+  ] : [];
+
   const infoItems = record ? [
     { label: "의식수준", value: record.consciousness },
-    { label: "식사량", value: record.meal },
-    { label: "수면", value: record.sleep },
+    { label: "식사량", value: record.meal_amount },
+    { label: "식사형태", value: record.meal_type },
+    { label: "수면", value: record.sleep_hours },
     { label: "이동", value: record.mobility },
     { label: "낙상위험", value: record.fall_risk },
     { label: "소변", value: record.urine },
-    { label: "대변", value: record.stool },
+    { label: "대변", value: record.bowel },
+    { label: "투약", value: record.medication },
+    { label: "피부", value: record.skin },
+    { label: "위생", value: record.hygiene },
+    { label: "욕창", value: record.bedsore },
     { label: "통증", value: record.pain != null ? `${record.pain}점` : null },
   ].filter(i => i.value) : [];
 
@@ -476,8 +488,23 @@ function GuardianScreen({ user, onBack }) {
       ),
       React.createElement("div", { style: { fontSize: 22, fontWeight: 800, color: "white" } }, `${patient.name}님`),
       React.createElement("div", { style: { fontSize: 13, color: "rgba(255,255,255,0.7)", marginTop: 4 } }, `${patient.room} · 입원 ${admitDays(patient.admitted_at)}일째`),
+
+      // 의식/활동/식사/특이사항 요약 박스
+      record && React.createElement("div", { style: { display: "grid", gridTemplateColumns: "1fr 1fr 1fr 1fr", gap: 8, marginTop: 16 } },
+        summaryItems.map((item, i) => React.createElement("div", { key: i, style: { background: "rgba(255,255,255,0.15)", borderRadius: 10, padding: "10px 8px", textAlign: "center" } },
+          React.createElement("div", { style: { fontSize: 11, color: "rgba(255,255,255,0.6)", marginBottom: 4 } }, item.label),
+          React.createElement("div", { style: { fontSize: 13, fontWeight: 800, color: item.highlight ? "#fbbf24" : "white", lineHeight: 1.2 } }, item.value || "—"),
+          item.sub && React.createElement("div", { style: { fontSize: 10, color: "rgba(255,255,255,0.5)", marginTop: 3 } }, item.sub)
+        ))
+      ),
+
       record?.doctor_comment && React.createElement("div", { style: { background: "rgba(255,255,255,0.1)", borderRadius: 10, padding: "10px 14px", marginTop: 12, fontSize: 13, color: "rgba(255,255,255,0.9)" } },
         "🩺 ", record.doctor_comment
+      ),
+
+      // 간호사 입력 완료 상태 표시
+      !loading && React.createElement("div", { style: { marginTop: 12, fontSize: 12, color: "rgba(255,255,255,0.6)", display: "flex", alignItems: "center", gap: 6 } },
+        record ? "🏥 간호사 입력 완료 · 주치의 검토 후 전달 예정이에요." : "⏳ 오늘 상태는 저녁 간호사 입력 후 확인하실 수 있어요."
       )
     ),
 
