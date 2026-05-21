@@ -488,7 +488,7 @@ function GuardianScreen({ user, onBack }) {
     { label: "의식", value: record.consciousness },
     { label: "활동", value: record.mobility, sub: record.fall_risk ? `낙상 ${record.fall_risk}` : null },
     { label: "식사", value: record.meal_amount, sub: record.meal_type || null },
-    { label: "특이사항", value: record.nurse_note ? "있음" : "없음", highlight: !!record.nurse_note },
+    { label: "검토", value: record.reviewed_at ? "완료" : "대기중", highlight: !record.reviewed_at },
   ] : [];
 
   const infoItems = record ? [
@@ -512,19 +512,19 @@ function GuardianScreen({ user, onBack }) {
     React.createElement("div", { style: { background: "linear-gradient(135deg,#064e3b,#059669)", padding: "48px 20px 18px" } },
       React.createElement("div", { style: { display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 10 } },
         React.createElement("button", { className: "back-btn", onClick: onBack }, "← 역할 선택"),
-        React.createElement("div", { style: { fontSize: 12, color: "rgba(255,255,255,0.5)" } }, "오늘안부 · 천안쌍용요양병원")
+        React.createElement("div", { style: { fontSize: 12, color: "rgba(255,255,255,0.8)", fontWeight: 600 } }, "오늘안부 · 천안쌍용요양병원")
       ),
       React.createElement("div", { style: { display: "flex", alignItems: "baseline", gap: 10, flexWrap: "wrap" } },
         React.createElement("div", { style: { fontSize: 26, fontWeight: 900, color: "white" } }, `${patient.name}님`),
-        React.createElement("div", { style: { fontSize: 13, color: "rgba(255,255,255,0.7)" } }, `${patient.room} · 입원 ${admitDays(patient.admitted_at)}일째`)
+        React.createElement("div", { style: { fontSize: 14, color: "rgba(255,255,255,0.9)", fontWeight: 600 } }, `${patient.room} · 입원 ${admitDays(patient.admitted_at)}일째`)
       ),
 
       // 의식/활동/식사/특이사항 요약 박스
       record && React.createElement("div", { style: { display: "grid", gridTemplateColumns: "1fr 1fr 1fr 1fr", gap: 6, marginTop: 12 } },
-        summaryItems.map((item, i) => React.createElement("div", { key: i, style: { background: "rgba(255,255,255,0.15)", borderRadius: 8, padding: "6px 4px", textAlign: "center" } },
-          React.createElement("div", { style: { fontSize: 10, color: "rgba(255,255,255,0.6)", marginBottom: 2 } }, item.label),
-          React.createElement("div", { style: { fontSize: 12, fontWeight: 800, color: item.highlight ? "#fbbf24" : "white", lineHeight: 1.2 } }, item.value || "—"),
-          item.sub && React.createElement("div", { style: { fontSize: 9, color: "rgba(255,255,255,0.5)", marginTop: 2 } }, item.sub)
+        summaryItems.map((item, i) => React.createElement("div", { key: i, style: { background: "rgba(255,255,255,0.18)", borderRadius: 8, padding: "8px 4px", textAlign: "center" } },
+          React.createElement("div", { style: { fontSize: 11, color: "rgba(255,255,255,0.85)", fontWeight: 700, marginBottom: 3 } }, item.label),
+          React.createElement("div", { style: { fontSize: 14, fontWeight: 900, color: item.highlight ? "#fbbf24" : "white", lineHeight: 1.2 } }, item.value || "—"),
+          item.sub && React.createElement("div", { style: { fontSize: 11, color: "rgba(255,255,255,0.75)", fontWeight: 600, marginTop: 2 } }, item.sub)
         ))
       )
     ),
@@ -558,20 +558,20 @@ function GuardianScreen({ user, onBack }) {
                   ];
                   const c = colors[i % colors.length];
                   return React.createElement("div", { key: i, style: { padding: "10px 10px", background: c.bg, borderRadius: 10, border: `1.5px solid ${c.border}` } },
-                    React.createElement("div", { style: { fontSize: 10, color: c.label, fontWeight: 700, marginBottom: 4 } }, item.label),
-                    React.createElement("div", { style: { fontSize: 14, fontWeight: 800, color: c.value } }, item.value)
+                    React.createElement("div", { style: { fontSize: 12, color: c.label, fontWeight: 700, marginBottom: 4 } }, item.label),
+                    React.createElement("div", { style: { fontSize: 15, fontWeight: 800, color: c.value } }, item.value)
                   );
                 })
               ),
               (record.mental || record.bprs) && React.createElement("div", { style: { padding: "12px 14px", background: "#faf5ff", borderRadius: 10, border: "1.5px solid #e9d5ff", marginBottom: 10 } },
-                React.createElement("div", { style: { fontSize: 11, color: "#7c3aed", fontWeight: 700, marginBottom: 6 } }, "🧩 BPSD (치매 행동·심리 증상)"),
+                React.createElement("div", { style: { fontSize: 11, color: "#7c3aed", fontWeight: 700, marginBottom: 6 } }, "🧩 BPSD (치매 행동·심리 증상 등 문제 증상)"),
                 React.createElement("div", { style: { display: "flex", flexWrap: "wrap", gap: 5 } },
                   (record.bprs || record.mental || "").split("·").map(s => s.trim()).filter(Boolean).map((s, i) =>
                     React.createElement("span", { key: i, style: { background: "#ede9fe", color: "#5b21b6", borderRadius: 20, fontSize: 12, fontWeight: 600, padding: "3px 10px" } }, s)
                   )
                 )
               ),
-              record.updated_at && React.createElement("div", { style: { fontSize: 12, color: "#94a3b8", marginTop: 4, textAlign: "right" } }, `${fmtDate(record.updated_at)} 간호사 입력`)
+              record.reviewed_at && React.createElement("div", { style: { fontSize: 12, color: "#94a3b8", marginTop: 4, textAlign: "right" } }, `${fmtDate(record.reviewed_at)} 주치의 검토`)
             ),
             record.doctor_findings?.length > 0 && React.createElement("div", { className: "card", style: { marginBottom: 12 } },
               React.createElement("div", { style: { fontWeight: 700, color: "#1e3a5f", marginBottom: 10 } }, "🩺 임상 소견"),
@@ -579,17 +579,23 @@ function GuardianScreen({ user, onBack }) {
                 record.doctor_findings.map((f, i) => React.createElement("span", { key: i, className: "tag tag-blue" }, f))
               )
             ),
-            record?.doctor_comment && React.createElement("div", { className: "card", style: { marginBottom: 12, borderLeft: "4px solid #4338ca" } },
-              React.createElement("div", { style: { fontSize: 11, color: "#4338ca", fontWeight: 700, marginBottom: 6 } }, "주치의 코멘트"),
-              React.createElement("div", { style: { fontSize: 14, color: "#1e293b", lineHeight: 1.7 } }, record.doctor_comment)
+            // 의사가 검토 완료한 경우에만 보호자에게 표시
+            record?.reviewed_at && record?.doctor_comment && React.createElement("div", { style: { marginBottom: 12, background: "white", borderRadius: 14, overflow: "hidden", boxShadow: "0 2px 12px rgba(0,0,0,0.08)" } },
+              React.createElement("div", { style: { background: "linear-gradient(135deg,#1e1b4b,#4338ca)", padding: "10px 16px", display: "flex", alignItems: "center", gap: 8 } },
+                React.createElement("div", { style: { fontSize: 13, fontWeight: 700, color: "white" } }, "🩺 주치의 코멘트")
+              ),
+              React.createElement("div", { style: { padding: "14px 16px", fontSize: 14, color: "#1e293b", lineHeight: 1.8 } }, record.doctor_comment)
             ),
-            record?.nurse_note && React.createElement("div", { className: "card", style: { marginBottom: 12, borderLeft: "4px solid #0369a1" } },
-              React.createElement("div", { style: { fontSize: 11, color: "#0369a1", fontWeight: 700, marginBottom: 6 } }, "간호사 일일 코멘트"),
-              React.createElement("div", { style: { fontSize: 14, color: "#1e293b", lineHeight: 1.7 } }, record.nurse_note)
+            // 변화없음 메시지 (의사 검토 완료 후 표시)
+            record?.reviewed_at && noChangeMsg && React.createElement("div", { style: { marginBottom: 12, background: "white", borderRadius: 14, overflow: "hidden", boxShadow: "0 2px 12px rgba(0,0,0,0.08)" } },
+              React.createElement("div", { style: { background: "linear-gradient(135deg,#064e3b,#059669)", padding: "10px 16px", display: "flex", alignItems: "center", gap: 8 } },
+                React.createElement("div", { style: { fontSize: 13, fontWeight: 700, color: "white" } }, "💚 오늘의 케어 메시지")
+              ),
+              React.createElement("div", { style: { padding: "14px 16px", fontSize: 14, color: "#166534", lineHeight: 1.8 } }, noChangeMsg)
             ),
-            noChangeMsg && React.createElement("div", { className: "card", style: { marginBottom: 12, background: "linear-gradient(135deg,#f0fdf4,#dcfce7)", border: "1px solid #86efac" } },
-              React.createElement("div", { style: { fontSize: 11, color: "#15803d", fontWeight: 700, marginBottom: 6 } }, "💚 오늘의 케어 메시지"),
-              React.createElement("div", { style: { fontSize: 13, color: "#166534", lineHeight: 1.7 } }, noChangeMsg)
+            // 아직 의사 검토 전
+            !record?.reviewed_at && React.createElement("div", { style: { marginBottom: 12, background: "#f8fafc", borderRadius: 14, padding: "16px", textAlign: "center", border: "1.5px dashed #e2e8f0" } },
+              React.createElement("div", { style: { fontSize: 13, color: "#94a3b8" } }, "🩺 주치의 검토 후 최종 내용이 전달될 예정이에요.")
             )
           )
       ),
@@ -1289,7 +1295,7 @@ function DoctorReviewScreen({ patient, user, onBack }) {
 
       // BPSD 의사 입력
       React.createElement("div", { style: { background: "#faf5ff", borderRadius: 14, marginBottom: 12, overflow: "hidden", boxShadow: "0 1px 6px rgba(0,0,0,0.06)" } },
-        React.createElement("div", { style: { background: "linear-gradient(135deg,#4c1d95,#7c3aed)", padding: "10px 16px", fontSize: 13, fontWeight: 700, color: "white" } }, "🧩 BPSD — 치매 행동·심리 증상 (복수 선택)"),
+        React.createElement("div", { style: { background: "linear-gradient(135deg,#4c1d95,#7c3aed)", padding: "10px 16px", fontSize: 13, fontWeight: 700, color: "white" } }, "🧩 BPSD — 치매 행동·심리 증상 등 문제 증상 (복수 선택)"),
         React.createElement("div", { style: { padding: 14 } },
           React.createElement("div", { style: { display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 6 } },
             BPSD_ITEMS.map(v => React.createElement("button", {
