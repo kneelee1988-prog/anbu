@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>안부 - 입원 환자 케어 플랫폼</title>
+  <title>오늘안부 - 입원 환자 케어 플랫폼</title>
   <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
@@ -181,7 +181,7 @@ function RoleSelectScreen({ onSelect }) {
 
   return React.createElement("div", { className: "screen", style: { background: "linear-gradient(160deg,#0f172a,#1e3a5f)" } },
     React.createElement("div", { style: { padding: "60px 24px 24px", textAlign: "center" } },
-      React.createElement("div", { style: { fontSize: 32, fontWeight: 900, color: "white", letterSpacing: "-0.5px" } }, "안부"),
+      React.createElement("div", { style: { fontSize: 24, fontWeight: 900, color: "white", letterSpacing: "-0.5px" } }, "오늘안부"),
       React.createElement("div", { style: { fontSize: 13, color: "rgba(255,255,255,0.6)", marginTop: 4 } }, "천안쌍용요양병원"),
       React.createElement("div", { style: { fontSize: 12, color: "rgba(255,255,255,0.4)", marginTop: 2 } }, "입원 환자 케어 연결 플랫폼")
     ),
@@ -198,19 +198,19 @@ function RoleSelectScreen({ onSelect }) {
         ),
         React.createElement("div", { style: { marginLeft: "auto", color: "rgba(255,255,255,0.4)", fontSize: 18 } }, "›")
       )),
-      notices.length > 0 && React.createElement("div", {
+      React.createElement("div", {
         onClick: () => onSelect("notices"),
-        style: { background: "rgba(239,68,68,0.15)", border: "1px solid rgba(239,68,68,0.3)", borderRadius: 16, padding: "16px 20px", cursor: "pointer", display: "flex", alignItems: "center", gap: 16 }
+        style: { background: "linear-gradient(135deg,rgba(251,191,36,0.15),rgba(245,158,11,0.1))", border: "1px solid rgba(251,191,36,0.35)", borderRadius: 16, padding: "16px 20px", cursor: "pointer", display: "flex", alignItems: "center", gap: 16, transition: "all 0.15s" }
       },
-        React.createElement("div", { style: { fontSize: 28, width: 44, height: 44, background: "rgba(239,68,68,0.2)", borderRadius: 12, display: "flex", alignItems: "center", justifyContent: "center" } }, "📢"),
+        React.createElement("div", { style: { fontSize: 28, width: 44, height: 44, background: "rgba(251,191,36,0.2)", borderRadius: 12, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 } }, "📢"),
         React.createElement("div", null,
           React.createElement("div", { style: { fontSize: 16, fontWeight: 700, color: "white", display: "flex", alignItems: "center", gap: 8 } },
             "공지사항",
-            React.createElement("span", { className: "badge" }, `NEW ${notices.length}`)
+            notices.length > 0 && React.createElement("span", { style: { background: "rgba(251,191,36,0.9)", color: "#1c1917", borderRadius: 20, fontSize: 11, fontWeight: 700, padding: "1px 8px" } }, "NEW " + notices.length)
           ),
-          React.createElement("div", { style: { fontSize: 12, color: "rgba(255,255,255,0.5)", marginTop: 2 } }, `최신 ${notices.length}건`)
+          React.createElement("div", { style: { fontSize: 12, color: "rgba(255,255,255,0.5)", marginTop: 2 } }, notices.length > 0 ? "최신 " + notices.length + "건" : "병원 소식을 확인하세요")
         ),
-        React.createElement("div", { style: { marginLeft: "auto", color: "rgba(255,255,255,0.4)", fontSize: 18 } }, "›")
+        React.createElement("div", { style: { marginLeft: "auto", color: "rgba(251,191,36,0.6)", fontSize: 18 } }, "»")
       )
     ),
     React.createElement("div", { style: { textAlign: "center", padding: "0 0 24px", color: "rgba(255,255,255,0.3)", fontSize: 12 } },
@@ -284,7 +284,7 @@ function LoginScreen({ loginType, onLogin, onBack, onSignup }) {
     React.createElement("div", { className: "header", style: { paddingTop: 48 } },
       React.createElement("button", { className: "back-btn", onClick: onBack }, "← 역할 선택"),
       React.createElement("div", { style: { fontSize: 24, fontWeight: 800, color: "white", marginTop: 12 } }, titles[loginType]),
-      React.createElement("div", { style: { fontSize: 13, color: "rgba(255,255,255,0.6)", marginTop: 4 } }, "안부 · 입원 환자 케어 플랫폼")
+      React.createElement("div", { style: { fontSize: 13, color: "rgba(255,255,255,0.6)", marginTop: 4 } }, "오늘안부 · 입원 환자 케어 플랫폼")
     ),
     React.createElement("div", { style: { flex: 1, padding: "0 24px 40px" } },
       error && React.createElement("div", { className: "error-msg" }, error),
@@ -472,7 +472,7 @@ function GuardianScreen({ user, onBack }) {
     React.createElement("div", { style: { background: "linear-gradient(135deg,#1e3a5f,#2563eb)", padding: "48px 20px 24px" } },
       React.createElement("div", { style: { display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 16 } },
         React.createElement("button", { className: "back-btn", onClick: onBack }, "← 역할 선택"),
-        React.createElement("div", { style: { fontSize: 12, color: "rgba(255,255,255,0.5)" } }, "안부 · 천안쌍용요양병원")
+        React.createElement("div", { style: { fontSize: 12, color: "rgba(255,255,255,0.5)" } }, "오늘안부 · 천안쌍용요양병원")
       ),
       React.createElement("div", { style: { fontSize: 22, fontWeight: 800, color: "white" } }, `${patient.name}님`),
       React.createElement("div", { style: { fontSize: 13, color: "rgba(255,255,255,0.7)", marginTop: 4 } }, `${patient.room} · 입원 ${admitDays(patient.admitted_at)}일째`),
@@ -575,7 +575,7 @@ function NurseScreen({ user, onBack }) {
         React.createElement("button", { className: "back-btn", onClick: onBack }, "← 역할 선택"),
         React.createElement("button", { className: "logout-btn", onClick: onBack }, "로그아웃 →")
       ),
-      React.createElement("div", { style: { fontSize: 11, color: "rgba(255,255,255,0.5)", marginTop: 8 } }, `안부 · 천안쌍용요양병원 · ${user.ward}`),
+      React.createElement("div", { style: { fontSize: 11, color: "rgba(255,255,255,0.5)", marginTop: 8 } }, `오늘안부 · 천안쌍용요양병원 · ${user.ward}`),
       React.createElement("div", { style: { display: "flex", justifyContent: "space-between", alignItems: "flex-end", marginTop: 4 } },
         React.createElement("div", { style: { fontSize: 18, fontWeight: 800, color: "white" } }, "오늘 상태 입력"),
         React.createElement("div", { style: { fontSize: 13, color: "rgba(255,255,255,0.7)" } }, `${patients.length}명`)
@@ -761,7 +761,7 @@ function DoctorScreen({ user, onBack }) {
         React.createElement("button", { className: "back-btn", onClick: onBack }, "← 역할 선택"),
         React.createElement("button", { className: "logout-btn", onClick: onBack }, "로그아웃 →")
       ),
-      React.createElement("div", { style: { fontSize: 11, color: "rgba(255,255,255,0.5)", marginTop: 8 } }, `안부 · 천안쌍용요양병원 · ${user.name} 원장`),
+      React.createElement("div", { style: { fontSize: 11, color: "rgba(255,255,255,0.5)", marginTop: 8 } }, `오늘안부 · 천안쌍용요양병원 · ${user.name} 원장`),
       React.createElement("div", { style: { display: "flex", justifyContent: "space-between", alignItems: "flex-end", marginTop: 4 } },
         React.createElement("div", { style: { fontSize: 18, fontWeight: 800, color: "white" } }, "환자 현황"),
         React.createElement("div", { style: { fontSize: 13, color: "rgba(255,255,255,0.7)" } }, `담당 ${patients.length}명`)
@@ -987,7 +987,7 @@ function AdminScreen({ user, onBack }) {
         React.createElement("button", { className: "back-btn", onClick: onBack }, "← 역할선택"),
         React.createElement("button", { className: "logout-btn", onClick: onBack }, "로그아웃 →")
       ),
-      React.createElement("div", { style: { fontSize: 11, color: "rgba(255,255,255,0.5)", marginTop: 8 } }, "안부 · 관리자"),
+      React.createElement("div", { style: { fontSize: 11, color: "rgba(255,255,255,0.5)", marginTop: 8 } }, "오늘안부 · 관리자"),
       React.createElement("div", { style: { fontSize: 18, fontWeight: 800, color: "white" } }, `${user.name} 병원장`),
       React.createElement("div", { style: { display: "flex", gap: 6, marginTop: 12, overflowX: "auto" } },
         [["staff","직원 계정"],["patients","환자 현황"],["notices","공지사항"],["requests","가입승인"]].map(([k,v]) =>
@@ -1235,7 +1235,7 @@ function App() {
   };
 
   if (screen === "splash") return React.createElement("div", { style: { minHeight: "100vh", background: "linear-gradient(160deg,#0f172a,#1e3a5f)", display: "flex", alignItems: "center", justifyContent: "center" } },
-    React.createElement("div", { style: { fontSize: 32, fontWeight: 900, color: "white" } }, "안부")
+    React.createElement("div", { style: { fontSize: 32, fontWeight: 900, color: "white" } }, "오늘안부")
   );
 
   if (screen === "onboarding") return React.createElement(OnboardingScreen, { onDone: handleOnboardDone });
