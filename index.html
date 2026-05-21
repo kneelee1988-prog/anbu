@@ -485,7 +485,7 @@ function GuardianScreen({ user, onBack }) {
     React.createElement("div", { style: { padding: "0 20px", marginTop: 16 } },
       React.createElement("div", { className: "tabs" },
         React.createElement("button", { className: `tab ${tab==="today"?"active":""}`, onClick: () => setTab("today") }, "오늘의 안부"),
-        React.createElement("button", { className: `tab ${tab==="message"?"active":""}`, onClick: () => setTab("message") }, "어머니께 한마디")
+        React.createElement("button", { className: `tab ${tab==="message"?"active":""}`, onClick: () => setTab("message") }, "전하고 싶은 한마디")
       )
     ),
 
@@ -524,7 +524,11 @@ function GuardianScreen({ user, onBack }) {
       ),
 
       tab === "message" && React.createElement("div", { className: "card" },
-        React.createElement("div", { style: { fontWeight: 700, color: "#1e3a5f", marginBottom: 16 } }, "💬 어머니께 한마디"),
+        React.createElement("div", { style: { fontWeight: 700, color: "#1e3a5f", marginBottom: 16 } }, "💬 전하고 싶은 한마디"),
+        React.createElement("div", { className: "field" },
+          React.createElement("label", { className: "label" }, "메시지"),
+          React.createElement("textarea", { className: "input", rows: 4, placeholder: "전하고 싶은 말을 적어주세요", value: msgForm.body, onChange: e => setMsgForm(f => ({...f, body: e.target.value})), style: { resize: "none", lineHeight: 1.6 } })
+        ),
         React.createElement("div", { className: "field" },
           React.createElement("label", { className: "label" }, "면회 예정일"),
           React.createElement("input", { className: "input", type: "date", value: msgForm.visitDate, onChange: e => setMsgForm(f => ({...f, visitDate: e.target.value})) })
@@ -532,10 +536,6 @@ function GuardianScreen({ user, onBack }) {
         React.createElement("div", { className: "field" },
           React.createElement("label", { className: "label" }, "면회 시간"),
           React.createElement("input", { className: "input", type: "time", value: msgForm.visitTime, onChange: e => setMsgForm(f => ({...f, visitTime: e.target.value})) })
-        ),
-        React.createElement("div", { className: "field" },
-          React.createElement("label", { className: "label" }, "메시지"),
-          React.createElement("textarea", { className: "input", rows: 4, placeholder: "어머니께 전하고 싶은 말을 적어주세요", value: msgForm.body, onChange: e => setMsgForm(f => ({...f, body: e.target.value})), style: { resize: "none", lineHeight: 1.6 } })
         ),
         React.createElement("button", { className: "btn btn-dark", onClick: sendMsg, disabled: sending }, sending ? "전송 중..." : "전송하기")
       )
