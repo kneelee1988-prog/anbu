@@ -467,6 +467,23 @@ function GuardianScreen({ user, onBack }) {
     finally { setSending(false); }
   };
 
+  // 변화없음 날 랜덤 위로 메시지
+  const NO_CHANGE_MSGS = [
+    "오늘도 평온하게 지내고 계세요 🌿 안정적인 하루가 쌓이는 것이 회복의 과정입니다.",
+    "어제와 비슷한 안정적인 상태를 유지하고 계십니다 ☀️ 규칙적인 케어가 함께하고 있어요.",
+    "오늘도 케어팀이 곁에서 함께하고 있어요 💚 걱정하지 마세요.",
+    "특별한 변화 없이 안정적인 하루를 보내셨어요 🌸 가족분의 관심이 큰 힘이 됩니다.",
+    "오늘도 편안하게 지내고 계세요 🌙 이상 징후가 생기면 즉시 연락드릴게요.",
+    "안정적인 일상이 계속되고 있어요 🤝 작은 안정이 쌓여 건강한 내일이 됩니다.",
+    "오늘도 무탈하게 잘 지내고 계십니다 🌱 꾸준한 케어로 함께하겠습니다.",
+    "오늘 하루도 어르신 곁을 지켰어요 🏥 가족분들도 편안한 하루 보내세요.",
+    "특이사항 없이 안정적으로 하루를 마쳤어요 🙏 항상 최선을 다하겠습니다.",
+    "오늘도 잘 돌봐드렸어요 💙 어르신 건강을 위해 늘 함께할게요.",
+  ];
+  const noChangeMsg = (record && record.no_change)
+    ? NO_CHANGE_MSGS[new Date().getDate() % NO_CHANGE_MSGS.length]
+    : null;
+
   const summaryItems = record ? [
     { label: "의식", value: record.consciousness },
     { label: "활동", value: record.mobility, sub: record.fall_risk ? `낙상 ${record.fall_risk}` : null },
@@ -547,8 +564,12 @@ function GuardianScreen({ user, onBack }) {
                 React.createElement("div", { style: { fontSize: 13, color: "#7c2d12", marginTop: 3 } }, record.mental)
               ),
               record.nurse_note && React.createElement("div", { style: { marginTop: 12, padding: "10px 12px", background: "#f0f9ff", borderRadius: 8 } },
-                React.createElement("div", { style: { fontSize: 11, color: "#0369a1", fontWeight: 600 } }, "간호사 특이사항"),
+                React.createElement("div", { style: { fontSize: 11, color: "#0369a1", fontWeight: 600 } }, "간호사 일일 코멘트"),
                 React.createElement("div", { style: { fontSize: 13, color: "#0c4a6e", marginTop: 3, lineHeight: 1.6 } }, record.nurse_note)
+              ),
+              noChangeMsg && React.createElement("div", { style: { marginTop: 12, padding: "14px 16px", background: "linear-gradient(135deg,#f0fdf4,#dcfce7)", borderRadius: 10, border: "1px solid #86efac" } },
+                React.createElement("div", { style: { fontSize: 11, color: "#15803d", fontWeight: 700, marginBottom: 6 } }, "💚 오늘의 케어 메시지"),
+                React.createElement("div", { style: { fontSize: 13, color: "#166534", lineHeight: 1.7 } }, noChangeMsg)
               ),
               record.updated_at && React.createElement("div", { style: { fontSize: 12, color: "#94a3b8", marginTop: 12, textAlign: "right" } }, `${fmtDate(record.updated_at)} 간호사 입력`)
             ),
@@ -1101,7 +1122,7 @@ function NurseRecordScreen({ patient, user, onBack, onSaved }) {
 
       // 12. 간호사 특이사항
       React.createElement("div", { style: { background: "white", borderRadius: 14, marginBottom: 24, overflow: "hidden", boxShadow: "0 1px 6px rgba(0,0,0,0.06)" } },
-        React.createElement("div", { style: { background: "linear-gradient(135deg,#065f46,#0d9488)", padding: "10px 16px", fontSize: 13, fontWeight: 700, color: "white" } }, "📝 간호사 특이사항"),
+        React.createElement("div", { style: { background: "linear-gradient(135deg,#065f46,#0d9488)", padding: "10px 16px", fontSize: 13, fontWeight: 700, color: "white" } }, "📝 간호사 일일 코멘트"),
         React.createElement("div", { style: { padding: 16 } },
           React.createElement("textarea", { className: "input", rows: 5,
             placeholder: "특이사항을 입력하세요",
@@ -1224,7 +1245,7 @@ function DoctorReviewScreen({ patient, user, onBack }) {
           )
         ),
         record.mental && React.createElement("div", { style: { marginTop: 10, padding: "8px 10px", background: "#fff7ed", borderRadius: 8, fontSize: 13, color: "#7c2d12" } }, `정신: ${record.mental}`),
-        record.nurse_note && React.createElement("div", { style: { marginTop: 8, padding: "8px 10px", background: "#f0f9ff", borderRadius: 8, fontSize: 13, color: "#0c4a6e", lineHeight: 1.5 } }, record.nurse_note)
+        record.nurse_note && React.createElement("div", { style: { marginTop: 8, padding: "8px 10px", background: "#f0f9ff", borderRadius: 8, fontSize: 13, color: "#0c4a6e", lineHeight: 1.5 } }, React.createElement("span", { style: { fontSize: 11, fontWeight: 700, color: "#0369a1", display: "block", marginBottom: 3 } }, "간호사 일일 코멘트"), record.nurse_note)
       ) : React.createElement("div", { className: "empty" }, "아직 간호사 기록이 없어요"),
 
       React.createElement("div", { className: "card", style: { marginBottom: 12 } },
