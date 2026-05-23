@@ -613,19 +613,7 @@ function GuardianScreen({ user, onBack }) {
               ),
               React.createElement("div", { style: { padding: "14px 16px", fontSize: 14, color: "#1e293b", lineHeight: 1.8 } }, record.doctor_comment)
             ),
-            // 오늘의 한마디 (간호사 입력, 의사 검토 후 표시)
-            record?.reviewed_at && record?.nurse_note && React.createElement("div", { style: { marginBottom: 12, background: "white", borderRadius: 14, overflow: "hidden", boxShadow: "0 2px 12px rgba(0,0,0,0.08)" } },
-              React.createElement("div", { style: { background: "linear-gradient(135deg,#064e3b,#059669)", padding: "10px 16px", display: "flex", alignItems: "center", gap: 8 } },
-                React.createElement("div", { style: { fontSize: 13, fontWeight: 700, color: "white" } }, "💚 간호사가 전해드리는 오늘안부")
-              ),
-              React.createElement("div", { style: { padding: "14px 16px" } },
-                record.nurse_note.split(" / ").map((msg, i) =>
-                  React.createElement("div", { key: i, style: { fontSize: 14, color: "#166534", lineHeight: 1.8, paddingBottom: i < record.nurse_note.split(" / ").length - 1 ? "6px" : 0 } },
-                    record.nurse_note.split(" / ").length > 1 ? `• ${msg}` : msg
-                  )
-                )
-              )
-            ),
+
             // 변화없음 메시지 (의사 검토 완료 후 표시)
             record?.reviewed_at && noChangeMsg && React.createElement("div", { style: { marginBottom: 12, background: "white", borderRadius: 14, overflow: "hidden", boxShadow: "0 2px 12px rgba(0,0,0,0.08)" } },
               React.createElement("div", { style: { background: "linear-gradient(135deg,#064e3b,#059669)", padding: "10px 16px", display: "flex", alignItems: "center", gap: 8 } },
@@ -972,7 +960,7 @@ function TodaySummaryPicker({ value, onChange }) {
 
   return React.createElement("div", { style: { background: "white", borderRadius: 14, marginBottom: 24, overflow: "hidden", boxShadow: "0 1px 6px rgba(0,0,0,0.06)" } },
     React.createElement("div", { style: { background: "linear-gradient(135deg,#065f46,#0d9488)", padding: "10px 16px", display: "flex", justifyContent: "space-between", alignItems: "center" } },
-      React.createElement("div", { style: { fontSize: 13, fontWeight: 700, color: "white" } }, "💚 간호사가 전해드리는 오늘안부 (복수 선택 가능)"),
+      React.createElement("div", { style: { fontSize: 13, fontWeight: 700, color: "white" } }, "💚 간호사가 전하는 오늘안부 (복수 선택 가능)"),
       React.createElement("button", { onClick: () => setShowAll(!showAll),
         style: { fontSize: 11, color: "rgba(255,255,255,0.8)", background: "rgba(255,255,255,0.2)", border: "none", borderRadius: 6, padding: "3px 8px", cursor: "pointer", fontFamily: "'Noto Sans KR',sans-serif" }
       }, showAll ? "접기" : "전체보기")
@@ -1278,9 +1266,6 @@ function NurseRecordScreen({ patient, user, onBack, onSaved }) {
           )
         )
       }),
-
-      // ── 섹션6: 오늘의 한마디 ──────────────────────────────────
-      React.createElement(TodaySummaryPicker, { value: form.nurse_note, onChange: v => set("nurse_note", v) }),
 
       React.createElement("button", { className: "btn btn-dark", onClick: handleSave, disabled: saving, style: { marginBottom: 20 } },
         saving ? "저장 중..." : "💾 저장하기"
