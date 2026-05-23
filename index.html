@@ -291,6 +291,8 @@ function LoginScreen({ loginType, onLogin, onBack, onSignup }) {
     finally { setLoading(false); }
   };
 
+  const handleKeyDown = (e) => { if (e.key === "Enter" && !loading) handleLogin(); };
+
   return React.createElement("div", { className: "screen", style: { background: bgColors[loginType] || bgColors.guardian } },
     React.createElement("div", { className: "header", style: { paddingTop: 48 } },
       React.createElement("button", { className: "back-btn", onClick: onBack }, "← 역할 선택"),
@@ -304,15 +306,15 @@ function LoginScreen({ loginType, onLogin, onBack, onSignup }) {
       loginType === "guardian" && React.createElement(React.Fragment, null,
         React.createElement("div", { className: "field" },
           React.createElement("label", { className: "label", style: { color: "rgba(255,255,255,0.8)" } }, "어르신 성함"),
-          React.createElement("input", { className: "input", placeholder: "예) 김순자", value: form.patientName, onChange: e => set("patientName", e.target.value) })
+          React.createElement("input", { className: "input", placeholder: "예) 김순자", value: form.patientName, onChange: e => set("patientName", e.target.value), onKeyDown: handleKeyDown })
         ),
         React.createElement("div", { className: "field" },
           React.createElement("label", { className: "label", style: { color: "rgba(255,255,255,0.8)" } }, "어르신 생년월일"),
-          React.createElement("input", { className: "input", placeholder: "예) 19460315", value: form.birthdate, onChange: e => set("birthdate", e.target.value), maxLength: 8 })
+          React.createElement("input", { className: "input", placeholder: "예) 19460315", value: form.birthdate, onChange: e => set("birthdate", e.target.value), maxLength: 8, onKeyDown: handleKeyDown })
         ),
         React.createElement("div", { className: "field" },
           React.createElement("label", { className: "label", style: { color: "rgba(255,255,255,0.8)" } }, "보호자 전화번호"),
-          React.createElement("input", { className: "input", placeholder: "예) 01012345678", value: form.phone, onChange: e => set("phone", e.target.value), type: "tel" })
+          React.createElement("input", { className: "input", placeholder: "예) 01012345678", value: form.phone, onChange: e => set("phone", e.target.value), type: "tel", onKeyDown: handleKeyDown })
         )
       ),
 
@@ -326,7 +328,7 @@ function LoginScreen({ loginType, onLogin, onBack, onSignup }) {
         ),
         React.createElement("div", { className: "field" },
           React.createElement("label", { className: "label", style: { color: "rgba(255,255,255,0.8)" } }, "비밀번호"),
-          React.createElement("input", { className: "input", type: "password", placeholder: "비밀번호 입력", value: form.password, onChange: e => set("password", e.target.value) })
+          React.createElement("input", { className: "input", type: "password", placeholder: "비밀번호 입력", value: form.password, onChange: e => set("password", e.target.value), onKeyDown: handleKeyDown })
         )
       ),
 
@@ -341,7 +343,7 @@ function LoginScreen({ loginType, onLogin, onBack, onSignup }) {
         ),
         React.createElement("div", { className: "field" },
           React.createElement("label", { className: "label", style: { color: "rgba(255,255,255,0.8)" } }, "비밀번호"),
-          React.createElement("input", { className: "input", type: "password", placeholder: "비밀번호 입력", value: form.password, onChange: e => set("password", e.target.value) })
+          React.createElement("input", { className: "input", type: "password", placeholder: "비밀번호 입력", value: form.password, onChange: e => set("password", e.target.value), onKeyDown: handleKeyDown })
         )
       ),
 
@@ -363,7 +365,7 @@ function LoginScreen({ loginType, onLogin, onBack, onSignup }) {
         ),
         React.createElement("div", { className: "field" },
           React.createElement("label", { className: "label", style: { color: "rgba(255,255,255,0.8)" } }, "비밀번호"),
-          React.createElement("input", { className: "input", type: "password", placeholder: "비밀번호 입력", value: form.password, onChange: e => set("password", e.target.value) })
+          React.createElement("input", { className: "input", type: "password", placeholder: "비밀번호 입력", value: form.password, onChange: e => set("password", e.target.value), onKeyDown: handleKeyDown })
         )
       ),
 
@@ -410,7 +412,7 @@ function GuardianSignupScreen({ onBack, onDone }) {
         ),
         React.createElement("div", { className: "field" },
           React.createElement("label", { className: "label" }, "연락처 *"),
-          React.createElement("input", { className: "input", placeholder: "예) 01012345678", value: form.phone, onChange: e => set("phone", e.target.value), type: "tel" })
+          React.createElement("input", { className: "input", placeholder: "예) 01012345678", value: form.phone, onChange: e => set("phone", e.target.value), type: "tel", onKeyDown: handleKeyDown })
         )
       ),
 
@@ -418,7 +420,7 @@ function GuardianSignupScreen({ onBack, onDone }) {
         React.createElement("div", { style: { fontWeight: 700, color: "#1e3a5f", marginBottom: 16 } }, "어르신 정보"),
         React.createElement("div", { className: "field" },
           React.createElement("label", { className: "label" }, "성함 *"),
-          React.createElement("input", { className: "input", placeholder: "예) 김순자", value: form.patientName, onChange: e => set("patientName", e.target.value) })
+          React.createElement("input", { className: "input", placeholder: "예) 김순자", value: form.patientName, onChange: e => set("patientName", e.target.value), onKeyDown: handleKeyDown })
         ),
         React.createElement("div", { className: "field" },
           React.createElement("label", { className: "label" }, "생년월일 *"),
