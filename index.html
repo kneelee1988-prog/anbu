@@ -520,6 +520,9 @@ function GuardianScreen({ user, onBack }) {
         React.createElement("div", { style: { fontSize: 26, fontWeight: 900, color: "white" } }, `${patient.name}님`),
         React.createElement("div", { style: { fontSize: 14, color: "rgba(255,255,255,0.9)", fontWeight: 600 } }, `${patient.room} · 입원 ${admitDays(patient.admitted_at)}일째`)
       ),
+      React.createElement("div", { style: { fontSize: 12, color: "rgba(255,255,255,0.7)", marginTop: 6 } },
+        `📅 ${new Date().toLocaleDateString("ko-KR", { year:"numeric", month:"long", day:"numeric", weekday:"short" })} 기준`
+      ),
 
       // 의식/활동/식사/특이사항 요약 박스
       record && React.createElement("div", { style: { display: "grid", gridTemplateColumns: "1fr 1fr 1fr 1fr", gap: 6, marginTop: 12 } },
@@ -1093,6 +1096,9 @@ function NurseRecordScreen({ patient, user, onBack, onSaved }) {
       React.createElement("button", { className: "back-btn", onClick: onBack }, "← 목록"),
       React.createElement("div", { style: { fontSize: 18, fontWeight: 800, color: "white", marginTop: 8 } }, `${patient.name} ${patient.age}세 · ${patient.gender}`),
       React.createElement("div", { style: { fontSize: 13, color: "rgba(255,255,255,0.7)" } }, `${patient.room} · 입원 ${admitDays(patient.admitted_at)}일째`),
+      React.createElement("div", { style: { fontSize: 12, color: "rgba(255,255,255,0.8)", marginTop: 4, fontWeight: 600 } },
+        `📅 ${new Date().toLocaleDateString("ko-KR", { year:"numeric", month:"long", day:"numeric", weekday:"short" })} 입력`
+      ),
       patient.dnr === true && React.createElement("span", { style: { fontSize: 11, fontWeight: 800, background: "#dcfce7", color: "#15803d", borderRadius: 4, padding: "2px 6px", marginTop: 6, display: "inline-block" } }, "DNR동의"),
       patient.dnr === false && React.createElement("span", { style: { fontSize: 11, fontWeight: 800, background: "#fee2e2", color: "#dc2626", borderRadius: 4, padding: "2px 6px", marginTop: 6, display: "inline-block" } }, "DNR비동의")
     ),
@@ -1357,7 +1363,6 @@ function DoctorCommentPicker({ value, onChange }) {
       "기침이 잦아 관찰 중입니다.",
       "구토 증상이 있어 관찰 중입니다.",
       "현재 상태에 대해 면밀히 관찰하며 최선을 다해 치료 중입니다.",
-      "보호자와 현재 상태에 대해 상담을 시행하였습니다.",
     ]},
   ];
 
@@ -1494,7 +1499,10 @@ function DoctorReviewScreen({ patient, user, onBack }) {
     React.createElement("div", { style: { background: "linear-gradient(135deg,#1e1b4b,#4338ca)", padding: "48px 20px 20px" } },
       React.createElement("button", { className: "back-btn", onClick: onBack }, "← 목록"),
       React.createElement("div", { style: { fontSize: 18, fontWeight: 800, color: "white", marginTop: 8 } }, `${patient.name} ${patient.age}세 · ${patient.gender}`),
-      React.createElement("div", { style: { fontSize: 13, color: "rgba(255,255,255,0.7)" } }, `${patient.room} · 입원 ${admitDays(patient.admitted_at)}일째`)
+      React.createElement("div", { style: { fontSize: 13, color: "rgba(255,255,255,0.7)" } }, `${patient.room} · 입원 ${admitDays(patient.admitted_at)}일째`),
+      React.createElement("div", { style: { fontSize: 12, color: "rgba(255,255,255,0.8)", marginTop: 4, fontWeight: 600 } },
+        `📅 ${new Date().toLocaleDateString("ko-KR", { year:"numeric", month:"long", day:"numeric", weekday:"short" })} 검토`
+      )
     ),
     React.createElement("div", { className: "scroll-area", style: { paddingTop: 16 } },
       record ? React.createElement("div", { className: "card", style: { marginBottom: 12 } },
