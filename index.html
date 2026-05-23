@@ -1286,30 +1286,52 @@ function NurseRecordScreen({ patient, user, onBack, onSaved }) {
             React.createElement(Btn, { key: v, label: v, small: true,
               active: form.mental.includes(v),
               onClick: () => toggle("mental", v),
-              color: v==="이상없음"?"#166534":"#7c3aed" })
+              color: v==="이상없음"?"#166534":"#0369a1" })
           )
         )
       }),
 
       // ── 섹션5: 통증 PAINAD ─────────────────────────────────
-      Sec({ title: "💉 통증 PAINAD (0~10)", accent: "linear-gradient(135deg,#7f1d1d,#b91c1c)",
+      Sec({ title: "💉 통증 PAINAD (0~10)", accent: "linear-gradient(135deg,#1e3a5f,#2563eb)",
         children: React.createElement(React.Fragment, null,
-          React.createElement("div", { style: { display: "grid", gridTemplateColumns: "repeat(11,1fr)", gap: 4, marginBottom: 8 } },
+          React.createElement("div", { style: { display: "grid", gridTemplateColumns: "repeat(11,1fr)", gap: 4, marginBottom: 10 } },
             [0,1,2,3,4,5,6,7,8,9,10].map(n =>
               React.createElement("button", { key: n, onClick: () => set("pain", n),
                 style: { padding: "10px 0", borderRadius: 8, border: "1.5px solid",
-                  borderColor: form.pain===n?"#dc2626":"#e2e8f0",
-                  background: form.pain===n?"#dc2626":"white",
+                  borderColor: form.pain===n?"#2563eb":"#e2e8f0",
+                  background: form.pain===n?"#2563eb":"white",
                   color: form.pain===n?"white":"#374151",
                   fontWeight: 800, fontSize: 14, cursor: "pointer", fontFamily: "'Noto Sans KR',sans-serif" }
               }, n)
             )
           ),
-          React.createElement("div", { style: { fontSize: 12, color: "#64748b", textAlign: "center" } },
-            form.pain === 0 ? "통증 없음" :
-            form.pain <= 3 ? "경미한 통증" :
-            form.pain <= 6 ? "중등도 통증" :
-            form.pain <= 8 ? "심한 통증" : "극심한 통증"
+          React.createElement("div", { style: { display: "grid", gridTemplateColumns: "repeat(11,1fr)", gap: 4, marginBottom: 8 } },
+            [
+              {n:0, label:"없음", color:"#16a34a"},
+              {n:1, label:"매우\n경미", color:"#65a30d"},
+              {n:2, label:"경미", color:"#65a30d"},
+              {n:3, label:"약함", color:"#ca8a04"},
+              {n:4, label:"보통", color:"#ca8a04"},
+              {n:5, label:"중간", color:"#ea580c"},
+              {n:6, label:"중등도", color:"#ea580c"},
+              {n:7, label:"심함", color:"#dc2626"},
+              {n:8, label:"매우\n심함", color:"#dc2626"},
+              {n:9, label:"극심", color:"#991b1b"},
+              {n:10, label:"최고\n통증", color:"#991b1b"},
+            ].map(({n, label, color}) =>
+              React.createElement("div", { key: n,
+                style: { textAlign: "center", fontSize: 9, fontWeight: 700, color: form.pain===n ? "#2563eb" : color,
+                  lineHeight: 1.3, whiteSpace: "pre-line" }
+              }, label)
+            )
+          ),
+          React.createElement("div", { style: { fontSize: 13, color: "#1e3a5f", textAlign: "center", fontWeight: 700, marginTop: 4 } },
+            form.pain === null || form.pain === undefined ? "숫자를 선택하세요" :
+            form.pain === 0 ? "✅ 통증 없음" :
+            form.pain <= 2 ? "🟡 경미한 통증" :
+            form.pain <= 4 ? "🟠 약한 통증" :
+            form.pain <= 6 ? "🔴 중등도 통증" :
+            form.pain <= 8 ? "🔴 심한 통증" : "🚨 극심한 통증"
           )
         )
       }),
