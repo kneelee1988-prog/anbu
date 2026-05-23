@@ -811,19 +811,19 @@ function PatientGrid({ patients, onSelect }) {
   );
 }
 
-// ── 간호사 기록 입력 화면 ─────────────────────────────────────
+// ── 간호사 기록 입력 화면 (압축 버전) ───────────────────────────
 function NurseRecordScreen({ patient, user, onBack, onSaved }) {
   const emptyForm = {
     consciousness:"", meal_amount:"", meal_type:"",
     sleep_hours:"", sleep_wakeups:"", sleep_nap:false, sleep_abnormal:false,
-    mobility:"", walk_count:"", fall_risk:"",
+    mobility:"", fall_risk:"",
     programs:[],
     urine:"", urine_catheter:false,
-    bowel:"", excretion_issues:[],
+    bowel:"",
     mood:[], mental:[],
     medication:"",
     skin:"", hygiene:"", bedsore:"",
-    oriental:null, oriental_items:[],
+    oriental_items:[],
     pain:0,
     nurse_note:""
   };
@@ -1216,12 +1216,9 @@ function DoctorScreen({ user, onBack }) {
 // ── 의사 검토 화면 ────────────────────────────────────────────
 function DoctorReviewScreen({ patient, user, onBack }) {
   const FINDINGS = {
-    "감염/호흡기": { items: ["폐렴 소견","폐혈증 의심","요로감염","폐부종","고열 지속","기침·가래 지속","산소포화도 저하"], bg:"#f0fdf4", border:"#86efac", activeBg:"#16a34a" },
-    "순환/의식":   { items: ["혈압 이상","부정맥","의식저하","뇌졸중 의심","부종 악화"], bg:"#eff6ff", border:"#93c5fd", activeBg:"#1d4ed8" },
-    "소화/영양":   { items: ["식욕부진 지속","흡인 위험","복통·복부팽만","체중감소","영양불량"], bg:"#fff7ed", border:"#fdba74", activeBg:"#c2410c" },
-    "통증/근골격": { items: ["통증 조절 필요","낙상 위험 증가","욕창 악화","관절 구축 진행"], bg:"#fef2f2", border:"#fca5a5", activeBg:"#b91c1c" },
-    "정신/행동":   { items: ["섬망 악화","우울증 의심","수면장애","공격적 행동"], bg:"#faf5ff", border:"#c4b5fd", activeBg:"#7c3aed" },
-    "처치/검사":   { items: ["Lab 이상소견 처치 중","검사결과 설명 시행","알부민 투여","수혈 시행","수혈 권유 중","L-Tube insertion 시행","영양제 투여 중","엑스레이 시행","혈액검사 시행"], bg:"#f0f9ff", border:"#7dd3fc", activeBg:"#0369a1" },
+    "감염·순환·호흡": { items: ["폐렴","패혈증","요로감염","폐부종","고열지속","산소포화도저하","혈압이상","부정맥","의식저하","뇌졸중의심","부종악화","기침·가래"], bg:"#f0fdf4", border:"#86efac", activeBg:"#16a34a" },
+    "소화·영양·통증": { items: ["식욕부진","흡인위험","복통·팽만","체중감소","영양불량","통증조절필요","낙상위험증가","욕창악화","관절구축"], bg:"#fff7ed", border:"#fdba74", activeBg:"#c2410c" },
+    "처치·검사·기타": { items: ["Lab이상 처치중","검사결과설명","알부민투여","수혈시행","수혈권유중","L-Tube삽입","영양제투여","엑스레이","혈액검사","섬망악화","우울증의심","공격적행동"], bg:"#f0f9ff", border:"#7dd3fc", activeBg:"#0369a1" },
   };
 
   const BPSD_ITEMS = [
