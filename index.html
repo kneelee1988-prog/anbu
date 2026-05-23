@@ -1106,7 +1106,7 @@ function NurseRecordScreen({ patient, user, onBack, onSaved }) {
     React.createElement("div", { style: { padding: "14px 16px" } }, children)
   );
 
-  const Lbl = ({ text }) => React.createElement("div", { style: { fontSize: 12, color: "#64748b", fontWeight: 600, marginBottom: 6, marginTop: 10 } }, text);
+  const Lbl = ({ text }) => React.createElement("div", { style: { fontSize: 13, color: "#475569", fontWeight: 700, marginBottom: 6, marginTop: 10 } }, text);
 
   const Btn = ({ label, active, onClick, color, small }) => React.createElement("button", {
     onClick,
@@ -1218,16 +1218,14 @@ function NurseRecordScreen({ patient, user, onBack, onSaved }) {
           ),
           React.createElement(Lbl, { text: "프로그램 참여" }),
           React.createElement(BtnRow, null,
-            ["그림그리기","음악치료","예배","생일잔치","공연"].map(v =>
+            ...["그림그리기","음악치료","예배","생일잔치","공연"].map(v =>
               React.createElement(Btn, { key: v, label: v, small: true,
                 active: form.programs.includes(v),
                 onClick: () => {
                   const cur = form.programs.filter(x => x !== "미참여");
                   set("programs", cur.includes(v) ? cur.filter(x=>x!==v) : [...cur, v]);
                 }, color: "#0d5c56" })
-            )
-          ),
-          React.createElement(BtnRow, null,
+            ),
             React.createElement(Btn, { label: "미참여", small: true,
               active: form.programs.includes("미참여"),
               onClick: () => set("programs", form.programs.includes("미참여") ? [] : ["미참여"]),
@@ -1277,9 +1275,9 @@ function NurseRecordScreen({ patient, user, onBack, onSaved }) {
         children: React.createElement(BtnGrid, null,
           ["이상없음","인지저하","기억력저하","지남력장애",
            "케어저항","충동행동","공격성","반복행동",
-           "반복적 소리지름","배회","섬망","수면장애",
-           "야간혼돈","우울감","불안","무기력",
-           "환청","환시","망상","혼잣말","고집스러움"
+           "반복소리지름","섬망","수면장애","야간혼돈",
+           "우울감","불안","무기력","환청",
+           "환시","망상","혼잣말","고집스러움","배회"
           ].map(v =>
             React.createElement(Btn, { key: v, label: v, small: true,
               active: form.mental.includes(v),
