@@ -1006,7 +1006,7 @@ function NurseRecordScreen({ patient, user, onBack, onSaved }) {
     mobility:"", fall_risk:"",
     programs:[],
     urine:"", urine_catheter:false,
-    bowel:"",
+    bowel:"", excretion_issues:[],
     mood:[], mental:[],
     medication:"",
     skin:"", hygiene:"", bedsore:"",
@@ -1222,6 +1222,46 @@ function NurseRecordScreen({ patient, user, onBack, onSaved }) {
                 onClick: () => toggle("excretion_issues", v),
                 color: v==="해당 사항 없음"?"#166534":"#7f1d1d" })
             )
+          )
+        )
+      }),
+
+      // ── 섹션4: BPSD ────────────────────────────────────────
+      Sec({ title: "🧩 BPSD — 행동·심리 증상 (복수 선택)", accent: "linear-gradient(135deg,#4c1d95,#7c3aed)",
+        children: React.createElement(BtnGrid, null,
+          ["이상없음","인지저하","기억력저하","지남력장애",
+           "우울감","불안","무기력","수면장애",
+           "환청","환시","망상","혼잣말",
+           "공격성","케어저항","배회","반복행동",
+           "야간혼돈","섬망","충동행동","고집스러움"
+          ].map(v =>
+            React.createElement(Btn, { key: v, label: v, small: true,
+              active: form.mental.includes(v),
+              onClick: () => toggle("mental", v),
+              color: v==="이상없음"?"#166534":"#7c3aed" })
+          )
+        )
+      }),
+
+      // ── 섹션5: 통증 PAINAD ─────────────────────────────────
+      Sec({ title: "💉 통증 PAINAD (0~10)", accent: "linear-gradient(135deg,#7f1d1d,#b91c1c)",
+        children: React.createElement(React.Fragment, null,
+          React.createElement("div", { style: { display: "grid", gridTemplateColumns: "repeat(11,1fr)", gap: 4, marginBottom: 8 } },
+            [0,1,2,3,4,5,6,7,8,9,10].map(n =>
+              React.createElement("button", { key: n, onClick: () => set("pain", n),
+                style: { padding: "10px 0", borderRadius: 8, border: "1.5px solid",
+                  borderColor: form.pain===n?"#dc2626":"#e2e8f0",
+                  background: form.pain===n?"#dc2626":"white",
+                  color: form.pain===n?"white":"#374151",
+                  fontWeight: 800, fontSize: 14, cursor: "pointer", fontFamily: "'Noto Sans KR',sans-serif" }
+              }, n)
+            )
+          ),
+          React.createElement("div", { style: { fontSize: 12, color: "#64748b", textAlign: "center" } },
+            form.pain === 0 ? "통증 없음" :
+            form.pain <= 3 ? "경미한 통증" :
+            form.pain <= 6 ? "중등도 통증" :
+            form.pain <= 8 ? "심한 통증" : "극심한 통증"
           )
         )
       }),
