@@ -1178,15 +1178,15 @@ function NurseRecordScreen({ patient, user, onBack, onSaved }) {
                 color: v==="8시간 이상"?"#166534":v==="6~8시간"?"#166534":v==="4~6시간"?"#713f12":"#7f1d1d" })
             )
           ),
+          React.createElement(BtnRow, null,
+            React.createElement(Btn, { label: "낮잠 있음", active: form.sleep_nap, onClick: () => set("sleep_nap", !form.sleep_nap), color: "#0c4a6e", small: true })
+          ),
           React.createElement(Lbl, { text: "중간 각성" }),
           React.createElement(BtnRow, null,
-            ["없음","1회","2회","3회 이상"].map(v =>
+            ...["없음","1회","2회","3회 이상"].map(v =>
               React.createElement(Btn, { key: v, label: v, small: true, active: form.sleep_wakeups===v, onClick: () => set("sleep_wakeups", v),
                 color: v==="없음"?"#166534":"#7f1d1d" })
-            )
-          ),
-          React.createElement(BtnRow, null,
-            React.createElement(Btn, { label: "낮잠 있음", active: form.sleep_nap, onClick: () => set("sleep_nap", !form.sleep_nap), color: "#0c4a6e", small: true }),
+            ),
             React.createElement(Btn, { label: "수면 중 이상행동", active: form.sleep_abnormal, onClick: () => set("sleep_abnormal", !form.sleep_abnormal), color: "#7f1d1d", small: true })
           )
         )
@@ -1241,13 +1241,11 @@ function NurseRecordScreen({ patient, user, onBack, onSaved }) {
         children: React.createElement(React.Fragment, null,
           React.createElement(Lbl, { text: "소변" }),
           React.createElement(BtnRow, null,
-            ["정상","감소","농축","실금"].map(v =>
+            ...["정상","감소","농축","실금"].map(v =>
               React.createElement(Btn, { key: v, label: v, small: true, active: form.urine===v, onClick: () => set("urine", v),
                 color: v==="정상"?"#166534":"#7f1d1d" })
-            )
-          ),
-          React.createElement(BtnRow, null,
-            React.createElement(Btn, { label: "카테터 사용 중", active: form.urine_catheter, onClick: () => set("urine_catheter", !form.urine_catheter), color: "#713f12", small: true })
+            ),
+            React.createElement(Btn, { label: "소변줄 사용 중", active: form.urine_catheter, onClick: () => set("urine_catheter", !form.urine_catheter), color: "#713f12", small: true })
           ),
           React.createElement(Lbl, { text: "대변" }),
           React.createElement(BtnRow, null,
@@ -1258,7 +1256,7 @@ function NurseRecordScreen({ patient, user, onBack, onSaved }) {
           ),
           React.createElement(Lbl, { text: "배변 특이사항 (복수 선택)" }),
           React.createElement(BtnGrid, null,
-            ["혈뇨","혈변","부정출혈","소변이 잘 안 나옴","소변 지림","침상배뇨","대변 지림","해당 사항 없음"].map(v =>
+            ["혈뇨","혈변","부정출혈","배뇨곤란","소변 지림","대변 지림","해당 사항 없음"].map(v =>
               React.createElement(Btn, { key: v, label: v, small: true,
                 active: form.excretion_issues.includes(v),
                 onClick: () => {
@@ -1294,7 +1292,7 @@ function NurseRecordScreen({ patient, user, onBack, onSaved }) {
                     : [...f.mental.filter(x => x !== "이상없음"), v] }));
                 }
               },
-              color: v==="이상없음"?"#166534":"#c2410c" })
+              color: v==="이상없음"?"#166534":"#ea7c3a" })
           )
         )
       }),
