@@ -783,21 +783,29 @@ function NurseScreen({ user, onBack }) {
     ),
     React.createElement("div", { className: "scroll-area", style: { paddingTop: 16 } },
       loading ? React.createElement("div", { className: "loading" }, "불러오는 중...")
-      : patients.map(p => React.createElement(PatientListItem, { key: p.id, patient: p, onClick: () => handlePatientClick(p) }))
+      : React.createElement(PatientGrid, { patients, onSelect: handlePatientClick })
     )
   );
 }
 
 // 환자 목록 아이템
 function PatientListItem({ patient, onClick }) {
-  return React.createElement("div", { className: "patient-card", onClick },
+  return React.createElement("div", { onClick,
+    style: { background: "white", borderRadius: 12, padding: "12px 14px", boxShadow: "0 1px 6px rgba(0,0,0,0.06)", cursor: "pointer", transition: "all 0.15s", border: "1.5px solid transparent" }
+  },
     React.createElement("div", { style: { display: "flex", justifyContent: "space-between", alignItems: "flex-start" } },
-      React.createElement("div", null,
-        React.createElement("div", { className: "patient-name" }, patient.name),
-        React.createElement("div", { className: "patient-info" }, `${patient.age}세 · ${patient.gender} · ${patient.room} · 입원 ${admitDays(patient.admitted_at)}일째`)
-      ),
-      React.createElement("div", { style: { fontSize: 18, color: "#94a3b8" } }, "›")
-    )
+      React.createElement("div", { style: { fontSize: 15, fontWeight: 700, color: "#1e3a5f" } }, patient.name),
+      React.createElement("div", { style: { fontSize: 16, color: "#94a3b8" } }, "›")
+    ),
+    React.createElement("div", { style: { fontSize: 12, color: "#64748b", marginTop: 3 } }, `${patient.age}세 · ${patient.gender}`),
+    React.createElement("div", { style: { fontSize: 12, color: "#94a3b8", marginTop: 2 } }, `입원 ${admitDays(patient.admitted_at)}일째`)
+  );
+}
+
+// 환자 목록을 2칸 그리드로 표시
+function PatientGrid({ patients, onSelect }) {
+  return React.createElement("div", { style: { display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8, paddingTop: 16 } },
+    patients.map(p => React.createElement(PatientListItem, { key: p.id, patient: p, onClick: () => onSelect(p) }))
   );
 }
 
@@ -1198,7 +1206,7 @@ function DoctorScreen({ user, onBack }) {
     ),
     React.createElement("div", { className: "scroll-area", style: { paddingTop: 16 } },
       loading ? React.createElement("div", { className: "loading" }, "불러오는 중...")
-      : patients.map(p => React.createElement(PatientListItem, { key: p.id, patient: p, onClick: () => setSelected(p) }))
+      : React.createElement(PatientGrid, { patients, onSelect: setSelected })
     )
   );
 }
@@ -1410,19 +1418,30 @@ function MessagesScreen({ user, onBack }) {
   const [messages, setMessages] = useState([]);
   const [loading, setLoading] = useState(true);
   const [filterWard, setFilterWard] = useState("전체");
+  const [filterDoctor, setFilterDoctor] = useState("전체");
   const WARDS = ["전체","믿음병동","소망병동","사랑병동","행복병동"];
+  const DOCTORS = ["전체","이요성","김성민","박지원","최동훈","정한솔"];
+  const isNurse = user.role === "nurse";
 
   useEffect(() => {
+    // 간호사: 자기 병동만, 의사: 자기 담당만 기본 로드
     Promise.all([
-      api("get_patients", user.role==="nurse" ? { ward: user.ward } : { doctorId: user.doctor_id }),
-      api("get_messages", user.role==="nurse" ? { ward: user.ward } : { doctorId: user.doctor_id })
+      api("get_patients", isNurse ? { ward: user.ward } : { doctorId: user.doctor_id }),
+      api("get_messages", isNurse ? { ward: user.ward } : { doctorId: user.doctor_id })
     ]).then(([pd, md]) => { setPatients(pd.patients||[]); setMessages(md.messages||[]); })
     .finally(() => setLoading(false));
   }, []);
 
   const unread = messages.filter(m => !m.is_read).length;
   const done = messages.filter(m => m.is_read).length;
-  const filtered = filterWard === "전체" ? messages : messages.filter(m => { const p = patients.find(p=>p.id===m.patient_id); return p?.room === filterWard; });
+
+  // 병동 또는 의사별 필터
+  const filtered = messages.filter(m => {
+    const p = patients.find(pt => pt.id === m.patient_id);
+    if (!p) return false;
+    if (filterWard !== "전체" && p.room !== filterWard) return false;
+    return true;
+  });
 
   return React.createElement("div", { className: "screen", style: { background: "#f0f4f8" } },
     React.createElement("div", { style: { background: "linear-gradient(135deg,#1e3a5f,#0891b2)", padding: "48px 20px 20px" } },
@@ -1430,30 +1449,38 @@ function MessagesScreen({ user, onBack }) {
         React.createElement("button", { className: "back-btn", onClick: onBack }, "← 역할 선택"),
         React.createElement("button", { className: "logout-btn", onClick: onBack }, "로그아웃 →")
       ),
-      React.createElement("div", { style: { display: "flex", gap: 12, marginTop: 12 } },
-        React.createElement("div", { style: { background: "rgba(255,255,255,0.15)", borderRadius: 10, padding: "10px 16px", textAlign: "center" } },
+      React.createElement("div", { style: { fontSize: 16, fontWeight: 800, color: "white", marginTop: 8 } },
+        isNurse ? `💬 가족들의 한마디 — ${user.ward}` : `💬 가족들의 한마디 — ${user.name} 원장`
+      ),
+      React.createElement("div", { style: { display: "flex", gap: 8, marginTop: 12 } },
+        React.createElement("div", { style: { background: "rgba(255,255,255,0.15)", borderRadius: 10, padding: "8px 16px", textAlign: "center", flex: 1 } },
           React.createElement("div", { style: { fontSize: 20, fontWeight: 800, color: "white" } }, messages.length),
-          React.createElement("div", { style: { fontSize: 11, color: "rgba(255,255,255,0.6)" } }, "전체")
+          React.createElement("div", { style: { fontSize: 11, color: "rgba(255,255,255,0.7)" } }, "전체")
         ),
-        React.createElement("div", { style: { background: "rgba(239,68,68,0.3)", borderRadius: 10, padding: "10px 16px", textAlign: "center" } },
+        React.createElement("div", { style: { background: "rgba(239,68,68,0.3)", borderRadius: 10, padding: "8px 16px", textAlign: "center", flex: 1 } },
           React.createElement("div", { style: { fontSize: 20, fontWeight: 800, color: "white" } }, unread),
-          React.createElement("div", { style: { fontSize: 11, color: "rgba(255,255,255,0.6)" } }, "미확인")
+          React.createElement("div", { style: { fontSize: 11, color: "rgba(255,255,255,0.7)" } }, "미확인")
         ),
-        React.createElement("div", { style: { background: "rgba(34,197,94,0.3)", borderRadius: 10, padding: "10px 16px", textAlign: "center" } },
+        React.createElement("div", { style: { background: "rgba(34,197,94,0.3)", borderRadius: 10, padding: "8px 16px", textAlign: "center", flex: 1 } },
           React.createElement("div", { style: { fontSize: 20, fontWeight: 800, color: "white" } }, done),
-          React.createElement("div", { style: { fontSize: 11, color: "rgba(255,255,255,0.6)" } }, "완료")
+          React.createElement("div", { style: { fontSize: 11, color: "rgba(255,255,255,0.7)" } }, "확인완료")
         )
       ),
-      React.createElement("div", { style: { display: "flex", gap: 6, marginTop: 12, overflowX: "auto", paddingBottom: 4 } },
-        WARDS.map(w => React.createElement("button", {
-          key: w, onClick: () => setFilterWard(w),
-          style: { padding: "6px 12px", borderRadius: 20, border: "none", background: filterWard===w?"white":"rgba(255,255,255,0.2)", color: filterWard===w?"#1e3a5f":"white", fontWeight: 600, fontSize: 13, cursor: "pointer", whiteSpace: "nowrap", fontFamily: "'Noto Sans KR',sans-serif" }
+      // 병동 필터 (간호사용)
+      isNurse && React.createElement("div", { style: { display: "flex", gap: 6, marginTop: 10, overflowX: "auto", paddingBottom: 2 } },
+        WARDS.map(w => React.createElement("button", { key: w, onClick: () => setFilterWard(w),
+          style: { padding: "5px 12px", borderRadius: 20, border: "none", background: filterWard===w?"white":"rgba(255,255,255,0.2)", color: filterWard===w?"#1e3a5f":"white", fontWeight: 600, fontSize: 12, cursor: "pointer", whiteSpace: "nowrap", fontFamily: "'Noto Sans KR',sans-serif" }
         }, w))
       )
     ),
     React.createElement("div", { className: "scroll-area", style: { paddingTop: 16 } },
       loading ? React.createElement("div", { className: "loading" }, "불러오는 중...")
-      : React.createElement(MessagesList, { messages: filtered, patients, onMarkRead: async (id) => { await api("mark_message_read", { messageId: id }); setMessages(ms => ms.map(m => m.id===id?{...m,is_read:true}:m)); } })
+      : React.createElement(MessagesList, { messages: filtered, patients,
+          onMarkRead: async (id) => {
+            await api("mark_message_read", { messageId: id });
+            setMessages(ms => ms.map(m => m.id===id?{...m,is_read:true}:m));
+          }
+        })
     )
   );
 }
