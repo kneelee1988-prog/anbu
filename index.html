@@ -617,12 +617,12 @@ function GuardianScreen({ user, onBack }) {
               React.createElement("div", { style: { padding: "14px 16px", fontSize: 14, color: "#1e293b", lineHeight: 1.8 } }, record.doctor_comment)
             ),
 
-            // 변화없음 메시지 (의사 검토 완료 후 표시)
-            record?.reviewed_at && noChangeMsg && React.createElement("div", { style: { marginBottom: 12, background: "white", borderRadius: 14, overflow: "hidden", boxShadow: "0 2px 12px rgba(0,0,0,0.08)" } },
+            // 따뜻한 한마디 (의사가 선택, 검토 완료 후 표시)
+            record?.reviewed_at && record?.warm_msg && React.createElement("div", { style: { marginBottom: 12, background: "white", borderRadius: 14, overflow: "hidden", boxShadow: "0 2px 12px rgba(0,0,0,0.08)" } },
               React.createElement("div", { style: { background: "linear-gradient(135deg,#064e3b,#059669)", padding: "10px 16px", display: "flex", alignItems: "center", gap: 8 } },
-                React.createElement("div", { style: { fontSize: 13, fontWeight: 700, color: "white" } }, "💚 오늘의 케어 메시지")
+                React.createElement("div", { style: { fontSize: 13, fontWeight: 700, color: "white" } }, "💚 케어팀이 전하는 한마디")
               ),
-              React.createElement("div", { style: { padding: "14px 16px", fontSize: 14, color: "#166534", lineHeight: 1.8 } }, noChangeMsg)
+              React.createElement("div", { style: { padding: "14px 16px", fontSize: 14, color: "#166534", lineHeight: 1.9 } }, record.warm_msg)
             ),
             // 아직 의사 검토 전
             !record?.reviewed_at && React.createElement("div", { style: { marginBottom: 12, background: "#f8fafc", borderRadius: 14, padding: "16px", textAlign: "center", border: "1.5px dashed #e2e8f0" } },
@@ -1316,6 +1316,89 @@ function DoctorScreen({ user, onBack }) {
   );
 }
 
+// ── 따뜻한 한마디 선택 컴포넌트 ────────────────────────────────
+function WarmMessagePicker({ value, onChange }) {
+  const MESSAGES = [
+    {
+      cat: "🤲 안심·위로", color: "#166534", bg: "#f0fdf4", border: "#86efac",
+      items: [
+        "의사, 간호사, 간병사, 영양팀 모두 어르신 곁에서 최선을 다하고 있어요. 안심하세요.",
+        "케어팀(의사·간호사·간병사·영양팀)이 24시간 함께하고 있습니다. 걱정 마세요.",
+        "어르신이 편안하게 지내실 수 있도록 모든 팀원이 함께 노력하고 있어요.",
+        "멀리서도 늘 걱정해 주시는 마음이 어르신께 큰 힘이 되고 있습니다.",
+        "가족분의 사랑이 어르신께 가장 좋은 약이에요. 자주 연락 주세요.",
+        "면회 오시면 어르신이 무척 좋아하실 것 같아요.",
+      ]
+    },
+    {
+      cat: "🌿 현실적 위로", color: "#0369a1", bg: "#f0f9ff", border: "#7dd3fc",
+      items: [
+        "지금 상태에서 최대한 편안하게 지내실 수 있도록 최선을 다하고 있어요.",
+        "고령이신 만큼 천천히 지켜보며 불편함이 없도록 돌봐드리고 있습니다.",
+        "몸은 힘드시지만 정신적으로 편안하게 지내실 수 있도록 함께하고 있어요.",
+        "완치보다 편안함과 존엄성을 지켜드리는 것을 목표로 최선을 다하고 있습니다.",
+        "어르신이 가능한 한 편안하고 행복한 시간을 보내실 수 있도록 돕겠습니다.",
+        "지금 이 순간에도 어르신 곁에서 따뜻하게 돌봐드리고 있어요.",
+      ]
+    },
+    {
+      cat: "🙏 예후·준비", color: "#7c3aed", bg: "#faf5ff", border: "#c4b5fd",
+      items: [
+        "현재 상태를 고려할 때 편안하게 지내시는 것이 가장 중요한 목표예요.",
+        "의료팀이 함께 상의하며 어르신께 가장 좋은 방향으로 케어하고 있습니다.",
+        "지금은 치료보다 편안함과 품위 있는 일상을 지켜드리는 데 집중하고 있어요.",
+        "어르신의 남은 시간이 가능한 한 평온하고 존엄하게 흐를 수 있도록 최선을 다하겠습니다.",
+        "가족분들도 마음의 준비를 하시면서 자주 방문해 주시면 어르신께 큰 위안이 됩니다.",
+        "어르신 곁에서 끝까지 함께하겠습니다. 가족분들도 스스로를 돌봐주세요.",
+      ]
+    },
+    {
+      cat: "💛 오늘 하루", color: "#92400e", bg: "#fffbeb", border: "#fcd34d",
+      items: [
+        "오늘도 어르신 곁을 지켰습니다. 내일도 함께할게요.",
+        "오늘 하루도 어르신이 불편함 없이 지내실 수 있도록 최선을 다했습니다.",
+        "오늘 어르신의 표정이 평온해 보여 케어팀도 마음이 놓였습니다.",
+        "하루하루 정성껏 돌봐드리겠습니다. 믿고 맡겨 주세요.",
+      ]
+    },
+  ];
+
+  const [selected, setSelected] = useState(value || "");
+
+  const select = (msg) => {
+    const next = selected === msg ? "" : msg;
+    setSelected(next);
+    onChange(next);
+  };
+
+  return React.createElement("div", { style: { background: "white", borderRadius: 14, marginBottom: 16, overflow: "hidden", boxShadow: "0 1px 6px rgba(0,0,0,0.06)" } },
+    React.createElement("div", { style: { background: "linear-gradient(135deg,#064e3b,#059669)", padding: "10px 16px", fontSize: 13, fontWeight: 700, color: "white" } },
+      "💚 케어팀이 전하는 한마디 (선택사항)"
+    ),
+    React.createElement("div", { style: { padding: 14 } },
+      selected && React.createElement("div", { style: { background: "#f0fdf4", borderRadius: 10, padding: "10px 12px", marginBottom: 12, border: "1.5px solid #86efac", display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: 8 } },
+        React.createElement("div", { style: { fontSize: 13, color: "#166534", lineHeight: 1.6 } }, selected),
+        React.createElement("button", { onClick: () => select(selected),
+          style: { fontSize: 11, color: "#dc2626", background: "none", border: "none", cursor: "pointer", flexShrink: 0 }
+        }, "✕ 취소")
+      ),
+      MESSAGES.map(cat => React.createElement("div", { key: cat.cat, style: { marginBottom: 12, background: cat.bg, borderRadius: 10, padding: "10px 12px", border: `1.5px solid ${cat.border}` } },
+        React.createElement("div", { style: { fontSize: 12, fontWeight: 700, color: cat.color, marginBottom: 8 } }, cat.cat),
+        React.createElement("div", { style: { display: "flex", flexDirection: "column", gap: 5 } },
+          cat.items.map(item => React.createElement("button", { key: item, onClick: () => select(item),
+            style: { textAlign: "left", padding: "7px 10px", borderRadius: 8,
+              border: `1.5px solid ${selected===item ? cat.color : cat.border}`,
+              background: selected===item ? cat.color : "white",
+              color: selected===item ? "white" : "#374151",
+              fontSize: 12, fontWeight: selected===item ? 700 : 400,
+              cursor: "pointer", fontFamily: "'Noto Sans KR',sans-serif", lineHeight: 1.5 }
+          }, item))
+        )
+      ))
+    )
+  );
+}
+
 // ── 의사 코멘트 입력 컴포넌트 ───────────────────────────────────
 function DoctorCommentPicker({ value, onChange }) {
   const [mode, setMode] = useState("preset"); // "preset" | "direct"
@@ -1453,6 +1536,7 @@ function DoctorReviewScreen({ patient, user, onBack }) {
   const [bprs, setBprs] = useState([]);
   const [specialAlerts, setSpecialAlerts] = useState([]);
   const [comment, setComment] = useState("");
+  const [warmMsg, setWarmMsg] = useState("");
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
 
@@ -1463,6 +1547,7 @@ function DoctorReviewScreen({ patient, user, onBack }) {
           setRecord(d.record);
           setFindings(d.record.doctor_findings || []);
           setComment(d.record.doctor_comment || "");
+          setWarmMsg(d.record.warm_msg || "");
           const b = d.record.bprs;
           setBprs(b ? (Array.isArray(b) ? b : b.split("·").map(s=>s.trim()).filter(Boolean)) : []);
           const sa = d.record.special_alerts;
@@ -1485,6 +1570,7 @@ function DoctorReviewScreen({ patient, user, onBack }) {
         special_alerts: specialAlerts.join(" · "),
         doctor_comment: comment,
         doctor_id: user.doctor_id,
+        warm_msg: warmMsg,
         reviewed_at: now()
       }});
       alert("저장됐어요!");
@@ -1587,6 +1673,7 @@ function DoctorReviewScreen({ patient, user, onBack }) {
       ),
 
       React.createElement(DoctorCommentPicker, { value: comment, onChange: setComment }),
+      React.createElement(WarmMessagePicker, { value: warmMsg, onChange: setWarmMsg }),
       React.createElement("button", { className: "btn btn-dark", onClick: handleSave, disabled: saving }, saving ? "저장 중..." : "💾 저장 및 전달")
     )
   );
