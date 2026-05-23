@@ -622,7 +622,14 @@ function GuardianScreen({ user, onBack }) {
               React.createElement("div", { style: { background: "linear-gradient(135deg,#064e3b,#059669)", padding: "10px 16px", display: "flex", alignItems: "center", gap: 8 } },
                 React.createElement("div", { style: { fontSize: 13, fontWeight: 700, color: "white" } }, "💚 케어팀이 전하는 한마디")
               ),
-              React.createElement("div", { style: { padding: "14px 16px", fontSize: 14, color: "#166534", lineHeight: 1.9 } }, record.warm_msg)
+              React.createElement("div", { style: { padding: "14px 16px" } },
+                record.warm_msg.split(" / ").map((msg, i) =>
+                  React.createElement("div", { key: i, style: { fontSize: 14, color: "#166534", lineHeight: 1.9,
+                    paddingBottom: i < record.warm_msg.split(" / ").length - 1 ? 8 : 0 } },
+                    record.warm_msg.split(" / ").length > 1 ? `• ${msg}` : msg
+                  )
+                )
+              )
             ),
             // 아직 의사 검토 전
             !record?.reviewed_at && React.createElement("div", { style: { marginBottom: 12, background: "#f8fafc", borderRadius: 14, padding: "16px", textAlign: "center", border: "1.5px dashed #e2e8f0" } },
@@ -1363,34 +1370,39 @@ function WarmMessagePicker({ value, onChange }) {
     },
   ];
 
-  const [selected, setSelected] = useState(value || "");
+  const [selected, setSelected] = useState(value ? value.split(" / ") : []);
 
-  const select = (msg) => {
-    const next = selected === msg ? "" : msg;
+  const toggle = (msg) => {
+    const next = selected.includes(msg)
+      ? selected.filter(x => x !== msg)
+      : [...selected, msg];
     setSelected(next);
-    onChange(next);
+    onChange(next.join(" / "));
   };
 
   return React.createElement("div", { style: { background: "white", borderRadius: 14, marginBottom: 16, overflow: "hidden", boxShadow: "0 1px 6px rgba(0,0,0,0.06)" } },
     React.createElement("div", { style: { background: "linear-gradient(135deg,#064e3b,#059669)", padding: "10px 16px", fontSize: 13, fontWeight: 700, color: "white" } },
-      "💚 케어팀이 전하는 한마디 (선택사항)"
+      "💚 케어팀이 전하는 한마디 (복수 선택 가능)"
     ),
     React.createElement("div", { style: { padding: 14 } },
-      selected && React.createElement("div", { style: { background: "#f0fdf4", borderRadius: 10, padding: "10px 12px", marginBottom: 12, border: "1.5px solid #86efac", display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: 8 } },
-        React.createElement("div", { style: { fontSize: 13, color: "#166534", lineHeight: 1.6 } }, selected),
-        React.createElement("button", { onClick: () => select(selected),
-          style: { fontSize: 11, color: "#dc2626", background: "none", border: "none", cursor: "pointer", flexShrink: 0 }
-        }, "✕ 취소")
+      selected.length > 0 && React.createElement("div", { style: { background: "#f0fdf4", borderRadius: 10, padding: "10px 12px", marginBottom: 12, border: "1.5px solid #86efac" } },
+        React.createElement("div", { style: { fontSize: 11, color: "#166534", fontWeight: 700, marginBottom: 6 } }, "선택된 내용"),
+        selected.map((msg, i) => React.createElement("div", { key: i, style: { display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: 8, marginBottom: 4 } },
+          React.createElement("div", { style: { fontSize: 13, color: "#166534", lineHeight: 1.6 } }, `• ${msg}`),
+          React.createElement("button", { onClick: () => toggle(msg),
+            style: { fontSize: 11, color: "#dc2626", background: "none", border: "none", cursor: "pointer", flexShrink: 0 }
+          }, "✕")
+        ))
       ),
       MESSAGES.map(cat => React.createElement("div", { key: cat.cat, style: { marginBottom: 12, background: cat.bg, borderRadius: 10, padding: "10px 12px", border: `1.5px solid ${cat.border}` } },
         React.createElement("div", { style: { fontSize: 12, fontWeight: 700, color: cat.color, marginBottom: 8 } }, cat.cat),
         React.createElement("div", { style: { display: "flex", flexDirection: "column", gap: 5 } },
-          cat.items.map(item => React.createElement("button", { key: item, onClick: () => select(item),
+          cat.items.map(item => React.createElement("button", { key: item, onClick: () => toggle(item),
             style: { textAlign: "left", padding: "7px 10px", borderRadius: 8,
-              border: `1.5px solid ${selected===item ? cat.color : cat.border}`,
-              background: selected===item ? cat.color : "white",
-              color: selected===item ? "white" : "#374151",
-              fontSize: 12, fontWeight: selected===item ? 700 : 400,
+              border: `1.5px solid ${selected.includes(item) ? cat.color : cat.border}`,
+              background: selected.includes(item) ? cat.color : "white",
+              color: selected.includes(item) ? "white" : "#374151",
+              fontSize: 12, fontWeight: selected.includes(item) ? 700 : 400,
               cursor: "pointer", fontFamily: "'Noto Sans KR',sans-serif", lineHeight: 1.5 }
           }, item))
         )
