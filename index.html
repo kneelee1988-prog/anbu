@@ -634,6 +634,11 @@ function GuardianScreen({ user, onBack }) {
             // 아직 의사 검토 전
             !record?.reviewed_at && React.createElement("div", { style: { marginBottom: 12, background: "#f8fafc", borderRadius: 14, padding: "16px", textAlign: "center", border: "1.5px dashed #e2e8f0" } },
               React.createElement("div", { style: { fontSize: 13, color: "#94a3b8" } }, "🩺 주치의 검토 후 최종 내용이 전달될 예정이에요.")
+            ),
+            // 고정 안내 문구
+            React.createElement("div", { style: { marginBottom: 12, background: "#fef2f2", borderRadius: 14, padding: "14px 16px", border: "1.5px solid #fecaca", display: "flex", alignItems: "flex-start", gap: 10 } },
+              React.createElement("div", { style: { fontSize: 18, flexShrink: 0 } }, "📞"),
+              React.createElement("div", { style: { fontSize: 13, color: "#7f1d1d", lineHeight: 1.7 } }, "상태가 급격히 나빠질 경우 담당 의료진이 보호자분께 직접 연락드리겠습니다.")
             )
           )
       ),
@@ -1327,45 +1332,56 @@ function DoctorScreen({ user, onBack }) {
 function WarmMessagePicker({ value, onChange }) {
   const MESSAGES = [
     {
-      cat: "🤲 안심·위로", color: "#166534", bg: "#f0fdf4", border: "#86efac",
+      cat: "🤝 함께하는 케어", color: "#166534", bg: "#f0fdf4", border: "#86efac",
       items: [
-        "의사, 간호사, 간병사, 영양팀 모두 어르신 곁에서 최선을 다하고 있어요. 안심하세요.",
-        "케어팀(의사·간호사·간병사·영양팀)이 24시간 함께하고 있습니다. 걱정 마세요.",
-        "어르신이 편안하게 지내실 수 있도록 모든 팀원이 함께 노력하고 있어요.",
-        "멀리서도 늘 걱정해 주시는 마음이 어르신께 큰 힘이 되고 있습니다.",
-        "가족분의 사랑이 어르신께 가장 좋은 약이에요. 자주 연락 주세요.",
-        "면회 오시면 어르신이 무척 좋아하실 것 같아요.",
+        "의사·간호사·간병사·영양팀 모두 어르신 곁에서 힘을 합쳐 함께하고 있습니다.",
+        "케어팀과 가족분이 함께 힘을 모아 어르신을 위해 최선을 다하고 있어요.",
+        "어르신을 위해 모든 팀원이 매일 소통하며 최선의 방향을 찾고 있습니다.",
+        "멀리서도 늘 마음을 써 주시는 가족분의 관심이 어르신께 큰 힘이 됩니다.",
+        "가족분이 자주 연락해 주시고 면회 오시면 어르신이 무척 좋아하십니다.",
+        "케어팀과 가족분이 한 팀이 되어 어르신의 하루를 함께 만들어가고 있어요.",
       ]
     },
     {
-      cat: "🌿 현실적 위로", color: "#0369a1", bg: "#f0f9ff", border: "#7dd3fc",
+      cat: "💙 보호자분께", color: "#0369a1", bg: "#f0f9ff", border: "#7dd3fc",
       items: [
-        "지금 상태에서 최대한 편안하게 지내실 수 있도록 최선을 다하고 있어요.",
-        "고령이신 만큼 천천히 지켜보며 불편함이 없도록 돌봐드리고 있습니다.",
-        "몸은 힘드시지만 정신적으로 편안하게 지내실 수 있도록 함께하고 있어요.",
-        "완치보다 편안함과 존엄성을 지켜드리는 것을 목표로 최선을 다하고 있습니다.",
-        "어르신이 가능한 한 편안하고 행복한 시간을 보내실 수 있도록 돕겠습니다.",
-        "지금 이 순간에도 어르신 곁에서 따뜻하게 돌봐드리고 있어요.",
+        "보호자분의 삶도 중요합니다. 자신과 자녀들, 다른 가족들을 잘 챙기시는 것이 어르신께 큰 힘이 될 것 같습니다.",
+        "죄책감보다는 지금 이 순간 어르신과의 시간을 소중히 여겨 주세요.",
+        "멀리서도 마음을 쓰고 계신 것만으로 어르신께 큰 위로가 됩니다.",
+        "보호자분이 건강하고 행복해야 어르신 곁에 더 오래 함께할 수 있어요.",
+        "어르신을 위해 애쓰시는 가족분의 마음이 느껴집니다. 케어팀도 함께 힘내겠습니다.",
+        "가족분도 많이 지치셨을 텐데, 케어팀이 곁에서 함께하겠습니다.",
       ]
     },
     {
-      cat: "🙏 예후·준비", color: "#7c3aed", bg: "#faf5ff", border: "#c4b5fd",
+      cat: "🌿 현실적 위로", color: "#7c3aed", bg: "#faf5ff", border: "#c4b5fd",
       items: [
-        "현재 상태를 고려할 때 편안하게 지내시는 것이 가장 중요한 목표예요.",
-        "의료팀이 함께 상의하며 어르신께 가장 좋은 방향으로 케어하고 있습니다.",
-        "지금은 치료보다 편안함과 품위 있는 일상을 지켜드리는 데 집중하고 있어요.",
+        "지금 상태에서 최대한 편안하게 지내실 수 있도록 함께 노력하고 있습니다.",
+        "완치보다 어르신의 편안함과 존엄성을 지켜드리는 것을 목표로 하고 있어요.",
+        "고령이신 만큼 무리한 치료보다 품위 있는 일상을 지켜드리는 데 집중하고 있습니다.",
+        "몸이 힘드신 날에도 정신적으로 편안하실 수 있도록 옆에서 함께하고 있어요.",
+        "지금 이 순간에도 어르신 곁에서 따뜻하게 돌봐드리고 있습니다.",
+        "하루하루 어르신의 상태를 면밀히 살피며 최선의 케어를 이어가고 있어요.",
+      ]
+    },
+    {
+      cat: "🙏 예후·준비", color: "#92400e", bg: "#fffbeb", border: "#fcd34d",
+      items: [
+        "현재 상태를 고려할 때 편안하게 지내시는 것이 가장 중요한 목표입니다.",
         "어르신의 남은 시간이 가능한 한 평온하고 존엄하게 흐를 수 있도록 최선을 다하겠습니다.",
+        "지금은 치료보다 어르신이 편안하고 품위 있게 지내실 수 있도록 돕는 데 집중하고 있어요.",
         "가족분들도 마음의 준비를 하시면서 자주 방문해 주시면 어르신께 큰 위안이 됩니다.",
-        "어르신 곁에서 끝까지 함께하겠습니다. 가족분들도 스스로를 돌봐주세요.",
+        "어르신 곁에서 끝까지 함께하겠습니다.",
+        "어떤 결정이든 가족분과 함께 충분히 상의하며 진행하겠습니다.",
       ]
     },
     {
-      cat: "💛 오늘 하루", color: "#92400e", bg: "#fffbeb", border: "#fcd34d",
+      cat: "💛 오늘 하루", color: "#1e3a5f", bg: "#eff6ff", border: "#bfdbfe",
       items: [
-        "오늘도 어르신 곁을 지켰습니다. 내일도 함께할게요.",
+        "오늘도 어르신 곁을 지켰습니다. 내일도 함께하겠습니다.",
         "오늘 하루도 어르신이 불편함 없이 지내실 수 있도록 최선을 다했습니다.",
-        "오늘 어르신의 표정이 평온해 보여 케어팀도 마음이 놓였습니다.",
-        "하루하루 정성껏 돌봐드리겠습니다. 믿고 맡겨 주세요.",
+        "오늘 어르신의 표정이 평온해 보여 케어팀 모두 감사한 마음이었습니다.",
+        "하루하루 정성껏 돌봐드리겠습니다.",
       ]
     },
   ];
@@ -1457,7 +1473,7 @@ function DoctorCommentPicker({ value, onChange }) {
       "케어저항이 있어 설득 후 진행하였습니다.",
       "기침이 잦아 관찰 중입니다.",
       "구토 증상이 있어 관찰 중입니다.",
-      "현재 상태에 대해 면밀히 관찰하며 최선을 다해 치료 중입니다.",
+      "현재 상태를 면밀히 살피며 최선을 다해 치료하고 있습니다.",
     ]},
   ];
 
@@ -1489,16 +1505,7 @@ function DoctorCommentPicker({ value, onChange }) {
         React.createElement(BtnMode, { id: "direct", label: "✏️ 직접 입력" })
       ),
 
-      // 선택된 항목 미리보기
-      mode === "preset" && selected.length > 0 && React.createElement("div", { style: { background: "#eff6ff", borderRadius: 10, padding: "10px 12px", marginBottom: 12, border: "1.5px solid #bfdbfe" } },
-        React.createElement("div", { style: { fontSize: 11, color: "#1d4ed8", fontWeight: 700, marginBottom: 6 } }, "선택된 내용 미리보기"),
-        selected.map((s, i) => React.createElement("div", { key: i, style: { display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: 8, marginBottom: 4 } },
-          React.createElement("div", { style: { fontSize: 13, color: "#1e3a5f", lineHeight: 1.5 } }, `• ${s}`),
-          React.createElement("button", { onClick: () => togglePreset(s),
-            style: { fontSize: 11, color: "#dc2626", background: "none", border: "none", cursor: "pointer", flexShrink: 0 }
-          }, "✕")
-        ))
-      ),
+
 
       // 직접입력
       mode === "direct" && React.createElement("textarea", { className: "input", rows: 4,
