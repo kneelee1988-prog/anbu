@@ -1261,7 +1261,13 @@ function NurseRecordScreen({ patient, user, onBack, onSaved }) {
             ["혈뇨","혈변","부정출혈","소변이 잘 안 나옴","소변 지림","침상배뇨","대변 지림","해당 사항 없음"].map(v =>
               React.createElement(Btn, { key: v, label: v, small: true,
                 active: form.excretion_issues.includes(v),
-                onClick: () => toggle("excretion_issues", v),
+                onClick: () => {
+                  if (v === "해당 사항 없음") {
+                    setForm(f => ({ ...f, excretion_issues: f.excretion_issues.includes(v) ? [] : [v] }));
+                  } else {
+                    setForm(f => ({ ...f, excretion_issues: f.excretion_issues.includes(v) ? f.excretion_issues.filter(x => x !== v) : [...f.excretion_issues.filter(x => x !== "해당 사항 없음"), v] }));
+                  }
+                },
                 color: v==="해당 사항 없음"?"#166534":"#7f1d1d" })
             )
           )
