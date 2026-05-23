@@ -728,37 +728,13 @@ function NurseScreen({ user, onBack }) {
     )
   );
 
-  // 변화없음/변화있음 선택 화면
-  if (selected && selectMode === "choose") return React.createElement("div", { className: "screen", style: { background: "#f0f4f8" } },
-    React.createElement("div", { style: { background: "linear-gradient(135deg,#064e3b,#059669)", padding: "48px 20px 24px" } },
-      React.createElement("button", { className: "back-btn", onClick: () => { setSelected(null); setSelectMode(null); } }, "← 목록"),
-      React.createElement("div", { style: { fontSize: 20, fontWeight: 800, color: "white", marginTop: 12 } }, `${selected.name}님`),
-      React.createElement("div", { style: { fontSize: 13, color: "rgba(255,255,255,0.7)", marginTop: 4 } }, `${selected.age}세 · ${selected.gender} · ${selected.room} · 입원 ${admitDays(selected.admitted_at)}일째`)
-    ),
-    React.createElement("div", { style: { padding: 24, display: "flex", flexDirection: "column", gap: 16, marginTop: 16 } },
-      React.createElement("div", { style: { fontSize: 15, fontWeight: 700, color: "#374151", textAlign: "center", marginBottom: 8 } }, "오늘 상태를 선택해 주세요"),
-
-      // 변화 없음 버튼
-      React.createElement("div", {
-        onClick: handleNoChange,
-        style: { background: "white", border: "2px solid #059669", borderRadius: 16, padding: "24px 20px", cursor: "pointer", textAlign: "center", boxShadow: "0 2px 12px rgba(5,150,105,0.15)", transition: "all 0.15s" }
-      },
-        React.createElement("div", { style: { fontSize: 40, marginBottom: 12 } }, "✅"),
-        React.createElement("div", { style: { fontSize: 18, fontWeight: 800, color: "#059669" } }, "변화 없음"),
-        React.createElement("div", { style: { fontSize: 13, color: "#64748b", marginTop: 6, lineHeight: 1.5 } }, "어제와 동일한 상태예요\n전날 기록이 그대로 저장돼요")
-      ),
-
-      // 변화 있음 버튼
-      React.createElement("div", {
-        onClick: () => setSelectMode("edit"),
-        style: { background: "white", border: "2px solid #3b82f6", borderRadius: 16, padding: "24px 20px", cursor: "pointer", textAlign: "center", boxShadow: "0 2px 12px rgba(59,130,246,0.15)", transition: "all 0.15s" }
-      },
-        React.createElement("div", { style: { fontSize: 40, marginBottom: 12 } }, "✏️"),
-        React.createElement("div", { style: { fontSize: 18, fontWeight: 800, color: "#3b82f6" } }, "변화 있음"),
-        React.createElement("div", { style: { fontSize: 13, color: "#64748b", marginTop: 6, lineHeight: 1.5 } }, "상태 변화가 있어요\n전날 내용을 불러와서 수정할게요")
-      )
-    )
-  );
+  // 변화없음/변화있음 선택 화면 (어제 기록 표시)
+  if (selected && selectMode === "choose") return React.createElement(NurseChooseScreen, {
+    patient: selected, user,
+    onNoChange: handleNoChange,
+    onEdit: () => setSelectMode("edit"),
+    onBack: () => { setSelected(null); setSelectMode(null); }
+  });
 
   if (selected && selectMode === "edit") return React.createElement(NurseRecordScreen, {
     patient: selected, user,
@@ -808,6 +784,102 @@ function PatientListItem({ patient, onClick }) {
 function PatientGrid({ patients, onSelect }) {
   return React.createElement("div", { style: { display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8, paddingTop: 16 } },
     patients.map(p => React.createElement(PatientListItem, { key: p.id, patient: p, onClick: () => onSelect(p) }))
+  );
+}
+
+// ── 간호사 변화없음/변화있음 선택 화면 ──────────────────────────
+function NurseChooseScreen({ patient, user, onNoChange, onEdit, onBack }) {
+  const [yesterdayRecord, setYesterdayRecord] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    // 어제 날짜 계산 (KST)
+    const now = new Date();
+    const kst = new Date(now.getTime() + 9 * 60 * 60 * 1000);
+    kst.setDate(kst.getDate() - 1);
+    const yStr = kst.toISOString().slice(0, 10);
+
+    fetch(`${SUPABASE_URL}/rest/v1/records?patient_id=eq.${patient.id}&date=eq.${yStr}&limit=1`, {
+      headers: { apikey: ANON_KEY, Authorization: "Bearer " + ANON_KEY }
+    }).then(r => r.json())
+      .then(d => setYesterdayRecord(d && d.length > 0 ? d[0] : null))
+      .finally(() => setLoading(false));
+  }, []);
+
+  const InfoBox = ({ label, value }) => value ? React.createElement("div", {
+    style: { background: "#f8fafc", borderRadius: 8, padding: "8px 10px", border: "1px solid #e2e8f0" }
+  },
+    React.createElement("div", { style: { fontSize: 10, color: "#94a3b8", fontWeight: 600 } }, label),
+    React.createElement("div", { style: { fontSize: 13, fontWeight: 700, color: "#1e293b", marginTop: 2 } }, value)
+  ) : null;
+
+  return React.createElement("div", { className: "screen", style: { background: "#f0f4f8" } },
+    React.createElement("div", { style: { background: "linear-gradient(135deg,#064e3b,#059669)", padding: "48px 20px 20px" } },
+      React.createElement("button", { className: "back-btn", onClick: onBack }, "← 목록"),
+      React.createElement("div", { style: { fontSize: 20, fontWeight: 800, color: "white", marginTop: 10 } }, `${patient.name}님`),
+      React.createElement("div", { style: { fontSize: 13, color: "rgba(255,255,255,0.7)", marginTop: 3 } },
+        `${patient.age}세 · ${patient.gender} · ${patient.room} · 입원 ${admitDays(patient.admitted_at)}일째`)
+    ),
+    React.createElement("div", { className: "scroll-area", style: { paddingTop: 16 } },
+
+      // 어제 기록 요약
+      React.createElement("div", { style: { background: "white", borderRadius: 14, padding: "16px", marginBottom: 16, boxShadow: "0 1px 6px rgba(0,0,0,0.06)" } },
+        React.createElement("div", { style: { fontSize: 13, fontWeight: 700, color: "#1e3a5f", marginBottom: 12, display: "flex", alignItems: "center", gap: 6 } },
+          "📋 어제 기록",
+          React.createElement("span", { style: { fontSize: 11, color: "#94a3b8", fontWeight: 400 } }, loading ? "불러오는 중..." : !yesterdayRecord ? "기록 없음" : "")
+        ),
+        loading ? React.createElement("div", { style: { color: "#94a3b8", fontSize: 13 } }, "...")
+        : !yesterdayRecord ? React.createElement("div", { style: { color: "#94a3b8", fontSize: 13, textAlign: "center", padding: "12px 0" } }, "어제 기록이 없어요")
+        : React.createElement(React.Fragment, null,
+            React.createElement("div", { style: { display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 6, marginBottom: 8 } },
+              [
+                ["의식", yesterdayRecord.consciousness],
+                ["식사량", yesterdayRecord.meal_amount],
+                ["식사형태", yesterdayRecord.meal_type],
+                ["수면", yesterdayRecord.sleep_hours],
+                ["이동", yesterdayRecord.mobility],
+                ["낙상위험", yesterdayRecord.fall_risk],
+                ["소변", yesterdayRecord.urine],
+                ["대변", yesterdayRecord.bowel],
+                ["통증", yesterdayRecord.pain != null ? `${yesterdayRecord.pain}점` : null],
+                ["피부", yesterdayRecord.skin],
+                ["위생", yesterdayRecord.hygiene],
+                ["욕창", yesterdayRecord.bedsore],
+                ["투약", yesterdayRecord.medication],
+              ].filter(([,v]) => v).map(([k, v]) => React.createElement(InfoBox, { key: k, label: k, value: v }))
+            ),
+            yesterdayRecord.mental && React.createElement("div", { style: { padding: "8px 10px", background: "#faf5ff", borderRadius: 8, marginBottom: 6, fontSize: 12, color: "#7c3aed" } },
+              React.createElement("span", { style: { fontWeight: 700 } }, "BPSD: "),
+              yesterdayRecord.mental
+            ),
+            yesterdayRecord.nurse_note && React.createElement("div", { style: { padding: "8px 10px", background: "#f0f9ff", borderRadius: 8, fontSize: 12, color: "#0369a1" } },
+              React.createElement("span", { style: { fontWeight: 700 } }, "코멘트: "),
+              yesterdayRecord.nurse_note
+            )
+          )
+      ),
+
+      // 선택 버튼
+      React.createElement("div", { style: { fontSize: 14, fontWeight: 700, color: "#374151", textAlign: "center", marginBottom: 14 } }, "오늘 상태를 선택해 주세요"),
+      React.createElement("div", { style: { display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12, marginBottom: 20 } },
+        React.createElement("div", {
+          onClick: onNoChange,
+          style: { background: "white", border: "2px solid #059669", borderRadius: 16, padding: "20px 12px", cursor: "pointer", textAlign: "center", boxShadow: "0 2px 12px rgba(5,150,105,0.12)" }
+        },
+          React.createElement("div", { style: { fontSize: 36, marginBottom: 10 } }, "✅"),
+          React.createElement("div", { style: { fontSize: 16, fontWeight: 800, color: "#059669" } }, "변화 없음"),
+          React.createElement("div", { style: { fontSize: 11, color: "#64748b", marginTop: 6, lineHeight: 1.5 } }, "어제와 동일해요")
+        ),
+        React.createElement("div", {
+          onClick: onEdit,
+          style: { background: "white", border: "2px solid #3b82f6", borderRadius: 16, padding: "20px 12px", cursor: "pointer", textAlign: "center", boxShadow: "0 2px 12px rgba(59,130,246,0.12)" }
+        },
+          React.createElement("div", { style: { fontSize: 36, marginBottom: 10 } }, "✏️"),
+          React.createElement("div", { style: { fontSize: 16, fontWeight: 800, color: "#3b82f6" } }, "변화 있음"),
+          React.createElement("div", { style: { fontSize: 11, color: "#64748b", marginTop: 6, lineHeight: 1.5 } }, "수정 입력할게요")
+        )
+      )
+    )
   );
 }
 
