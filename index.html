@@ -186,7 +186,7 @@ function RoleSelectScreen({ onSelect }) {
     { key: "guardian", icon: "👨‍👩‍👧", title: "보호자", desc: "오늘 하루 가족의 상태를 확인하세요" },
     { key: "nurse", icon: "👩‍⚕️", title: "간호사", desc: "환자 상태 입력" },
     { key: "doctor", icon: "🩺", title: "의사", desc: "담당 환자 현황 확인" },
-    { key: "messages", icon: "💬", title: "가족에게 한마디 확인", desc: "면회 일정 및 메시지 확인 (의사·간호사용)" },
+    { key: "messages", icon: "💬", title: "가족들의 한마디 확인", desc: "보호자 메시지 및 면회 일정 확인" },
     { key: "admin", icon: "👑", title: "관리자", desc: "직원 계정 및 환자 관리" },
   ];
 
@@ -647,25 +647,17 @@ function GuardianScreen({ user, onBack }) {
 
 // ── 간호사 화면 ───────────────────────────────────────────────
 function NurseScreen({ user, onBack }) {
-  const [tab, setTab] = useState("patients");
   const [patients, setPatients] = useState([]);
-  const [messages, setMessages] = useState([]);
   const [loading, setLoading] = useState(true);
   const [selected, setSelected] = useState(null);
   const [selectMode, setSelectMode] = useState(null); // null | 'choose' | 'edit'
   const [noChangePopup, setNoChangePopup] = useState(null); // { name, message, ward }
 
   useEffect(() => {
-    Promise.all([
-      api("get_patients", { ward: user.ward }),
-      api("get_messages", { ward: user.ward })
-    ]).then(([pd, md]) => {
-      setPatients(pd.patients || []);
-      setMessages(md.messages || []);
-    }).finally(() => setLoading(false));
+    api("get_patients", { ward: user.ward })
+      .then(d => setPatients(d.patients || []))
+      .finally(() => setLoading(false));
   }, []);
-
-  const unread = messages.filter(m => !m.is_read).length;
 
   const handlePatientClick = (p) => {
     setSelected(p);
@@ -787,17 +779,11 @@ function NurseScreen({ user, onBack }) {
         React.createElement("div", { style: { fontSize: 18, fontWeight: 800, color: "white" } }, "오늘 상태 입력"),
         React.createElement("div", { style: { fontSize: 13, color: "rgba(255,255,255,0.7)" } }, `${patients.length}명`)
       ),
-      React.createElement("div", { style: { display: "flex", gap: 8, marginTop: 12 } },
-        React.createElement("button", { onClick: () => setTab("patients"), style: { flex: 1, padding: "8px", background: tab==="patients"?"white":"rgba(255,255,255,0.15)", border: "none", borderRadius: 8, color: tab==="patients"?"#064e3b":"white", fontWeight: 600, fontSize: 13, cursor: "pointer", fontFamily: "'Noto Sans KR',sans-serif" } }, "환자관리"),
-        React.createElement("button", { onClick: () => setTab("messages"), style: { flex: 1, padding: "8px", background: tab==="messages"?"white":"rgba(255,255,255,0.15)", border: "none", borderRadius: 8, color: tab==="messages"?"#064e3b":"white", fontWeight: 600, fontSize: 13, cursor: "pointer", fontFamily: "'Noto Sans KR',sans-serif", display: "flex", alignItems: "center", justifyContent: "center", gap: 6 } },
-          "보호자 한마디", unread > 0 && React.createElement("span", { className: "badge" }, unread)
-        )
-      )
+      React.createElement("div", { style: { marginTop: 8 } })
     ),
     React.createElement("div", { className: "scroll-area", style: { paddingTop: 16 } },
       loading ? React.createElement("div", { className: "loading" }, "불러오는 중...")
-      : tab === "patients" ? patients.map(p => React.createElement(PatientListItem, { key: p.id, patient: p, onClick: () => handlePatientClick(p) }))
-      : React.createElement(MessagesList, { messages, patients, onMarkRead: async (id) => { await api("mark_message_read", { messageId: id }); setMessages(ms => ms.map(m => m.id===id?{...m,is_read:true}:m)); } })
+      : patients.map(p => React.createElement(PatientListItem, { key: p.id, patient: p, onClick: () => handlePatientClick(p) }))
     )
   );
 }
@@ -1183,29 +1169,19 @@ function NurseRecordScreen({ patient, user, onBack, onSaved }) {
 
 // ── 의사 화면 ─────────────────────────────────────────────────
 function DoctorScreen({ user, onBack }) {
-  const [tab, setTab] = useState("patients");
   const [patients, setPatients] = useState([]);
-  const [messages, setMessages] = useState([]);
   const [loading, setLoading] = useState(true);
   const [selected, setSelected] = useState(null);
 
   useEffect(() => {
-    Promise.all([
-      api("get_patients", { doctorId: user.doctor_id }),
-      api("get_messages", { doctorId: user.doctor_id })
-    ]).then(([pd, md]) => {
-      setPatients(pd.patients || []);
-      setMessages(md.messages || []);
-    }).finally(() => setLoading(false));
+    api("get_patients", { doctorId: user.doctor_id })
+      .then(d => setPatients(d.patients || []))
+      .finally(() => setLoading(false));
   }, []);
-
-  const unread = messages.filter(m => !m.is_read).length;
 
   if (selected) return React.createElement(DoctorReviewScreen, {
     patient: selected, user, onBack: () => setSelected(null)
   });
-
-  const pending = patients.filter(p => !p._reviewed);
 
   return React.createElement("div", { className: "screen", style: { background: "#f0f4f8" } },
     React.createElement("div", { style: { background: "linear-gradient(135deg,#1e1b4b,#4338ca)", padding: "48px 20px 20px" } },
@@ -1218,17 +1194,11 @@ function DoctorScreen({ user, onBack }) {
         React.createElement("div", { style: { fontSize: 18, fontWeight: 800, color: "white" } }, "환자 현황"),
         React.createElement("div", { style: { fontSize: 13, color: "rgba(255,255,255,0.7)" } }, `담당 ${patients.length}명`)
       ),
-      React.createElement("div", { style: { display: "flex", gap: 8, marginTop: 12 } },
-        React.createElement("button", { onClick: () => setTab("patients"), style: { flex: 1, padding: "8px", background: tab==="patients"?"white":"rgba(255,255,255,0.15)", border: "none", borderRadius: 8, color: tab==="patients"?"#1e1b4b":"white", fontWeight: 600, fontSize: 13, cursor: "pointer", fontFamily: "'Noto Sans KR',sans-serif" } }, "환자목록"),
-        React.createElement("button", { onClick: () => setTab("messages"), style: { flex: 1, padding: "8px", background: tab==="messages"?"white":"rgba(255,255,255,0.15)", border: "none", borderRadius: 8, color: tab==="messages"?"#1e1b4b":"white", fontWeight: 600, fontSize: 13, cursor: "pointer", fontFamily: "'Noto Sans KR',sans-serif", display: "flex", alignItems: "center", justifyContent: "center", gap: 6 } },
-          "보호자 한마디", unread > 0 && React.createElement("span", { className: "badge" }, unread)
-        )
-      )
+      React.createElement("div", { style: { marginTop: 8 } })
     ),
     React.createElement("div", { className: "scroll-area", style: { paddingTop: 16 } },
       loading ? React.createElement("div", { className: "loading" }, "불러오는 중...")
-      : tab === "patients" ? patients.map(p => React.createElement(PatientListItem, { key: p.id, patient: p, onClick: () => setSelected(p) }))
-      : React.createElement(MessagesList, { messages, patients, onMarkRead: async (id) => { await api("mark_message_read", { messageId: id }); setMessages(ms => ms.map(m => m.id===id?{...m,is_read:true}:m)); } })
+      : patients.map(p => React.createElement(PatientListItem, { key: p.id, patient: p, onClick: () => setSelected(p) }))
     )
   );
 }
