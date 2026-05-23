@@ -1285,8 +1285,16 @@ function NurseRecordScreen({ patient, user, onBack, onSaved }) {
           ].map(v =>
             React.createElement(Btn, { key: v, label: v, small: true,
               active: form.mental.includes(v),
-              onClick: () => toggle("mental", v),
-              color: v==="이상없음"?"#166534":"#0369a1" })
+              onClick: () => {
+                if (v === "이상없음") {
+                  setForm(f => ({ ...f, mental: f.mental.includes("이상없음") ? [] : ["이상없음"] }));
+                } else {
+                  setForm(f => ({ ...f, mental: f.mental.includes(v)
+                    ? f.mental.filter(x => x !== v)
+                    : [...f.mental.filter(x => x !== "이상없음"), v] }));
+                }
+              },
+              color: v==="이상없음"?"#166534":"#c2410c" })
           )
         )
       }),
