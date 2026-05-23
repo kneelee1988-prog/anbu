@@ -2,11 +2,13 @@
   "name": "오늘안부 - 입원 환자 케어 플랫폼",
   "short_name": "오늘안부",
   "description": "천안쌍용요양병원 입원 환자 케어 연결 플랫폼",
-  "start_url": "/",
+  "start_url": "/anbu/",
+  "scope": "/anbu/",
   "display": "standalone",
-  "background_color": "#0f172a",
-  "theme_color": "#1e3a5f",
   "orientation": "portrait",
+  "background_color": "#1e3a5f",
+  "theme_color": "#1e3a5f",
+  "lang": "ko",
   "icons": [
     {
       "src": "icon-192.png",
