@@ -137,7 +137,11 @@ async function getNotices() {
 }
 
 // ── 유틸 ──────────────────────────────────────────────────────
-const today = () => new Date().toISOString().slice(0, 10);
+const today = () => {
+  const now = new Date();
+  const kst = new Date(now.getTime() + 9 * 60 * 60 * 1000);
+  return kst.toISOString().slice(0, 10);
+};
 const now = () => new Date().toISOString();
 const fmtDate = (s) => {
   if (!s) return "";
