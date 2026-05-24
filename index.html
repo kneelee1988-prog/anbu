@@ -1598,10 +1598,31 @@ function DoctorCommentPicker({ value, onChange }) {
 
 // ── 의사 검토 화면 ────────────────────────────────────────────
 function DoctorReviewScreen({ patient, user, onBack }) {
-  const FINDINGS = {
-    "감염·순환·호흡": { items: ["폐렴","패혈증","요로감염","폐부종","고열지속","산소포화도저하","혈압이상","부정맥","의식저하","뇌졸중의심","부종악화","기침·가래"], bg:"#f0fdf4", border:"#86efac", activeBg:"#16a34a" },
-    "소화·영양·통증": { items: ["식욕부진","흡인위험","복통·팽만","체중감소","영양불량","통증조절필요","낙상위험증가","욕창악화","관절구축"], bg:"#fff7ed", border:"#fdba74", activeBg:"#c2410c" },
-    "처치·검사·기타": { items: ["혈액검사","엑스레이검사","Lab이상 처치중","수액공급","활동(휠체어)시도","영양제투여","L-Tube삽입","알부민투여","수혈시행","섬망악화","우울증의심","공격적행동"], bg:"#f0f9ff", border:"#7dd3fc", activeBg:"#0369a1" },
+
+  const MEDICAL_ITEMS = {
+    "🔬 검사": {
+      items: ["일반혈액검사","간기능검사","전해질검사","염증수치검사","신기능검사","소변검사","엑스레이검사","심전도검사"],
+      bg:"#f0f9ff", border:"#7dd3fc", activeBg:"#0369a1"
+    },
+    "💉 처치·투약": {
+      items: ["대증요법","항생제투여","진통제투여","수액공급","산소공급","석션시행","영양제투여","TPN","알부민투여","수혈시행","욕창치료","상처처치","L-Tube삽입","도뇨관삽입"],
+      bg:"#fff7ed", border:"#fdba74", activeBg:"#c2410c"
+    },
+    "🏥 의뢰·협진": {
+      items: ["내과","외과","정형외과","재활의학과","정신건강의학과","가정의학과","한방과","피부과","산부인과","신경과","비뇨기과"],
+      bg:"#f5f3ff", border:"#c4b5fd", activeBg:"#7c3aed"
+    },
+  };
+
+  const ALERT_ITEMS = {
+    "⚠️ 걱정되는 상황": {
+      items: ["열이 납니다","혈압이 불안정합니다","호흡이 힘들어보입니다","폐에 문제가 생겼습니다","감염 증상이 있습니다","드시기 힘들어하십니다","삼킴이 어려우십니다","의식이 흐려지고 있습니다","낙상 위험이 높습니다","욕창이 생겼습니다","통증이 있으십니다","체중이 줄고 있습니다","부종이 심해지고 있습니다","수면이 많이 불안정합니다"],
+      color:"#dc2626", bg:"#fff1f2", border:"#fecaca", activeBg:"#dc2626"
+    },
+    "✅ 호전되는 상황": {
+      items: ["열이 내렸습니다","혈압이 안정됐습니다","호흡이 나아졌습니다","식욕이 돌아왔습니다","의식이 또렷해지고 있습니다","욕창이 좋아지고 있습니다","통증이 줄었습니다","부종이 빠지고 있습니다","수면이 안정되고 있습니다","전반적으로 호전되고 있습니다"],
+      color:"#15803d", bg:"#f0fdf4", border:"#bbf7d0", activeBg:"#16a34a"
+    },
   };
 
   const BPSD_ITEMS = [
@@ -1710,50 +1731,49 @@ function DoctorReviewScreen({ patient, user, onBack }) {
         )
       ),
 
-      // 의사 소견상 특이사항
-      React.createElement("div", { style: { background: "white", borderRadius: 14, marginBottom: 12, overflow: "hidden", boxShadow: "0 1px 6px rgba(0,0,0,0.06)" } },
-        React.createElement("div", { style: { background: "linear-gradient(135deg,#7f1d1d,#dc2626)", padding: "10px 16px", fontSize: 13, fontWeight: 700, color: "white" } }, "⚠️ 의사 소견상 특이사항 (보호자에게 전달)"),
-        React.createElement("div", { style: { padding: 14 } },
-          React.createElement("div", { style: { fontSize: 12, color: "#dc2626", fontWeight: 700, marginBottom: 8 } }, "▼ 악화 / 주의"),
-          React.createElement("div", { style: { display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 6, marginBottom: 14 } },
-            ["폐렴","패혈증","요로감염","급성호흡곤란","산소포화도저하","혈압저하","고열지속","원인미상고열","낙상","욕창악화","의식저하","부정맥","흡인위험","체중감소","탈수","부종악화"].map(v =>
-              React.createElement("button", { key: v, onClick: () => toggleAlert(v),
+      // 의사 처치·검사·협진
+      React.createElement("div", { className: "card", style: { marginBottom: 12 } },
+        React.createElement("div", { style: { fontWeight: 700, color: "#1e3a5f", marginBottom: 14, fontSize: 14 } }, "🩺 오늘의 의료 처치 내역"),
+        Object.entries(MEDICAL_ITEMS).map(([cat, {items, bg, border, activeBg}]) =>
+          React.createElement("div", { key: cat, style: { marginBottom: 12, background: bg, borderRadius: 12, padding: "12px 12px 10px", border: `1.5px solid ${border}` } },
+            React.createElement("div", { style: { fontSize: 13, color: "#1e293b", fontWeight: 800, marginBottom: 8 } }, cat),
+            React.createElement("div", { style: { display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 6 } },
+              items.map(f => React.createElement("button", {
+                key: f, onClick: () => toggleFinding(f),
                 style: { padding: "7px 6px", borderRadius: 8, border: "1.5px solid",
-                  borderColor: specialAlerts.includes(v) ? "#dc2626" : "#fecaca",
-                  background: specialAlerts.includes(v) ? "#dc2626" : "#fff1f2",
-                  color: specialAlerts.includes(v) ? "white" : "#7f1d1d",
+                  borderColor: findings.includes(f) ? activeBg : border,
+                  background: findings.includes(f) ? activeBg : "white",
+                  color: findings.includes(f) ? "white" : "#374151",
                   fontSize: 12, fontWeight: 600, cursor: "pointer",
                   fontFamily: "'Noto Sans KR',sans-serif", lineHeight: 1.3 }
-              }, v)
-            )
-          ),
-          React.createElement("div", { style: { fontSize: 12, color: "#15803d", fontWeight: 700, marginBottom: 8 } }, "▲ 호전 / 회복"),
-          React.createElement("div", { style: { display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 6 } },
-            ["폐렴회복","패혈증회복","요로감염회복","고열해열됨","산소포화도상승","혈압안정","낙상치료중","욕창호전","의식호전","식욕회복","체중증가","부종감소","통증감소","수면개선","활동증가","전반적호전"].map(v =>
-              React.createElement("button", { key: v, onClick: () => toggleAlert(v),
-                style: { padding: "7px 6px", borderRadius: 8, border: "1.5px solid",
-                  borderColor: specialAlerts.includes(v) ? "#16a34a" : "#bbf7d0",
-                  background: specialAlerts.includes(v) ? "#16a34a" : "#f0fdf4",
-                  color: specialAlerts.includes(v) ? "white" : "#166534",
-                  fontSize: 12, fontWeight: 600, cursor: "pointer",
-                  fontFamily: "'Noto Sans KR',sans-serif", lineHeight: 1.3 }
-              }, v)
+              }, f))
             )
           )
         )
       ),
 
-      React.createElement("div", { className: "card", style: { marginBottom: 12 } },
-        React.createElement("div", { style: { fontWeight: 700, color: "#1e3a5f", marginBottom: 14 } }, "🩺 임상 소견 (복수 선택)"),
-        Object.entries(FINDINGS).map(([cat, {items, bg, border, activeBg}]) => React.createElement("div", { key: cat, style: { marginBottom: 14, background: bg, borderRadius: 12, padding: "12px 12px 10px", border: `1.5px solid ${border}` } },
-          React.createElement("div", { style: { fontSize: 14, color: "#1e293b", fontWeight: 800, marginBottom: 10 } }, `■ ${cat}`),
-          React.createElement("div", { style: { display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 6 } },
-            items.map(f => React.createElement("button", {
-              key: f, onClick: () => toggleFinding(f),
-              style: { padding: "7px 6px", borderRadius: 8, border: "1.5px solid", borderColor: findings.includes(f)?activeBg:border, background: findings.includes(f)?activeBg:"white", color: findings.includes(f)?"white":"#374151", fontSize: 12, fontWeight: 600, cursor: "pointer", fontFamily: "'Noto Sans KR',sans-serif", lineHeight: 1.3 }
-            }, f))
+      // 보호자 전달 특이사항
+      React.createElement("div", { style: { background: "white", borderRadius: 14, marginBottom: 12, overflow: "hidden", boxShadow: "0 1px 6px rgba(0,0,0,0.06)" } },
+        React.createElement("div", { style: { background: "linear-gradient(135deg,#7f1d1d,#dc2626)", padding: "10px 16px", fontSize: 13, fontWeight: 700, color: "white" } }, "💬 보호자에게 전달할 상태"),
+        React.createElement("div", { style: { padding: 14 } },
+          Object.entries(ALERT_ITEMS).map(([cat, {items, color, bg, border, activeBg}]) =>
+            React.createElement("div", { key: cat, style: { marginBottom: 12 } },
+              React.createElement("div", { style: { fontSize: 12, color, fontWeight: 700, marginBottom: 8 } }, cat),
+              React.createElement("div", { style: { display: "grid", gridTemplateColumns: "1fr 1fr", gap: 6 } },
+                items.map(v => React.createElement("button", {
+                  key: v, onClick: () => toggleAlert(v),
+                  style: { padding: "8px 10px", borderRadius: 8, border: "1.5px solid",
+                    borderColor: specialAlerts.includes(v) ? activeBg : border,
+                    background: specialAlerts.includes(v) ? activeBg : bg,
+                    color: specialAlerts.includes(v) ? "white" : color,
+                    fontSize: 12, fontWeight: 600, cursor: "pointer",
+                    fontFamily: "'Noto Sans KR',sans-serif", lineHeight: 1.4,
+                    textAlign: "left" }
+                }, v))
+              )
+            )
           )
-        ))
+        )
       ),
 
       React.createElement(DoctorCommentPicker, { value: comment, onChange: setComment }),
