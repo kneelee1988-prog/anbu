@@ -873,7 +873,7 @@ function NurseChooseScreen({ patient, user, onNoChange, onEdit, onBack }) {
           `${patient.age}세 · ${patient.gender}`,
           `🏥 ${patient.room}`,
           `📅 입원 ${admitDays(patient.admitted_at)}일째`,
-          patient.doctor ? `👨‍⚕️ ${patient.doctor}` : null
+          null
         ].filter(Boolean).map((txt, i) =>
           React.createElement("div", { key: i, style: {
             background: "rgba(255,255,255,0.15)", border: "1px solid rgba(255,255,255,0.25)",
@@ -1727,7 +1727,7 @@ function DoctorReviewScreen({ patient, user, onBack }) {
           `${patient.age}세 · ${patient.gender}`,
           `🏥 ${patient.room}`,
           `📅 입원 ${admitDays(patient.admitted_at)}일째`,
-          patient.doctor ? `👨‍⚕️ ${patient.doctor}` : null,
+          user.name ? `👨‍⚕️ 주치의 ${user.name}` : null,
           `🗓 ${new Date().toLocaleDateString("ko-KR", { month:"long", day:"numeric", weekday:"short" })} 검토`
         ].filter(Boolean).map((txt, i) =>
           React.createElement("div", { key: i, style: {
