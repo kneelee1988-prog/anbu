@@ -571,7 +571,7 @@ function GuardianScreen({ user, onBack }) {
               (record.mental || record.bprs) && React.createElement("div", { style: { padding: "12px 14px", background: "#faf5ff", borderRadius: 10, border: "1.5px solid #e9d5ff", marginBottom: 10 } },
                 React.createElement("div", { style: { fontSize: 11, color: "#7c3aed", fontWeight: 700, marginBottom: 6 } }, "🧩 BPSD (치매 행동·심리 증상 등 문제 증상)"),
                 React.createElement("div", { style: { display: "flex", flexWrap: "wrap", gap: 5 } },
-                  (record.bprs || record.mental || "").split("·").map(s => s.trim()).filter(Boolean).map((s, i) =>
+                  (record.bprs || record.mental || "").split("·").map(s => s.trim()).filter(Boolean).map(s=>s.replace("다칠위험있는 반복행동","다칠위험있는 행동반복")).map((s, i) =>
                     React.createElement("span", { key: i, style: { background: "#ede9fe", color: "#5b21b6", borderRadius: 20, fontSize: 12, fontWeight: 600, padding: "3px 10px" } }, s)
                   )
                 )
@@ -1691,7 +1691,7 @@ function DoctorReviewScreen({ patient, user, onBack }) {
         React.createElement("div", { style: { padding: 14 } },
           record && record.mental && record.mental.length > 0
           ? React.createElement("div", { style: { display: "flex", flexWrap: "wrap", gap: 6 } },
-              (Array.isArray(record.mental) ? record.mental : record.mental.split("·").map(s=>s.trim()).filter(Boolean))
+              (Array.isArray(record.mental) ? record.mental : record.mental.split("·").map(s=>s.trim()).filter(Boolean)).map(s=>s.replace("다칠위험있는 반복행동","다칠위험있는 행동반복"))
               .map((v, i) => React.createElement("div", {
                 key: i,
                 style: {
