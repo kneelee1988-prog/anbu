@@ -740,10 +740,10 @@ function GuardianScreen({ user, onBack }) {
                 })
               ),
               (record.mental || record.bprs) && React.createElement("div", { style: { padding: "12px 14px", background: "#faf5ff", borderRadius: 10, border: "1.5px solid #e9d5ff", marginBottom: 10 } },
-                React.createElement("div", { style: { fontSize: 11, color: "#7c3aed", fontWeight: 700, marginBottom: 6 } }, "🧩 BPSD (치매 행동·심리 증상 등 문제 증상)"),
+                React.createElement("div", { style: { fontSize: 11, color: "#1e3a5f", fontWeight: 700, marginBottom: 6 } }, "🧩 BPSD (치매 행동·심리 증상 등 문제 증상)"),
                 React.createElement("div", { style: { display: "flex", flexWrap: "wrap", gap: 5 } },
                   (record.bprs || record.mental || "").split("·").map(s => s.trim()).filter(Boolean).map(s=>s.replace("다칠위험있는 반복행동","다칠위험있는 행동반복")).map((s, i) =>
-                    React.createElement("span", { key: i, style: { background: "#ede9fe", color: "#5b21b6", borderRadius: 20, fontSize: 12, fontWeight: 600, padding: "3px 10px" } }, s)
+                    React.createElement("span", { key: i, style: { background: "#ede9fe", color: "#5b21b6", borderRadius: 8, fontSize: 12, fontWeight: 600, padding: "4px 10px", border: "1px solid #c4b5fd" } }, s)
                   )
                 )
               ),
@@ -767,13 +767,13 @@ function GuardianScreen({ user, onBack }) {
                   bad.length > 0 && React.createElement(React.Fragment, null,
                     React.createElement("div", { style: { background: "linear-gradient(135deg,#7f1d1d,#dc2626)", padding: "10px 16px", fontSize: 13, fontWeight: 700, color: "white" } }, "⚠️ 의사 소견 — 주의사항"),
                     React.createElement("div", { style: { padding: "12px 16px", display: "flex", flexWrap: "wrap", gap: 6 } },
-                      bad.map((a,i) => React.createElement("span", { key: i, style: { background: "#fee2e2", color: "#b91c1c", borderRadius: 20, fontSize: 13, fontWeight: 700, padding: "4px 12px" } }, a))
+                      bad.map((a,i) => React.createElement("span", { key: i, style: { background: "#fee2e2", color: "#b91c1c", borderRadius: 8, fontSize: 13, fontWeight: 700, padding: "5px 12px", border: "1px solid #fecaca" } }, a))
                     )
                   ),
                   good.length > 0 && React.createElement(React.Fragment, null,
                     React.createElement("div", { style: { background: "linear-gradient(135deg,#064e3b,#16a34a)", padding: "10px 16px", fontSize: 13, fontWeight: 700, color: "white", marginTop: bad.length > 0 ? 1 : 0 } }, "✅ 의사 소견 — 호전사항"),
                     React.createElement("div", { style: { padding: "12px 16px", display: "flex", flexWrap: "wrap", gap: 6 } },
-                      good.map((a,i) => React.createElement("span", { key: i, style: { background: "#dcfce7", color: "#15803d", borderRadius: 20, fontSize: 13, fontWeight: 700, padding: "4px 12px" } }, a))
+                      good.map((a,i) => React.createElement("span", { key: i, style: { background: "#dcfce7", color: "#15803d", borderRadius: 8, fontSize: 13, fontWeight: 700, padding: "5px 12px", border: "1px solid #86efac" } }, a))
                     )
                   )
                 );
