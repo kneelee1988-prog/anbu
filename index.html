@@ -853,11 +853,34 @@ function NurseChooseScreen({ patient, user, onNoChange, onEdit, onBack }) {
   ) : null;
 
   return React.createElement("div", { className: "screen", style: { background: "#f0f4f8" } },
-    React.createElement("div", { style: { background: "linear-gradient(135deg,#064e3b,#059669)", padding: "48px 20px 20px" } },
-      React.createElement("button", { className: "back-btn", onClick: onBack }, "← 목록"),
-      React.createElement("div", { style: { fontSize: 20, fontWeight: 800, color: "white", marginTop: 10 } }, `${patient.name}님`),
-      React.createElement("div", { style: { fontSize: 13, color: "rgba(255,255,255,0.7)", marginTop: 3 } },
-        `${patient.age}세 · ${patient.gender} · ${patient.room} · 입원 ${admitDays(patient.admitted_at)}일째`)
+    React.createElement("div", { style: { background: "linear-gradient(135deg,#064e3b,#059669)", padding: "44px 20px 18px", position: "relative" } },
+      // 상단 바: 뒤로가기 + 역할 뱃지
+      React.createElement("div", { style: { display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 14 } },
+        React.createElement("button", { className: "back-btn", onClick: onBack }, "← 목록"),
+        React.createElement("div", { style: {
+          background: "rgba(255,255,255,0.18)", border: "1px solid rgba(255,255,255,0.35)",
+          borderRadius: 20, padding: "4px 12px", fontSize: 11, fontWeight: 800,
+          color: "white", letterSpacing: "0.5px"
+        } }, "🩺 간호사 역할")
+      ),
+      // 환자 이름
+      React.createElement("div", { style: { fontSize: 24, fontWeight: 900, color: "white", letterSpacing: "-0.5px", marginBottom: 6 } },
+        `${patient.name}님`
+      ),
+      // 정보 칩들
+      React.createElement("div", { style: { display: "flex", flexWrap: "wrap", gap: 6 } },
+        ...[
+          `${patient.age}세 · ${patient.gender}`,
+          `🏥 ${patient.room}`,
+          `📅 입원 ${admitDays(patient.admitted_at)}일째`,
+          patient.doctor ? `👨‍⚕️ ${patient.doctor}` : null
+        ].filter(Boolean).map((txt, i) =>
+          React.createElement("div", { key: i, style: {
+            background: "rgba(255,255,255,0.15)", border: "1px solid rgba(255,255,255,0.25)",
+            borderRadius: 20, padding: "4px 10px", fontSize: 12, fontWeight: 600, color: "white"
+          } }, txt)
+        )
+      )
     ),
     React.createElement("div", { className: "scroll-area", style: { paddingTop: 16 } },
 
@@ -1684,12 +1707,34 @@ function DoctorReviewScreen({ patient, user, onBack }) {
   if (loading) return React.createElement("div", { className: "loading", style: { paddingTop: 80 } }, "불러오는 중...");
 
   return React.createElement("div", { className: "screen", style: { background: "#f0f4f8" } },
-    React.createElement("div", { style: { background: "linear-gradient(135deg,#1e1b4b,#4338ca)", padding: "48px 20px 20px" } },
-      React.createElement("button", { className: "back-btn", onClick: onBack }, "← 목록"),
-      React.createElement("div", { style: { fontSize: 18, fontWeight: 800, color: "white", marginTop: 8 } }, `${patient.name} ${patient.age}세 · ${patient.gender}`),
-      React.createElement("div", { style: { fontSize: 13, color: "rgba(255,255,255,0.7)" } }, `${patient.room} · 입원 ${admitDays(patient.admitted_at)}일째`),
-      React.createElement("div", { style: { fontSize: 12, color: "rgba(255,255,255,0.8)", marginTop: 4, fontWeight: 600 } },
-        `📅 ${new Date().toLocaleDateString("ko-KR", { year:"numeric", month:"long", day:"numeric", weekday:"short" })} 검토`
+    React.createElement("div", { style: { background: "linear-gradient(135deg,#1e1b4b,#4338ca)", padding: "44px 20px 18px", position: "relative" } },
+      // 상단 바: 뒤로가기 + 역할 뱃지
+      React.createElement("div", { style: { display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 14 } },
+        React.createElement("button", { className: "back-btn", onClick: onBack }, "← 목록"),
+        React.createElement("div", { style: {
+          background: "rgba(255,255,255,0.18)", border: "1px solid rgba(255,255,255,0.35)",
+          borderRadius: 20, padding: "4px 12px", fontSize: 11, fontWeight: 800,
+          color: "white", letterSpacing: "0.5px"
+        } }, "👨‍⚕️ 의사 역할")
+      ),
+      // 환자 이름
+      React.createElement("div", { style: { fontSize: 24, fontWeight: 900, color: "white", letterSpacing: "-0.5px", marginBottom: 6 } },
+        `${patient.name}님`
+      ),
+      // 정보 칩들
+      React.createElement("div", { style: { display: "flex", flexWrap: "wrap", gap: 6 } },
+        ...[
+          `${patient.age}세 · ${patient.gender}`,
+          `🏥 ${patient.room}`,
+          `📅 입원 ${admitDays(patient.admitted_at)}일째`,
+          patient.doctor ? `👨‍⚕️ ${patient.doctor}` : null,
+          `🗓 ${new Date().toLocaleDateString("ko-KR", { month:"long", day:"numeric", weekday:"short" })} 검토`
+        ].filter(Boolean).map((txt, i) =>
+          React.createElement("div", { key: i, style: {
+            background: "rgba(255,255,255,0.15)", border: "1px solid rgba(255,255,255,0.25)",
+            borderRadius: 20, padding: "4px 10px", fontSize: 12, fontWeight: 600, color: "white"
+          } }, txt)
+        )
       )
     ),
     React.createElement("div", { className: "scroll-area", style: { paddingTop: 16 } },
