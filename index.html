@@ -508,15 +508,17 @@ function GuardianScreen({ user, onBack }) {
   useEffect(() => {
     if (tab === "history" && history.length === 0) {
       setHistLoading(true);
-      // 최근 14일치 records 조회
-      const twoWeeksAgo = new Date();
-      twoWeeksAgo.setDate(twoWeeksAgo.getDate() - 14);
-      const fromDate = twoWeeksAgo.toISOString().split("T")[0];
-      fetch(`${SUPABASE_URL}/rest/v1/records?patient_id=eq.${patient.id}&date=gte.${fromDate}&order=date.asc&limit=14`, {
-        headers: { apikey: ANON_KEY, Authorization: `Bearer ${ANON_KEY}` }
+      const fromDate = new Date();
+      fromDate.setDate(fromDate.getDate() - 14);
+      const kstOffset = 9 * 60 * 60 * 1000;
+      const kstFrom = new Date(fromDate.getTime() + kstOffset);
+      const fromStr = kstFrom.toISOString().slice(0, 10);
+      fetch(`${SUPABASE_URL}/rest/v1/records?patient_id=eq.${patient.id}&date=gte.${fromStr}&order=date.asc&limit=14`, {
+        headers: { apikey: ANON_KEY, Authorization: "Bearer " + ANON_KEY }
       })
       .then(r => r.json())
-      .then(data => setHistory(Array.isArray(data) ? data : []))
+      .then(data => { console.log("history data:", data); setHistory(Array.isArray(data) ? data : []); })
+      .catch(e => { console.error("history error:", e); setHistory([]); })
       .finally(() => setHistLoading(false));
     }
   }, [tab]);
@@ -1032,12 +1034,16 @@ function NurseChooseScreen({ patient, user, onNoChange, onEdit, onBack }) {
       setHistLoading(true);
       const fromDate = new Date();
       fromDate.setDate(fromDate.getDate() - 14);
-      const fromStr = fromDate.toISOString().split("T")[0];
+      const kstOffset = 9 * 60 * 60 * 1000;
+      const kstFrom = new Date(fromDate.getTime() + kstOffset);
+      const fromStr = kstFrom.toISOString().slice(0, 10);
       fetch(`${SUPABASE_URL}/rest/v1/records?patient_id=eq.${patient.id}&date=gte.${fromStr}&order=date.asc&limit=14`, {
         headers: { apikey: ANON_KEY, Authorization: "Bearer " + ANON_KEY }
-      }).then(r => r.json())
-        .then(data => setHistory(Array.isArray(data) ? data : []))
-        .finally(() => setHistLoading(false));
+      })
+      .then(r => r.json())
+      .then(data => { console.log("history data:", data); setHistory(Array.isArray(data) ? data : []); })
+      .catch(e => { console.error("history error:", e); setHistory([]); })
+      .finally(() => setHistLoading(false));
     }
   }, [tab]);
 
@@ -1956,12 +1962,16 @@ function DoctorReviewScreen({ patient, user, onBack }) {
       setHistLoading(true);
       const fromDate = new Date();
       fromDate.setDate(fromDate.getDate() - 14);
-      const fromStr = fromDate.toISOString().split("T")[0];
+      const kstOffset = 9 * 60 * 60 * 1000;
+      const kstFrom = new Date(fromDate.getTime() + kstOffset);
+      const fromStr = kstFrom.toISOString().slice(0, 10);
       fetch(`${SUPABASE_URL}/rest/v1/records?patient_id=eq.${patient.id}&date=gte.${fromStr}&order=date.asc&limit=14`, {
         headers: { apikey: ANON_KEY, Authorization: "Bearer " + ANON_KEY }
-      }).then(r => r.json())
-        .then(data => setHistory(Array.isArray(data) ? data : []))
-        .finally(() => setHistLoading(false));
+      })
+      .then(r => r.json())
+      .then(data => { console.log("history data:", data); setHistory(Array.isArray(data) ? data : []); })
+      .catch(e => { console.error("history error:", e); setHistory([]); })
+      .finally(() => setHistLoading(false));
     }
   }, [tab]);
 
