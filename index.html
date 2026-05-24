@@ -1693,9 +1693,24 @@ function DoctorReviewScreen({ patient, user, onBack }) {
       )
     ),
     React.createElement("div", { className: "scroll-area", style: { paddingTop: 16 } },
-      record ? React.createElement("div", { className: "card", style: { marginBottom: 12 } },
-        React.createElement("div", { style: { fontWeight: 700, color: "#1e3a5f", marginBottom: 12 } }, "📋 간호사 입력 요약"),
-        React.createElement("div", { style: { display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 8, marginBottom: 8 } },
+
+      // 간호사 입력 영역 구분선
+      React.createElement("div", { style: { display: "flex", alignItems: "center", gap: 10, margin: "0 0 12px" } },
+        React.createElement("div", { style: { flex: 1, height: 1, background: "linear-gradient(to right, transparent, #94a3b8)" } }),
+        React.createElement("div", { style: {
+          display: "flex", alignItems: "center", gap: 6,
+          background: "linear-gradient(135deg,#0d9488,#0f766e)",
+          color: "white", fontSize: 12, fontWeight: 800,
+          padding: "7px 18px", borderRadius: 20,
+          letterSpacing: "0.5px", whiteSpace: "nowrap",
+          boxShadow: "0 2px 8px rgba(13,148,136,0.3)"
+        } }, "🩺 간호사 입력 내용"),
+        React.createElement("div", { style: { flex: 1, height: 1, background: "linear-gradient(to left, transparent, #94a3b8)" } })
+      ),
+
+      record ? React.createElement("div", { style: { background: "white", borderRadius: 14, marginBottom: 12, overflow: "hidden", boxShadow: "0 1px 6px rgba(0,0,0,0.06)" } },
+        React.createElement("div", { style: { background: "linear-gradient(135deg,#e0f2fe,#bae6fd)", padding: "10px 16px", fontSize: 13, fontWeight: 800, color: "#0c4a6e", borderBottom: "1px solid #bae6fd" } }, "📋 간호사 입력 요약"),
+        React.createElement("div", { style: { padding: "12px 12px 8px", display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 8, marginBottom: 4 } },
           [["의식",record.consciousness],["식사량",record.meal_amount],["식사형태",record.meal_type],["수면",record.sleep_hours],["이동",record.mobility],["낙상위험",record.fall_risk],["소변",record.urine],["대변",record.bowel],["통증",record.pain!=null?`${record.pain}점`:null],["피부",record.skin],["위생",record.hygiene],["욕창",record.bedsore],["투약",record.medication],["한방",record.oriental_items||null]].filter(([,v])=>v).map(([k,v]) =>
             React.createElement("div", { key: k, style: { padding: "8px 10px", background: "#f8fafc", borderRadius: 8, border: "1px solid #e2e8f0" } },
               React.createElement("div", { style: { fontSize: 11, color: "#475569", fontWeight: 800 } }, k),
@@ -1703,12 +1718,12 @@ function DoctorReviewScreen({ patient, user, onBack }) {
             )
           )
         ),
-        record.nurse_note && React.createElement("div", { style: { marginTop: 8, padding: "8px 10px", background: "#f0f9ff", borderRadius: 8, fontSize: 13, color: "#0c4a6e", lineHeight: 1.5 } }, React.createElement("span", { style: { fontSize: 11, fontWeight: 700, color: "#0369a1", display: "block", marginBottom: 3 } }, "간호사 일일 코멘트"), record.nurse_note)
+        record.nurse_note && React.createElement("div", { style: { margin: "0 12px 12px", padding: "8px 10px", background: "#f0f9ff", borderRadius: 8, fontSize: 13, color: "#0c4a6e", lineHeight: 1.5 } }, React.createElement("span", { style: { fontSize: 11, fontWeight: 700, color: "#0369a1", display: "block", marginBottom: 3 } }, "간호사 일일 코멘트"), record.nurse_note)
       ) : React.createElement("div", { className: "empty" }, "아직 간호사 기록이 없어요"),
 
       // 간호사 입력 BPSD 표시 (읽기전용 버튼)
-      React.createElement("div", { style: { background: "#faf5ff", borderRadius: 14, marginBottom: 12, overflow: "hidden", boxShadow: "0 1px 6px rgba(0,0,0,0.06)" } },
-        React.createElement("div", { style: { background: "linear-gradient(135deg,#134e4a,#0f766e)", padding: "10px 16px", fontSize: 13, fontWeight: 700, color: "white" } }, "🧩 BPSD — 간호사 입력 행동·심리 증상"),
+      React.createElement("div", { style: { background: "white", borderRadius: 14, marginBottom: 12, overflow: "hidden", boxShadow: "0 1px 6px rgba(0,0,0,0.06)" } },
+        React.createElement("div", { style: { background: "linear-gradient(135deg,#ccfbf1,#99f6e4)", padding: "10px 16px", fontSize: 13, fontWeight: 800, color: "#0f5546", borderBottom: "1px solid #99f6e4" } }, "🧩 BPSD — 간호사 입력 행동·심리 증상"),
         React.createElement("div", { style: { padding: 14 } },
           record && record.mental && record.mental.length > 0
           ? React.createElement("div", { style: { display: "flex", flexWrap: "wrap", gap: 6 } },
@@ -1740,10 +1755,10 @@ function DoctorReviewScreen({ patient, user, onBack }) {
         React.createElement("div", { style: {
           display: "flex", alignItems: "center", gap: 6,
           background: "linear-gradient(135deg,#1e3a5f,#2563eb)",
-          color: "white", fontSize: 11, fontWeight: 800,
-          padding: "5px 14px", borderRadius: 20,
+          color: "white", fontSize: 13, fontWeight: 800,
+          padding: "8px 22px", borderRadius: 20,
           letterSpacing: "0.5px", whiteSpace: "nowrap",
-          boxShadow: "0 2px 8px rgba(30,58,95,0.25)"
+          boxShadow: "0 2px 10px rgba(30,58,95,0.3)"
         } }, "✏️ 의사 입력 영역"),
         React.createElement("div", { style: { flex: 1, height: 1, background: "linear-gradient(to left, transparent, #94a3b8)" } })
       ),
