@@ -1685,6 +1685,30 @@ function DoctorReviewScreen({ patient, user, onBack }) {
         record.nurse_note && React.createElement("div", { style: { marginTop: 8, padding: "8px 10px", background: "#f0f9ff", borderRadius: 8, fontSize: 13, color: "#0c4a6e", lineHeight: 1.5 } }, React.createElement("span", { style: { fontSize: 11, fontWeight: 700, color: "#0369a1", display: "block", marginBottom: 3 } }, "간호사 일일 코멘트"), record.nurse_note)
       ) : React.createElement("div", { className: "empty" }, "아직 간호사 기록이 없어요"),
 
+      // 간호사 입력 BPSD 표시 (읽기전용 버튼)
+      React.createElement("div", { style: { background: "#faf5ff", borderRadius: 14, marginBottom: 12, overflow: "hidden", boxShadow: "0 1px 6px rgba(0,0,0,0.06)" } },
+        React.createElement("div", { style: { background: "linear-gradient(135deg,#134e4a,#0f766e)", padding: "10px 16px", fontSize: 13, fontWeight: 700, color: "white" } }, "🧩 BPSD — 간호사 입력 행동·심리 증상"),
+        React.createElement("div", { style: { padding: 14 } },
+          record && record.mental && record.mental.length > 0
+          ? React.createElement("div", { style: { display: "flex", flexWrap: "wrap", gap: 6 } },
+              (Array.isArray(record.mental) ? record.mental : record.mental.split("·").map(s=>s.trim()).filter(Boolean))
+              .map((v, i) => React.createElement("div", {
+                key: i,
+                style: {
+                  padding: "7px 12px", borderRadius: 8,
+                  border: "1.5px solid",
+                  borderColor: v === "이상없음" ? "#166534" : "#ea7c3a",
+                  background: v === "이상없음" ? "#166534" : "#ea7c3a",
+                  color: "white", fontSize: 12, fontWeight: 600,
+                  whiteSpace: "nowrap",
+                  fontFamily: "'Noto Sans KR',sans-serif"
+                }
+              }, v))
+            )
+          : React.createElement("div", { style: { color: "#94a3b8", fontSize: 13 } }, "간호사 입력 내용이 없습니다.")
+        )
+      ),
+
       // 의사 소견상 특이사항
       React.createElement("div", { style: { background: "white", borderRadius: 14, marginBottom: 12, overflow: "hidden", boxShadow: "0 1px 6px rgba(0,0,0,0.06)" } },
         React.createElement("div", { style: { background: "linear-gradient(135deg,#7f1d1d,#dc2626)", padding: "10px 16px", fontSize: 13, fontWeight: 700, color: "white" } }, "⚠️ 의사 소견상 특이사항 (보호자에게 전달)"),
@@ -1715,30 +1739,6 @@ function DoctorReviewScreen({ patient, user, onBack }) {
               }, v)
             )
           )
-        )
-      ),
-
-      // 간호사 입력 BPSD 표시 (읽기전용 버튼)
-      React.createElement("div", { style: { background: "#faf5ff", borderRadius: 14, marginBottom: 12, overflow: "hidden", boxShadow: "0 1px 6px rgba(0,0,0,0.06)" } },
-        React.createElement("div", { style: { background: "linear-gradient(135deg,#134e4a,#0f766e)", padding: "10px 16px", fontSize: 13, fontWeight: 700, color: "white" } }, "🧩 BPSD — 간호사 입력 행동·심리 증상"),
-        React.createElement("div", { style: { padding: 14 } },
-          record && record.mental && record.mental.length > 0
-          ? React.createElement("div", { style: { display: "flex", flexWrap: "wrap", gap: 6 } },
-              (Array.isArray(record.mental) ? record.mental : record.mental.split("·").map(s=>s.trim()).filter(Boolean))
-              .map((v, i) => React.createElement("div", {
-                key: i,
-                style: {
-                  padding: "7px 12px", borderRadius: 8,
-                  border: "1.5px solid",
-                  borderColor: v === "이상없음" ? "#166534" : "#ea7c3a",
-                  background: v === "이상없음" ? "#166534" : "#ea7c3a",
-                  color: "white", fontSize: 12, fontWeight: 600,
-                  whiteSpace: "nowrap",
-                  fontFamily: "'Noto Sans KR',sans-serif"
-                }
-              }, v))
-            )
-          : React.createElement("div", { style: { color: "#94a3b8", fontSize: 13 } }, "간호사 입력 내용이 없습니다.")
         )
       ),
 
