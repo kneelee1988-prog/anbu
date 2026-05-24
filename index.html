@@ -1677,14 +1677,14 @@ function DoctorReviewScreen({ patient, user, onBack }) {
         React.createElement("div", { style: { display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 8, marginBottom: 8 } },
           [["의식",record.consciousness],["식사량",record.meal_amount],["식사형태",record.meal_type],["수면",record.sleep_hours],["이동",record.mobility],["낙상위험",record.fall_risk],["소변",record.urine],["대변",record.bowel],["통증",record.pain!=null?`${record.pain}점`:null],["피부",record.skin],["위생",record.hygiene],["욕창",record.bedsore],["투약",record.medication],["한방",record.oriental_items||null]].filter(([,v])=>v).map(([k,v]) =>
             React.createElement("div", { key: k, style: { padding: "8px 10px", background: "#f8fafc", borderRadius: 8, border: "1px solid #e2e8f0" } },
-              React.createElement("div", { style: { fontSize: 11, color: "#94a3b8", fontWeight: 600 } }, k),
+              React.createElement("div", { style: { fontSize: 11, color: "#475569", fontWeight: 800 } }, k),
               React.createElement("div", { style: { fontSize: 13, fontWeight: 700, color: "#1e293b", marginTop: 2 } }, v)
             )
           )
         ),
         record.mental && React.createElement("div", { style: { marginTop: 10, padding: "8px 10px", background: "#faf5ff", borderRadius: 8 } },
-          React.createElement("div", { style: { fontSize: 11, color: "#7c3aed", fontWeight: 700, marginBottom: 4 } }, "🧩 간호사 기록 - BPSD"),
-          React.createElement("div", { style: { fontSize: 13, color: "#4c1d95" } }, record.mental)
+          React.createElement("div", { style: { fontSize: 12, color: "#7c3aed", fontWeight: 700, marginBottom: 4 } }, "🧩 간호사 기록 - BPSD"),
+          React.createElement("div", { style: { fontSize: 15, color: "#4c1d95", fontWeight: 600, lineHeight: 1.7 } }, record.mental)
         ),
         record.nurse_note && React.createElement("div", { style: { marginTop: 8, padding: "8px 10px", background: "#f0f9ff", borderRadius: 8, fontSize: 13, color: "#0c4a6e", lineHeight: 1.5 } }, React.createElement("span", { style: { fontSize: 11, fontWeight: 700, color: "#0369a1", display: "block", marginBottom: 3 } }, "간호사 일일 코멘트"), record.nurse_note)
       ) : React.createElement("div", { className: "empty" }, "아직 간호사 기록이 없어요"),
