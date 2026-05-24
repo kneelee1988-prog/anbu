@@ -1601,7 +1601,7 @@ function DoctorReviewScreen({ patient, user, onBack }) {
 
   const MEDICAL_ITEMS = {
     "🔬 검사": {
-      items: ["일반혈액검사","간기능검사","전해질검사","염증수치검사","신기능검사","소변검사","엑스레이검사","심전도검사"],
+      items: ["일반혈액검사","간기능검사","전해질검사","염증수치검사","신기능검사","소변검사","엑스레이검사","심전도검사","기타"],
       bg:"#f0f9ff", border:"#7dd3fc", activeBg:"#0369a1"
     },
     "💉 처치·투약": {
@@ -1729,6 +1729,23 @@ function DoctorReviewScreen({ patient, user, onBack }) {
             )
           : React.createElement("div", { style: { color: "#94a3b8", fontSize: 13 } }, "간호사 입력 내용이 없습니다.")
         )
+      ),
+
+      // 의사 입력 구분선
+      React.createElement("div", { style: {
+        display: "flex", alignItems: "center", gap: 10,
+        margin: "4px 0 12px"
+      } },
+        React.createElement("div", { style: { flex: 1, height: 1, background: "linear-gradient(to right, transparent, #94a3b8)" } }),
+        React.createElement("div", { style: {
+          display: "flex", alignItems: "center", gap: 6,
+          background: "linear-gradient(135deg,#1e3a5f,#2563eb)",
+          color: "white", fontSize: 11, fontWeight: 800,
+          padding: "5px 14px", borderRadius: 20,
+          letterSpacing: "0.5px", whiteSpace: "nowrap",
+          boxShadow: "0 2px 8px rgba(30,58,95,0.25)"
+        } }, "✏️ 의사 입력 영역"),
+        React.createElement("div", { style: { flex: 1, height: 1, background: "linear-gradient(to left, transparent, #94a3b8)" } })
       ),
 
       // 의사 처치·검사·협진
