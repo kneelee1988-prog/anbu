@@ -995,22 +995,47 @@ function PatientGrid({ patients, onSelect }) {
 
 // ── 간호사 변화없음/변화있음 선택 화면 ──────────────────────────
 function NurseChooseScreen({ patient, user, onNoChange, onEdit, onBack }) {
+  const [tab, setTab] = useState("today");
   const [yesterdayRecord, setYesterdayRecord] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [history, setHistory] = useState([]);
+  const [histLoading, setHistLoading] = useState(false);
+  const [expandedDate, setExpandedDate] = useState(null);
+
+  const CONSCIOUSNESS_MAP = ["혼수","반혼수","혼미","졸림","명료"];
+  const MEAL_MAP = ["안 드심","거의 안 드심","절반","잘 드심"];
+  const SLEEP_MAP = ["4시간 미만","4~6시간","6~8시간","8시간 이상"];
+  const MOBILITY_MAP = ["침상 안정","침상 위 활동","보조 보행","독립 보행"];
+  const goodHighColor = (v, max) => {
+    const pct = v / max;
+    return pct >= 0.75 ? "#16a34a" : pct >= 0.5 ? "#65a30d" : pct >= 0.25 ? "#f59e0b" : "#ef4444";
+  };
 
   useEffect(() => {
-    // 어제 날짜 계산 (KST)
     const now = new Date();
     const kst = new Date(now.getTime() + 9 * 60 * 60 * 1000);
     kst.setDate(kst.getDate() - 1);
     const yStr = kst.toISOString().slice(0, 10);
-
     fetch(`${SUPABASE_URL}/rest/v1/records?patient_id=eq.${patient.id}&date=eq.${yStr}&limit=1`, {
       headers: { apikey: ANON_KEY, Authorization: "Bearer " + ANON_KEY }
     }).then(r => r.json())
       .then(d => setYesterdayRecord(d && d.length > 0 ? d[0] : null))
       .finally(() => setLoading(false));
   }, []);
+
+  useEffect(() => {
+    if (tab === "history" && history.length === 0) {
+      setHistLoading(true);
+      const fromDate = new Date();
+      fromDate.setDate(fromDate.getDate() - 14);
+      const fromStr = fromDate.toISOString().split("T")[0];
+      fetch(`${SUPABASE_URL}/rest/v1/records?patient_id=eq.${patient.id}&date=gte.${fromStr}&order=date.asc&limit=14`, {
+        headers: { apikey: ANON_KEY, Authorization: "Bearer " + ANON_KEY }
+      }).then(r => r.json())
+        .then(data => setHistory(Array.isArray(data) ? data : []))
+        .finally(() => setHistLoading(false));
+    }
+  }, [tab]);
 
   const InfoBox = ({ label, value }) => value ? React.createElement("div", {
     style: { background: "#f8fafc", borderRadius: 8, padding: "8px 10px", border: "1px solid #e2e8f0" }
@@ -1049,9 +1074,68 @@ function NurseChooseScreen({ patient, user, onNoChange, onEdit, onBack }) {
         )
       )
     ),
+    // 탭
+    React.createElement("div", { style: { padding: "0 20px", marginTop: 16 } },
+      React.createElement("div", { className: "tabs" },
+        React.createElement("button", { className: `tab ${tab==="today"?"active":""}`, onClick: () => setTab("today") }, "오늘 입력"),
+        React.createElement("button", { className: `tab ${tab==="history"?"active":""}`, onClick: () => setTab("history") }, "지난 기록")
+      )
+    ),
     React.createElement("div", { className: "scroll-area", style: { paddingTop: 16 } },
 
-      // 어제 기록 요약
+      // ── 지난 기록 탭 ──────────────────────────────────────
+      tab === "history" && (
+        histLoading
+        ? React.createElement("div", { className: "loading" }, "불러오는 중...")
+        : history.length === 0
+        ? React.createElement("div", { className: "empty" }, "지난 기록이 없어요")
+        : React.createElement(React.Fragment, null,
+            React.createElement("div", { className: "card", style: { marginBottom: 12 } },
+              React.createElement("div", { style: { fontWeight: 800, color: "#1e3a5f", fontSize: 14, marginBottom: 16 } }, "📈 최근 추세"),
+              TrendChart({ records: history.map(r => ({ date: r.date, consciousness: categoryToNum(r.consciousness, CONSCIOUSNESS_MAP) })), label: "🧠 의식수준", field: "consciousness", maxVal: 5, colorFn: goodHighColor }),
+              TrendChart({ records: history.map(r => ({ date: r.date, meal: categoryToNum(r.meal_amount, MEAL_MAP) })), label: "🍽 식사량", field: "meal", maxVal: 4, colorFn: goodHighColor }),
+              TrendChart({ records: history.map(r => ({ date: r.date, pain: r.pain != null ? r.pain : null })), label: "💊 통증 (낮을수록 좋음)", field: "pain", maxVal: 10, colorFn: (v) => v <= 2 ? "#16a34a" : v <= 4 ? "#65a30d" : v <= 6 ? "#f59e0b" : v <= 8 ? "#ef4444" : "#991b1b" }),
+              TrendChart({ records: history.map(r => ({ date: r.date, sleep: categoryToNum(r.sleep_hours, SLEEP_MAP) })), label: "😴 수면시간", field: "sleep", maxVal: 4, colorFn: goodHighColor }),
+              TrendChart({ records: history.map(r => ({ date: r.date, mobility: categoryToNum(r.mobility, MOBILITY_MAP) })), label: "🚶 이동능력", field: "mobility", maxVal: 4, colorFn: goodHighColor }),
+            ),
+            React.createElement("div", { className: "card" },
+              React.createElement("div", { style: { fontWeight: 800, color: "#1e3a5f", fontSize: 14, marginBottom: 12 } }, "📅 날짜별 상세"),
+              [...history].reverse().map((r) => {
+                const isExpanded = expandedDate === r.date;
+                const d = new Date(r.date);
+                const dateStr = `${d.getMonth()+1}월 ${d.getDate()}일 (${["일","월","화","수","목","금","토"][d.getDay()]})`;
+                return React.createElement("div", { key: r.date, style: { marginBottom: 8, borderRadius: 10, border: "1.5px solid #e2e8f0", overflow: "hidden" } },
+                  React.createElement("div", { onClick: () => setExpandedDate(isExpanded ? null : r.date),
+                    style: { padding: "10px 14px", background: isExpanded ? "#eff6ff" : "#f8fafc", cursor: "pointer", display: "flex", justifyContent: "space-between", alignItems: "center" } },
+                    React.createElement("div", null,
+                      React.createElement("div", { style: { fontSize: 13, fontWeight: 800, color: "#1e3a5f" } }, dateStr),
+                      React.createElement("div", { style: { fontSize: 12, color: "#64748b", marginTop: 2 } },
+                        [r.consciousness, r.meal_amount, r.pain != null ? `통증 ${r.pain}점` : null].filter(Boolean).join(" · "))
+                    ),
+                    React.createElement("div", { style: { fontSize: 16, color: "#94a3b8" } }, isExpanded ? "▲" : "▽")
+                  ),
+                  isExpanded && React.createElement("div", { style: { padding: "12px 14px", background: "white" } },
+                    React.createElement("div", { style: { display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 6, marginBottom: 8 } },
+                      [["의식",r.consciousness],["식사량",r.meal_amount],["식사형태",r.meal_type],["수면",r.sleep_hours],["이동",r.mobility],["낙상위험",r.fall_risk],["소변",r.urine],["대변",r.bowel],["통증",r.pain!=null?`${r.pain}점`:null],["투약",r.medication],["욕창",r.bedsore]]
+                      .filter(([,v])=>v).map(([k,v]) =>
+                        React.createElement("div", { key: k, style: { padding: "6px 8px", background: "#f8fafc", borderRadius: 8, border: "1px solid #e2e8f0" } },
+                          React.createElement("div", { style: { fontSize: 10, color: "#64748b", fontWeight: 700 } }, k),
+                          React.createElement("div", { style: { fontSize: 12, fontWeight: 800, color: "#1e293b", marginTop: 1 } }, v)
+                        )
+                      )
+                    ),
+                    r.mental && React.createElement("div", { style: { fontSize: 12, color: "#7c3aed", background: "#faf5ff", borderRadius: 8, padding: "6px 10px", marginBottom: 6 } },
+                      React.createElement("span", { style: { fontWeight: 700 } }, "BPSD: "), r.mental),
+                    r.nurse_note && React.createElement("div", { style: { fontSize: 12, color: "#0c4a6e", background: "#f0f9ff", borderRadius: 8, padding: "6px 10px" } },
+                      React.createElement("span", { style: { fontWeight: 700 } }, "코멘트: "), r.nurse_note)
+                  )
+                );
+              })
+            )
+          )
+      ),
+
+      tab === "today" && React.createElement(React.Fragment, null,
       React.createElement("div", { style: { background: "white", borderRadius: 14, padding: "16px", marginBottom: 16, boxShadow: "0 1px 6px rgba(0,0,0,0.06)" } },
         React.createElement("div", { style: { fontSize: 13, fontWeight: 700, color: "#1e3a5f", marginBottom: 12, display: "flex", alignItems: "center", gap: 6 } },
           "📋 어제 기록",
@@ -1108,6 +1192,7 @@ function NurseChooseScreen({ patient, user, onNoChange, onEdit, onBack }) {
           React.createElement("div", { style: { fontSize: 11, color: "#64748b", marginTop: 6, lineHeight: 1.5 } }, "수정 입력할게요")
         )
       )
+      ) // today tab 닫기
     )
   );
 }
@@ -1831,6 +1916,19 @@ function DoctorReviewScreen({ patient, user, onBack }) {
   const [warmMsg, setWarmMsg] = useState("");
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [tab, setTab] = useState("today");
+  const [history, setHistory] = useState([]);
+  const [histLoading, setHistLoading] = useState(false);
+  const [expandedDate, setExpandedDate] = useState(null);
+
+  const CONSCIOUSNESS_MAP = ["혼수","반혼수","혼미","졸림","명료"];
+  const MEAL_MAP = ["안 드심","거의 안 드심","절반","잘 드심"];
+  const SLEEP_MAP = ["4시간 미만","4~6시간","6~8시간","8시간 이상"];
+  const MOBILITY_MAP = ["침상 안정","침상 위 활동","보조 보행","독립 보행"];
+  const goodHighColor = (v, max) => {
+    const pct = v / max;
+    return pct >= 0.75 ? "#16a34a" : pct >= 0.5 ? "#65a30d" : pct >= 0.25 ? "#f59e0b" : "#ef4444";
+  };
 
   useEffect(() => {
     api("get_today_record", { patientId: patient.id, phone: "staff" })
@@ -1848,6 +1946,20 @@ function DoctorReviewScreen({ patient, user, onBack }) {
       })
       .finally(() => setLoading(false));
   }, []);
+
+  useEffect(() => {
+    if (tab === "history" && history.length === 0) {
+      setHistLoading(true);
+      const fromDate = new Date();
+      fromDate.setDate(fromDate.getDate() - 14);
+      const fromStr = fromDate.toISOString().split("T")[0];
+      fetch(`${SUPABASE_URL}/rest/v1/records?patient_id=eq.${patient.id}&date=gte.${fromStr}&order=date.asc&limit=14`, {
+        headers: { apikey: ANON_KEY, Authorization: "Bearer " + ANON_KEY }
+      }).then(r => r.json())
+        .then(data => setHistory(Array.isArray(data) ? data : []))
+        .finally(() => setHistLoading(false));
+    }
+  }, [tab]);
 
   const toggleFinding = (f) => setFindings(fs => fs.includes(f) ? fs.filter(x=>x!==f) : [...fs, f]);
   const toggleBprs = (v) => setBprs(bs => bs.includes(v) ? bs.filter(x=>x!==v) : [...bs, v]);
@@ -1904,9 +2016,73 @@ function DoctorReviewScreen({ patient, user, onBack }) {
         )
       )
     ),
+    // 탭
+    React.createElement("div", { style: { padding: "0 20px", marginTop: 16 } },
+      React.createElement("div", { className: "tabs" },
+        React.createElement("button", { className: `tab ${tab==="today"?"active":""}`, onClick: () => setTab("today") }, "오늘 검토"),
+        React.createElement("button", { className: `tab ${tab==="history"?"active":""}`, onClick: () => setTab("history") }, "지난 기록")
+      )
+    ),
     React.createElement("div", { className: "scroll-area", style: { paddingTop: 16 } },
 
-      // 간호사 입력 영역 구분선
+      // ── 지난 기록 탭 ──────────────────────────────────────
+      tab === "history" && (
+        histLoading
+        ? React.createElement("div", { className: "loading" }, "불러오는 중...")
+        : history.length === 0
+        ? React.createElement("div", { className: "empty" }, "지난 기록이 없어요")
+        : React.createElement(React.Fragment, null,
+            React.createElement("div", { className: "card", style: { marginBottom: 12 } },
+              React.createElement("div", { style: { fontWeight: 800, color: "#1e3a5f", fontSize: 14, marginBottom: 16 } }, "📈 최근 추세"),
+              TrendChart({ records: history.map(r => ({ date: r.date, consciousness: categoryToNum(r.consciousness, CONSCIOUSNESS_MAP) })), label: "🧠 의식수준", field: "consciousness", maxVal: 5, colorFn: goodHighColor }),
+              TrendChart({ records: history.map(r => ({ date: r.date, meal: categoryToNum(r.meal_amount, MEAL_MAP) })), label: "🍽 식사량", field: "meal", maxVal: 4, colorFn: goodHighColor }),
+              TrendChart({ records: history.map(r => ({ date: r.date, pain: r.pain != null ? r.pain : null })), label: "💊 통증 (낮을수록 좋음)", field: "pain", maxVal: 10, colorFn: (v) => v <= 2 ? "#16a34a" : v <= 4 ? "#65a30d" : v <= 6 ? "#f59e0b" : v <= 8 ? "#ef4444" : "#991b1b" }),
+              TrendChart({ records: history.map(r => ({ date: r.date, sleep: categoryToNum(r.sleep_hours, SLEEP_MAP) })), label: "😴 수면시간", field: "sleep", maxVal: 4, colorFn: goodHighColor }),
+              TrendChart({ records: history.map(r => ({ date: r.date, mobility: categoryToNum(r.mobility, MOBILITY_MAP) })), label: "🚶 이동능력", field: "mobility", maxVal: 4, colorFn: goodHighColor }),
+              TrendChart({ records: history.map(r => ({ date: r.date, urine: categoryToNum(r.urine, ["실금","농축","감소","정상"]) })), label: "🚿 소변", field: "urine", maxVal: 4, colorFn: goodHighColor }),
+              TrendChart({ records: history.map(r => ({ date: r.date, bowel: categoryToNum(r.bowel, ["실금","관장","묽은 변","설사","변비","정상"]) })), label: "🚽 대변", field: "bowel", maxVal: 6, colorFn: goodHighColor }),
+            ),
+            React.createElement("div", { className: "card" },
+              React.createElement("div", { style: { fontWeight: 800, color: "#1e3a5f", fontSize: 14, marginBottom: 12 } }, "📅 날짜별 상세"),
+              [...history].reverse().map((r) => {
+                const isExpanded = expandedDate === r.date;
+                const d = new Date(r.date);
+                const dateStr = `${d.getMonth()+1}월 ${d.getDate()}일 (${["일","월","화","수","목","금","토"][d.getDay()]})`;
+                return React.createElement("div", { key: r.date, style: { marginBottom: 8, borderRadius: 10, border: "1.5px solid #e2e8f0", overflow: "hidden" } },
+                  React.createElement("div", { onClick: () => setExpandedDate(isExpanded ? null : r.date),
+                    style: { padding: "10px 14px", background: isExpanded ? "#eff6ff" : "#f8fafc", cursor: "pointer", display: "flex", justifyContent: "space-between", alignItems: "center" } },
+                    React.createElement("div", null,
+                      React.createElement("div", { style: { fontSize: 13, fontWeight: 800, color: "#1e3a5f" } }, dateStr),
+                      React.createElement("div", { style: { fontSize: 12, color: "#64748b", marginTop: 2 } },
+                        [r.consciousness, r.meal_amount, r.pain != null ? `통증 ${r.pain}점` : null, r.urine ? `소변 ${r.urine}` : null].filter(Boolean).join(" · "))
+                    ),
+                    React.createElement("div", { style: { fontSize: 16, color: "#94a3b8" } }, isExpanded ? "▲" : "▽")
+                  ),
+                  isExpanded && React.createElement("div", { style: { padding: "12px 14px", background: "white" } },
+                    React.createElement("div", { style: { display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 6, marginBottom: 8 } },
+                      [["의식",r.consciousness],["식사량",r.meal_amount],["식사형태",r.meal_type],["수면",r.sleep_hours],["이동",r.mobility],["낙상위험",r.fall_risk],["소변",r.urine],["대변",r.bowel],["통증",r.pain!=null?`${r.pain}점`:null],["피부",r.skin],["위생",r.hygiene],["욕창",r.bedsore],["투약",r.medication]]
+                      .filter(([,v])=>v).map(([k,v]) =>
+                        React.createElement("div", { key: k, style: { padding: "6px 8px", background: "#f8fafc", borderRadius: 8, border: "1px solid #e2e8f0" } },
+                          React.createElement("div", { style: { fontSize: 10, color: "#64748b", fontWeight: 700 } }, k),
+                          React.createElement("div", { style: { fontSize: 12, fontWeight: 800, color: "#1e293b", marginTop: 1 } }, v)
+                        )
+                      )
+                    ),
+                    r.mental && React.createElement("div", { style: { fontSize: 12, color: "#7c3aed", background: "#faf5ff", borderRadius: 8, padding: "6px 10px", marginBottom: 6 } },
+                      React.createElement("span", { style: { fontWeight: 700 } }, "BPSD: "), r.mental),
+                    r.special_alerts && React.createElement("div", { style: { fontSize: 12, color: "#dc2626", background: "#fff1f2", borderRadius: 8, padding: "6px 10px", marginBottom: 6 } },
+                      React.createElement("span", { style: { fontWeight: 700 } }, "특이사항: "),
+                      Array.isArray(r.special_alerts) ? r.special_alerts.join(" · ") : r.special_alerts),
+                    r.doctor_comment && React.createElement("div", { style: { fontSize: 12, color: "#1e3a5f", background: "#eff6ff", borderRadius: 8, padding: "6px 10px" } },
+                      React.createElement("span", { style: { fontWeight: 700 } }, "의사 코멘트: "), r.doctor_comment)
+                  )
+                );
+              })
+            )
+          )
+      ),
+
+      tab === "today" && React.createElement(React.Fragment, null,
       React.createElement("div", { style: { display: "flex", alignItems: "center", gap: 10, margin: "0 0 12px" } },
         React.createElement("div", { style: { flex: 1, height: 1, background: "linear-gradient(to right, transparent, #94a3b8)" } }),
         React.createElement("div", { style: {
@@ -2023,6 +2199,7 @@ function DoctorReviewScreen({ patient, user, onBack }) {
       React.createElement(DoctorCommentPicker, { value: comment, onChange: setComment }),
       React.createElement(WarmMessagePicker, { value: warmMsg, onChange: setWarmMsg }),
       React.createElement("button", { className: "btn btn-dark", onClick: handleSave, disabled: saving }, saving ? "저장 중..." : "💾 저장 및 전달")
+      ) // today tab 닫기
     )
   );
 }
