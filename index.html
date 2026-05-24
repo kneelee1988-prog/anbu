@@ -1902,11 +1902,11 @@ function DoctorReviewScreen({ patient, user, onBack }) {
   const ALERT_ITEMS = {
     "⚠️ 걱정되는 상황": {
       items: ["열이 납니다","혈압이 불안정합니다","호흡이 힘들어보입니다","폐에 문제가 생겼습니다","감염 증상이 있습니다","드시기 힘들어하십니다","삼킴이 어려우십니다","의식이 흐려지고 있습니다","낙상 위험이 높습니다","욕창이 생겼습니다","통증이 있으십니다","체중이 줄고 있습니다","부종이 심해지고 있습니다","수면이 많이 불안정합니다"],
-      color:"#dc2626", bg:"#fff1f2", border:"#fecaca", activeBg:"#dc2626"
+      color:"#92400e", bg:"#fffbeb", border:"#fde68a", activeBg:"#d97706"
     },
     "✅ 호전되는 상황": {
       items: ["열이 내렸습니다","혈압이 안정됐습니다","호흡이 나아졌습니다","식욕이 돌아왔습니다","의식이 또렷해지고 있습니다","욕창이 좋아지고 있습니다","통증이 줄었습니다","부종이 빠지고 있습니다","수면이 안정되고 있습니다","전반적으로 호전되고 있습니다"],
-      color:"#15803d", bg:"#f0fdf4", border:"#bbf7d0", activeBg:"#16a34a"
+      color:"#166534", bg:"#f0fdf4", border:"#bbf7d0", activeBg:"#16a34a"
     },
   };
 
@@ -2188,7 +2188,7 @@ function DoctorReviewScreen({ patient, user, onBack }) {
 
       // 보호자 전달 특이사항
       React.createElement("div", { style: { background: "white", borderRadius: 14, marginBottom: 12, overflow: "hidden", boxShadow: "0 1px 6px rgba(0,0,0,0.06)" } },
-        React.createElement("div", { style: { background: "linear-gradient(135deg,#7f1d1d,#dc2626)", padding: "10px 16px", fontSize: 13, fontWeight: 700, color: "white" } }, "💬 보호자에게 전달할 상태"),
+        React.createElement("div", { style: { background: "linear-gradient(135deg,#1e3a5f,#2c5282)", padding: "10px 16px", fontSize: 13, fontWeight: 700, color: "white" } }, "💬 보호자에게 전달할 상태"),
         React.createElement("div", { style: { padding: 14 } },
           Object.entries(ALERT_ITEMS).map(([cat, {items, color, bg, border, activeBg}]) =>
             React.createElement("div", { key: cat, style: { marginBottom: 12 } },
@@ -2199,10 +2199,12 @@ function DoctorReviewScreen({ patient, user, onBack }) {
                   style: { padding: "8px 10px", borderRadius: 8, border: "1.5px solid",
                     borderColor: specialAlerts.includes(v) ? activeBg : border,
                     background: specialAlerts.includes(v) ? activeBg : bg,
-                    color: specialAlerts.includes(v) ? "white" : color,
-                    fontSize: 12, fontWeight: 600, cursor: "pointer",
+                    color: specialAlerts.includes(v) ? "white" : "#1e293b",
+                    fontSize: 12, fontWeight: specialAlerts.includes(v) ? 700 : 500,
+                    cursor: "pointer",
                     fontFamily: "'Noto Sans KR',sans-serif", lineHeight: 1.4,
-                    textAlign: "left" }
+                    textAlign: "left",
+                    transition: "all 0.15s ease" }
                 }, v))
               )
             )
