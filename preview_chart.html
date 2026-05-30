@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>김순자님 상태 추세</title>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: 'Noto Sans KR', sans-serif; background: #e2e8f0; display: flex; justify-content: center; }
+    #root { width: 100%; max-width: 480px; background: #f0f4f8; min-height: 100vh; }
+  </style>
+</head>
+<body>
+<div id="root"></div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
+<script>
+"use strict";
+const { useState } = React;
+
+const SAMPLE_DATA = [
+  { date: "2026-05-17", consciousness: "졸림", meal_amount: "절반", sleep_hours: "4~6시간", mobility: "휠체어", pain: 5, urine: "정상", bowel: "변비" },
+  { date: "2026-05-18", consciousness: "졸림", meal_amount: "1/4",  sleep_hours: "4시간 미만", mobility: "휠체어", pain: 6, urine: "감소", bowel: "변비" },
+  { date: "2026-05-19", consciousness: "혼미", meal_amount: "소량",  sleep_hours: "4시간 미만", mobility: "침상 안정", pain: 7, urine: "감소", bowel: "변비" },
+  { date: "2026-05-20", consciousness: "혼미", meal_amount: "소량",  sleep_hours: "4~6시간", mobility: "침상 안정", pain: 7, urine: "정상", bowel: "정상" },
+  { date: "2026-05-21", consciousness: "졸림", meal_amount: "절반",  sleep_hours: "4~6시간", mobility: "휠체어", pain: 5, urine: "정상", bowel: "정상" },
+  { date: "2026-05-22", consciousness: "졸림", meal_amount: "3/4",   sleep_hours: "6~8시간", mobility: "휠체어", pain: 4, urine: "정상", bowel: "정상" },
+  { date: "2026-05-23", consciousness: "졸림", meal_amount: "3/4",   sleep_hours: "6~8시간", mobility: "부축 보행", pain: 3, urine: "정상", bowel: "정상" },
+];
+
+function categoryToNum(val, map) {
+  if (!val) return null;
+  const idx = map.indexOf(val);
+  return idx >= 0 ? idx + 1 : null;
+}
+
+function TrendChart({ records, label, field, maxVal, colorFn, unit, hint, valueLabelFn }) {
+  const max = maxVal || 10;
+  const days = records.slice(-7);
+  const DAY_KO = ["일","월","화","수","목","금","토"];
+
+  return React.createElement("div", { style: { marginBottom: 4 } },
+    // 제목 + 힌트
+    React.createElement("div", { style: { marginBottom: 6 } },
+      React.createElement("div", { style: { fontSize: 13, fontWeight: 800, color: "#1e3a5f" } }, label),
+      hint && React.createElement("div", { style: { fontSize: 10, color: "#94a3b8", marginTop: 2 } }, hint)
+    ),
+    // 막대
+    React.createElement("div", { style: { display: "flex", alignItems: "flex-end", gap: 4, height: 72 } },
+      days.map((r, i) => {
+        const val = r[field];
+        const pct = val !== null ? Math.max((val / max) * 100, 8) : 0;
+        const color = val === null ? "#e2e8f0" : colorFn(val, max);
+        // 파스텔 변환
+        const pastelBg = val === null ? "#f1f5f9" : color + "33";
+        const d = new Date(r.date);
+        const dayLabel = DAY_KO[d.getDay()];
+        const isToday = i === days.length - 1;
+        const displayVal = valueLabelFn ? valueLabelFn(val) : (val !== null ? `${val}${unit||""}` : "—");
+
+        return React.createElement("div", { key: i, style: { flex: 1, display: "flex", flexDirection: "column", alignItems: "center", gap: 3 } },
+          React.createElement("div", { style: { fontSize: 10, fontWeight: 800, color: val === null ? "#cbd5e1" : color, minHeight: 14, textAlign: "center" } }, displayVal),
+          React.createElement("div", { style: { width: "100%", height: 52, display: "flex", alignItems: "flex-end", justifyContent: "center" } },
+            React.createElement("div", { style: {
+              width: isToday ? "60%" : "45%",
+              height: val !== null ? `${pct}%` : "3px",
+              background: val !== null
+                ? `linear-gradient(180deg, ${color}99, ${color}dd)`
+                : "#e2e8f0",
+              borderRadius: "4px 4px 2px 2px",
+              transition: "height 0.4s ease",
+              boxShadow: isToday && val !== null ? `0 2px 6px ${color}55` : "none",
+              outline: isToday && val !== null ? `2px solid ${color}` : "none",
+              outlineOffset: "1px",
+            }})
+          ),
+          React.createElement("div", { style: {
+            fontSize: 10, fontWeight: isToday ? 800 : 500,
+            color: isToday ? "#1e3a5f" : "#94a3b8"
+          } }, isToday ? "오늘" : dayLabel)
+        );
+      })
+    )
+  );
+}
+
+function ChartPair({ left, right }) {
+  return React.createElement("div", { style: { display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16, marginBottom: 20, paddingBottom: 20, borderBottom: "1px solid #f1f5f9" } },
+    React.createElement("div", null, left),
+    React.createElement("div", null, right)
+  );
+}
+
+function App() {
+  const CONSCIOUSNESS_MAP = ["혼수","반혼수","혼미","졸림","명료"];
+  const MEAL_MAP = ["거부","소량","1/4","절반","3/4","잘 드심"];
+  const SLEEP_MAP = ["4시간 미만","4~6시간","6~8시간","8시간 이상"];
+  const MOBILITY_MAP = ["침상 안정","휠체어","부축 보행","워커","독립 보행"];
+
+  const goodHigh = (v, max) => {
+    const p = v / max;
+    return p >= 0.8 ? "#16a34a" : p >= 0.6 ? "#65a30d" : p >= 0.4 ? "#f59e0b" : p >= 0.2 ? "#ef4444" : "#991b1b";
+  };
+  const painColor = (v) => v <= 2 ? "#16a34a" : v <= 4 ? "#65a30d" : v <= 6 ? "#f59e0b" : v <= 8 ? "#ef4444" : "#991b1b";
+
+  const last = SAMPLE_DATA[SAMPLE_DATA.length - 1];
+  const first = SAMPLE_DATA[0];
+
+  const compare = [
+    { label: "의식", before: first.consciousness, after: last.consciousness,
+      good: CONSCIOUSNESS_MAP.indexOf(last.consciousness) >= CONSCIOUSNESS_MAP.indexOf(first.consciousness) },
+    { label: "식사", before: first.meal_amount, after: last.meal_amount,
+      good: MEAL_MAP.indexOf(last.meal_amount) >= MEAL_MAP.indexOf(first.meal_amount) },
+    { label: "통증", before: `${first.pain}점`, after: `${last.pain}점`, good: last.pain <= first.pain },
+    { label: "이동", before: first.mobility, after: last.mobility,
+      good: MOBILITY_MAP.indexOf(last.mobility) >= MOBILITY_MAP.indexOf(first.mobility) },
+  ];
+
+  const consciousnessLabel = (v) => {
+    if (v === null) return "—";
+    return ["혼수","반혼수","혼미","졸림","명료"][v-1] || "—";
+  };
+  const mealLabel = (v) => {
+    if (v === null) return "—";
+    return ["거부","소량","1/4","절반","3/4","잘드심"][v-1] || "—";
+  };
+  const sleepLabel = (v) => {
+    if (v === null) return "—";
+    return ["4h↓","4~6h","6~8h","8h↑"][v-1] || "—";
+  };
+  const mobilityLabel = (v) => {
+    if (v === null) return "—";
+    return ["침상","휠체어","부축","워커","독립"][v-1] || "—";
+  };
+
+  const charts = {
+    consciousness: {
+      label: "🧠 의식수준",
+      hint: "명료에 가까울수록 좋아요 ↑",
+      records: SAMPLE_DATA.map(r => ({ date: r.date, val: categoryToNum(r.consciousness, CONSCIOUSNESS_MAP) })),
+      maxVal: 5, colorFn: goodHigh, valueLabelFn: consciousnessLabel
+    },
+    meal: {
+      label: "🍽️ 식사량",
+      hint: "많이 드실수록 좋아요 ↑",
+      records: SAMPLE_DATA.map(r => ({ date: r.date, val: categoryToNum(r.meal_amount, MEAL_MAP) })),
+      maxVal: 6, colorFn: goodHigh, valueLabelFn: mealLabel
+    },
+    pain: {
+      label: "💊 통증",
+      hint: "낮을수록 좋아요 ↓",
+      records: SAMPLE_DATA.map(r => ({ date: r.date, val: r.pain })),
+      maxVal: 10, colorFn: (v) => painColor(v), unit: "점", valueLabelFn: (v) => v !== null ? `${v}점` : "—"
+    },
+    sleep: {
+      label: "😴 수면",
+      hint: "길수록 좋아요 ↑",
+      records: SAMPLE_DATA.map(r => ({ date: r.date, val: categoryToNum(r.sleep_hours, SLEEP_MAP) })),
+      maxVal: 4, colorFn: goodHigh, valueLabelFn: sleepLabel
+    },
+    mobility: {
+      label: "🚶 이동능력",
+      hint: "독립보행에 가까울수록 좋아요 ↑",
+      records: SAMPLE_DATA.map(r => ({ date: r.date, val: categoryToNum(r.mobility, MOBILITY_MAP) })),
+      maxVal: 5, colorFn: goodHigh, valueLabelFn: mobilityLabel
+    },
+  };
+
+  return React.createElement("div", null,
+    // 헤더
+    React.createElement("div", { style: { background: "linear-gradient(135deg,#064e3b,#059669)", padding: "48px 20px 20px" } },
+      React.createElement("div", { style: { fontSize: 12, color: "rgba(255,255,255,0.7)", marginBottom: 6 } }, "오늘안부 · 천안쌍용요양병원"),
+      React.createElement("div", { style: { display: "flex", alignItems: "baseline", gap: 8 } },
+        React.createElement("div", { style: { fontSize: 26, fontWeight: 900, color: "white" } }, "김순자님"),
+        React.createElement("div", { style: { fontSize: 13, color: "rgba(255,255,255,0.8)", fontWeight: 600 } }, "믿음병동 · 입원 42일째")
+      ),
+      React.createElement("div", { style: { fontSize: 12, color: "rgba(255,255,255,0.6)", marginTop: 4 } }, "📅 최근 7일 상태 추세"),
+      React.createElement("div", { style: { display: "grid", gridTemplateColumns: "1fr 1fr 1fr 1fr", gap: 6, marginTop: 12 } },
+        [
+          { label: "의식", value: last.consciousness },
+          { label: "활동", value: last.mobility },
+          { label: "식사", value: last.meal_amount },
+          { label: "통증", value: `${last.pain}점` },
+        ].map((item, i) => React.createElement("div", { key: i, style: { background: "rgba(255,255,255,0.18)", borderRadius: 8, padding: "8px 4px", textAlign: "center" } },
+          React.createElement("div", { style: { fontSize: 11, color: "rgba(255,255,255,0.8)", fontWeight: 700, marginBottom: 3 } }, item.label),
+          React.createElement("div", { style: { fontSize: 13, fontWeight: 900, color: "white" } }, item.value)
+        ))
+      )
+    ),
+
+    React.createElement("div", { style: { padding: "16px 20px 40px" } },
+
+      // 7일 비교 카드
+      React.createElement("div", { style: { background: "white", borderRadius: 14, padding: 16, marginBottom: 16, boxShadow: "0 2px 12px rgba(0,0,0,0.08)" } },
+        React.createElement("div", { style: { fontSize: 14, fontWeight: 800, color: "#1e3a5f", marginBottom: 12 } }, "📊 7일 전 → 오늘 변화"),
+        React.createElement("div", { style: { display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8 } },
+          compare.map((c, i) => React.createElement("div", { key: i, style: {
+            background: c.good ? "#f0fdf4" : "#fff7ed",
+            borderRadius: 10, padding: "10px 12px",
+            border: `1.5px solid ${c.good ? "#86efac" : "#fed7aa"}`
+          } },
+            React.createElement("div", { style: { fontSize: 11, color: "#64748b", fontWeight: 700, marginBottom: 4 } }, c.label),
+            React.createElement("div", { style: { display: "flex", alignItems: "center", gap: 5, flexWrap: "wrap" } },
+              React.createElement("span", { style: { fontSize: 11, color: "#94a3b8", textDecoration: "line-through" } }, c.before),
+              React.createElement("span", { style: { fontSize: 12, color: "#64748b" } }, "→"),
+              React.createElement("span", { style: { fontSize: 13, fontWeight: 800, color: c.good ? "#16a34a" : "#c2410c" } }, c.after),
+              React.createElement("span", null, c.good ? "📈" : "📉")
+            )
+          ))
+        )
+      ),
+
+      // 추세 그래프 카드 (2칸 배치)
+      React.createElement("div", { style: { background: "white", borderRadius: 14, padding: "18px 16px 8px", boxShadow: "0 2px 12px rgba(0,0,0,0.08)" } },
+        React.createElement("div", { style: { fontSize: 14, fontWeight: 800, color: "#1e3a5f", marginBottom: 20 } }, "📈 최근 7일 추세"),
+
+        ChartPair({
+          left: TrendChart({ ...charts.consciousness, field: "val" }),
+          right: TrendChart({ ...charts.meal, field: "val" })
+        }),
+        ChartPair({
+          left: TrendChart({ ...charts.pain, field: "val" }),
+          right: TrendChart({ ...charts.sleep, field: "val" })
+        }),
+        React.createElement("div", { style: { marginBottom: 12 } },
+          TrendChart({ ...charts.mobility, field: "val" })
+        )
+      )
+    )
+  );
+}
+
+ReactDOM.createRoot(document.getElementById("root")).render(React.createElement(App));
+</script>
+</body>
+</html>
