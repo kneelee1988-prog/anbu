@@ -1713,7 +1713,6 @@ function WarmMessagePicker({ value, onChange }) {
         "현재 상태를 고려할 때 편안하게 지내시는 것이 가장 중요한 목표입니다.",
         "어르신의 남은 시간이 가능한 한 평온하고 존엄하게 흐를 수 있도록 최선을 다하겠습니다.",
         "지금은 치료보다 어르신이 편안하고 품위 있게 지내실 수 있도록 돕는 데 집중하고 있어요.",
-        "가족분들도 마음의 준비를 하시면서 자주 방문해 주시면 어르신께 큰 위안이 됩니다.",
         "어르신 곁에서 끝까지 함께하겠습니다.",
         "어떤 결정이든 가족분과 함께 충분히 상의하며 진행하겠습니다.",
       ]
@@ -1722,7 +1721,7 @@ function WarmMessagePicker({ value, onChange }) {
       cat: "💛 오늘 하루", color: "#1e3a5f", bg: "#eff6ff", border: "#bfdbfe",
       items: [
         "오늘도 어르신 곁을 지켰습니다. 내일도 함께하겠습니다.",
-        "오늘 하루도 어르신이 불편함 없이 지내실 수 있도록 최선을 다했습니다.",
+        "오늘 하루도 어르신이 불편함 없이 지내실 수 있도록 최선을 다했으며 내일도 더 최선을 다해 케어하도록 노력하겠습니다.",
         "오늘 어르신의 표정이 평온해 보여 케어팀 모두 감사한 마음이었습니다.",
         "하루하루 정성껏 돌봐드리겠습니다.",
       ]
@@ -1770,116 +1769,7 @@ function WarmMessagePicker({ value, onChange }) {
   );
 }
 
-// ── 의사 코멘트 입력 컴포넌트 ───────────────────────────────────
-function DoctorCommentPicker({ value, onChange }) {
-  const [mode, setMode] = useState("preset"); // "preset" | "direct"
-  const [selected, setSelected] = useState(() => {
-    if (!value) return [];
-    // " / " 구분자로 split, 없으면 전체를 하나로
-    return value.includes(" / ") ? value.split(" / ").map(s=>s.trim()).filter(Boolean) : (value ? [value] : []);
-  });
 
-  const PRESETS = [
-    { cat: "😊 안정·호전", color: "#166534", bg: "#f0fdf4", border: "#86efac", items: [
-      "전반적으로 안정적인 하루였습니다.",
-      "특이사항 없이 별다른 변화없는 하루를 보내셨습니다.",
-      "어제보다 전반적으로 상태가 좋아 보이셨습니다.",
-      "가족과의 통화 후 기분이 좋아지셨습니다.",
-      "가족 면회 후 기분이 좋아보이셨습니다.",
-      "프로그램 참여 시 즐거워하셨습니다.",
-      "경관식 잘 진행되었습니다.",
-    ]},
-    { cat: "😔 저하·주의", color: "#c2410c", bg: "#fff7ed", border: "#fdba74", items: [
-      "오늘 컨디션이 평소보다 저하되어 보였습니다.",
-      "식사량이 평소보다 줄었습니다.",
-      "식욕이 없으시고 기운이 없어 보이셨습니다.",
-      "흡인 위험으로 식이 조절 중입니다.",
-      "수면 중 자주 깨어 불안해하셨습니다.",
-      "보행 시 불안정한 모습이 관찰됩니다.",
-      "낙상 위험으로 침대 난간 올려두었습니다.",
-      "무기력하고 말씀이 없으신 하루였습니다.",
-      "울음을 보이셨으나 위로 후 안정됐습니다.",
-    ]},
-    { cat: "🏥 처치·관찰", color: "#0369a1", bg: "#f0f9ff", border: "#7dd3fc", items: [
-      "통증을 호소하셨으나 처치 후 안정됐습니다.",
-      "혈압 변동이 있어 처치 후 관찰 중입니다.",
-      "산소포화도 저하로 산소 공급 중입니다.",
-      "발열이 있어 처치 중입니다.",
-      "부종이 관찰되어 관찰 중입니다.",
-      "상처 부위 드레싱 처치 시행하였습니다.",
-      "욕창 처치 시행하였습니다.",
-      "체위 변경 2시간마다 시행하였습니다.",
-      "혈당 측정 및 인슐린 투여 시행하였습니다.",
-      "엑스레이 검사 및 전반적인 혈액검사 시행하였습니다.",
-      "소변줄 관리 및 교체 시행하였습니다.",
-      "투약 거부로 설득 후 투약 완료하였습니다.",
-    ]},
-    { cat: "🧩 정신·행동", color: "#7c3aed", bg: "#faf5ff", border: "#c4b5fd", items: [
-      "섬망 증상이 관찰되었습니다.",
-      "혼란스러워하시며 지남력 저하가 관찰됩니다.",
-      "케어저항이 있어 설득 후 진행하였습니다.",
-      "기침이 잦아 관찰 중입니다.",
-      "구토 증상이 있어 관찰 중입니다.",
-      "현재 상태를 면밀히 살피며 최선을 다해 치료하고 있습니다.",
-    ]},
-  ];
-
-  const togglePreset = (item) => {
-    const next = selected.includes(item)
-      ? selected.filter(x => x !== item)
-      : [...selected, item];
-    setSelected(next);
-    onChange(next.join(" / "));
-  };
-
-  const BtnMode = ({ id, label }) => React.createElement("button", { onClick: () => setMode(id),
-    style: { flex: 1, padding: "9px", borderRadius: 8, border: "1.5px solid",
-      borderColor: mode===id ? "#1e3a5f" : "#e2e8f0",
-      background: mode===id ? "#1e3a5f" : "white",
-      color: mode===id ? "white" : "#64748b",
-      fontWeight: 700, fontSize: 14, cursor: "pointer", fontFamily: "'Noto Sans KR',sans-serif" }
-  }, label);
-
-  return React.createElement("div", { style: { background: "white", borderRadius: 14, marginBottom: 24, overflow: "hidden", boxShadow: "0 1px 6px rgba(0,0,0,0.06)" } },
-    // 헤더
-    React.createElement("div", { style: { background: "linear-gradient(135deg,#1e1b4b,#4338ca)", padding: "10px 16px", fontSize: 13, fontWeight: 700, color: "white" } },
-      "🩺 주치의가 전하는 오늘안부"
-    ),
-    React.createElement("div", { style: { padding: 14 } },
-      // 탭 선택
-      React.createElement("div", { style: { display: "flex", gap: 8, marginBottom: 14 } },
-        React.createElement(BtnMode, { id: "preset", label: "📋 항목 선택하기" }),
-        React.createElement(BtnMode, { id: "direct", label: "✏️ 직접 입력" })
-      ),
-
-
-
-      // 직접입력
-      mode === "direct" && React.createElement("textarea", { className: "input", rows: 4,
-        placeholder: "보호자에게 전달할 내용을 직접 입력하세요",
-        value: value, onChange: e => { setSelected([]); onChange(e.target.value); },
-        style: { resize: "none", lineHeight: 1.6 }
-      }),
-
-      // 항목 선택
-      mode === "preset" && React.createElement("div", null,
-        PRESETS.map(cat => React.createElement("div", { key: cat.cat, style: { marginBottom: 12, background: cat.bg, borderRadius: 10, padding: "10px 12px", border: `1.5px solid ${cat.border}` } },
-          React.createElement("div", { style: { fontSize: 12, fontWeight: 700, color: cat.color, marginBottom: 8 } }, cat.cat),
-          React.createElement("div", { style: { display: "flex", flexDirection: "column", gap: 5 } },
-            cat.items.map(item => React.createElement("button", { key: item, onClick: () => togglePreset(item),
-              style: { textAlign: "left", padding: "7px 10px", borderRadius: 8,
-                border: `1.5px solid ${selected.includes(item) ? cat.color : cat.border}`,
-                background: selected.includes(item) ? cat.color : "white",
-                color: selected.includes(item) ? "white" : "#374151",
-                fontSize: 12, fontWeight: selected.includes(item) ? 700 : 400,
-                cursor: "pointer", fontFamily: "'Noto Sans KR',sans-serif", lineHeight: 1.4 }
-            }, item))
-          )
-        ))
-      )
-    )
-  );
-}
 
 // ── 의사 검토 화면 ────────────────────────────────────────────
 function DoctorReviewScreen({ patient, user, onBack }) {
@@ -1961,7 +1851,6 @@ function DoctorReviewScreen({ patient, user, onBack }) {
   const [findings, setFindings] = useState([]);
   const [bprs, setBprs] = useState([]);
   const [specialAlerts, setSpecialAlerts] = useState([]);
-  const [comment, setComment] = useState("");
   const [warmMsg, setWarmMsg] = useState("");
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -1985,7 +1874,6 @@ function DoctorReviewScreen({ patient, user, onBack }) {
         if (d.record) {
           setRecord(d.record);
           setFindings(d.record.doctor_findings || []);
-          setComment(d.record.doctor_comment || "");
           setWarmMsg(d.record.warm_msg || "");
           const b = d.record.bprs;
           setBprs(b ? (Array.isArray(b) ? b : b.split("·").map(s=>s.trim()).filter(Boolean)) : []);
@@ -2025,7 +1913,6 @@ function DoctorReviewScreen({ patient, user, onBack }) {
         doctor_findings: findings,
         bprs: bprs.join(" · "),
         special_alerts: specialAlerts.join(" · "),
-        doctor_comment: comment,
         doctor_id: user.doctor_id,
         warm_msg: warmMsg,
         reviewed_at: now()
@@ -2317,7 +2204,6 @@ function DoctorReviewScreen({ patient, user, onBack }) {
         )
       ),
 
-      React.createElement(DoctorCommentPicker, { value: comment, onChange: setComment }),
       React.createElement(WarmMessagePicker, { value: warmMsg, onChange: setWarmMsg }),
       React.createElement("button", { className: "btn btn-dark", onClick: handleSave, disabled: saving }, saving ? "저장 중..." : "💾 저장 및 전달")
       ) // today tab 닫기
