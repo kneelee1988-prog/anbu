@@ -624,12 +624,12 @@ function GuardianScreen({ user, onBack }) {
       const kstOffset = 9 * 60 * 60 * 1000;
       const kstFrom = new Date(fromDate.getTime() + kstOffset);
       const fromStr = kstFrom.toISOString().slice(0, 10);
-      fetch(`${SUPABASE_URL}/rest/v1/records?patient_id=eq.${patient.id}&date=gte.${fromStr}&order=date.asc&limit=14`, {
+      fetch(`${SUPABASE_URL}/rest/v1/records?patient_id=eq.${patient.id}&order=date.asc&limit=14`, {
         headers: { apikey: ANON_KEY, Authorization: "Bearer " + ANON_KEY }
       })
       .then(r => r.json())
-      .then(data => { console.log("history data:", data); setHistory(Array.isArray(data) ? data : []); })
-      .catch(e => { console.error("history error:", e); setHistory([]); })
+      .then(data => { setHistory(Array.isArray(data) ? data : []); })
+      .catch(e => { setHistory([]); })
       .finally(() => setHistLoading(false));
     }
   }, [tab]);
