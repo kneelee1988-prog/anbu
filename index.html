@@ -454,32 +454,33 @@ function TrendChart({ records, label, field, maxVal, colorFn, valueLabelFn, acce
   const accent = accentColor || "#1e3a5f";
   return React.createElement("div", {
     style: { background: "white", borderRadius: 12, padding: "12px 10px 10px",
-      border: `1.5px solid ${accent}22`, boxShadow: "0 1px 6px rgba(0,0,0,0.06)" }
+      border: `1.5px solid ${accent}22`, boxShadow: "0 1px 6px rgba(0,0,0,0.06)",
+      minWidth: 0, overflow: "hidden" }
   },
-    React.createElement("div", { style: { fontSize: 15, fontWeight: 800, color: accent, marginBottom: 10 } }, label),
-    React.createElement("div", { style: { display: "flex", alignItems: "flex-end", gap: 3, height: 72 } },
+    React.createElement("div", { style: { fontSize: 13, fontWeight: 800, color: accent, marginBottom: 12 } }, label),
+    React.createElement("div", { style: { display: "flex", alignItems: "flex-end", gap: 2, height: 80 } },
       days.map((r, i) => {
         const val = r[field];
-        const pct = val !== null ? Math.max((val / max) * 100, 8) : 0;
-        const color = val === null ? "#e2e8f0" : colorFn(val, max);
+        const pct = val !== null && val > 0 ? Math.max((val / max) * 100, 8) : 0;
+        const color = val === null || val === undefined ? "#e2e8f0" : colorFn(val, max);
         const d = new Date(r.date);
         const dateLabel = `${d.getMonth()+1}/${d.getDate()}`;
         const isToday = i === days.length - 1;
-        const displayVal = val !== null ? (valueLabelFn ? valueLabelFn(val) : `${val}`) : "";
-        return React.createElement("div", { key: i, style: { flex: 1, display: "flex", flexDirection: "column", alignItems: "center", gap: 2 } },
-          React.createElement("div", { style: { fontSize: 15, fontWeight: 800, color: val === null ? "#cbd5e1" : color, minHeight: 12, textAlign: "center", lineHeight: 1.2 } }, displayVal),
-          React.createElement("div", { style: { width: "100%", height: 44, display: "flex", alignItems: "flex-end", justifyContent: "center" } },
+        const displayVal = (val !== null && val !== undefined && val !== "") ? (valueLabelFn ? valueLabelFn(val) : `${val}`) : "";
+        return React.createElement("div", { key: i, style: { flex: 1, minWidth: 0, display: "flex", flexDirection: "column", alignItems: "center", gap: 2 } },
+          React.createElement("div", { style: { fontSize: 9, fontWeight: 800, color: !displayVal ? "#cbd5e1" : color, minHeight: 14, textAlign: "center", lineHeight: 1.3, width: "100%", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" } }, displayVal),
+          React.createElement("div", { style: { width: "100%", height: 48, display: "flex", alignItems: "flex-end", justifyContent: "center" } },
             React.createElement("div", { style: {
-              width: isToday ? "58%" : "42%",
-              height: val !== null ? `${pct}%` : "3px",
-              background: val !== null ? `linear-gradient(180deg, ${color}77, ${color}bb)` : "#f1f5f9",
+              width: isToday ? "60%" : "44%",
+              height: pct > 0 ? `${pct}%` : "3px",
+              background: pct > 0 ? `linear-gradient(180deg, ${color}77, ${color}bb)` : "#f1f5f9",
               borderRadius: "2px 2px 0 0",
-              outline: isToday && val !== null ? `2px solid ${color}` : "1px dashed #e2e8f0",
+              outline: isToday && pct > 0 ? `2px solid ${color}` : "1px dashed #e2e8f0",
               outlineOffset: "1px",
-              boxShadow: isToday && val !== null ? `0 2px 6px ${color}44` : "none",
+              boxShadow: isToday && pct > 0 ? `0 2px 6px ${color}44` : "none",
             }})
           ),
-          React.createElement("div", { style: { fontSize: 15, fontWeight: isToday ? 800 : 500, color: isToday ? accent : "#94a3b8" } },
+          React.createElement("div", { style: { fontSize: 9, fontWeight: isToday ? 800 : 500, color: isToday ? accent : "#94a3b8", whiteSpace: "nowrap" } },
             isToday ? "오늘" : dateLabel)
         );
       })
@@ -1691,7 +1692,7 @@ function NurseChooseScreen({ patient, user, onNoChange, onEdit, onBack }) {
             React.createElement("div", { style: { fontSize: 15, color: "#94a3b8" } }, "기록이 쌓이면 추세 그래프를 볼 수 있어요")
           )
         : React.createElement(React.Fragment, null,
-            React.createElement("div", { style: { marginBottom: 12 } },
+            React.createElement("div", { style: { marginBottom: 12, padding: "0 0" } },
               React.createElement("div", { style: { fontWeight: 800, color: "#1e3a5f", fontSize: 15, marginBottom: 12 } }, "📈 최근 7일 추세"),
               React.createElement("div", { style: { display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10, marginBottom: 10 } },
                 React.createElement(TrendChart, { records: history.map(r => ({ date: r.date, val: categoryToNum(r.consciousness, CONSCIOUSNESS_MAP) })), label: "🧠 의식수준", field: "val", maxVal: 5, accentColor: "#1d4ed8",
@@ -1729,19 +1730,23 @@ function NurseChooseScreen({ patient, user, onNoChange, onEdit, onBack }) {
                     React.createElement("div", { style: { fontSize: 16, color: "#94a3b8" } }, isExpanded ? "▲" : "▽")
                   ),
                   isExpanded && React.createElement("div", { style: { padding: "12px 14px", background: "white" } },
-                    React.createElement("div", { style: { display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 6, marginBottom: 8 } },
-                      [["의식",r.consciousness],["식사량",r.meal_amount],["식사형태",r.meal_type],["수면",r.sleep_hours],["이동",r.mobility],["낙상위험",r.fall_risk],["소변",r.urine],["대변",r.bowel],["통증",r.pain!=null?`${r.pain}점`:null],["투약",r.medication],["욕창",r.bedsore]]
-                      .filter(([,v])=>v).map(([k,v]) =>
-                        React.createElement("div", { key: k, style: { padding: "6px 8px", background: "#f8fafc", borderRadius: 8, border: "1px solid #e2e8f0" } },
-                          React.createElement("div", { style: { fontSize: 15, color: "#64748b", fontWeight: 700 } }, k),
-                          React.createElement("div", { style: { fontSize: 15, fontWeight: 800, color: "#1e293b", marginTop: 1 } }, v)
-                        )
+                    r._empty
+                    ? React.createElement("div", { style: { textAlign: "center", padding: "12px 0", color: "#94a3b8", fontSize: 14 } }, "이 날은 기록이 없어요")
+                    : React.createElement(React.Fragment, null,
+                        React.createElement("div", { style: { display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 6, marginBottom: 8 } },
+                          [["의식",r.consciousness],["식사량",r.meal_amount],["식사형태",r.meal_type],["수면",r.sleep_hours],["이동",r.mobility],["낙상위험",r.fall_risk],["소변",r.urine],["대변",r.bowel],["통증",r.pain!=null?`${r.pain}점`:null],["투약",r.medication],["욕창",r.bedsore]]
+                          .filter(([,v])=>v).map(([k,v]) =>
+                            React.createElement("div", { key: k, style: { padding: "6px 8px", background: "#f8fafc", borderRadius: 8, border: "1px solid #e2e8f0" } },
+                              React.createElement("div", { style: { fontSize: 13, color: "#64748b", fontWeight: 700 } }, k),
+                              React.createElement("div", { style: { fontSize: 14, fontWeight: 800, color: "#1e293b", marginTop: 1 } }, v)
+                            )
+                          )
+                        ),
+                        r.mental && React.createElement("div", { style: { fontSize: 14, color: "#7c3aed", background: "#faf5ff", borderRadius: 8, padding: "6px 10px", marginBottom: 6 } },
+                          React.createElement("span", { style: { fontWeight: 700 } }, "BPSD: "), r.mental),
+                        r.nurse_note && React.createElement("div", { style: { fontSize: 14, color: "#0c4a6e", background: "#f0f9ff", borderRadius: 8, padding: "6px 10px" } },
+                          React.createElement("span", { style: { fontWeight: 700 } }, "코멘트: "), r.nurse_note)
                       )
-                    ),
-                    r.mental && React.createElement("div", { style: { fontSize: 15, color: "#7c3aed", background: "#faf5ff", borderRadius: 8, padding: "6px 10px", marginBottom: 6 } },
-                      React.createElement("span", { style: { fontWeight: 700 } }, "BPSD: "), r.mental),
-                    r.nurse_note && React.createElement("div", { style: { fontSize: 15, color: "#0c4a6e", background: "#f0f9ff", borderRadius: 8, padding: "6px 10px" } },
-                      React.createElement("span", { style: { fontWeight: 700 } }, "코멘트: "), r.nurse_note)
                   )
                 );
               })
@@ -2685,6 +2690,9 @@ function DoctorReviewScreen({ patient, user, onBack }) {
                     React.createElement("div", { style: { fontSize: 16, color: "#94a3b8" } }, isExpanded ? "▲" : "▽")
                   ),
                   isExpanded && React.createElement("div", { style: { padding: "12px 14px", background: "white" } },
+                    r._empty
+                    ? React.createElement("div", { style: { textAlign: "center", padding: "12px 0", color: "#94a3b8", fontSize: 14 } }, "이 날은 기록이 없어요")
+                    : React.createElement(React.Fragment, null,
                     React.createElement("div", { style: { display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 6, marginBottom: 8 } },
                       [["의식",r.consciousness],["식사량",r.meal_amount],["식사형태",r.meal_type],["수면",r.sleep_hours],["이동",r.mobility],["낙상위험",r.fall_risk],["소변",r.urine],["대변",r.bowel],["통증",r.pain!=null?`${r.pain}점`:null],["피부",r.skin],["위생",r.hygiene],["욕창",r.bedsore],["투약",r.medication]]
                       .filter(([,v])=>v).map(([k,v]) =>
@@ -2728,6 +2736,7 @@ function DoctorReviewScreen({ patient, user, onBack }) {
                     })(),
                     r.doctor_comment && React.createElement("div", { style: { fontSize: 15, color: "#1e3a5f", background: "#eff6ff", borderRadius: 8, padding: "6px 10px" } },
                       React.createElement("span", { style: { fontWeight: 700 } }, "의사 코멘트: "), r.doctor_comment)
+                    ) // Fragment 닫기
                   )
                 );
               })
