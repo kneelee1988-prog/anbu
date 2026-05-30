@@ -763,9 +763,6 @@ function GuardianScreen({ user, onBack }) {
         ? React.createElement("div", { className: "empty" }, "지난 기록이 없어요")
         : React.createElement(React.Fragment, null,
 
-            // 사진 박스
-            React.createElement(PhotoBox, { patientId: patient.id }),
-
             // 추세 그래프 (2칸 박스)
             React.createElement("div", { style: { fontSize: 13, fontWeight: 800, color: "#1e3a5f", marginBottom: 10 } }, "📈 최근 7일 추세"),
             ...[
@@ -859,6 +856,7 @@ function GuardianScreen({ user, onBack }) {
             React.createElement("div", { style: { fontSize: 13, color: "#94a3b8", marginTop: 8, lineHeight: 1.6 } }, "어르신에 대하여 면밀하게 지속적으로 관찰 및 케어 중입니다.")
           )
         : React.createElement(React.Fragment, null,
+            React.createElement(PhotoBox, { patientId: patient.id }),
             React.createElement("div", { className: "card", style: { marginBottom: 12 } },
               React.createElement("div", { style: { fontWeight: 700, color: "#1e3a5f", marginBottom: 14, fontSize: 15 } }, "📋 오늘 상태 요약"),
               React.createElement("div", { style: { display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 8, marginBottom: 12 } },
@@ -888,12 +886,17 @@ function GuardianScreen({ user, onBack }) {
               ),
               record.reviewed_at && React.createElement("div", { style: { fontSize: 12, color: "#94a3b8", marginTop: 4, textAlign: "right" } }, `${fmtDate(record.reviewed_at)} 주치의 검토`)
             ),
-            record.doctor_findings?.length > 0 && React.createElement("div", { className: "card", style: { marginBottom: 12 } },
-              React.createElement("div", { style: { fontWeight: 700, color: "#1e3a5f", marginBottom: 10 } }, "🩺 임상 소견"),
-              React.createElement("div", { style: { display: "flex", flexWrap: "wrap", gap: 6 } },
-                record.doctor_findings.map((f, i) => React.createElement("span", { key: i, className: "tag tag-blue" }, f))
-              )
-            ),
+            record.doctor_findings?.length > 0 && (() => {
+              // 검사항목만 필터링
+              const examKeywords = ["검사","엑스레이","혈액","소변","심전도","CT","MRI","초음파","배양","조직"];
+              const exams = record.doctor_findings.filter(f => examKeywords.some(k => f.includes(k)));
+              return exams.length > 0 && React.createElement("div", { className: "card", style: { marginBottom: 12 } },
+                React.createElement("div", { style: { fontWeight: 700, color: "#1e3a5f", marginBottom: 10 } }, "🔬 임상 검사"),
+                React.createElement("div", { style: { display: "flex", flexWrap: "wrap", gap: 6 } },
+                  exams.map((f, i) => React.createElement("span", { key: i, className: "tag tag-blue" }, f))
+                )
+              );
+            })(),
             // 특이사항 (의사 검토 완료 후)
             record?.reviewed_at && record?.special_alerts && record.special_alerts.length > 0 && (() => {
               const raw = typeof record.special_alerts === "string"
@@ -1951,8 +1954,8 @@ function DoctorReviewScreen({ patient, user, onBack }) {
     { label: "🫀 혈압불안정", bad: "혈압이 불안정합니다", good: "혈압 모니터링 강화 중입니다" },
     { label: "😴 의식저하", bad: "의식의 저하를 보입니다", good: "의식저하 유발 약물 최소화하였습니다" },
     { label: "🍽️ 식욕저하", bad: "식욕저하 및 식이거부가 보입니다", good: "식이 권유 하고 있습니다. 계속 식이 저하시 식욕촉진제가 필요할 수 있으며, 기간이 길어질 경우 L-tube 삽입이 필요할 수도 있습니다 (보호자 동의)" },
-    { label: "🌊 흡인위험", bad: "연하곤란과 사레들림이 관찰됩니다", good: "집중 관찰 중이며 식이 보조 중입니다. 연하곤란 지속시 L-tube 삽입이 필요할 수 있습니다 (보호자 동의)" },
-    { label: "🩹 욕창", bad: "욕창이 발생하였습니다", good: "욕창 처치 중입니다" },
+    { label: "🌊 흡인위험", bad: "연하곤란과 사레들림이 관찰됩니다", good: "연하곤란에 대해 집중 관찰 중이며 식이 보조 중입니다. 연하곤란 지속시 L-tube 삽입이 필요할 수 있습니다 (보호자 동의)" },
+    { label: "🩹 욕창", bad: "욕창이 발생하였습니다", good: "욕창 처치를 시행하고 있습니다" },
     { label: "💊 통증", bad: "불특정 부위의 통증을 호소하십니다", good: "통증 조절 중입니다" },
     { label: "💉 혈당불안정", bad: "혈당이 불안정합니다", good: "계속 관찰 및 식이조절 중이며, 인슐린 주사가 필요할 경우 적용합니다" },
     { label: "🧪 검사이상", bad: "검사 결과에서 이상 소견이 보입니다", good: "검사 결과 확인 및 처치 중입니다" },
