@@ -1279,12 +1279,16 @@ function GuardianScreen({ user, onBack }) {
                 ),
                 // 호전 + 보호자 동의 나란히 2칸
                 (recovering.length > 0 || needConsent.length > 0) && React.createElement("div", { style: { display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8, marginBottom: 8 } },
-                  GridSection({ title: "✅ 호전되는 상황", items: recovering,
-                    headerBg: "linear-gradient(135deg,#14532d,#16a34a)",
-                    itemBg: "#f0fdf4", itemColor: "#166534", itemBorder: "#bbf7d0" }),
-                  GridSection({ title: "📋 보호자 동의 필요", items: needConsent,
-                    headerBg: "linear-gradient(135deg,#78350f,#d97706)",
-                    itemBg: "#fffbeb", itemColor: "#92400e", itemBorder: "#fde68a" })
+                  React.createElement("div", null,
+                    ListSection({ title: "✅ 호전되는 상황", items: recovering,
+                      headerBg: "linear-gradient(135deg,#14532d,#16a34a)",
+                      itemBg: "#f0fdf4", itemColor: "#166534", itemBorder: "#bbf7d0" })
+                  ),
+                  React.createElement("div", null,
+                    ListSection({ title: "📋 보호자 동의 필요", items: needConsent,
+                      headerBg: "linear-gradient(135deg,#78350f,#d97706)",
+                      itemBg: "#fffbeb", itemColor: "#92400e", itemBorder: "#fde68a" })
+                  )
                 ),
                 // 치료 종료 전체폭
                 doneTreat.length > 0 && FullSection({ title: "🟢 치료 종료", items: doneTreat,
