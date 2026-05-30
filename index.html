@@ -487,6 +487,20 @@ function TrendChart({ records, label, field, maxVal, colorFn, valueLabelFn, acce
   );
 }
 
+// ── 공통 색상 함수 (전체 통일) ──────────────────────────────
+const CHART_COLOR = {
+  goodHigh: (v, max) => {
+    const p = v / max;
+    return p >= 0.8 ? "#16a34a" : p >= 0.6 ? "#65a30d" : p >= 0.4 ? "#f59e0b" : p >= 0.2 ? "#ef4444" : "#dc2626";
+  },
+  pain: (v) => v <= 2 ? "#16a34a" : v <= 4 ? "#65a30d" : v <= 6 ? "#f59e0b" : v <= 8 ? "#ef4444" : "#dc2626",
+  delirium: (v, max) => {
+    const p = v / max;
+    return p <= 0.15 ? "#16a34a" : p <= 0.3 ? "#65a30d" : p <= 0.5 ? "#f59e0b" : p <= 0.7 ? "#ef4444" : "#dc2626";
+  },
+  consciousness: (v) => v === 5 ? "#16a34a" : v === 4 ? "#f59e0b" : "#ef4444",
+};
+
 // 사진 박스 컴포넌트
 // 사진 로드 공통 훅
 function usePatientPhotos(patientId) {
@@ -1022,32 +1036,32 @@ function GuardianScreen({ user, onBack }) {
               [
                 { label: "🧠 의식수준", accentColor: "#1d4ed8", maxVal: 5,
                   records: history.map(r => ({ date: r.date, val: categoryToNum(r.consciousness, CONSCIOUSNESS_MAP) })),
-                  colorFn: (v) => v===5?"#16a34a":v===4?"#f59e0b":v===3?"#ef4444":"#dc2626",
+                  colorFn: CHART_COLOR.consciousness,
                   valueLabelFn: v => ["혼수","반혼수","혼미","졸림","명료"][v-1]||"—" },
                 { label: "🍽️ 식사량", accentColor: "#c2410c", maxVal: 6,
                   records: history.map(r => ({ date: r.date, val: categoryToNum(r.meal_amount, MEAL_MAP) })),
-                  colorFn: goodHighColor,
+                  colorFn: CHART_COLOR.goodHigh,
                   valueLabelFn: v => ["거부","소량","1/4","절반","3/4","잘드심"][v-1]||"—" },
               ],
               [
                 { label: "💊 통증", accentColor: "#b91c1c", maxVal: 10,
                   records: history.map(r => ({ date: r.date, val: r.pain != null ? r.pain : null })),
-                  colorFn: (v) => v<=2?"#16a34a":v<=4?"#65a30d":v<=6?"#f59e0b":v<=8?"#ef4444":"#dc2626",
+                  colorFn: CHART_COLOR.pain,
                   valueLabelFn: v => v!=null?`${v}점`:"—" },
                 { label: "😴 수면시간", accentColor: "#4338ca", maxVal: 4,
                   records: history.map(r => ({ date: r.date, val: categoryToNum(r.sleep_hours, SLEEP_MAP) })),
-                  colorFn: goodHighColor,
+                  colorFn: CHART_COLOR.goodHigh,
                   valueLabelFn: v => ["4h↓","4~6h","6~8h","8h↑"][v-1]||"—" },
               ],
               [
                 { label: "🚶 이동능력", accentColor: "#0369a1", maxVal: 5,
                   records: history.map(r => ({ date: r.date, val: categoryToNum(r.mobility, MOBILITY_MAP) })),
-                  colorFn: goodHighColor,
+                  colorFn: CHART_COLOR.goodHigh,
                   valueLabelFn: v => ["침상","휠체어","부축","워커","독립"][v-1]||"—" },
-                { label: "🧩 섬망증상", accentColor: "#7c3aed", maxVal: 7,
-                  records: history.map(r => ({ date: r.date, val: r.mental && r.mental.includes("섬망") ? 5 : r.mental && r.mental.includes("야간혼돈") ? 3 : r.mental && r.mental.includes("혼잣말") ? 2 : r.mental ? 1 : 0 })),
-                  colorFn: (v, max) => { const p=v/max; return p<=0.15?"#16a34a":p<=0.3?"#65a30d":p<=0.5?"#f59e0b":p<=0.7?"#ef4444":"#dc2626"; },
-                  valueLabelFn: v => ["없음","경미","경미","보통","보통","심함","극심"][v]||"없음" },
+                { label: "🧩 섬망증상", accentColor: "#7c3aed", maxVal: 5,
+                  records: history.map(r => ({ date: r.date, val: r.mental && r.mental.includes("섬망") ? 5 : r.mental && r.mental.includes("야간혼돈") ? 3 : r.mental && r.mental.includes("혼잣말") ? 2 : (r.mental && r.mental !== "이상없음") ? 1 : 0 })),
+                  colorFn: CHART_COLOR.delirium,
+                  valueLabelFn: v => ["없음","경미","경미","보통","보통","심함"][v]||"없음" },
               ],
             ].map((pair, pi) =>
               React.createElement("div", { key: pi, style: { display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10, marginBottom: 10 } },
@@ -1595,17 +1609,26 @@ function NurseChooseScreen({ patient, user, onNoChange, onEdit, onBack }) {
   useEffect(() => {
     if (tab === "history" && history.length === 0) {
       setHistLoading(true);
-      const fromDate = new Date();
-      fromDate.setDate(fromDate.getDate() - 14);
-      const kstOffset = 9 * 60 * 60 * 1000;
-      const kstFrom = new Date(fromDate.getTime() + kstOffset);
-      const fromStr = kstFrom.toISOString().slice(0, 10);
-      fetch(`${SUPABASE_URL}/rest/v1/records?patient_id=eq.${patient.id}&date=gte.${fromStr}&order=date.asc&limit=14`, {
+      const frames = [];
+      for (let i = 6; i >= 0; i--) {
+        const d = new Date();
+        d.setDate(d.getDate() - i);
+        const kst = new Date(d.getTime() + 9 * 60 * 60 * 1000);
+        frames.push(kst.toISOString().slice(0, 10));
+      }
+      fetch(`${SUPABASE_URL}/rest/v1/records?patient_id=eq.${patient.id}&order=date.asc&limit=30`, {
         headers: { apikey: ANON_KEY, Authorization: "Bearer " + ANON_KEY }
       })
       .then(r => r.json())
-      .then(data => { console.log("history data:", data); setHistory(Array.isArray(data) ? data : []); })
-      .catch(e => { console.error("history error:", e); setHistory([]); })
+      .then(data => {
+        const records = Array.isArray(data) ? data : [];
+        const filled = frames.map(date => {
+          const found = records.find(r => r.date === date);
+          return found || { date, _empty: true };
+        });
+        setHistory(filled);
+      })
+      .catch(() => setHistory(frames.map(date => ({ date, _empty: true }))))
       .finally(() => setHistLoading(false));
     }
   }, [tab]);
@@ -1668,13 +1691,26 @@ function NurseChooseScreen({ patient, user, onNoChange, onEdit, onBack }) {
             React.createElement("div", { style: { fontSize: 15, color: "#94a3b8" } }, "기록이 쌓이면 추세 그래프를 볼 수 있어요")
           )
         : React.createElement(React.Fragment, null,
-            React.createElement("div", { className: "card", style: { marginBottom: 12 } },
-              React.createElement("div", { style: { fontWeight: 800, color: "#1e3a5f", fontSize: 15, marginBottom: 16 } }, "📈 최근 추세"),
-              TrendChart({ records: history.map(r => ({ date: r.date, consciousness: categoryToNum(r.consciousness, CONSCIOUSNESS_MAP) })), label: "🧠 의식수준", field: "consciousness", maxVal: 5, colorFn: goodHighColor }),
-              TrendChart({ records: history.map(r => ({ date: r.date, meal: categoryToNum(r.meal_amount, MEAL_MAP) })), label: "🍽 식사량", field: "meal", maxVal: 4, colorFn: goodHighColor }),
-              TrendChart({ records: history.map(r => ({ date: r.date, pain: r.pain != null ? r.pain : null })), label: "💊 통증 (낮을수록 좋음)", field: "pain", maxVal: 10, colorFn: (v) => v <= 2 ? "#16a34a" : v <= 4 ? "#65a30d" : v <= 6 ? "#f59e0b" : v <= 8 ? "#ef4444" : "#991b1b" }),
-              TrendChart({ records: history.map(r => ({ date: r.date, sleep: categoryToNum(r.sleep_hours, SLEEP_MAP) })), label: "😴 수면시간", field: "sleep", maxVal: 4, colorFn: goodHighColor }),
-              TrendChart({ records: history.map(r => ({ date: r.date, mobility: categoryToNum(r.mobility, MOBILITY_MAP) })), label: "🚶 이동능력", field: "mobility", maxVal: 4, colorFn: goodHighColor }),
+            React.createElement("div", { style: { marginBottom: 12 } },
+              React.createElement("div", { style: { fontWeight: 800, color: "#1e3a5f", fontSize: 15, marginBottom: 12 } }, "📈 최근 7일 추세"),
+              React.createElement("div", { style: { display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10, marginBottom: 10 } },
+                React.createElement(TrendChart, { records: history.map(r => ({ date: r.date, val: categoryToNum(r.consciousness, CONSCIOUSNESS_MAP) })), label: "🧠 의식수준", field: "val", maxVal: 5, accentColor: "#1d4ed8",
+                  colorFn: CHART_COLOR.consciousness, valueLabelFn: v => ["혼수","반혼수","혼미","졸림","명료"][v-1]||"—" }),
+                React.createElement(TrendChart, { records: history.map(r => ({ date: r.date, val: categoryToNum(r.meal_amount, MEAL_MAP) })), label: "🍽️ 식사량", field: "val", maxVal: 6, accentColor: "#c2410c",
+                  colorFn: CHART_COLOR.goodHigh, valueLabelFn: v => ["거부","소량","1/4","절반","3/4","잘드심"][v-1]||"—" })
+              ),
+              React.createElement("div", { style: { display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10, marginBottom: 10 } },
+                React.createElement(TrendChart, { records: history.map(r => ({ date: r.date, val: r.pain != null ? r.pain : null })), label: "💊 통증", field: "val", maxVal: 10, accentColor: "#b91c1c",
+                  colorFn: CHART_COLOR.pain, valueLabelFn: v => v != null ? `${v}점` : "—" }),
+                React.createElement(TrendChart, { records: history.map(r => ({ date: r.date, val: categoryToNum(r.sleep_hours, SLEEP_MAP) })), label: "😴 수면시간", field: "val", maxVal: 4, accentColor: "#4338ca",
+                  colorFn: CHART_COLOR.goodHigh, valueLabelFn: v => ["4h↓","4~6h","6~8h","8h↑"][v-1]||"—" })
+              ),
+              React.createElement("div", { style: { display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10 } },
+                React.createElement(TrendChart, { records: history.map(r => ({ date: r.date, val: categoryToNum(r.mobility, MOBILITY_MAP) })), label: "🚶 이동능력", field: "val", maxVal: 5, accentColor: "#0369a1",
+                  colorFn: CHART_COLOR.goodHigh, valueLabelFn: v => ["침상","휠체어","부축","워커","독립"][v-1]||"—" }),
+                React.createElement(TrendChart, { records: history.map(r => ({ date: r.date, val: r.mental && r.mental.includes("섬망") ? 5 : r.mental && r.mental.includes("야간혼돈") ? 3 : r.mental && r.mental.includes("혼잣말") ? 2 : (r.mental && r.mental !== "이상없음") ? 1 : 0 })), label: "🧩 섬망증상", field: "val", maxVal: 5, accentColor: "#7c3aed",
+                  colorFn: CHART_COLOR.delirium, valueLabelFn: v => ["없음","경미","경미","보통","보통","심함"][v]||"없음" })
+              )
             ),
             React.createElement("div", { className: "card" },
               React.createElement("div", { style: { fontWeight: 800, color: "#1e3a5f", fontSize: 15, marginBottom: 12 } }, "📅 날짜별 상세"),
@@ -2515,17 +2551,27 @@ function DoctorReviewScreen({ patient, user, onBack }) {
   useEffect(() => {
     if (tab === "history" && history.length === 0) {
       setHistLoading(true);
-      const fromDate = new Date();
-      fromDate.setDate(fromDate.getDate() - 14);
-      const kstOffset = 9 * 60 * 60 * 1000;
-      const kstFrom = new Date(fromDate.getTime() + kstOffset);
-      const fromStr = kstFrom.toISOString().slice(0, 10);
-      fetch(`${SUPABASE_URL}/rest/v1/records?patient_id=eq.${patient.id}&date=gte.${fromStr}&order=date.asc&limit=14`, {
+      // 최근 7일 날짜 프레임 생성
+      const frames = [];
+      for (let i = 6; i >= 0; i--) {
+        const d = new Date();
+        d.setDate(d.getDate() - i);
+        const kst = new Date(d.getTime() + 9 * 60 * 60 * 1000);
+        frames.push(kst.toISOString().slice(0, 10));
+      }
+      fetch(`${SUPABASE_URL}/rest/v1/records?patient_id=eq.${patient.id}&order=date.asc&limit=30`, {
         headers: { apikey: ANON_KEY, Authorization: "Bearer " + ANON_KEY }
       })
       .then(r => r.json())
-      .then(data => { console.log("history data:", data); setHistory(Array.isArray(data) ? data : []); })
-      .catch(e => { console.error("history error:", e); setHistory([]); })
+      .then(data => {
+        const records = Array.isArray(data) ? data : [];
+        const filled = frames.map(date => {
+          const found = records.find(r => r.date === date);
+          return found || { date, _empty: true };
+        });
+        setHistory(filled);
+      })
+      .catch(() => setHistory(frames.map(date => ({ date, _empty: true }))))
       .finally(() => setHistLoading(false));
     }
   }, [tab]);
@@ -2650,9 +2696,36 @@ function DoctorReviewScreen({ patient, user, onBack }) {
                     ),
                     r.mental && React.createElement("div", { style: { fontSize: 15, color: "#7c3aed", background: "#faf5ff", borderRadius: 8, padding: "6px 10px", marginBottom: 6 } },
                       React.createElement("span", { style: { fontWeight: 700 } }, "BPSD: "), r.mental),
-                    r.special_alerts && React.createElement("div", { style: { fontSize: 15, color: "#dc2626", background: "#fff1f2", borderRadius: 8, padding: "6px 10px", marginBottom: 6 } },
-                      React.createElement("span", { style: { fontWeight: 700 } }, "특이사항: "),
-                      Array.isArray(r.special_alerts) ? r.special_alerts.join(" · ") : r.special_alerts),
+                    r.special_alerts && (() => {
+                      const raw = Array.isArray(r.special_alerts)
+                        ? r.special_alerts
+                        : (typeof r.special_alerts === "string" ? r.special_alerts.split("·").map(s=>s.trim()).filter(Boolean) : []);
+                      const getTag = (a) => { const m = a.match(/^\[([STRCD])\]/); return m ? m[1] : null; };
+                      const strip = (a) => a.replace(/^\[[STRCD]\]/, "");
+                      const sections = [
+                        { tag: "S", label: "⚠️ 현재 상태", bg: "#fff1f2", color: "#be123c", border: "#fecdd3" },
+                        { tag: "T", label: "🩺 처치·치료", bg: "#eff6ff", color: "#1d4ed8", border: "#bfdbfe" },
+                        { tag: "R", label: "✅ 호전", bg: "#f0fdf4", color: "#166534", border: "#bbf7d0" },
+                        { tag: "D", label: "🟢 치료 종료", bg: "#dcfce7", color: "#14532d", border: "#86efac" },
+                        { tag: "C", label: "📋 보호자 동의", bg: "#fffbeb", color: "#92400e", border: "#fde68a" },
+                      ];
+                      const hasTagged = raw.some(a => getTag(a));
+                      return React.createElement("div", { style: { marginBottom: 6 } },
+                        hasTagged
+                          ? sections.map(sec => {
+                              const items = raw.filter(a => getTag(a) === sec.tag).map(strip);
+                              if (!items.length) return null;
+                              return React.createElement("div", { key: sec.tag, style: { background: sec.bg, borderRadius: 8, padding: "7px 10px", marginBottom: 5, border: `1px solid ${sec.border}` } },
+                                React.createElement("div", { style: { fontSize: 13, fontWeight: 800, color: sec.color, marginBottom: 4 } }, sec.label),
+                                items.map((item, i) => React.createElement("div", { key: i, style: { fontSize: 14, color: sec.color, lineHeight: 1.6 } }, `• ${item}`))
+                              );
+                            })
+                          : React.createElement("div", { style: { fontSize: 15, color: "#dc2626", background: "#fff1f2", borderRadius: 8, padding: "6px 10px" } },
+                              React.createElement("span", { style: { fontWeight: 700 } }, "특이사항: "),
+                              raw.join(" · ")
+                            )
+                      );
+                    })(),
                     r.doctor_comment && React.createElement("div", { style: { fontSize: 15, color: "#1e3a5f", background: "#eff6ff", borderRadius: 8, padding: "6px 10px" } },
                       React.createElement("span", { style: { fontWeight: 700 } }, "의사 코멘트: "), r.doctor_comment)
                   )
