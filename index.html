@@ -533,9 +533,10 @@ function PhotoBox({ patientId }) {
     loading
       ? React.createElement("div", { style: { textAlign: "center", padding: "20px 0", color: "#94a3b8", fontSize: 13 } }, "불러오는 중...")
       : photos.length === 0
-        ? React.createElement("div", { style: { border: "2px dashed #e2e8f0", borderRadius: 12, padding: "20px 16px", textAlign: "center", background: "#f8fafc" } },
-            React.createElement("div", { style: { fontSize: 32, marginBottom: 6 } }, "📷"),
-            React.createElement("div", { style: { fontSize: 13, color: "#94a3b8" } }, "아직 등록된 사진이 없어요")
+        ? React.createElement("div", { style: { border: "2px dashed #e2e8f0", borderRadius: 14, padding: "32px 20px", textAlign: "center", background: "#f8fafc" } },
+            React.createElement("div", { style: { fontSize: 48, marginBottom: 12 } }, "📷"),
+            React.createElement("div", { style: { fontSize: 15, fontWeight: 800, color: "#1e3a5f", marginBottom: 8 } }, "아직 등록된 사진이 없어요"),
+            React.createElement("div", { style: { fontSize: 12, color: "#94a3b8", lineHeight: 1.7 } }, "간호팀이 주 1~2회", React.createElement("br", null), "어르신 사진을 올려드려요")
           )
         : React.createElement("div", { style: { display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 6 } },
             photos.map(p => React.createElement("div", { key: p.id, style: { position: "relative", borderRadius: 8, overflow: "hidden", aspectRatio: "1", background: "#f1f5f9" } },
@@ -854,7 +855,11 @@ function GuardianScreen({ user, onBack }) {
         histLoading
         ? React.createElement("div", { className: "loading" }, "불러오는 중...")
         : history.length === 0
-        ? React.createElement("div", { className: "empty" }, "지난 기록이 없어요")
+        ? React.createElement("div", { style: { padding: "40px 20px", textAlign: "center" } },
+            React.createElement("div", { style: { fontSize: 48, marginBottom: 14 } }, "📅"),
+            React.createElement("div", { style: { fontSize: 15, fontWeight: 800, color: "#1e3a5f", marginBottom: 8 } }, "아직 지난 기록이 없어요"),
+            React.createElement("div", { style: { fontSize: 13, color: "#94a3b8" } }, "기록이 쌓이면 추세 그래프도 볼 수 있어요")
+          )
         : React.createElement(React.Fragment, null,
 
             // 추세 그래프 (2칸 박스)
@@ -946,8 +951,14 @@ function GuardianScreen({ user, onBack }) {
       ),
       tab === "today" && (
         loading ? React.createElement("div", { className: "loading" }, "불러오는 중...")
-        : !record ? React.createElement("div", { className: "empty" }, React.createElement("div", { className: "empty-icon" }, "⏳"), "아직 오늘 상태가 입력되지 않았어요",
-            React.createElement("div", { style: { fontSize: 13, color: "#94a3b8", marginTop: 8, lineHeight: 1.6 } }, "어르신에 대하여 면밀하게 지속적으로 관찰 및 케어 중입니다.")
+        : !record ? React.createElement("div", { style: { padding: "32px 20px", textAlign: "center" } },
+            React.createElement("div", { style: { fontSize: 52, marginBottom: 16 } }, "🌿"),
+            React.createElement("div", { style: { fontSize: 15, fontWeight: 800, color: "#1e3a5f", marginBottom: 10 } }, "아직 오늘 기록이 없어요"),
+            React.createElement("div", { style: { fontSize: 13, color: "#64748b", lineHeight: 1.8, background: "white", borderRadius: 14, padding: "16px 20px", boxShadow: "0 2px 8px rgba(0,0,0,0.06)" } },
+              "간호팀이 지금 이 순간에도", React.createElement("br", null),
+              "어르신 곁에서 정성껏 케어하고 있어요.", React.createElement("br", null),
+              React.createElement("span", { style: { color: "#94a3b8", fontSize: 12 } }, "오늘 기록은 오전 중 업데이트될 예정이에요")
+            )
           )
         : React.createElement(React.Fragment, null,
             // ── 한줄 요약 카드
@@ -1480,7 +1491,11 @@ function NurseChooseScreen({ patient, user, onNoChange, onEdit, onBack }) {
         histLoading
         ? React.createElement("div", { className: "loading" }, "불러오는 중...")
         : history.length === 0
-        ? React.createElement("div", { className: "empty" }, "지난 기록이 없어요")
+        ? React.createElement("div", { style: { padding: "40px 20px", textAlign: "center" } },
+            React.createElement("div", { style: { fontSize: 48, marginBottom: 14 } }, "📅"),
+            React.createElement("div", { style: { fontSize: 15, fontWeight: 800, color: "#1e3a5f", marginBottom: 8 } }, "지난 기록이 없어요"),
+            React.createElement("div", { style: { fontSize: 13, color: "#94a3b8" } }, "기록이 쌓이면 추세 그래프를 볼 수 있어요")
+          )
         : React.createElement(React.Fragment, null,
             React.createElement("div", { className: "card", style: { marginBottom: 12 } },
               React.createElement("div", { style: { fontWeight: 800, color: "#1e3a5f", fontSize: 13, marginBottom: 16 } }, "📈 최근 추세"),
@@ -2399,7 +2414,11 @@ function DoctorReviewScreen({ patient, user, onBack }) {
         histLoading
         ? React.createElement("div", { className: "loading" }, "불러오는 중...")
         : history.length === 0
-        ? React.createElement("div", { className: "empty" }, "지난 기록이 없어요")
+        ? React.createElement("div", { style: { padding: "40px 20px", textAlign: "center" } },
+            React.createElement("div", { style: { fontSize: 48, marginBottom: 14 } }, "📅"),
+            React.createElement("div", { style: { fontSize: 15, fontWeight: 800, color: "#1e3a5f", marginBottom: 8 } }, "지난 기록이 없어요"),
+            React.createElement("div", { style: { fontSize: 13, color: "#94a3b8" } }, "기록이 쌓이면 추세 그래프를 볼 수 있어요")
+          )
         : React.createElement(React.Fragment, null,
             React.createElement("div", { className: "card", style: { marginBottom: 12 } },
               React.createElement("div", { style: { fontWeight: 800, color: "#1e3a5f", fontSize: 13, marginBottom: 16 } }, "📈 최근 추세"),
@@ -2476,7 +2495,11 @@ function DoctorReviewScreen({ patient, user, onBack }) {
           )
         ),
         record.nurse_note && React.createElement("div", { style: { margin: "0 12px 12px", padding: "8px 10px", background: "#f0f9ff", borderRadius: 8, fontSize: 13, color: "#0c4a6e", lineHeight: 1.5 } }, React.createElement("span", { style: { fontSize: 11, fontWeight: 700, color: "#0369a1", display: "block", marginBottom: 3 } }, "간호사 일일 코멘트"), record.nurse_note)
-      ) : React.createElement("div", { className: "empty" }, "아직 간호사 기록이 없어요"),
+      ) : React.createElement("div", { style: { padding: "40px 20px", textAlign: "center" } },
+          React.createElement("div", { style: { fontSize: 48, marginBottom: 14 } }, "📋"),
+          React.createElement("div", { style: { fontSize: 15, fontWeight: 800, color: "#1e3a5f", marginBottom: 8 } }, "아직 오늘 간호 기록이 없어요"),
+          React.createElement("div", { style: { fontSize: 13, color: "#94a3b8" } }, "간호사 기록 후 검토할 수 있어요")
+        ),
 
       // 간호사 입력 BPSD 표시 (읽기전용 버튼)
       React.createElement("div", { style: { background: "white", borderRadius: 14, marginBottom: 12, overflow: "hidden", boxShadow: "0 1px 6px rgba(0,0,0,0.06)" } },
@@ -2666,7 +2689,11 @@ function MessagesList({ messages, patients, onMarkRead }) {
     );
   };
 
-  if (messages.length === 0) return React.createElement("div", { className: "empty" }, React.createElement("div", { className: "empty-icon" }, "💬"), "메시지가 없어요");
+  if (messages.length === 0) return React.createElement("div", { style: { padding: "40px 20px", textAlign: "center" } },
+    React.createElement("div", { style: { fontSize: 48, marginBottom: 14 } }, "💬"),
+    React.createElement("div", { style: { fontSize: 15, fontWeight: 800, color: "#1e3a5f", marginBottom: 8 } }, "아직 메시지가 없어요"),
+    React.createElement("div", { style: { fontSize: 13, color: "#94a3b8" } }, "보호자가 한마디를 남기면 여기에 표시돼요")
+  );
 
   return React.createElement(React.Fragment, null,
     thisWeek.length > 0 && React.createElement(React.Fragment, null,
