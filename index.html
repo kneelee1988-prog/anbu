@@ -895,29 +895,46 @@ function GuardianScreen({ user, onBack }) {
               )
             ),
             // 특이사항 (의사 검토 완료 후)
-            record?.reviewed_at && record?.special_alerts && record.special_alerts.length > 0 && React.createElement("div", { style: { marginBottom: 12, background: "white", borderRadius: 14, overflow: "hidden", boxShadow: "0 2px 12px rgba(0,0,0,0.08)" } },
-              (() => {
-                const alerts = typeof record.special_alerts === "string"
-                  ? record.special_alerts.split("·").map(s=>s.trim()).filter(Boolean)
-                  : record.special_alerts;
-                const bad = alerts.filter(a => !a.includes("회복") && !a.includes("됨") && !a.includes("상승") && !a.includes("안정") && !a.includes("호전") && !a.includes("증가") && !a.includes("감소") && !a.includes("개선") && !a.includes("치료중") && !a.includes("전반적"));
-                const good = alerts.filter(a => a.includes("회복") || a.includes("됨") || a.includes("상승") || a.includes("안정") || a.includes("호전") || a.includes("증가") || a.includes("감소") || a.includes("개선") || a.includes("치료중") || a.includes("전반적"));
-                return React.createElement(React.Fragment, null,
-                  bad.length > 0 && React.createElement(React.Fragment, null,
-                    React.createElement("div", { style: { background: "linear-gradient(135deg,#7f1d1d,#dc2626)", padding: "10px 16px", fontSize: 13, fontWeight: 700, color: "white" } }, "⚠️ 의사 소견 — 주의사항"),
-                    React.createElement("div", { style: { padding: "12px 16px", display: "flex", flexWrap: "wrap", gap: 6 } },
-                      bad.map((a,i) => React.createElement("span", { key: i, style: { background: "#fee2e2", color: "#b91c1c", borderRadius: 8, fontSize: 13, fontWeight: 700, padding: "5px 12px", border: "1px solid #fecaca" } }, a))
-                    )
-                  ),
-                  good.length > 0 && React.createElement(React.Fragment, null,
-                    React.createElement("div", { style: { background: "linear-gradient(135deg,#064e3b,#16a34a)", padding: "10px 16px", fontSize: 13, fontWeight: 700, color: "white", marginTop: bad.length > 0 ? 1 : 0 } }, "✅ 의사 소견 — 호전사항"),
-                    React.createElement("div", { style: { padding: "12px 16px", display: "flex", flexWrap: "wrap", gap: 6 } },
-                      good.map((a,i) => React.createElement("span", { key: i, style: { background: "#dcfce7", color: "#15803d", borderRadius: 8, fontSize: 13, fontWeight: 700, padding: "5px 12px", border: "1px solid #86efac" } }, a))
-                    )
+            record?.reviewed_at && record?.special_alerts && record.special_alerts.length > 0 && (() => {
+              const raw = typeof record.special_alerts === "string"
+                ? record.special_alerts.split("·").map(s=>s.trim()).filter(Boolean)
+                : (Array.isArray(record.special_alerts) ? record.special_alerts : []);
+
+              // 세 가지로 분류
+              const needConsent = raw.filter(a => a.includes("보호자 동의") || a.includes("보호자 안내"));
+              const treating = raw.filter(a =>
+                !a.includes("보호자 동의") && !a.includes("보호자 안내") &&
+                (a.includes("중입니다") || a.includes("하였습니다") || a.includes("중이에요") ||
+                 a.includes("조금씩") || a.includes("종료") || a.includes("시작하였"))
+              );
+              const symptoms = raw.filter(a =>
+                !needConsent.includes(a) && !treating.includes(a)
+              );
+
+              const Section = ({ title, items, headerBg, itemBg, itemColor, itemBorder }) =>
+                items.length > 0 && React.createElement("div", { style: { marginBottom: 10, background: "white", borderRadius: 14, overflow: "hidden", boxShadow: "0 2px 8px rgba(0,0,0,0.07)" } },
+                  React.createElement("div", { style: { background: headerBg, padding: "9px 16px", fontSize: 13, fontWeight: 700, color: "white" } }, title),
+                  React.createElement("div", { style: { padding: "12px 14px", display: "flex", flexDirection: "column", gap: 6 } },
+                    items.map((a, i) => React.createElement("div", { key: i, style: {
+                      background: itemBg, color: itemColor, borderRadius: 8,
+                      fontSize: 13, fontWeight: 600, padding: "8px 12px",
+                      border: `1px solid ${itemBorder}`, lineHeight: 1.5
+                    } }, a))
                   )
                 );
-              })()
-            ),
+
+              return React.createElement(React.Fragment, null,
+                Section({ title: "⚠️ 현재 상태", items: symptoms,
+                  headerBg: "linear-gradient(135deg,#7f1d1d,#dc2626)",
+                  itemBg: "#fff1f2", itemColor: "#be123c", itemBorder: "#fecdd3" }),
+                Section({ title: "🩺 처치·치료 진행 중", items: treating,
+                  headerBg: "linear-gradient(135deg,#1e3a5f,#2563eb)",
+                  itemBg: "#eff6ff", itemColor: "#1d4ed8", itemBorder: "#bfdbfe" }),
+                Section({ title: "📋 보호자 안내·동의 필요", items: needConsent,
+                  headerBg: "linear-gradient(135deg,#78350f,#d97706)",
+                  itemBg: "#fffbeb", itemColor: "#92400e", itemBorder: "#fde68a" }),
+              );
+            })(),
 
             // 의사가 검토 완료한 경우에만 보호자에게 표시
             record?.reviewed_at && record?.doctor_comment && React.createElement("div", { style: { marginBottom: 12, background: "white", borderRadius: 14, overflow: "hidden", boxShadow: "0 2px 12px rgba(0,0,0,0.08)" } },
