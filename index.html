@@ -772,6 +772,30 @@ function GuardianScreen({ user, onBack }) {
     { label: "특이사항", value: (record.special_alerts && record.special_alerts.length > 0) ? "있음" : "없음", highlight: !!(record.special_alerts && record.special_alerts.length > 0) },
   ] : [];
 
+  // 오늘 상태 한줄 요약 생성
+  const getTodaySummary = (rec) => {
+    if (!rec) return null;
+    const alerts = rec.special_alerts;
+    const hasAlert = alerts && alerts.length > 0;
+    const c = rec.consciousness;
+    const pain = rec.pain;
+    const meal = rec.meal_amount;
+
+    // 의식 수준 판단
+    const badConsciousness = ["혼수","반혼수","혼미"].includes(c);
+    const highPain = pain != null && pain >= 5;
+    const poorMeal = ["거부","소량"].includes(meal);
+
+    if (hasAlert && badConsciousness) return { emoji: "😔", text: "오늘 어르신 상태가 다소 걱정됩니다", color: "#dc2626", bg: "#fff1f2", border: "#fecdd3" };
+    if (hasAlert) return { emoji: "🤔", text: "오늘 챙겨봐야 할 사항이 있어요", color: "#d97706", bg: "#fffbeb", border: "#fde68a" };
+    if (badConsciousness || highPain) return { emoji: "😐", text: "오늘 어르신이 다소 힘드신 것 같아요", color: "#d97706", bg: "#fffbeb", border: "#fde68a" };
+    if (poorMeal) return { emoji: "😕", text: "오늘 식사를 잘 못하셨어요", color: "#d97706", bg: "#fffbeb", border: "#fde68a" };
+    return { emoji: "😊", text: "오늘 어르신은 비교적 안정적이에요", color: "#16a34a", bg: "#f0fdf4", border: "#bbf7d0" };
+  };
+
+  const todaySummary = getTodaySummary(record);
+  const [showDetail, setShowDetail] = React.useState(false);
+
   const infoItems = record ? [
     { label: "의식수준", value: record.consciousness },
     { label: "식사량", value: record.meal_amount },
@@ -926,34 +950,73 @@ function GuardianScreen({ user, onBack }) {
             React.createElement("div", { style: { fontSize: 13, color: "#94a3b8", marginTop: 8, lineHeight: 1.6 } }, "어르신에 대하여 면밀하게 지속적으로 관찰 및 케어 중입니다.")
           )
         : React.createElement(React.Fragment, null,
-            React.createElement("div", { className: "card", style: { marginBottom: 12 } },
-              React.createElement("div", { style: { fontWeight: 700, color: "#1e3a5f", marginBottom: 14, fontSize: 15 } }, "📋 오늘 상태 요약"),
-              React.createElement("div", { style: { display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 8, marginBottom: 12 } },
-                infoItems.map((item, i) => {
-                  const colors = [
-                    { bg: "#eff6ff", border: "#bfdbfe", label: "#1d4ed8", value: "#1e3a5f" },
-                    { bg: "#f0fdf4", border: "#bbf7d0", label: "#15803d", value: "#14532d" },
-                    { bg: "#fff7ed", border: "#fed7aa", label: "#c2410c", value: "#7c2d12" },
-                    { bg: "#faf5ff", border: "#e9d5ff", label: "#7c3aed", value: "#4c1d95" },
-                    { bg: "#f0f9ff", border: "#bae6fd", label: "#0369a1", value: "#0c4a6e" },
-                    { bg: "#fef2f2", border: "#fecaca", label: "#b91c1c", value: "#7f1d1d" },
-                  ];
-                  const c = colors[i % colors.length];
-                  return React.createElement("div", { key: i, style: { padding: "10px 10px", background: c.bg, borderRadius: 10, border: `1.5px solid ${c.border}` } },
-                    React.createElement("div", { style: { fontSize: 12, color: c.label, fontWeight: 700, marginBottom: 4 } }, item.label),
-                    React.createElement("div", { style: { fontSize: 15, fontWeight: 800, color: c.value } }, item.value)
-                  );
-                })
+            // ── 한줄 요약 카드
+            todaySummary && React.createElement("div", { style: {
+              background: todaySummary.bg, borderRadius: 16, padding: "18px 20px",
+              border: `2px solid ${todaySummary.border}`, marginBottom: 12,
+              boxShadow: "0 2px 12px rgba(0,0,0,0.06)"
+            } },
+              React.createElement("div", { style: { display: "flex", alignItems: "center", gap: 12, marginBottom: 14 } },
+                React.createElement("div", { style: { fontSize: 36 } }, todaySummary.emoji),
+                React.createElement("div", null,
+                  React.createElement("div", { style: { fontSize: 15, fontWeight: 800, color: todaySummary.color, lineHeight: 1.4 } }, todaySummary.text),
+                  record.reviewed_at && React.createElement("div", { style: { fontSize: 11, color: "#94a3b8", marginTop: 4 } }, `${fmtDate(record.reviewed_at)} 주치의 검토`)
+                )
               ),
-              (record.mental || record.bprs) && React.createElement("div", { style: { padding: "12px 14px", background: "#faf5ff", borderRadius: 10, border: "1.5px solid #e9d5ff", marginBottom: 10 } },
-                React.createElement("div", { style: { fontSize: 11, color: "#1e3a5f", fontWeight: 700, marginBottom: 6 } }, "🧩 BPSD (치매 행동·심리 증상 등 문제 증상)"),
-                React.createElement("div", { style: { display: "flex", flexWrap: "wrap", gap: 5 } },
-                  (record.bprs || record.mental || "").split("·").map(s => s.trim()).filter(Boolean).map(s=>s.replace("다칠위험있는 반복행동","다칠위험있는 행동반복")).map((s, i) =>
-                    React.createElement("span", { key: i, style: { background: "#ede9fe", color: "#5b21b6", borderRadius: 8, fontSize: 12, fontWeight: 600, padding: "4px 10px", border: "1px solid #c4b5fd" } }, s)
+              // 핵심 4가지만 항상 표시
+              React.createElement("div", { style: { display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8, marginBottom: 12 } },
+                [
+                  { label: "🧠 의식", value: record.consciousness },
+                  { label: "🍽️ 식사", value: record.meal_amount ? `${record.meal_amount}${record.meal_type ? ` (${record.meal_type})` : ""}` : null },
+                  { label: "🚶 활동", value: record.mobility },
+                  { label: "💊 통증", value: record.pain != null ? `${record.pain}점` : null },
+                ].filter(i => i.value).map((item, i) =>
+                  React.createElement("div", { key: i, style: {
+                    background: "white", borderRadius: 10, padding: "10px 14px",
+                    border: "1.5px solid rgba(0,0,0,0.07)"
+                  } },
+                    React.createElement("div", { style: { fontSize: 11, color: "#64748b", fontWeight: 700, marginBottom: 3 } }, item.label),
+                    React.createElement("div", { style: { fontSize: 15, fontWeight: 800, color: "#1e293b" } }, item.value)
                   )
                 )
               ),
-              record.reviewed_at && React.createElement("div", { style: { fontSize: 12, color: "#94a3b8", marginTop: 4, textAlign: "right" } }, `${fmtDate(record.reviewed_at)} 주치의 검토`)
+              // 펼치기 버튼
+              React.createElement("button", {
+                onClick: () => setShowDetail(v => !v),
+                style: { width: "100%", padding: "10px", borderRadius: 10, border: `1.5px solid ${todaySummary.border}`,
+                  background: "white", color: todaySummary.color, fontSize: 13, fontWeight: 700,
+                  cursor: "pointer", fontFamily: "'Noto Sans KR',sans-serif",
+                  display: "flex", alignItems: "center", justifyContent: "center", gap: 6 }
+              }, showDetail ? "▲ 간단히 보기" : "▽ 상세 내용 보기"),
+
+              // 펼쳐지는 상세
+              showDetail && React.createElement("div", { style: { marginTop: 12 } },
+                React.createElement("div", { style: { display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 6, marginBottom: 10 } },
+                  infoItems.filter(i => !["의식수준","식사량","식사형태","이동","통증"].includes(i.label)).map((item, i) => {
+                    const colors = [
+                      { bg: "#eff6ff", border: "#bfdbfe", label: "#1d4ed8", value: "#1e3a5f" },
+                      { bg: "#f0fdf4", border: "#bbf7d0", label: "#15803d", value: "#14532d" },
+                      { bg: "#fff7ed", border: "#fed7aa", label: "#c2410c", value: "#7c2d12" },
+                      { bg: "#faf5ff", border: "#e9d5ff", label: "#7c3aed", value: "#4c1d95" },
+                      { bg: "#f0f9ff", border: "#bae6fd", label: "#0369a1", value: "#0c4a6e" },
+                      { bg: "#fef2f2", border: "#fecaca", label: "#b91c1c", value: "#7f1d1d" },
+                    ];
+                    const c = colors[i % colors.length];
+                    return React.createElement("div", { key: i, style: { padding: "8px 10px", background: c.bg, borderRadius: 10, border: `1.5px solid ${c.border}` } },
+                      React.createElement("div", { style: { fontSize: 10, color: c.label, fontWeight: 700, marginBottom: 3 } }, item.label),
+                      React.createElement("div", { style: { fontSize: 13, fontWeight: 800, color: c.value } }, item.value)
+                    );
+                  })
+                ),
+                (record.mental || record.bprs) && React.createElement("div", { style: { padding: "12px 14px", background: "#faf5ff", borderRadius: 10, border: "1.5px solid #e9d5ff" } },
+                  React.createElement("div", { style: { fontSize: 11, color: "#1e3a5f", fontWeight: 700, marginBottom: 6 } }, "🧩 BPSD (치매 행동·심리 증상)"),
+                  React.createElement("div", { style: { display: "flex", flexWrap: "wrap", gap: 5 } },
+                    (record.bprs || record.mental || "").split("·").map(s => s.trim()).filter(Boolean).map((s, i) =>
+                      React.createElement("span", { key: i, style: { background: "#ede9fe", color: "#5b21b6", borderRadius: 8, fontSize: 12, fontWeight: 600, padding: "4px 10px", border: "1px solid #c4b5fd" } }, s)
+                    )
+                  )
+                )
+              )
             ),
             record.doctor_findings?.length > 0 && (() => {
               // 검사항목만 필터링
