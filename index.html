@@ -2878,32 +2878,72 @@ function App() {
   const [role, setRole] = useState(null);
   const [currentUser, setCurrentUser] = useState(null);
 
+  const goScreen = (s, opts = {}) => {
+    setScreen(s);
+    window.history.pushState({ screen: s, ...opts }, "");
+  };
+
   useEffect(() => {
-    // 온보딩 확인
     const seen = localStorage.getItem("anbu_onboarded");
-    setScreen(seen ? "roleSelect" : "onboarding");
+    const initScreen = seen ? "roleSelect" : "onboarding";
+    setScreen(initScreen);
+    window.history.replaceState({ screen: initScreen }, "");
+
+    // 브라우저 뒤로가기 처리
+    const onPop = (e) => {
+      const s = e.state?.screen;
+      if (!s || s === "roleSelect" || s === "onboarding") {
+        // 역할선택 화면 → 종료 확인
+        if (window.confirm("앱을 종료하시겠습니까?")) {
+          window.history.back();
+        } else {
+          window.history.pushState({ screen: "roleSelect" }, "");
+          setScreen("roleSelect");
+          setCurrentUser(null);
+          setRole(null);
+        }
+      } else if (s === "login") {
+        setScreen("login");
+        setCurrentUser(null);
+      } else if (s === "app") {
+        // 앱 내에서 뒤로가기 → 로그아웃 확인
+        if (window.confirm("로그아웃 하시겠습니까?")) {
+          setCurrentUser(null);
+          setRole(null);
+          setScreen("roleSelect");
+          window.history.replaceState({ screen: "roleSelect" }, "");
+        } else {
+          window.history.pushState({ screen: "app" }, "");
+        }
+      } else {
+        setScreen(s);
+      }
+    };
+
+    window.addEventListener("popstate", onPop);
+    return () => window.removeEventListener("popstate", onPop);
   }, []);
 
   const handleOnboardDone = () => {
     localStorage.setItem("anbu_onboarded", "1");
-    setScreen("roleSelect");
+    goScreen("roleSelect");
   };
 
   const handleRoleSelect = (r) => {
-    if (r === "notices") { setRole("notices"); setScreen("notices"); return; }
+    if (r === "notices") { setRole("notices"); goScreen("notices"); return; }
     setRole(r);
-    setScreen("login");
+    goScreen("login");
   };
 
   const handleLogin = (user) => {
     setCurrentUser(user);
-    setScreen("app");
+    goScreen("app");
   };
 
   const handleLogout = () => {
     setCurrentUser(null);
     setRole(null);
-    setScreen("roleSelect");
+    goScreen("roleSelect");
   };
 
   if (screen === "splash") return React.createElement("div", { style: { minHeight: "100vh", background: "linear-gradient(160deg,#0f172a,#1e3a5f)", display: "flex", alignItems: "center", justifyContent: "center" } },
