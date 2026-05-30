@@ -905,35 +905,57 @@ function GuardianScreen({ user, onBack }) {
 
               // 세 가지로 분류
               const needConsent = raw.filter(a => a.includes("보호자 동의") || a.includes("보호자 안내"));
-              const treating = raw.filter(a =>
-                !a.includes("보호자 동의") && !a.includes("보호자 안내") &&
-                (a.includes("중입니다") || a.includes("하였습니다") || a.includes("중이에요") ||
-                 a.includes("조금씩") || a.includes("종료") || a.includes("시작하였"))
-              );
+
+              // 증상(현재 상태) 키워드 - 치료중 표현이어도 증상인 것
+              const symptomKeywords = ["의심됩니다","관찰됩니다","보입니다","있습니다","호소하십니다","시작했습니다","발생하였습니다","떨어지고","저하를","진행 중입니다","줄었습니다","나타나고"];
+              const treatKeywords = ["처치 중","공급 중","투약 중","조절 중","시행하고","진행하고","보조 중","강화 중","최소화","종료하였","회복되고","좋아지고","나아지고","안정되","또렷해","빠지고","돌아오고","내려가고"];
+
               const symptoms = raw.filter(a =>
-                !needConsent.includes(a) && !treating.includes(a)
+                !needConsent.includes(a) &&
+                (symptomKeywords.some(k => a.includes(k)) || (!treatKeywords.some(k => a.includes(k)) && !a.includes("중입니다")))
+              );
+              const treating = raw.filter(a =>
+                !needConsent.includes(a) &&
+                !symptoms.includes(a) &&
+                (treatKeywords.some(k => a.includes(k)) || a.includes("중입니다") || a.includes("조금씩"))
               );
 
-              const Section = ({ title, items, headerBg, itemBg, itemColor, itemBorder }) =>
-                items.length > 0 && React.createElement("div", { style: { marginBottom: 10, background: "white", borderRadius: 14, overflow: "hidden", boxShadow: "0 2px 8px rgba(0,0,0,0.07)" } },
-                  React.createElement("div", { style: { background: headerBg, padding: "9px 16px", fontSize: 13, fontWeight: 700, color: "white" } }, title),
-                  React.createElement("div", { style: { padding: "12px 14px", display: "flex", flexDirection: "column", gap: 6 } },
+              const GridSection = ({ title, items, headerBg, itemBg, itemColor, itemBorder }) =>
+                items.length > 0 && React.createElement("div", { style: { background: "white", borderRadius: 14, overflow: "hidden", boxShadow: "0 2px 8px rgba(0,0,0,0.07)", display: "flex", flexDirection: "column" } },
+                  React.createElement("div", { style: { background: headerBg, padding: "9px 14px", fontSize: 12, fontWeight: 700, color: "white" } }, title),
+                  React.createElement("div", { style: { padding: "10px 10px", display: "grid", gridTemplateColumns: "1fr 1fr", gap: 5 } },
                     items.map((a, i) => React.createElement("div", { key: i, style: {
                       background: itemBg, color: itemColor, borderRadius: 8,
-                      fontSize: 13, fontWeight: 600, padding: "8px 12px",
+                      fontSize: 11, fontWeight: 600, padding: "7px 8px",
+                      border: `1px solid ${itemBorder}`, lineHeight: 1.5
+                    } }, a))
+                  )
+                );
+
+              const FullSection = ({ title, items, headerBg, itemBg, itemColor, itemBorder }) =>
+                items.length > 0 && React.createElement("div", { style: { marginBottom: 8, background: "white", borderRadius: 14, overflow: "hidden", boxShadow: "0 2px 8px rgba(0,0,0,0.07)" } },
+                  React.createElement("div", { style: { background: headerBg, padding: "9px 14px", fontSize: 12, fontWeight: 700, color: "white" } }, title),
+                  React.createElement("div", { style: { padding: "10px 12px", display: "flex", flexDirection: "column", gap: 5 } },
+                    items.map((a, i) => React.createElement("div", { key: i, style: {
+                      background: itemBg, color: itemColor, borderRadius: 8,
+                      fontSize: 12, fontWeight: 600, padding: "7px 10px",
                       border: `1px solid ${itemBorder}`, lineHeight: 1.5
                     } }, a))
                   )
                 );
 
               return React.createElement(React.Fragment, null,
-                Section({ title: "⚠️ 현재 상태", items: symptoms,
-                  headerBg: "linear-gradient(135deg,#7f1d1d,#dc2626)",
-                  itemBg: "#fff1f2", itemColor: "#be123c", itemBorder: "#fecdd3" }),
-                Section({ title: "🩺 처치·치료 진행 중", items: treating,
-                  headerBg: "linear-gradient(135deg,#1e3a5f,#2563eb)",
-                  itemBg: "#eff6ff", itemColor: "#1d4ed8", itemBorder: "#bfdbfe" }),
-                Section({ title: "📋 보호자 안내·동의 필요", items: needConsent,
+                // 현재상태 + 처치치료 나란히 2칸
+                (symptoms.length > 0 || treating.length > 0) && React.createElement("div", { style: { display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8, marginBottom: 8 } },
+                  GridSection({ title: "⚠️ 현재 상태", items: symptoms,
+                    headerBg: "linear-gradient(135deg,#7f1d1d,#dc2626)",
+                    itemBg: "#fff1f2", itemColor: "#be123c", itemBorder: "#fecdd3" }),
+                  GridSection({ title: "🩺 처치·치료 중", items: treating,
+                    headerBg: "linear-gradient(135deg,#1e3a5f,#2563eb)",
+                    itemBg: "#eff6ff", itemColor: "#1d4ed8", itemBorder: "#bfdbfe" })
+                ),
+                // 보호자 동의는 전체 폭으로
+                FullSection({ title: "📋 보호자 안내·동의 필요", items: needConsent,
                   headerBg: "linear-gradient(135deg,#78350f,#d97706)",
                   itemBg: "#fffbeb", itemColor: "#92400e", itemBorder: "#fde68a" }),
               );
@@ -952,12 +974,14 @@ function GuardianScreen({ user, onBack }) {
               React.createElement("div", { style: { background: "linear-gradient(135deg,#064e3b,#059669)", padding: "10px 16px", display: "flex", alignItems: "center", gap: 8 } },
                 React.createElement("div", { style: { fontSize: 13, fontWeight: 700, color: "white" } }, "💚 케어팀이 전하는 한마디")
               ),
-              React.createElement("div", { style: { padding: "14px 16px" } },
+              React.createElement("div", { style: { padding: "12px 14px", display: "flex", flexDirection: "column", gap: 8 } },
                 record.warm_msg.split(" / ").map((msg, i) =>
-                  React.createElement("div", { key: i, style: { fontSize: 14, color: "#166534", lineHeight: 1.9,
-                    paddingBottom: i < record.warm_msg.split(" / ").length - 1 ? 8 : 0 } },
-                    record.warm_msg.split(" / ").length > 1 ? `• ${msg}` : msg
-                  )
+                  React.createElement("div", { key: i, style: {
+                    fontSize: 13, color: "#166534", lineHeight: 1.7,
+                    background: "#f0fdf4", borderRadius: 10,
+                    padding: "10px 14px", border: "1px solid #bbf7d0",
+                    fontWeight: 500
+                  } }, msg)
                 )
               )
             ),
@@ -1955,7 +1979,7 @@ function DoctorReviewScreen({ patient, user, onBack }) {
     { label: "😴 의식저하", bad: "의식의 저하를 보입니다", good: "의식저하 유발 약물 최소화하였습니다" },
     { label: "🍽️ 식욕저하", bad: "식욕저하 및 식이거부가 보입니다", good: "식이 권유 하고 있습니다. 계속 식이 저하시 식욕촉진제가 필요할 수 있으며, 기간이 길어질 경우 L-tube 삽입이 필요할 수도 있습니다 (보호자 동의)" },
     { label: "🌊 흡인위험", bad: "연하곤란과 사레들림이 관찰됩니다", good: "연하곤란에 대해 집중 관찰 중이며 식이 보조 중입니다. 연하곤란 지속시 L-tube 삽입이 필요할 수 있습니다 (보호자 동의)" },
-    { label: "🩹 욕창", bad: "욕창이 발생하였습니다", good: "욕창 처치를 시행하고 있습니다" },
+    { label: "🩹 욕창", bad: "욕창이 발생하였습니다", good: "욕창 처치 중입니다" },
     { label: "💊 통증", bad: "불특정 부위의 통증을 호소하십니다", good: "통증 조절 중입니다" },
     { label: "💉 혈당불안정", bad: "혈당이 불안정합니다", good: "계속 관찰 및 식이조절 중이며, 인슐린 주사가 필요할 경우 적용합니다" },
     { label: "🧪 검사이상", bad: "검사 결과에서 이상 소견이 보입니다", good: "검사 결과 확인 및 처치 중입니다" },
