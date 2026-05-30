@@ -643,15 +643,11 @@ function categoryToNum(val, map) {
 function GuardianScreen({ user, onBack }) {
   const [tab, setTab] = useState("today");
 
-  // 탭 변경 시 히스토리에 push
+  // 탭 변경 시 stateRef 업데이트
   const goTab = (t) => {
     setTab(t);
-    appStateRef.current.tab = t;
-    window.history.pushState({ anbu: true, screen: "app", tab: t }, "");
-    // 모바일에서 뒤로가기 여유 확보
-    for (let i = 0; i < 5; i++) {
-      window.history.pushState({ anbu: true, dummy: true }, "");
-    }
+    // App의 stateRef 업데이트
+    window.dispatchEvent(new CustomEvent("anbu-tab-change", { detail: t }));
   };
 
   // 브라우저 뒤로가기로 탭 복원
@@ -2639,10 +2635,10 @@ function AdminScreen({ user, onBack }) {
     React.createElement("div", { style: { background: "linear-gradient(135deg,#1c1917,#44403c)", padding: "48px 20px 16px" } },
       React.createElement("div", { className: "header-top" },
         React.createElement("button", { className: "back-btn", onClick: () => {
-          if (window.confirm("로그아웃 하시겠습니까?")) onBack();
+          onBack();
         } }, "← 역할선택"),
         React.createElement("button", { className: "logout-btn", onClick: () => {
-          if (window.confirm("로그아웃 하시겠습니까?")) onBack();
+          onBack();
         } }, "로그아웃 →")
       ),
       React.createElement("div", { style: { fontSize: 11, color: "rgba(255,255,255,0.5)", marginTop: 8 } }, "오늘안부 · 관리자"),
@@ -2961,7 +2957,13 @@ function App() {
     };
 
     window.addEventListener("popstate", onPop);
-    return () => window.removeEventListener("popstate", onPop);
+    // 탭 변경 이벤트 수신
+    const onTabChange = (e) => { stateRef.current.tab = e.detail; };
+    window.addEventListener("anbu-tab-change", onTabChange);
+    return () => {
+      window.removeEventListener("popstate", onPop);
+      window.removeEventListener("anbu-tab-change", onTabChange);
+    };
   }, []);
 
   const handleOnboardDone = () => {
