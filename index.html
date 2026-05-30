@@ -2883,40 +2883,52 @@ function App() {
     window.history.pushState({ screen: s, ...opts }, "");
   };
 
+  // 로그인 상태 ref (이벤트 핸들러에서 최신값 참조용)
+  const isLoggedInRef = React.useRef(false);
+  const screenRef = React.useRef("splash");
+
   useEffect(() => {
     const seen = localStorage.getItem("anbu_onboarded");
     const initScreen = seen ? "roleSelect" : "onboarding";
     setScreen(initScreen);
-    window.history.replaceState({ screen: initScreen }, "");
+    screenRef.current = initScreen;
 
-    // 브라우저 뒤로가기 처리
+    // 더미 히스토리 여러 개 쌓아서 뒤로가기 여러 번 눌러도 앱 안에 머물게
+    window.history.pushState({ anbu: 1 }, "");
+    window.history.pushState({ anbu: 2 }, "");
+    window.history.pushState({ anbu: 3 }, "");
+
     const onPop = (e) => {
-      const s = e.state?.screen;
-      if (!s || s === "roleSelect" || s === "onboarding") {
-        // 역할선택 화면 → 종료 확인
-        if (window.confirm("앱을 종료하시겠습니까?")) {
-          window.history.back();
-        } else {
-          window.history.pushState({ screen: "roleSelect" }, "");
-          setScreen("roleSelect");
-          setCurrentUser(null);
-          setRole(null);
-        }
-      } else if (s === "login") {
-        setScreen("login");
-        setCurrentUser(null);
-      } else if (s === "app") {
-        // 앱 내에서 뒤로가기 → 로그아웃 확인
+      if (isLoggedInRef.current) {
+        // 로그인 상태 → 로그아웃 확인
         if (window.confirm("로그아웃 하시겠습니까?")) {
+          isLoggedInRef.current = false;
           setCurrentUser(null);
           setRole(null);
           setScreen("roleSelect");
-          window.history.replaceState({ screen: "roleSelect" }, "");
-        } else {
-          window.history.pushState({ screen: "app" }, "");
+          screenRef.current = "roleSelect";
         }
+        // 항상 더미 히스토리 다시 쌓기
+        window.history.pushState({ anbu: 1 }, "");
+        window.history.pushState({ anbu: 2 }, "");
+        window.history.pushState({ anbu: 3 }, "");
+      } else if (screenRef.current === "login" || screenRef.current === "signup" || screenRef.current === "notices") {
+        // 로그인/회원가입 화면 → 역할선택으로
+        setScreen("roleSelect");
+        setRole(null);
+        screenRef.current = "roleSelect";
+        window.history.pushState({ anbu: 1 }, "");
+        window.history.pushState({ anbu: 2 }, "");
+        window.history.pushState({ anbu: 3 }, "");
       } else {
-        setScreen(s);
+        // 역할선택 화면에서 뒤로가기 → 종료 확인
+        if (window.confirm("앱을 종료하시겠습니까?")) {
+          window.history.go(-10); // 완전히 빠져나가기
+        } else {
+          window.history.pushState({ anbu: 1 }, "");
+          window.history.pushState({ anbu: 2 }, "");
+          window.history.pushState({ anbu: 3 }, "");
+        }
       }
     };
 
@@ -2926,24 +2938,30 @@ function App() {
 
   const handleOnboardDone = () => {
     localStorage.setItem("anbu_onboarded", "1");
-    goScreen("roleSelect");
+    setScreen("roleSelect");
+    screenRef.current = "roleSelect";
   };
 
   const handleRoleSelect = (r) => {
-    if (r === "notices") { setRole("notices"); goScreen("notices"); return; }
+    if (r === "notices") { setRole("notices"); setScreen("notices"); screenRef.current = "notices"; return; }
     setRole(r);
-    goScreen("login");
+    setScreen("login");
+    screenRef.current = "login";
   };
 
   const handleLogin = (user) => {
     setCurrentUser(user);
-    goScreen("app");
+    isLoggedInRef.current = true;
+    screenRef.current = "app";
+    setScreen("app");
   };
 
   const handleLogout = () => {
+    isLoggedInRef.current = false;
     setCurrentUser(null);
     setRole(null);
-    goScreen("roleSelect");
+    screenRef.current = "roleSelect";
+    setScreen("roleSelect");
   };
 
   if (screen === "splash") return React.createElement("div", { style: { minHeight: "100vh", background: "linear-gradient(160deg,#0f172a,#1e3a5f)", display: "flex", alignItems: "center", justifyContent: "center" } },
@@ -2957,7 +2975,7 @@ function App() {
     loginType: role,
     onLogin: handleLogin,
     onBack: () => setScreen("roleSelect"),
-    onSignup: () => setScreen("signup")
+    onSignup: () => { setScreen("signup"); screenRef.current = "signup"; }
   });
   if (screen === "signup") return React.createElement(GuardianSignupScreen, {
     onBack: () => setScreen("login"),
