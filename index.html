@@ -715,20 +715,20 @@ function CustomCalendar({ value, onChange }) {
 
   return React.createElement("div", { style: { background: "white", borderRadius: 16, border: "1.5px solid #e2e8f0", overflow: "hidden", boxShadow: "0 2px 12px rgba(0,0,0,0.06)" } },
     // 헤더
-    React.createElement("div", { style: { background: "linear-gradient(135deg,#1e3a5f,#2563eb)", padding: "14px 16px", display: "flex", alignItems: "center", justifyContent: "space-between" } },
-      React.createElement("button", { onClick: prevMonth, style: { background: "rgba(255,255,255,0.2)", border: "none", color: "white", borderRadius: 8, width: 32, height: 32, fontSize: 16, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center" } }, "‹"),
-      React.createElement("div", { style: { fontSize: 15, fontWeight: 800, color: "white" } }, `${viewYear}년 ${MONTHS[viewMonth]}`),
-      React.createElement("button", { onClick: nextMonth, style: { background: "rgba(255,255,255,0.2)", border: "none", color: "white", borderRadius: 8, width: 32, height: 32, fontSize: 16, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center" } }, "›")
+    React.createElement("div", { style: { background: "linear-gradient(135deg,#1e3a5f,#2563eb)", padding: "10px 14px", display: "flex", alignItems: "center", justifyContent: "space-between" } },
+      React.createElement("button", { onClick: prevMonth, style: { background: "rgba(255,255,255,0.2)", border: "none", color: "white", borderRadius: 8, width: 28, height: 28, fontSize: 15, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center" } }, "‹"),
+      React.createElement("div", { style: { fontSize: 14, fontWeight: 800, color: "white" } }, `${viewYear}년 ${MONTHS[viewMonth]}`),
+      React.createElement("button", { onClick: nextMonth, style: { background: "rgba(255,255,255,0.2)", border: "none", color: "white", borderRadius: 8, width: 28, height: 28, fontSize: 15, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center" } }, "›")
     ),
     // 요일 헤더
     React.createElement("div", { style: { display: "grid", gridTemplateColumns: "repeat(7, 1fr)", background: "#f8fafc", borderBottom: "1px solid #e2e8f0" } },
       DAYS.map((d, i) => React.createElement("div", { key: d, style: {
-        textAlign: "center", padding: "8px 0", fontSize: 11, fontWeight: 700,
+        textAlign: "center", padding: "6px 0", fontSize: 11, fontWeight: 700,
         color: i === 0 ? "#ef4444" : i === 6 ? "#3b82f6" : "#64748b"
       } }, d))
     ),
     // 날짜 그리드
-    React.createElement("div", { style: { display: "grid", gridTemplateColumns: "repeat(7, 1fr)", padding: "8px" , gap: 2 } },
+    React.createElement("div", { style: { display: "grid", gridTemplateColumns: "repeat(7, 1fr)", padding: "6px", gap: 2 } },
       cells.map((d, i) => {
         if (!d) return React.createElement("div", { key: i });
         const dateStr = toStr(d);
@@ -740,10 +740,10 @@ function CustomCalendar({ value, onChange }) {
           key: i,
           onClick: () => !isPast && onChange(dateStr),
           style: {
-            padding: "8px 4px", borderRadius: 10, border: "none",
+            padding: "6px 4px", borderRadius: 8, border: "none",
             background: isSelected ? "#1e3a5f" : isToday ? "#eff6ff" : "transparent",
             color: isSelected ? "white" : isPast ? "#cbd5e1" : dow === 0 ? "#ef4444" : dow === 6 ? "#3b82f6" : "#1e293b",
-            fontSize: 13, fontWeight: isSelected || isToday ? 800 : 400,
+            fontSize: 12, fontWeight: isSelected || isToday ? 800 : 400,
             cursor: isPast ? "default" : "pointer",
             outline: isToday && !isSelected ? "2px solid #2563eb" : "none",
             outlineOffset: "-2px",
@@ -754,12 +754,12 @@ function CustomCalendar({ value, onChange }) {
       })
     ),
     // 선택된 날짜 표시
-    value && React.createElement("div", { style: { padding: "10px 16px", background: "#eff6ff", borderTop: "1px solid #e2e8f0", display: "flex", alignItems: "center", gap: 8 } },
-      React.createElement("span", { style: { fontSize: 16 } }, "📅"),
+    value && React.createElement("div", { style: { padding: "8px 14px", background: "#eff6ff", borderTop: "1px solid #e2e8f0", display: "flex", alignItems: "center", gap: 8 } },
+      React.createElement("span", { style: { fontSize: 15 } }, "📅"),
       React.createElement("span", { style: { fontSize: 13, fontWeight: 700, color: "#1d4ed8" } },
         new Date(value + "T00:00:00").toLocaleDateString("ko-KR", { year:"numeric", month:"long", day:"numeric", weekday:"long" })
       ),
-      React.createElement("button", { onClick: () => onChange(""), style: { marginLeft: "auto", fontSize: 11, color: "#94a3b8", background: "none", border: "none", cursor: "pointer" } }, "✕ 취소")
+      React.createElement("button", { onClick: () => onChange(""), style: { marginLeft: "auto", fontSize: 12, fontWeight: 700, color: "#ef4444", background: "none", border: "none", cursor: "pointer" } }, "✕ 취소")
     )
   );
 }
