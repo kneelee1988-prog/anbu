@@ -1893,94 +1893,55 @@ function DoctorReviewScreen({ patient, user, onBack }) {
       items: ["대증요법","항생제투여","진통제투여","수액공급","산소공급","석션시행","영양제투여","TPN","알부민투여","수혈시행","욕창치료","상처처치","L-Tube삽입","도뇨관삽입"],
       bg:"#fff7ed", border:"#fdba74", activeBg:"#c2410c"
     },
-    "🏥 의뢰·협진": {
-      items: ["내과","외과","정형외과","재활의학과","정신건강의학과","가정의학과","한방과","피부과","산부인과","신경과","비뇨기과"],
-      bg:"#f5f3ff", border:"#c4b5fd", activeBg:"#7c3aed"
-    },
+
   };
 
-  const ALERT_ITEMS = {
-    "⚠️ 걱정되는 상황": {
-      items: [
-        "열이 나기 시작했습니다",
-        "폐렴이 의심됩니다",
-        "패혈증이 의심됩니다",
-        "요로감염이 의심됩니다",
-        "간·담·췌 계통의 감염이 의심됩니다",
-        "내과적 정밀검사가 필요할 것 같습니다",
-        "특정하기 어려운 감염증이 있는 것 같습니다",
-        "식이거부로 식사량 감소 보입니다",
-        "연하곤란이 있습니다",
-        "흡인성폐렴 발생 가능성이 높습니다",
-        "잦은 기침과 가래가 있어 예의주시 중입니다",
-        "산소포화도가 떨어질 때가 있습니다",
-        "호흡 곤란 증상을 보입니다",
-        "의식의 저하를 보입니다",
-        "불특정 부위의 통증을 호소하십니다",
-        "욕창이 생겼고 지금은 단계 확인 중입니다",
-        "피부질환이 관찰됩니다",
-        "갑작스러운 처짐 상태가 보입니다",
-        "식욕저하 보입니다",
-        "저알부민혈증을 보입니다",
-        "탈수 현상이 보입니다",
-        "전해질 불균형이 보입니다",
-        "혈압이 불안정합니다",
-        "갑자기 붓는 현상이 나타나기 시작하였습니다",
-        "다른 때보다 더 숨차하십니다",
-        "전반적인 기력저하가 눈에 띄게 진행 중입니다",
-        "거동 시간이 현저히 줄었습니다",
-        "오늘 검사결과에서 이상 소견이 보입니다",
-        "혈당이 불안정합니다",
-        "저혈당 위험이 있습니다",
-      ],
-      color:"#92400e", bg:"#fffbeb", border:"#fde68a", activeBg:"#d97706"
-    },
-    "🩺 처치 및 보호자 안내": {
-      items: [
-        "신체진찰 시행하였습니다 (시진·촉진·타진·청진)",
-        "혈액검사 시행하였습니다 (CBC, LFT, E/L, Urine, CRP 등)",
-        "해열제 투약 하였습니다",
-        "흉부엑스레이 확인 중입니다",
-        "폐렴 치료 시작하였습니다",
-        "패혈증 치료 시작하였습니다",
-        "요로감염 치료 시작하였습니다",
-        "항생제 투약 중입니다",
-        "산소공급 중입니다",
-        "수액공급 중입니다",
-        "연하곤란으로 식이보조 중입니다",
-        "의식저하 유발 약물 최소화하였습니다",
-        "혈압 모니터링 강화 중입니다",
-        "욕창 처치 중입니다",
-        "통증 조절 중입니다",
-        "내과 협진 의뢰하였습니다",
-        "피부과 협진 의뢰하였습니다",
-        "정밀검사 진행 중입니다",
-        "검사결과 추가 확인 중입니다",
-        "전해질 보충 중입니다",
-        "알부민 저하로 알부민 주사가 필요합니다 (보호자 동의 필요)",
-        "식이부진으로 영양제 투여가 필요합니다 (보호자 동의 필요)",
-        "경관식이 필요한 상태입니다 (보호자 동의 필요)",
-        "입원치료 강화가 필요합니다",
-        "먹는 당뇨약으로 조절이 안되어 혈당에 따라 인슐린을 주사합니다 (보호자 안내)",
-      ],
-      color:"#1e4d8c", bg:"#eff6ff", border:"#bfdbfe", activeBg:"#2563eb"
-    },
-    "✅ 호전되는 상황": {
-      items: [
-        "열이 내렸습니다",
-        "혈압이 안정됐습니다",
-        "호흡이 나아졌습니다",
-        "식욕이 돌아왔습니다",
-        "의식이 또렷해지고 있습니다",
-        "욕창이 좋아지고 있습니다",
-        "통증이 줄었습니다",
-        "부종이 빠지고 있습니다",
-        "수면이 안정되고 있습니다",
-        "전반적으로 호전되고 있습니다",
-      ],
-      color:"#166534", bg:"#f0fdf4", border:"#bbf7d0", activeBg:"#16a34a"
-    },
-  };
+  // 증상+처치 세트 (클릭 한 번에 쌍으로 전달)
+  const ALERT_SETS = [
+    { label: "🌡️ 발열", bad: "열이 나기 시작했습니다", good: "해열제 투약 및 관찰 중입니다" },
+    { label: "🫁 폐렴", bad: "폐렴이 의심됩니다", good: "폐렴 치료를 시작하였습니다" },
+    { label: "🦠 패혈증", bad: "패혈증이 의심됩니다", good: "패혈증 치료를 시작하였습니다" },
+    { label: "💧 요로감염", bad: "요로감염이 의심됩니다", good: "항생제 투약을 시작하였습니다" },
+    { label: "😮‍💨 산소저하", bad: "산소포화도가 떨어지고 있습니다", good: "산소 공급 중입니다" },
+    { label: "💨 호흡곤란", bad: "호흡 곤란 증상을 보입니다", good: "산소 공급 및 처치 중입니다" },
+    { label: "🫀 혈압불안정", bad: "혈압이 불안정합니다", good: "혈압 모니터링 강화 중입니다" },
+    { label: "😴 의식저하", bad: "의식의 저하를 보입니다", good: "의식저하 유발 약물 최소화하였습니다" },
+    { label: "🍽️ 식욕저하", bad: "식욕저하 및 식이거부가 보입니다", good: "식이 조절 및 영양 보충 중입니다" },
+    { label: "🌊 흡인위험", bad: "흡인성 폐렴 발생 가능성이 높습니다", good: "연하곤란으로 식이 보조 중입니다" },
+    { label: "🩹 욕창", bad: "욕창이 발생하였습니다", good: "욕창 처치 중입니다" },
+    { label: "💊 통증", bad: "불특정 부위의 통증을 호소하십니다", good: "통증 조절 중입니다" },
+    { label: "💉 혈당불안정", bad: "혈당이 불안정합니다", good: "혈당에 따라 인슐린을 투여합니다 (보호자 안내)" },
+    { label: "🧪 검사이상", bad: "검사 결과에서 이상 소견이 보입니다", good: "검사 결과 확인 및 처치 중입니다" },
+    { label: "🫧 부종", bad: "갑자기 붓는 현상이 나타나고 있습니다", good: "부종 원인 파악 및 처치 중입니다" },
+    { label: "🔋 기력저하", bad: "전반적인 기력저하가 진행 중입니다", good: "영양 보충 및 처치 중입니다" },
+    { label: "🩸 저알부민", bad: "저알부민혈증이 보입니다", good: "알부민 주사가 필요합니다 (보호자 동의 필요)" },
+    { label: "💧 탈수", bad: "탈수 현상이 보입니다", good: "수액 공급 중입니다" },
+    { label: "🧬 전해질이상", bad: "전해질 불균형이 보입니다", good: "전해질 보충 중입니다" },
+    { label: "🛁 피부질환", bad: "피부질환이 관찰됩니다", good: "피부과 처치 중입니다" },
+  ];
+
+  const ALERT_RECOVERY = [
+    "열이 내렸습니다",
+    "혈압이 안정됐습니다",
+    "호흡이 나아졌습니다",
+    "식욕이 돌아왔습니다",
+    "의식이 또렷해지고 있습니다",
+    "욕창이 좋아지고 있습니다",
+    "통증이 줄었습니다",
+    "부종이 빠지고 있습니다",
+    "수면이 안정되고 있습니다",
+    "폐렴이 회복되고 있습니다",
+    "감염이 호전되고 있습니다",
+    "전반적으로 호전되고 있습니다",
+  ];
+
+  const ALERT_CONSENT = [
+    "알부민 주사가 필요합니다 (보호자 동의 필요)",
+    "경관식이 필요한 상태입니다 (보호자 동의 필요)",
+    "영양제 투여가 필요합니다 (보호자 동의 필요)",
+    "입원치료 강화가 필요합니다",
+    "정밀검사가 필요합니다",
+  ];
 
   const BPSD_ITEMS = [
     "인지저하","기억력 저하","지남력 장애","판단력 저하",
@@ -2258,27 +2219,79 @@ function DoctorReviewScreen({ patient, user, onBack }) {
         )
       ),
 
-      // 보호자 전달 특이사항
+      // 보호자 전달 특이사항 (증상+처치 세트)
       React.createElement("div", { style: { background: "white", borderRadius: 14, marginBottom: 12, overflow: "hidden", boxShadow: "0 1px 6px rgba(0,0,0,0.06)" } },
         React.createElement("div", { style: { background: "linear-gradient(135deg,#1e3a5f,#2c5282)", padding: "10px 16px", fontSize: 13, fontWeight: 700, color: "white" } }, "💬 보호자에게 전달할 상태"),
         React.createElement("div", { style: { padding: 14 } },
-          Object.entries(ALERT_ITEMS).map(([cat, {items, color, bg, border, activeBg}]) =>
-            React.createElement("div", { key: cat, style: { marginBottom: 12 } },
-              React.createElement("div", { style: { fontSize: 12, color, fontWeight: 700, marginBottom: 8 } }, cat),
-              React.createElement("div", { style: { display: "grid", gridTemplateColumns: "1fr 1fr", gap: 6 } },
-                items.map(v => React.createElement("button", {
-                  key: v, onClick: () => toggleAlert(v),
-                  style: { padding: "8px 10px", borderRadius: 8, border: "1.5px solid",
-                    borderColor: specialAlerts.includes(v) ? activeBg : border,
-                    background: specialAlerts.includes(v) ? activeBg : bg,
-                    color: specialAlerts.includes(v) ? "white" : "#1e293b",
-                    fontSize: 12, fontWeight: specialAlerts.includes(v) ? 700 : 500,
-                    cursor: "pointer",
-                    fontFamily: "'Noto Sans KR',sans-serif", lineHeight: 1.4,
-                    textAlign: "left",
-                    transition: "all 0.15s ease" }
-                }, v))
+
+          // 증상+처치 세트
+          React.createElement("div", { style: { fontSize: 12, color: "#92400e", fontWeight: 700, marginBottom: 8 } }, "⚠️ 주요 상황 (클릭하면 증상·처치가 함께 전달돼요)"),
+          React.createElement("div", { style: { display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 6, marginBottom: 14 } },
+            ALERT_SETS.map(s => {
+              const isActive = specialAlerts.includes(s.bad);
+              return React.createElement("button", {
+                key: s.label,
+                onClick: () => {
+                  if (isActive) {
+                    setSpecialAlerts(sa => sa.filter(x => x !== s.bad && x !== s.good));
+                  } else {
+                    setSpecialAlerts(sa => [...sa.filter(x => x !== s.bad && x !== s.good), s.bad, s.good]);
+                  }
+                },
+                style: {
+                  padding: "10px 6px", borderRadius: 10, border: "1.5px solid",
+                  borderColor: isActive ? "#d97706" : "#fde68a",
+                  background: isActive ? "#d97706" : "#fffbeb",
+                  color: isActive ? "white" : "#92400e",
+                  fontSize: 12, fontWeight: 700, cursor: "pointer",
+                  fontFamily: "'Noto Sans KR',sans-serif", lineHeight: 1.4,
+                  textAlign: "center", transition: "all 0.15s"
+                }
+              }, s.label)
+            })
+          ),
+
+          // 선택된 세트 미리보기
+          specialAlerts.filter(a => !ALERT_RECOVERY.includes(a) && !ALERT_CONSENT.includes(a)).length > 0 &&
+          React.createElement("div", { style: { background: "#fffbeb", borderRadius: 10, padding: "10px 12px", marginBottom: 14, border: "1.5px solid #fde68a" } },
+            React.createElement("div", { style: { fontSize: 11, color: "#92400e", fontWeight: 700, marginBottom: 6 } }, "선택된 내용 (보호자에게 전달)"),
+            ALERT_SETS.filter(s => specialAlerts.includes(s.bad)).map((s, i) =>
+              React.createElement("div", { key: i, style: { fontSize: 12, color: "#78350f", lineHeight: 1.6, paddingBottom: 4, borderBottom: "1px solid #fef3c7", marginBottom: 4 } },
+                React.createElement("span", { style: { fontWeight: 700 } }, `${s.label}: `),
+                `${s.bad} → ${s.good}`
               )
+            )
+          ),
+
+          // 호전 상황
+          React.createElement("div", { style: { fontSize: 12, color: "#166534", fontWeight: 700, marginBottom: 8 } }, "✅ 호전되는 상황"),
+          React.createElement("div", { style: { display: "grid", gridTemplateColumns: "1fr 1fr", gap: 6, marginBottom: 14 } },
+            ALERT_RECOVERY.map(v =>
+              React.createElement("button", {
+                key: v, onClick: () => toggleAlert(v),
+                style: { padding: "8px 10px", borderRadius: 8, border: "1.5px solid",
+                  borderColor: specialAlerts.includes(v) ? "#16a34a" : "#bbf7d0",
+                  background: specialAlerts.includes(v) ? "#16a34a" : "#f0fdf4",
+                  color: specialAlerts.includes(v) ? "white" : "#166534",
+                  fontSize: 12, fontWeight: 600, cursor: "pointer",
+                  fontFamily: "'Noto Sans KR',sans-serif", lineHeight: 1.4, textAlign: "left" }
+              }, v)
+            )
+          ),
+
+          // 보호자 동의 필요
+          React.createElement("div", { style: { fontSize: 12, color: "#1e4d8c", fontWeight: 700, marginBottom: 8 } }, "📋 보호자 안내·동의 필요"),
+          React.createElement("div", { style: { display: "flex", flexDirection: "column", gap: 6 } },
+            ALERT_CONSENT.map(v =>
+              React.createElement("button", {
+                key: v, onClick: () => toggleAlert(v),
+                style: { padding: "9px 12px", borderRadius: 8, border: "1.5px solid",
+                  borderColor: specialAlerts.includes(v) ? "#2563eb" : "#bfdbfe",
+                  background: specialAlerts.includes(v) ? "#2563eb" : "#eff6ff",
+                  color: specialAlerts.includes(v) ? "white" : "#1e4d8c",
+                  fontSize: 12, fontWeight: 600, cursor: "pointer",
+                  fontFamily: "'Noto Sans KR',sans-serif", textAlign: "left" }
+              }, v)
             )
           )
         )
