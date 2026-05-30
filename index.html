@@ -646,7 +646,12 @@ function GuardianScreen({ user, onBack }) {
   // 탭 변경 시 히스토리에 push
   const goTab = (t) => {
     setTab(t);
+    appStateRef.current.tab = t;
     window.history.pushState({ anbu: true, screen: "app", tab: t }, "");
+    // 모바일에서 뒤로가기 여유 확보
+    for (let i = 0; i < 5; i++) {
+      window.history.pushState({ anbu: true, dummy: true }, "");
+    }
   };
 
   // 브라우저 뒤로가기로 탭 복원
@@ -2884,39 +2889,74 @@ function App() {
 
   // 히스토리에 상태 push (탭/화면 이동마다 호출)
   const pushHistory = (state) => {
+    appStateRef.current = { ...appStateRef.current, ...state };
     window.history.pushState({ anbu: true, ...state }, "");
+    pushDummy(5);
+  };
+
+  // 현재 앱 상태를 ref로 추적 (popstate에서 최신값 참조)
+  const appStateRef = React.useRef({ screen: "splash", tab: "today" });
+
+  const pushDummy = (n = 5) => {
+    for (let i = 0; i < n; i++) {
+      window.history.pushState({ anbu: true, dummy: true }, "");
+    }
   };
 
   useEffect(() => {
     const seen = localStorage.getItem("anbu_onboarded");
     const initScreen = seen ? "roleSelect" : "onboarding";
     setScreen(initScreen);
+    appStateRef.current.screen = initScreen;
+
+    // 시작 시 더미 히스토리 충분히 쌓기 (모바일 대응)
     window.history.replaceState({ anbu: true, screen: initScreen }, "");
+    pushDummy(10);
 
     const onPop = (e) => {
-      const state = e.state;
-      if (!state || !state.anbu) {
-        // 앱 히스토리 밖으로 나가려는 경우
-        if (window.confirm("앱을 종료하시겠습니까?")) {
-          window.history.go(-10);
+      const cur = appStateRef.current;
+
+      // 로그인된 상태에서 뒤로가기
+      if (isLoggedInRef.current) {
+        const tabs = ["today", "history", "photos", "message"];
+        const curTabIdx = tabs.indexOf(cur.tab || "today");
+
+        if (curTabIdx > 0) {
+          // 탭 이전으로
+          const prevTab = tabs[curTabIdx - 1];
+          appStateRef.current.tab = prevTab;
+          window.dispatchEvent(new CustomEvent("anbu-tab", { detail: prevTab }));
+          pushDummy(5);
         } else {
-          window.history.pushState({ anbu: true, screen: "roleSelect" }, "");
+          // 첫 탭 → 로그아웃 확인
+          if (window.confirm("로그아웃 하시겠습니까?")) {
+            isLoggedInRef.current = false;
+            setCurrentUser(null);
+            setRole(null);
+            setScreen("roleSelect");
+            appStateRef.current = { screen: "roleSelect", tab: "today" };
+            pushDummy(10);
+          } else {
+            pushDummy(5);
+          }
         }
         return;
       }
-      // 이전 상태로 복원
-      const s = state.screen;
-      const t = state.tab;
-      if (s) setScreen(s);
-      if (t) {
-        // 탭 상태는 GuardianScreen 내부에서 관리하므로
-        // 커스텀 이벤트로 전달
-        window.dispatchEvent(new CustomEvent("anbu-tab", { detail: t }));
-      }
-      if (s === "roleSelect" || s === "onboarding") {
-        isLoggedInRef.current = false;
-        setCurrentUser(null);
+
+      // 비로그인 상태
+      if (cur.screen === "login" || cur.screen === "signup" || cur.screen === "notices") {
+        setScreen("roleSelect");
         setRole(null);
+        appStateRef.current.screen = "roleSelect";
+        pushDummy(10);
+      } else if (cur.screen === "roleSelect" || cur.screen === "onboarding") {
+        if (window.confirm("앱을 종료하시겠습니까?")) {
+          window.history.go(-20);
+        } else {
+          pushDummy(10);
+        }
+      } else {
+        pushDummy(5);
       }
     };
 
@@ -2940,8 +2980,9 @@ function App() {
   const handleLogin = (user) => {
     setCurrentUser(user);
     isLoggedInRef.current = true;
+    appStateRef.current = { screen: "app", tab: "today" };
     setScreen("app");
-    pushHistory({ screen: "app" });
+    pushDummy(10);
   };
 
   const handleLogout = () => {
@@ -2949,8 +2990,9 @@ function App() {
     isLoggedInRef.current = false;
     setCurrentUser(null);
     setRole(null);
+    appStateRef.current = { screen: "roleSelect", tab: "today" };
     setScreen("roleSelect");
-    pushHistory({ screen: "roleSelect" });
+    pushDummy(10);
   };
 
   if (screen === "splash") return React.createElement("div", { style: { minHeight: "100vh", background: "linear-gradient(160deg,#0f172a,#1e3a5f)", display: "flex", alignItems: "center", justifyContent: "center" } },
