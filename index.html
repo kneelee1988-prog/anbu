@@ -723,21 +723,40 @@ function GuardianScreen({ user, onBack }) {
   const patient = user.patient;
 
   useEffect(() => {
-    api("get_today_record", { patientId: patient.id, phone: user.phone })
-      .then(d => setRecord(d.record))
-      .finally(() => setLoading(false));
+    // 오늘 기록 + 최근 7일 기록 병렬 로드
+    const frames = [];
+    for (let i = 6; i >= 0; i--) {
+      const d = new Date();
+      d.setDate(d.getDate() - i);
+      const kst = new Date(d.getTime() + 9 * 60 * 60 * 1000);
+      frames.push(kst.toISOString().slice(0, 10));
+    }
+
+    Promise.all([
+      api("get_today_record", { patientId: patient.id, phone: user.phone }),
+      fetch(`${SUPABASE_URL}/rest/v1/records?patient_id=eq.${patient.id}&order=date.asc&limit=30`, {
+        headers: { apikey: ANON_KEY, Authorization: "Bearer " + ANON_KEY }
+      }).then(r => r.json())
+    ])
+    .then(([todayData, histData]) => {
+      setRecord(todayData.record);
+      const records = Array.isArray(histData) ? histData : [];
+      const filled = frames.map(date => {
+        const found = records.find(r => r.date === date);
+        return found || { date, _empty: true };
+      });
+      setHistory(filled);
+    })
+    .catch(() => {
+      setHistory(frames.map(date => ({ date, _empty: true })));
+    })
+    .finally(() => setLoading(false));
   }, []);
 
-  // 지난 기록 탭 클릭 시 히스토리 로드
+  // 지난 기록 탭 클릭 시 히스토리 로드 (이미 로드됐으면 스킵)
   useEffect(() => {
     if (tab === "history" && history.length === 0) {
       setHistLoading(true);
-      const fromDate = new Date();
-      fromDate.setDate(fromDate.getDate() - 14);
-      const kstOffset = 9 * 60 * 60 * 1000;
-      const kstFrom = new Date(fromDate.getTime() + kstOffset);
-      const fromStr = kstFrom.toISOString().slice(0, 10);
-      // 최근 7일 날짜 프레임 생성
       const frames = [];
       for (let i = 6; i >= 0; i--) {
         const d = new Date();
@@ -745,24 +764,19 @@ function GuardianScreen({ user, onBack }) {
         const kst = new Date(d.getTime() + 9 * 60 * 60 * 1000);
         frames.push(kst.toISOString().slice(0, 10));
       }
-
       fetch(`${SUPABASE_URL}/rest/v1/records?patient_id=eq.${patient.id}&order=date.asc&limit=30`, {
         headers: { apikey: ANON_KEY, Authorization: "Bearer " + ANON_KEY }
       })
       .then(r => r.json())
       .then(data => {
         const records = Array.isArray(data) ? data : [];
-        // 7일 프레임에 실제 기록 매핑 (없는 날은 빈 객체)
         const filled = frames.map(date => {
           const found = records.find(r => r.date === date);
           return found || { date, _empty: true };
         });
         setHistory(filled);
       })
-      .catch(e => {
-        // 오류시에도 빈 7일 프레임 표시
-        setHistory(frames.map(date => ({ date, _empty: true })));
-      })
+      .catch(() => setHistory(frames.map(date => ({ date, _empty: true }))))
       .finally(() => setHistLoading(false));
     }
   }, [tab]);
@@ -1903,7 +1917,24 @@ function NurseRecordScreen({ patient, user, onBack, onSaved }) {
         `📅 ${new Date().toLocaleDateString("ko-KR", { year:"numeric", month:"long", day:"numeric", weekday:"short" })} 입력`
       ),
       patient.dnr === true && React.createElement("span", { style: { fontSize: 11, fontWeight: 800, background: "#dcfce7", color: "#15803d", borderRadius: 4, padding: "2px 6px", marginTop: 6, display: "inline-block" } }, "DNR동의"),
-      patient.dnr === false && React.createElement("span", { style: { fontSize: 11, fontWeight: 800, background: "#fee2e2", color: "#dc2626", borderRadius: 4, padding: "2px 6px", marginTop: 6, display: "inline-block" } }, "DNR비동의")
+      patient.dnr === false && React.createElement("span", { style: { fontSize: 11, fontWeight: 800, background: "#fee2e2", color: "#dc2626", borderRadius: 4, padding: "2px 6px", marginTop: 6, display: "inline-block" } }, "DNR비동의"),
+
+      // 진행률 바
+      React.createElement("div", { style: { marginTop: 14 } },
+        React.createElement("div", { style: { display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 5 } },
+          React.createElement("div", { style: { fontSize: 11, color: "rgba(255,255,255,0.8)", fontWeight: 600 } },
+            `입력 진행률 · ${progress.done}/${progress.total} 항목`),
+          React.createElement("div", { style: { fontSize: 12, fontWeight: 800, color: progress.pct === 100 ? "#bbf7d0" : "white" } },
+            `${progress.pct}%`)
+        ),
+        React.createElement("div", { style: { height: 6, background: "rgba(255,255,255,0.2)", borderRadius: 99, overflow: "hidden" } },
+          React.createElement("div", { style: {
+            height: "100%", borderRadius: 99, transition: "width 0.4s ease",
+            width: `${progress.pct}%`,
+            background: progress.pct === 100 ? "#4ade80" : "rgba(255,255,255,0.9)"
+          } })
+        )
+      )
     ),
     React.createElement("div", { className: "scroll-area", style: { paddingTop: 16 } },
 
