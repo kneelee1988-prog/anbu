@@ -1651,7 +1651,7 @@ function NurseChooseScreen({ patient, user, onNoChange, onEdit, onBack }) {
     React.createElement("div", { style: { padding: "0 20px", marginTop: 16 } },
       React.createElement("div", { className: "tabs" },
         React.createElement("button", { className: `tab ${tab==="today"?"active":""}`, onClick: () => setTab("today") }, "오늘 입력"),
-        React.createElement("button", { className: `tab ${tab==="history"?"active":""}`, onClick: () => goTab("history") }, "지난 기록")
+        React.createElement("button", { className: `tab ${tab==="history"?"active":""}`, onClick: () => setTab("history") }, "지난 기록")
       )
     ),
 
@@ -2595,7 +2595,7 @@ function DoctorReviewScreen({ patient, user, onBack }) {
     React.createElement("div", { style: { padding: "0 20px", marginTop: 16 } },
       React.createElement("div", { className: "tabs" },
         React.createElement("button", { className: `tab ${tab==="today"?"active":""}`, onClick: () => setTab("today") }, "오늘 검토"),
-        React.createElement("button", { className: `tab ${tab==="history"?"active":""}`, onClick: () => goTab("history") }, "지난 기록")
+        React.createElement("button", { className: `tab ${tab==="history"?"active":""}`, onClick: () => setTab("history") }, "지난 기록")
       )
     ),
 
