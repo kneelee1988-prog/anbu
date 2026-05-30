@@ -993,6 +993,7 @@ function GuardianScreen({ user, onBack }) {
                 else symptoms.push(a);
               });
 
+              // 2칸 그리드 섹션 (현재상태, 호전, 치료종료용 - 짧은 문구)
               const GridSection = ({ title, items, headerBg, itemBg, itemColor, itemBorder }) =>
                 items.length > 0 && React.createElement("div", { style: { background: "white", borderRadius: 14, overflow: "hidden", boxShadow: "0 2px 8px rgba(0,0,0,0.07)", display: "flex", flexDirection: "column" } },
                   React.createElement("div", { style: { background: headerBg, padding: "9px 14px", fontSize: 12, fontWeight: 700, color: "white" } }, title),
@@ -1002,6 +1003,23 @@ function GuardianScreen({ user, onBack }) {
                       fontSize: 11, fontWeight: 600, padding: "7px 8px",
                       border: `1px solid ${itemBorder}`, lineHeight: 1.5
                     } }, a))
+                  )
+                );
+
+              // 1칸 전체폭 리스트 섹션 (처치·치료 중 - 긴 문구)
+              const ListSection = ({ title, items, headerBg, itemBg, itemColor, itemBorder }) =>
+                items.length > 0 && React.createElement("div", { style: { marginBottom: 8, background: "white", borderRadius: 14, overflow: "hidden", boxShadow: "0 2px 8px rgba(0,0,0,0.07)" } },
+                  React.createElement("div", { style: { background: headerBg, padding: "9px 14px", fontSize: 12, fontWeight: 700, color: "white" } }, title),
+                  React.createElement("div", { style: { padding: "8px 12px", display: "flex", flexDirection: "column", gap: 5 } },
+                    items.map((a, i) => React.createElement("div", { key: i, style: {
+                      display: "flex", alignItems: "flex-start", gap: 8,
+                      background: itemBg, color: itemColor, borderRadius: 8,
+                      fontSize: 12, fontWeight: 600, padding: "8px 10px",
+                      border: `1px solid ${itemBorder}`, lineHeight: 1.6
+                    } },
+                      React.createElement("span", { style: { flexShrink: 0, marginTop: 1 } }, "✓"),
+                      React.createElement("span", null, a)
+                    ))
                   )
                 );
 
@@ -1023,9 +1041,11 @@ function GuardianScreen({ user, onBack }) {
                   GridSection({ title: "⚠️ 현재 상태", items: symptoms,
                     headerBg: "linear-gradient(135deg,#7f1d1d,#dc2626)",
                     itemBg: "#fff1f2", itemColor: "#be123c", itemBorder: "#fecdd3" }),
-                  GridSection({ title: "🩺 처치·치료 중", items: treating,
-                    headerBg: "linear-gradient(135deg,#1e3a5f,#2563eb)",
-                    itemBg: "#eff6ff", itemColor: "#1d4ed8", itemBorder: "#bfdbfe" })
+                  React.createElement("div", null,
+                    ListSection({ title: "🩺 처치·치료 중", items: treating,
+                      headerBg: "linear-gradient(135deg,#1e3a5f,#2563eb)",
+                      itemBg: "#eff6ff", itemColor: "#1d4ed8", itemBorder: "#bfdbfe" })
+                  )
                 ),
                 // 호전 + 치료종료 나란히 2칸
                 (recovering.length > 0 || doneTreat.length > 0) && React.createElement("div", { style: { display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8, marginBottom: 8 } },
