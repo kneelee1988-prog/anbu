@@ -765,8 +765,12 @@ function GuardianScreen({ user, onBack }) {
     // 헤더
     React.createElement("div", { style: { background: "linear-gradient(135deg,#064e3b,#059669)", padding: "48px 20px 18px" } },
       React.createElement("div", { style: { display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 10 } },
-        React.createElement("button", { className: "back-btn", onClick: onBack }, "← 역할 선택"),
-        React.createElement("button", { className: "logout-btn", onClick: onBack }, "로그아웃 →")
+        React.createElement("button", { className: "back-btn", onClick: () => {
+          if (window.confirm("로그아웃 하시겠습니까?")) onBack();
+        } }, "← 역할 선택"),
+        React.createElement("button", { className: "logout-btn", onClick: () => {
+          if (window.confirm("로그아웃 하시겠습니까?")) onBack();
+        } }, "로그아웃 →")
       ),
       React.createElement("div", { style: { display: "flex", alignItems: "baseline", gap: 10, flexWrap: "wrap" } },
         React.createElement("div", { style: { fontSize: 26, fontWeight: 900, color: "white" } }, `${patient.name}님`),
@@ -1192,8 +1196,12 @@ function NurseScreen({ user, onBack }) {
   return React.createElement("div", { className: "screen", style: { background: "#f0f4f8" } },
     React.createElement("div", { style: { background: "linear-gradient(135deg,#064e3b,#059669)", padding: "48px 20px 20px" } },
       React.createElement("div", { className: "header-top" },
-        React.createElement("button", { className: "back-btn", onClick: onBack }, "← 역할 선택"),
-        React.createElement("button", { className: "logout-btn", onClick: onBack }, "로그아웃 →")
+        React.createElement("button", { className: "back-btn", onClick: () => {
+          if (window.confirm("로그아웃 하시겠습니까?")) onBack();
+        } }, "← 역할 선택"),
+        React.createElement("button", { className: "logout-btn", onClick: () => {
+          if (window.confirm("로그아웃 하시겠습니까?")) onBack();
+        } }, "로그아웃 →")
       ),
       React.createElement("div", { style: { fontSize: 11, color: "rgba(255,255,255,0.5)", marginTop: 8 } }, `오늘안부 · 천안쌍용요양병원 · ${user.ward}`),
       React.createElement("div", { style: { display: "flex", justifyContent: "space-between", alignItems: "flex-end", marginTop: 4 } },
@@ -1645,7 +1653,10 @@ function NurseRecordScreen({ patient, user, onBack, onSaved }) {
 
   return React.createElement("div", { className: "screen", style: { background: "#f0f4f8" } },
     React.createElement("div", { style: { background: "linear-gradient(135deg,#064e3b,#059669)", padding: "48px 20px 20px" } },
-      React.createElement("button", { className: "back-btn", onClick: onBack }, "← 목록"),
+      React.createElement("button", { className: "back-btn", onClick: () => {
+        if (window.confirm("목록으로 돌아가시겠습니까?
+저장하지 않은 내용은 사라집니다.")) onBack();
+      } }, "← 목록"),
       React.createElement("div", { style: { fontSize: 18, fontWeight: 800, color: "white", marginTop: 8 } }, `${patient.name} ${patient.age}세 · ${patient.gender}`),
       React.createElement("div", { style: { fontSize: 13, color: "rgba(255,255,255,0.7)" } }, `${patient.room} · 입원 ${admitDays(patient.admitted_at)}일째`),
       React.createElement("div", { style: { fontSize: 12, color: "rgba(255,255,255,0.8)", marginTop: 4, fontWeight: 600 } },
@@ -1887,8 +1898,12 @@ function DoctorScreen({ user, onBack }) {
   return React.createElement("div", { className: "screen", style: { background: "#f0f4f8" } },
     React.createElement("div", { style: { background: "linear-gradient(135deg,#1e1b4b,#4338ca)", padding: "48px 20px 20px" } },
       React.createElement("div", { className: "header-top" },
-        React.createElement("button", { className: "back-btn", onClick: onBack }, "← 역할 선택"),
-        React.createElement("button", { className: "logout-btn", onClick: onBack }, "로그아웃 →")
+        React.createElement("button", { className: "back-btn", onClick: () => {
+          if (window.confirm("로그아웃 하시겠습니까?")) onBack();
+        } }, "← 역할 선택"),
+        React.createElement("button", { className: "logout-btn", onClick: () => {
+          if (window.confirm("로그아웃 하시겠습니까?")) onBack();
+        } }, "로그아웃 →")
       ),
       React.createElement("div", { style: { fontSize: 11, color: "rgba(255,255,255,0.5)", marginTop: 8 } }, `오늘안부 · 천안쌍용요양병원 · ${user.name} 원장`),
       React.createElement("div", { style: { display: "flex", justifyContent: "space-between", alignItems: "flex-end", marginTop: 4 } },
@@ -2162,7 +2177,10 @@ function DoctorReviewScreen({ patient, user, onBack }) {
     React.createElement("div", { style: { background: "linear-gradient(135deg,#1e1b4b,#4338ca)", padding: "44px 20px 18px", position: "relative" } },
       // 상단 바: 뒤로가기 + 역할 뱃지
       React.createElement("div", { style: { display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 14 } },
-        React.createElement("button", { className: "back-btn", onClick: onBack }, "← 목록"),
+        React.createElement("button", { className: "back-btn", onClick: () => {
+          if (window.confirm("목록으로 돌아가시겠습니까?
+저장하지 않은 내용은 사라집니다.")) onBack();
+        } }, "← 목록"),
         React.createElement("div", { style: {
           background: "rgba(255,255,255,0.18)", border: "1px solid rgba(255,255,255,0.35)",
           borderRadius: 20, padding: "4px 12px", fontSize: 11, fontWeight: 800,
@@ -2528,8 +2546,12 @@ function MessagesScreen({ user, onBack }) {
   return React.createElement("div", { className: "screen", style: { background: "#f0f4f8" } },
     React.createElement("div", { style: { background: "linear-gradient(135deg,#1e3a5f,#0891b2)", padding: "48px 20px 16px" } },
       React.createElement("div", { className: "header-top" },
-        React.createElement("button", { className: "back-btn", onClick: onBack }, "← 역할 선택"),
-        React.createElement("button", { className: "logout-btn", onClick: onBack }, "로그아웃 →")
+        React.createElement("button", { className: "back-btn", onClick: () => {
+          if (window.confirm("로그아웃 하시겠습니까?")) onBack();
+        } }, "← 역할 선택"),
+        React.createElement("button", { className: "logout-btn", onClick: () => {
+          if (window.confirm("로그아웃 하시겠습니까?")) onBack();
+        } }, "로그아웃 →")
       ),
       React.createElement("div", { style: { fontSize: 16, fontWeight: 800, color: "white", marginTop: 8 } }, "💬 가족들의 한마디 확인"),
       React.createElement("div", { style: { fontSize: 12, color: "rgba(255,255,255,0.7)", marginTop: 3 } },
@@ -2616,8 +2638,12 @@ function AdminScreen({ user, onBack }) {
   return React.createElement("div", { className: "screen", style: { background: "#f0f4f8" } },
     React.createElement("div", { style: { background: "linear-gradient(135deg,#1c1917,#44403c)", padding: "48px 20px 16px" } },
       React.createElement("div", { className: "header-top" },
-        React.createElement("button", { className: "back-btn", onClick: onBack }, "← 역할선택"),
-        React.createElement("button", { className: "logout-btn", onClick: onBack }, "로그아웃 →")
+        React.createElement("button", { className: "back-btn", onClick: () => {
+          if (window.confirm("로그아웃 하시겠습니까?")) onBack();
+        } }, "← 역할선택"),
+        React.createElement("button", { className: "logout-btn", onClick: () => {
+          if (window.confirm("로그아웃 하시겠습니까?")) onBack();
+        } }, "로그아웃 →")
       ),
       React.createElement("div", { style: { fontSize: 11, color: "rgba(255,255,255,0.5)", marginTop: 8 } }, "오늘안부 · 관리자"),
       React.createElement("div", { style: { fontSize: 18, fontWeight: 800, color: "white" } }, `${user.name} 병원장`),
