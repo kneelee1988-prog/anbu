@@ -2197,8 +2197,9 @@ function DoctorReviewScreen({ patient, user, onBack }) {
           const b = d.record.bprs;
           setBprs(b ? (Array.isArray(b) ? b : b.split("·").map(s=>s.trim()).filter(Boolean)) : []);
           const sa = d.record.special_alerts;
-          setSpecialAlerts(sa ? (Array.isArray(sa) ? sa : sa.split("·").map(s=>s.trim()).filter(Boolean)) : []);
-          // 이미 태그 포함된 데이터면 그대로 사용
+          const saArr = sa ? (Array.isArray(sa) ? sa : sa.split("·").map(s=>s.trim()).filter(Boolean)) : [];
+          // 태그 없는 구버전 데이터 제거하고 태그 있는 것만 로드
+          setSpecialAlerts(saArr.filter(a => /^\[[STRCD]\]/.test(a)));
         }
       })
       .finally(() => setLoading(false));
