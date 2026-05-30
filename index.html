@@ -494,14 +494,15 @@ function usePatientPhotos(patientId) {
   const [loading, setLoading] = React.useState(true);
 
   const loadPhotos = () => {
-    fetch(`${SUPABASE_URL}/storage/v1/object/list/patient-photos/${patientId}`, {
+    setLoading(true);
+    fetch(`${SUPABASE_URL}/storage/v1/object/list/patient-photos`, {
       method: "POST",
       headers: { apikey: ANON_KEY, Authorization: "Bearer " + ANON_KEY, "Content-Type": "application/json" },
-      body: JSON.stringify({ limit: 20, sortBy: { column: "created_at", order: "desc" } })
+      body: JSON.stringify({ prefix: `${patientId}/`, limit: 20, sortBy: { column: "created_at", order: "desc" } })
     }).then(r => r.json())
       .then(data => {
         if (Array.isArray(data)) {
-          setPhotos(data.slice(0, 12).map(f => ({
+          setPhotos(data.filter(f => f.name && f.name !== ".emptyFolderPlaceholder").slice(0, 12).map(f => ({
             id: f.id, name: f.name,
             url: `${SUPABASE_URL}/storage/v1/object/public/patient-photos/${patientId}/${f.name}`,
             date: new Date(f.created_at).toLocaleDateString("ko-KR", { month:"long", day:"numeric" }),
@@ -519,11 +520,16 @@ function usePatientPhotos(patientId) {
 
 // 보호자용 - 보기 전용
 function PhotoBox({ patientId }) {
-  const { photos, loading } = usePatientPhotos(patientId);
+  const { photos, loading, reload } = usePatientPhotos(patientId);
   const [preview, setPreview] = React.useState(null);
 
   return React.createElement("div", { style: { background: "white", borderRadius: 14, padding: 14, marginBottom: 14, boxShadow: "0 2px 12px rgba(0,0,0,0.08)" } },
-    React.createElement("div", { style: { fontSize: 13, fontWeight: 800, color: "#1e3a5f", marginBottom: 12 } }, "📷 어르신 사진"),
+    React.createElement("div", { style: { display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 12 } },
+      React.createElement("div", { style: { fontSize: 13, fontWeight: 800, color: "#1e3a5f" } }, "📷 어르신 사진"),
+      React.createElement("button", { onClick: reload,
+        style: { fontSize: 11, color: "#64748b", background: "#f1f5f9", border: "none", borderRadius: 6, padding: "4px 10px", cursor: "pointer", fontFamily: "'Noto Sans KR',sans-serif", fontWeight: 600 }
+      }, "🔄 새로고침")
+    ),
     loading
       ? React.createElement("div", { style: { textAlign: "center", padding: "20px 0", color: "#94a3b8", fontSize: 13 } }, "불러오는 중...")
       : photos.length === 0
