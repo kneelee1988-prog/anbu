@@ -2871,6 +2871,11 @@ function App() {
   const [role, setRole] = useState(null);
   const [currentUser, setCurrentUser] = useState(null);
 
+  useEffect(() => {
+    const seen = localStorage.getItem("anbu_onboarded");
+    setScreen(seen ? "roleSelect" : "onboarding");
+  }, []);
+
   const handleOnboardDone = () => {
     localStorage.setItem("anbu_onboarded", "1");
     setScreen("roleSelect");
