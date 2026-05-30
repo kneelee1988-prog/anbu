@@ -53,7 +53,7 @@
 
     /* 탭 */
     .tabs { display: flex; background: #f1f5f9; border-radius: 10px; padding: 4px; margin-bottom: 20px; }
-    .tab { flex: 1; padding: 8px 4px; text-align: center; font-size: 11px; font-weight: 600; color: #64748b; border-radius: 8px; cursor: pointer; transition: all 0.2s; border: none; background: none; font-family: 'Noto Sans KR', sans-serif; white-space: nowrap; }
+    .tab { flex: 1; padding: 8px 4px; text-align: center; font-size: 13px; font-weight: 700; color: #64748b; border-radius: 8px; cursor: pointer; transition: all 0.2s; border: none; background: none; font-family: 'Noto Sans KR', sans-serif; white-space: nowrap; }
     .tab.active { background: white; color: #1e3a5f; box-shadow: 0 1px 4px rgba(0,0,0,0.1); }
 
     /* 헤더 */
@@ -168,7 +168,7 @@ function OnboardingScreen({ onDone }) {
     React.createElement("div", { style: { textAlign: "center" } },
       React.createElement("div", { style: { fontSize: 72, marginBottom: 24 } }, s.icon),
       React.createElement("div", { style: { fontSize: 26, fontWeight: 800, color: "white", whiteSpace: "pre-line", lineHeight: 1.3, marginBottom: 16 } }, s.title),
-      React.createElement("div", { style: { fontSize: 15, color: "rgba(255,255,255,0.7)", whiteSpace: "pre-line", lineHeight: 1.6 } }, s.desc)
+      React.createElement("div", { style: { fontSize: 16, color: "rgba(255,255,255,0.7)", whiteSpace: "pre-line", lineHeight: 1.6 } }, s.desc)
     ),
     React.createElement("div", { style: { display: "flex", gap: 8, justifyContent: "center" } },
       slides.map((_, i) => React.createElement("div", { key: i, style: { width: i === idx ? 24 : 8, height: 8, borderRadius: 4, background: i === idx ? "white" : "rgba(255,255,255,0.3)", transition: "all 0.3s" } }))
@@ -197,8 +197,8 @@ function RoleSelectScreen({ onSelect }) {
   return React.createElement("div", { className: "screen", style: { background: "linear-gradient(160deg,#0f172a,#1e3a5f)" } },
     React.createElement("div", { style: { padding: "60px 24px 24px", textAlign: "center" } },
       React.createElement("div", { style: { fontSize: 28, fontWeight: 900, color: "white", letterSpacing: "-0.5px" } }, "오늘안부"),
-      React.createElement("div", { style: { fontSize: 13, color: "rgba(255,255,255,0.6)", marginTop: 4 } }, "천안쌍용요양병원"),
-      React.createElement("div", { style: { fontSize: 12, color: "rgba(255,255,255,0.4)", marginTop: 2 } }, "입원 환자 케어 연결 플랫폼")
+      React.createElement("div", { style: { fontSize: 15, color: "rgba(255,255,255,0.6)", marginTop: 4 } }, "천안쌍용요양병원"),
+      React.createElement("div", { style: { fontSize: 15, color: "rgba(255,255,255,0.4)", marginTop: 2 } }, "입원 환자 케어 연결 플랫폼")
     ),
     React.createElement("div", { style: { flex: 1, padding: "0 20px 40px", display: "flex", flexDirection: "column", gap: 10 } },
       roles.map(r => React.createElement("div", {
@@ -208,8 +208,8 @@ function RoleSelectScreen({ onSelect }) {
       },
         React.createElement("div", { style: { fontSize: 28, width: 44, height: 44, background: "rgba(255,255,255,0.1)", borderRadius: 12, display: "flex", alignItems: "center", justifyContent: "center" } }, r.icon),
         React.createElement("div", null,
-          React.createElement("div", { style: { fontSize: 15, fontWeight: 700, color: "white" } }, r.title),
-          React.createElement("div", { style: { fontSize: 12, color: "rgba(255,255,255,0.5)", marginTop: 2 } }, r.desc)
+          React.createElement("div", { style: { fontSize: 16, fontWeight: 700, color: "white" } }, r.title),
+          React.createElement("div", { style: { fontSize: 15, color: "rgba(255,255,255,0.5)", marginTop: 2 } }, r.desc)
         ),
         React.createElement("div", { style: { marginLeft: "auto", color: "rgba(255,255,255,0.4)", fontSize: 18 } }, "›")
       )),
@@ -219,16 +219,16 @@ function RoleSelectScreen({ onSelect }) {
       },
         React.createElement("div", { style: { fontSize: 28, width: 44, height: 44, background: "rgba(251,191,36,0.2)", borderRadius: 12, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 } }, "📢"),
         React.createElement("div", null,
-          React.createElement("div", { style: { fontSize: 15, fontWeight: 700, color: "white", display: "flex", alignItems: "center", gap: 8 } },
+          React.createElement("div", { style: { fontSize: 16, fontWeight: 700, color: "white", display: "flex", alignItems: "center", gap: 8 } },
             "공지사항",
-            notices.length > 0 && React.createElement("span", { style: { background: "rgba(251,191,36,0.9)", color: "#1c1917", borderRadius: 20, fontSize: 11, fontWeight: 700, padding: "1px 8px" } }, "NEW " + notices.length)
+            notices.length > 0 && React.createElement("span", { style: { background: "rgba(251,191,36,0.9)", color: "#1c1917", borderRadius: 20, fontSize: 15, fontWeight: 700, padding: "1px 8px" } }, "NEW " + notices.length)
           ),
-          React.createElement("div", { style: { fontSize: 12, color: "rgba(255,255,255,0.5)", marginTop: 2 } }, notices.length > 0 ? "최신 " + notices.length + "건" : "병원 소식을 확인하세요")
+          React.createElement("div", { style: { fontSize: 15, color: "rgba(255,255,255,0.5)", marginTop: 2 } }, notices.length > 0 ? "최신 " + notices.length + "건" : "병원 소식을 확인하세요")
         ),
         React.createElement("div", { style: { marginLeft: "auto", color: "rgba(251,191,36,0.6)", fontSize: 18 } }, "»")
       )
     ),
-    React.createElement("div", { style: { textAlign: "center", padding: "0 0 24px", color: "rgba(255,255,255,0.3)", fontSize: 12 } },
+    React.createElement("div", { style: { textAlign: "center", padding: "0 0 24px", color: "rgba(255,255,255,0.3)", fontSize: 15 } },
       "Powered by (주)디어다샘버"
     )
   );
@@ -247,9 +247,9 @@ function NoticesScreen({ onBack }) {
       notices.length === 0
         ? React.createElement("div", { className: "empty" }, React.createElement("div", { className: "empty-icon" }, "📭"), "공지사항이 없어요")
         : notices.map(n => React.createElement("div", { key: n.id, className: "card", style: { marginBottom: 12 } },
-            React.createElement("div", { style: { fontWeight: 700, fontSize: 15, color: "#1e3a5f", marginBottom: 8 } }, n.title),
-            React.createElement("div", { style: { fontSize: 13, color: "#374151", lineHeight: 1.6 } }, n.content),
-            React.createElement("div", { style: { fontSize: 12, color: "#94a3b8", marginTop: 10 } }, n.created_at?.slice(0,10))
+            React.createElement("div", { style: { fontWeight: 700, fontSize: 16, color: "#1e3a5f", marginBottom: 8 } }, n.title),
+            React.createElement("div", { style: { fontSize: 15, color: "#374151", lineHeight: 1.6 } }, n.content),
+            React.createElement("div", { style: { fontSize: 15, color: "#94a3b8", marginTop: 10 } }, n.created_at?.slice(0,10))
           ))
     )
   );
@@ -301,7 +301,7 @@ function LoginScreen({ loginType, onLogin, onBack, onSignup }) {
     React.createElement("div", { className: "header", style: { paddingTop: 48 } },
       React.createElement("button", { className: "back-btn", onClick: onBack }, "← 역할 선택"),
       React.createElement("div", { style: { fontSize: 24, fontWeight: 800, color: "white", marginTop: 12 } }, titles[loginType]),
-      React.createElement("div", { style: { fontSize: 13, color: "rgba(255,255,255,0.6)", marginTop: 4 } }, "오늘안부 · 입원 환자 케어 플랫폼")
+      React.createElement("div", { style: { fontSize: 15, color: "rgba(255,255,255,0.6)", marginTop: 4 } }, "오늘안부 · 입원 환자 케어 플랫폼")
     ),
     React.createElement("div", { style: { flex: 1, padding: "0 24px 40px" } },
       error && React.createElement("div", { className: "error-msg" }, error),
@@ -357,7 +357,7 @@ function LoginScreen({ loginType, onLogin, onBack, onSignup }) {
           React.createElement("div", { style: { display: "flex", gap: 8, marginBottom: 16 } },
             ["nurse","doctor"].map(r => React.createElement("button", {
               key: r, onClick: () => set("msgRole", r),
-              style: { flex: 1, padding: "10px", borderRadius: 8, border: "1.5px solid", borderColor: (form.msgRole||"nurse") === r ? "#1e3a5f" : "#e2e8f0", background: (form.msgRole||"nurse") === r ? "#1e3a5f" : "white", color: (form.msgRole||"nurse") === r ? "white" : "#64748b", fontWeight: 600, fontSize: 13, cursor: "pointer", fontFamily: "'Noto Sans KR',sans-serif" }
+              style: { flex: 1, padding: "10px", borderRadius: 8, border: "1.5px solid", borderColor: (form.msgRole||"nurse") === r ? "#1e3a5f" : "#e2e8f0", background: (form.msgRole||"nurse") === r ? "#1e3a5f" : "white", color: (form.msgRole||"nurse") === r ? "white" : "#64748b", fontWeight: 600, fontSize: 15, cursor: "pointer", fontFamily: "'Noto Sans KR',sans-serif" }
             }, r === "nurse" ? "👩‍⚕️ 간호사" : "🩺 의사"))
           ),
           (form.msgRole||"nurse") === "nurse"
@@ -401,9 +401,9 @@ function GuardianSignupScreen({ onBack, onDone }) {
 
   return React.createElement("div", { className: "screen", style: { background: "#f8fafc" } },
     React.createElement("div", { style: { padding: "48px 24px 24px" } },
-      React.createElement("button", { onClick: onBack, style: { background: "#f1f5f9", border: "none", borderRadius: 8, padding: "8px 14px", fontSize: 13, cursor: "pointer", fontFamily: "'Noto Sans KR',sans-serif", marginBottom: 20 } }, "← 돌아가기"),
+      React.createElement("button", { onClick: onBack, style: { background: "#f1f5f9", border: "none", borderRadius: 8, padding: "8px 14px", fontSize: 15, cursor: "pointer", fontFamily: "'Noto Sans KR',sans-serif", marginBottom: 20 } }, "← 돌아가기"),
       React.createElement("div", { style: { fontSize: 24, fontWeight: 800, color: "#1e3a5f" } }, "보호자 회원가입"),
-      React.createElement("div", { style: { fontSize: 13, color: "#64748b", marginTop: 4 } }, "가입 신청 후 관리자 승인이 완료되면 로그인하실 수 있어요.")
+      React.createElement("div", { style: { fontSize: 15, color: "#64748b", marginTop: 4 } }, "가입 신청 후 관리자 승인이 완료되면 로그인하실 수 있어요.")
     ),
     React.createElement("div", { className: "scroll-area", style: { paddingTop: 0 } },
       error && React.createElement("div", { className: "error-msg" }, error),
@@ -456,7 +456,7 @@ function TrendChart({ records, label, field, maxVal, colorFn, valueLabelFn, acce
     style: { background: "white", borderRadius: 12, padding: "12px 10px 10px",
       border: `1.5px solid ${accent}22`, boxShadow: "0 1px 6px rgba(0,0,0,0.06)" }
   },
-    React.createElement("div", { style: { fontSize: 12, fontWeight: 800, color: accent, marginBottom: 10 } }, label),
+    React.createElement("div", { style: { fontSize: 15, fontWeight: 800, color: accent, marginBottom: 10 } }, label),
     React.createElement("div", { style: { display: "flex", alignItems: "flex-end", gap: 3, height: 72 } },
       days.map((r, i) => {
         const val = r[field];
@@ -467,7 +467,7 @@ function TrendChart({ records, label, field, maxVal, colorFn, valueLabelFn, acce
         const isToday = i === days.length - 1;
         const displayVal = val !== null ? (valueLabelFn ? valueLabelFn(val) : `${val}`) : "";
         return React.createElement("div", { key: i, style: { flex: 1, display: "flex", flexDirection: "column", alignItems: "center", gap: 2 } },
-          React.createElement("div", { style: { fontSize: 11, fontWeight: 800, color: val === null ? "#cbd5e1" : color, minHeight: 12, textAlign: "center", lineHeight: 1.2 } }, displayVal),
+          React.createElement("div", { style: { fontSize: 15, fontWeight: 800, color: val === null ? "#cbd5e1" : color, minHeight: 12, textAlign: "center", lineHeight: 1.2 } }, displayVal),
           React.createElement("div", { style: { width: "100%", height: 44, display: "flex", alignItems: "flex-end", justifyContent: "center" } },
             React.createElement("div", { style: {
               width: isToday ? "58%" : "42%",
@@ -479,7 +479,7 @@ function TrendChart({ records, label, field, maxVal, colorFn, valueLabelFn, acce
               boxShadow: isToday && val !== null ? `0 2px 6px ${color}44` : "none",
             }})
           ),
-          React.createElement("div", { style: { fontSize: 11, fontWeight: isToday ? 800 : 500, color: isToday ? accent : "#94a3b8" } },
+          React.createElement("div", { style: { fontSize: 15, fontWeight: isToday ? 800 : 500, color: isToday ? accent : "#94a3b8" } },
             isToday ? "오늘" : dateLabel)
         );
       })
@@ -536,7 +536,7 @@ function GuardianNoticesTab() {
 
   if (notices.length === 0) return React.createElement("div", { style: { padding: "40px 20px", textAlign: "center" } },
     React.createElement("div", { style: { fontSize: 48, marginBottom: 14 } }, "📢"),
-    React.createElement("div", { style: { fontSize: 15, fontWeight: 800, color: "#1e3a5f", marginBottom: 8 } }, "등록된 공지가 없어요")
+    React.createElement("div", { style: { fontSize: 16, fontWeight: 800, color: "#1e3a5f", marginBottom: 8 } }, "등록된 공지가 없어요")
   );
 
   return React.createElement("div", { style: { padding: "0 0 20px" } },
@@ -548,14 +548,14 @@ function GuardianNoticesTab() {
         React.createElement("div", { style: { display: "flex", alignItems: "center", gap: 8, marginBottom: 8 } },
           React.createElement("div", { style: {
             background: "#eff6ff", borderRadius: 6, padding: "2px 8px",
-            fontSize: 11, fontWeight: 800, color: "#1d4ed8"
+            fontSize: 15, fontWeight: 800, color: "#1d4ed8"
           } }, "📢 공지"),
-          React.createElement("div", { style: { fontSize: 11, color: "#94a3b8", marginLeft: "auto" } },
+          React.createElement("div", { style: { fontSize: 15, color: "#94a3b8", marginLeft: "auto" } },
             new Date(n.created_at).toLocaleDateString("ko-KR", { month: "long", day: "numeric" })
           )
         ),
-        React.createElement("div", { style: { fontSize: 14, fontWeight: 800, color: "#1e3a5f", marginBottom: 6 } }, n.title),
-        React.createElement("div", { style: { fontSize: 13, color: "#475569", lineHeight: 1.7 } }, n.content)
+        React.createElement("div", { style: { fontSize: 15, fontWeight: 800, color: "#1e3a5f", marginBottom: 6 } }, n.title),
+        React.createElement("div", { style: { fontSize: 15, color: "#475569", lineHeight: 1.7 } }, n.content)
       )
     )
   );
@@ -568,25 +568,25 @@ function PhotoBox({ patientId }) {
 
   return React.createElement("div", { style: { background: "white", borderRadius: 14, padding: 14, marginBottom: 14, boxShadow: "0 2px 12px rgba(0,0,0,0.08)" } },
     React.createElement("div", { style: { display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 12 } },
-      React.createElement("div", { style: { fontSize: 13, fontWeight: 800, color: "#1e3a5f" } }, "📷 어르신 사진"),
+      React.createElement("div", { style: { fontSize: 15, fontWeight: 800, color: "#1e3a5f" } }, "📷 어르신 사진"),
       React.createElement("button", { onClick: reload,
-        style: { fontSize: 11, color: "#64748b", background: "#f1f5f9", border: "none", borderRadius: 6, padding: "4px 10px", cursor: "pointer", fontFamily: "'Noto Sans KR',sans-serif", fontWeight: 600 }
+        style: { fontSize: 15, color: "#64748b", background: "#f1f5f9", border: "none", borderRadius: 6, padding: "4px 10px", cursor: "pointer", fontFamily: "'Noto Sans KR',sans-serif", fontWeight: 600 }
       }, "🔄 새로고침")
     ),
     loading
-      ? React.createElement("div", { style: { textAlign: "center", padding: "20px 0", color: "#94a3b8", fontSize: 13 } }, "불러오는 중...")
+      ? React.createElement("div", { style: { textAlign: "center", padding: "20px 0", color: "#94a3b8", fontSize: 15 } }, "불러오는 중...")
       : photos.length === 0
         ? React.createElement("div", { style: { border: "2px dashed #e2e8f0", borderRadius: 14, padding: "32px 20px", textAlign: "center", background: "#f8fafc" } },
             React.createElement("div", { style: { fontSize: 48, marginBottom: 12 } }, "📷"),
-            React.createElement("div", { style: { fontSize: 15, fontWeight: 800, color: "#1e3a5f", marginBottom: 8 } }, "아직 등록된 사진이 없어요"),
-            React.createElement("div", { style: { fontSize: 12, color: "#94a3b8", lineHeight: 1.7 } }, "간호팀이 주 1~2회", React.createElement("br", null), "어르신 사진을 올려드려요")
+            React.createElement("div", { style: { fontSize: 16, fontWeight: 800, color: "#1e3a5f", marginBottom: 8 } }, "아직 등록된 사진이 없어요"),
+            React.createElement("div", { style: { fontSize: 15, color: "#94a3b8", lineHeight: 1.7 } }, "간호팀이 주 1~2회", React.createElement("br", null), "어르신 사진을 올려드려요")
           )
         : React.createElement("div", { style: { display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 6 } },
             photos.map(p => React.createElement("div", { key: p.id, style: { position: "relative", borderRadius: 8, overflow: "hidden", aspectRatio: "1", background: "#f1f5f9" } },
               p.isVideo
                 ? React.createElement("video", { src: p.url, style: { width: "100%", height: "100%", objectFit: "cover" } })
                 : React.createElement("img", { src: p.url, style: { width: "100%", height: "100%", objectFit: "cover", cursor: "pointer" }, onClick: () => setPreview(p) }),
-              React.createElement("div", { style: { position: "absolute", bottom: 0, left: 0, right: 0, background: "rgba(0,0,0,0.45)", padding: "3px 6px", fontSize: 11, color: "white", fontWeight: 600 } }, p.date),
+              React.createElement("div", { style: { position: "absolute", bottom: 0, left: 0, right: 0, background: "rgba(0,0,0,0.45)", padding: "3px 6px", fontSize: 15, color: "white", fontWeight: 600 } }, p.date),
               p.isVideo && React.createElement("div", { style: { position: "absolute", top: "50%", left: "50%", transform: "translate(-50%,-50%)", fontSize: 22 } }, "▶️")
             ))
           ),
@@ -634,38 +634,38 @@ function NursePhotoBox({ patientId }) {
 
   return React.createElement("div", { style: { background: "white", borderRadius: 14, marginBottom: 12, overflow: "hidden", boxShadow: "0 1px 6px rgba(0,0,0,0.06)" } },
     React.createElement("div", { style: { background: "linear-gradient(135deg,#1e3a5f,#2563eb)", padding: "10px 16px", display: "flex", justifyContent: "space-between", alignItems: "center" } },
-      React.createElement("div", { style: { fontSize: 13, fontWeight: 700, color: "white" } }, "📷 어르신 사진"),
+      React.createElement("div", { style: { fontSize: 15, fontWeight: 700, color: "white" } }, "📷 어르신 사진"),
       React.createElement("div", { style: { display: "flex", gap: 6 } },
         React.createElement("button", {
           onClick: () => { fileRef.current.accept="image/*"; fileRef.current.setAttribute("capture","environment"); fileRef.current.click(); },
-          style: { padding: "5px 10px", borderRadius: 7, border: "none", background: "white", color: "#1e3a5f", fontSize: 11, fontWeight: 700, cursor: "pointer", fontFamily: "'Noto Sans KR',sans-serif" }
+          style: { padding: "5px 10px", borderRadius: 7, border: "none", background: "white", color: "#1e3a5f", fontSize: 15, fontWeight: 700, cursor: "pointer", fontFamily: "'Noto Sans KR',sans-serif" }
         }, uploading ? "올리는 중..." : "📷 촬영"),
         React.createElement("button", {
           onClick: () => { fileRef.current.accept="image/*,video/*"; fileRef.current.removeAttribute("capture"); fileRef.current.click(); },
-          style: { padding: "5px 10px", borderRadius: 7, border: "1px solid rgba(255,255,255,0.4)", background: "transparent", color: "white", fontSize: 11, fontWeight: 700, cursor: "pointer", fontFamily: "'Noto Sans KR',sans-serif" }
+          style: { padding: "5px 10px", borderRadius: 7, border: "1px solid rgba(255,255,255,0.4)", background: "transparent", color: "white", fontSize: 15, fontWeight: 700, cursor: "pointer", fontFamily: "'Noto Sans KR',sans-serif" }
         }, "🖼️ 갤러리")
       )
     ),
     React.createElement("div", { style: { padding: 12 } },
       React.createElement("input", { ref: fileRef, type: "file", multiple: true, onChange: handleFile, style: { display: "none" } }),
       loading
-        ? React.createElement("div", { style: { textAlign: "center", padding: "16px 0", color: "#94a3b8", fontSize: 13 } }, "불러오는 중...")
+        ? React.createElement("div", { style: { textAlign: "center", padding: "16px 0", color: "#94a3b8", fontSize: 15 } }, "불러오는 중...")
         : photos.length === 0
           ? React.createElement("div", { onClick: () => fileRef.current.click(),
               style: { border: "2px dashed #e2e8f0", borderRadius: 10, padding: "20px 16px", textAlign: "center", cursor: "pointer", background: "#f8fafc" } },
               React.createElement("div", { style: { fontSize: 30, marginBottom: 6 } }, "📷"),
-              React.createElement("div", { style: { fontSize: 12, color: "#64748b", fontWeight: 600 } }, "사진을 추가해 주세요"),
-              React.createElement("div", { style: { fontSize: 11, color: "#94a3b8", marginTop: 3 } }, "주 1~2회 촬영 권장")
+              React.createElement("div", { style: { fontSize: 15, color: "#64748b", fontWeight: 600 } }, "사진을 추가해 주세요"),
+              React.createElement("div", { style: { fontSize: 15, color: "#94a3b8", marginTop: 3 } }, "주 1~2회 촬영 권장")
             )
           : React.createElement("div", { style: { display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 6 } },
               photos.map(p => React.createElement("div", { key: p.id, style: { position: "relative", borderRadius: 8, overflow: "hidden", aspectRatio: "1", background: "#f1f5f9" } },
                 p.isVideo
                   ? React.createElement("video", { src: p.url, style: { width: "100%", height: "100%", objectFit: "cover" } })
                   : React.createElement("img", { src: p.url, style: { width: "100%", height: "100%", objectFit: "cover", cursor: "pointer" }, onClick: () => setPreview(p) }),
-                React.createElement("div", { style: { position: "absolute", bottom: 0, left: 0, right: 0, background: "rgba(0,0,0,0.45)", padding: "3px 6px", fontSize: 11, color: "white", fontWeight: 600 } }, p.date),
+                React.createElement("div", { style: { position: "absolute", bottom: 0, left: 0, right: 0, background: "rgba(0,0,0,0.45)", padding: "3px 6px", fontSize: 15, color: "white", fontWeight: 600 } }, p.date),
                 p.isVideo && React.createElement("div", { style: { position: "absolute", top: "50%", left: "50%", transform: "translate(-50%,-50%)", fontSize: 20 } }, "▶️"),
                 React.createElement("button", { onClick: () => deletePhoto(p),
-                  style: { position: "absolute", top: 3, right: 3, background: "rgba(0,0,0,0.55)", border: "none", color: "white", borderRadius: "50%", width: 18, height: 18, fontSize: 11, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center" }
+                  style: { position: "absolute", top: 3, right: 3, background: "rgba(0,0,0,0.55)", border: "none", color: "white", borderRadius: "50%", width: 18, height: 18, fontSize: 15, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center" }
                 }, "✕")
               ))
             )
@@ -716,14 +716,14 @@ function CustomCalendar({ value, onChange }) {
   return React.createElement("div", { style: { background: "white", borderRadius: 16, border: "1.5px solid #e2e8f0", overflow: "hidden", boxShadow: "0 2px 12px rgba(0,0,0,0.06)" } },
     // 헤더
     React.createElement("div", { style: { background: "linear-gradient(135deg,#1e3a5f,#2563eb)", padding: "10px 14px", display: "flex", alignItems: "center", justifyContent: "space-between" } },
-      React.createElement("button", { onClick: prevMonth, style: { background: "rgba(255,255,255,0.2)", border: "none", color: "white", borderRadius: 8, width: 28, height: 28, fontSize: 15, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center" } }, "‹"),
-      React.createElement("div", { style: { fontSize: 14, fontWeight: 800, color: "white" } }, `${viewYear}년 ${MONTHS[viewMonth]}`),
-      React.createElement("button", { onClick: nextMonth, style: { background: "rgba(255,255,255,0.2)", border: "none", color: "white", borderRadius: 8, width: 28, height: 28, fontSize: 15, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center" } }, "›")
+      React.createElement("button", { onClick: prevMonth, style: { background: "rgba(255,255,255,0.2)", border: "none", color: "white", borderRadius: 8, width: 28, height: 28, fontSize: 16, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center" } }, "‹"),
+      React.createElement("div", { style: { fontSize: 15, fontWeight: 800, color: "white" } }, `${viewYear}년 ${MONTHS[viewMonth]}`),
+      React.createElement("button", { onClick: nextMonth, style: { background: "rgba(255,255,255,0.2)", border: "none", color: "white", borderRadius: 8, width: 28, height: 28, fontSize: 16, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center" } }, "›")
     ),
     // 요일 헤더
     React.createElement("div", { style: { display: "grid", gridTemplateColumns: "repeat(7, 1fr)", background: "#f8fafc", borderBottom: "1px solid #e2e8f0" } },
       DAYS.map((d, i) => React.createElement("div", { key: d, style: {
-        textAlign: "center", padding: "6px 0", fontSize: 11, fontWeight: 700,
+        textAlign: "center", padding: "6px 0", fontSize: 15, fontWeight: 700,
         color: i === 0 ? "#ef4444" : i === 6 ? "#3b82f6" : "#64748b"
       } }, d))
     ),
@@ -743,7 +743,7 @@ function CustomCalendar({ value, onChange }) {
             padding: "6px 4px", borderRadius: 8, border: "none",
             background: isSelected ? "#1e3a5f" : isToday ? "#eff6ff" : "transparent",
             color: isSelected ? "white" : isPast ? "#cbd5e1" : dow === 0 ? "#ef4444" : dow === 6 ? "#3b82f6" : "#1e293b",
-            fontSize: 12, fontWeight: isSelected || isToday ? 800 : 400,
+            fontSize: 15, fontWeight: isSelected || isToday ? 800 : 400,
             cursor: isPast ? "default" : "pointer",
             outline: isToday && !isSelected ? "2px solid #2563eb" : "none",
             outlineOffset: "-2px",
@@ -755,11 +755,11 @@ function CustomCalendar({ value, onChange }) {
     ),
     // 선택된 날짜 표시
     value && React.createElement("div", { style: { padding: "8px 14px", background: "#eff6ff", borderTop: "1px solid #e2e8f0", display: "flex", alignItems: "center", gap: 8 } },
-      React.createElement("span", { style: { fontSize: 15 } }, "📅"),
-      React.createElement("span", { style: { fontSize: 13, fontWeight: 700, color: "#1d4ed8" } },
+      React.createElement("span", { style: { fontSize: 16 } }, "📅"),
+      React.createElement("span", { style: { fontSize: 15, fontWeight: 700, color: "#1d4ed8" } },
         new Date(value + "T00:00:00").toLocaleDateString("ko-KR", { year:"numeric", month:"long", day:"numeric", weekday:"long" })
       ),
-      React.createElement("button", { onClick: () => onChange(""), style: { marginLeft: "auto", fontSize: 12, fontWeight: 700, color: "#ef4444", background: "none", border: "none", cursor: "pointer" } }, "✕ 취소")
+      React.createElement("button", { onClick: () => onChange(""), style: { marginLeft: "auto", fontSize: 15, fontWeight: 700, color: "#ef4444", background: "none", border: "none", cursor: "pointer" } }, "✕ 취소")
     )
   );
 }
@@ -960,14 +960,14 @@ function GuardianScreen({ user, onBack }) {
       ),
       React.createElement("div", { style: { display: "flex", alignItems: "baseline", gap: 10, flexWrap: "wrap" } },
         React.createElement("div", { style: { fontSize: 26, fontWeight: 900, color: "white" } }, `${patient.name}님`),
-        React.createElement("div", { style: { fontSize: 13, color: "rgba(255,255,255,0.9)", fontWeight: 600 } }, `${patient.room} · 입원 ${admitDays(patient.admitted_at)}일째`)
+        React.createElement("div", { style: { fontSize: 15, color: "rgba(255,255,255,0.9)", fontWeight: 600 } }, `${patient.room} · 입원 ${admitDays(patient.admitted_at)}일째`)
       ),
       React.createElement("div", { style: { display: "flex", alignItems: "center", gap: 8, marginTop: 6 } },
-        React.createElement("div", { style: { fontSize: 12, color: "rgba(255,255,255,0.7)" } },
+        React.createElement("div", { style: { fontSize: 15, color: "rgba(255,255,255,0.7)" } },
           `📅 ${new Date().toLocaleDateString("ko-KR", { year:"numeric", month:"long", day:"numeric", weekday:"short" })} 기준`
         ),
         record?.updated_at && React.createElement("div", { style: {
-          fontSize: 11, fontWeight: 800, background: "#bbf7d0", color: "#14532d",
+          fontSize: 15, fontWeight: 800, background: "#bbf7d0", color: "#14532d",
           borderRadius: 20, padding: "2px 10px", display: "flex", alignItems: "center", gap: 4
         } }, "✓ 오늘 업데이트됨")
       ),
@@ -982,10 +982,10 @@ function GuardianScreen({ user, onBack }) {
             borderRadius: 10, padding: "10px 4px", textAlign: "center",
             border: isAlert ? "1.5px solid rgba(251,191,36,0.6)" : "1px solid rgba(255,255,255,0.15)"
           } },
-            React.createElement("div", { style: { fontSize: 15, marginBottom: 3 } }, icons[i]),
-            React.createElement("div", { style: { fontSize: 11, color: "rgba(255,255,255,0.8)", fontWeight: 700, marginBottom: 2 } }, item.label),
-            React.createElement("div", { style: { fontSize: 12, fontWeight: 900, color: isAlert ? "#fbbf24" : "white", lineHeight: 1.2 } }, item.value || "—"),
-            item.sub && React.createElement("div", { style: { fontSize: 11, color: "rgba(255,255,255,0.75)", fontWeight: 600, marginTop: 2 } }, item.sub)
+            React.createElement("div", { style: { fontSize: 16, marginBottom: 3 } }, icons[i]),
+            React.createElement("div", { style: { fontSize: 15, color: "rgba(255,255,255,0.8)", fontWeight: 700, marginBottom: 2 } }, item.label),
+            React.createElement("div", { style: { fontSize: 15, fontWeight: 900, color: isAlert ? "#fbbf24" : "white", lineHeight: 1.2 } }, item.value || "—"),
+            item.sub && React.createElement("div", { style: { fontSize: 15, color: "rgba(255,255,255,0.75)", fontWeight: 600, marginTop: 2 } }, item.sub)
           );
         })
       )
@@ -1011,13 +1011,13 @@ function GuardianScreen({ user, onBack }) {
         : history.length === 0
         ? React.createElement("div", { style: { padding: "40px 20px", textAlign: "center" } },
             React.createElement("div", { style: { fontSize: 48, marginBottom: 14 } }, "📅"),
-            React.createElement("div", { style: { fontSize: 15, fontWeight: 800, color: "#1e3a5f", marginBottom: 8 } }, "아직 지난 기록이 없어요"),
-            React.createElement("div", { style: { fontSize: 13, color: "#94a3b8" } }, "기록이 쌓이면 추세 그래프도 볼 수 있어요")
+            React.createElement("div", { style: { fontSize: 16, fontWeight: 800, color: "#1e3a5f", marginBottom: 8 } }, "아직 지난 기록이 없어요"),
+            React.createElement("div", { style: { fontSize: 15, color: "#94a3b8" } }, "기록이 쌓이면 추세 그래프도 볼 수 있어요")
           )
         : React.createElement(React.Fragment, null,
 
             // 추세 그래프 (2칸 박스)
-            React.createElement("div", { style: { fontSize: 13, fontWeight: 800, color: "#1e3a5f", marginBottom: 10 } }, "📈 최근 7일 추세"),
+            React.createElement("div", { style: { fontSize: 15, fontWeight: 800, color: "#1e3a5f", marginBottom: 10 } }, "📈 최근 7일 추세"),
             ...[
               [
                 { label: "🧠 의식수준", accentColor: "#1d4ed8", maxVal: 5,
@@ -1057,7 +1057,7 @@ function GuardianScreen({ user, onBack }) {
 
             // 날짜별 카드
             React.createElement("div", { className: "card" },
-              React.createElement("div", { style: { fontWeight: 800, color: "#1e3a5f", fontSize: 13, marginBottom: 12 } }, "📅 날짜별 상세"),
+              React.createElement("div", { style: { fontWeight: 800, color: "#1e3a5f", fontSize: 15, marginBottom: 12 } }, "📅 날짜별 상세"),
               [...history].reverse().map((r, i) => {
                 const isExpanded = expandedDate === r.date;
                 const d = new Date(r.date);
@@ -1070,8 +1070,8 @@ function GuardianScreen({ user, onBack }) {
                       display: "flex", justifyContent: "space-between", alignItems: "center" }
                   },
                     React.createElement("div", null,
-                      React.createElement("div", { style: { fontSize: 13, fontWeight: 800, color: "#1e3a5f" } }, dateStr),
-                      React.createElement("div", { style: { fontSize: 12, color: "#64748b", marginTop: 2 } },
+                      React.createElement("div", { style: { fontSize: 15, fontWeight: 800, color: "#1e3a5f" } }, dateStr),
+                      React.createElement("div", { style: { fontSize: 15, color: "#64748b", marginTop: 2 } },
                         [r.consciousness, r.meal_amount, r.pain != null ? `통증 ${r.pain}점` : null].filter(Boolean).join(" · ")
                       )
                     ),
@@ -1086,15 +1086,15 @@ function GuardianScreen({ user, onBack }) {
                        ["투약",r.medication],["욕창",r.bedsore]
                       ].filter(([,v])=>v).map(([k,v]) =>
                         React.createElement("div", { key: k, style: { padding: "6px 8px", background: "#f8fafc", borderRadius: 8, border: "1px solid #e2e8f0" } },
-                          React.createElement("div", { style: { fontSize: 11, color: "#64748b", fontWeight: 700 } }, k),
-                          React.createElement("div", { style: { fontSize: 12, fontWeight: 800, color: "#1e293b", marginTop: 1 } }, v)
+                          React.createElement("div", { style: { fontSize: 15, color: "#64748b", fontWeight: 700 } }, k),
+                          React.createElement("div", { style: { fontSize: 15, fontWeight: 800, color: "#1e293b", marginTop: 1 } }, v)
                         )
                       )
                     ),
-                    r.special_alerts && React.createElement("div", { style: { fontSize: 12, color: "#dc2626", fontWeight: 600, marginBottom: 6 } },
+                    r.special_alerts && React.createElement("div", { style: { fontSize: 15, color: "#dc2626", fontWeight: 600, marginBottom: 6 } },
                       "⚠️ " + (Array.isArray(r.special_alerts) ? r.special_alerts.join(" · ") : r.special_alerts)
                     ),
-                    r.nurse_note && React.createElement("div", { style: { fontSize: 12, color: "#0c4a6e", background: "#f0f9ff", borderRadius: 8, padding: "8px 10px" } },
+                    r.nurse_note && React.createElement("div", { style: { fontSize: 15, color: "#0c4a6e", background: "#f0f9ff", borderRadius: 8, padding: "8px 10px" } },
                       React.createElement("span", { style: { fontWeight: 700 } }, "간호사 코멘트: "), r.nurse_note
                     )
                   )
@@ -1107,11 +1107,11 @@ function GuardianScreen({ user, onBack }) {
         loading ? React.createElement("div", { className: "loading" }, "불러오는 중...")
         : !record ? React.createElement("div", { style: { padding: "32px 20px", textAlign: "center" } },
             React.createElement("div", { style: { fontSize: 52, marginBottom: 16 } }, "🌿"),
-            React.createElement("div", { style: { fontSize: 15, fontWeight: 800, color: "#1e3a5f", marginBottom: 10 } }, "아직 오늘 기록이 없어요"),
-            React.createElement("div", { style: { fontSize: 13, color: "#64748b", lineHeight: 1.8, background: "white", borderRadius: 14, padding: "16px 20px", boxShadow: "0 2px 8px rgba(0,0,0,0.06)" } },
+            React.createElement("div", { style: { fontSize: 16, fontWeight: 800, color: "#1e3a5f", marginBottom: 10 } }, "아직 오늘 기록이 없어요"),
+            React.createElement("div", { style: { fontSize: 15, color: "#64748b", lineHeight: 1.8, background: "white", borderRadius: 14, padding: "16px 20px", boxShadow: "0 2px 8px rgba(0,0,0,0.06)" } },
               "간호팀이 지금 이 순간에도", React.createElement("br", null),
               "어르신 곁에서 정성껏 케어하고 있어요.", React.createElement("br", null),
-              React.createElement("span", { style: { color: "#94a3b8", fontSize: 12 } }, "오늘 기록은 오전 중 업데이트될 예정이에요")
+              React.createElement("span", { style: { color: "#94a3b8", fontSize: 15 } }, "오늘 기록은 오전 중 업데이트될 예정이에요")
             )
           )
         : React.createElement(React.Fragment, null,
@@ -1124,8 +1124,8 @@ function GuardianScreen({ user, onBack }) {
               React.createElement("div", { style: { display: "flex", alignItems: "center", gap: 12, marginBottom: 14 } },
                 React.createElement("div", { style: { fontSize: 36 } }, todaySummary.emoji),
                 React.createElement("div", null,
-                  React.createElement("div", { style: { fontSize: 15, fontWeight: 800, color: todaySummary.color, lineHeight: 1.4 } }, todaySummary.text),
-                  record.reviewed_at && React.createElement("div", { style: { fontSize: 11, color: "#94a3b8", marginTop: 4 } }, `${fmtDate(record.reviewed_at)} 주치의 검토`)
+                  React.createElement("div", { style: { fontSize: 16, fontWeight: 800, color: todaySummary.color, lineHeight: 1.4 } }, todaySummary.text),
+                  record.reviewed_at && React.createElement("div", { style: { fontSize: 15, color: "#94a3b8", marginTop: 4 } }, `${fmtDate(record.reviewed_at)} 주치의 검토`)
                 )
               ),
               // 핵심 4가지만 항상 표시
@@ -1140,8 +1140,8 @@ function GuardianScreen({ user, onBack }) {
                     background: "white", borderRadius: 10, padding: "10px 14px",
                     border: "1.5px solid rgba(0,0,0,0.07)"
                   } },
-                    React.createElement("div", { style: { fontSize: 11, color: "#64748b", fontWeight: 700, marginBottom: 3 } }, item.label),
-                    React.createElement("div", { style: { fontSize: 15, fontWeight: 800, color: "#1e293b" } }, item.value)
+                    React.createElement("div", { style: { fontSize: 15, color: "#64748b", fontWeight: 700, marginBottom: 3 } }, item.label),
+                    React.createElement("div", { style: { fontSize: 16, fontWeight: 800, color: "#1e293b" } }, item.value)
                   )
                 )
               ),
@@ -1149,7 +1149,7 @@ function GuardianScreen({ user, onBack }) {
               React.createElement("button", {
                 onClick: () => setShowDetail(v => !v),
                 style: { width: "100%", padding: "10px", borderRadius: 10, border: `1.5px solid ${todaySummary.border}`,
-                  background: "white", color: todaySummary.color, fontSize: 13, fontWeight: 700,
+                  background: "white", color: todaySummary.color, fontSize: 15, fontWeight: 700,
                   cursor: "pointer", fontFamily: "'Noto Sans KR',sans-serif",
                   display: "flex", alignItems: "center", justifyContent: "center", gap: 6 }
               }, showDetail ? "▲ 간단히 보기" : "▽ 상세 내용 보기"),
@@ -1168,16 +1168,16 @@ function GuardianScreen({ user, onBack }) {
                     ];
                     const c = colors[i % colors.length];
                     return React.createElement("div", { key: i, style: { padding: "8px 10px", background: c.bg, borderRadius: 10, border: `1.5px solid ${c.border}` } },
-                      React.createElement("div", { style: { fontSize: 11, color: c.label, fontWeight: 700, marginBottom: 3 } }, item.label),
-                      React.createElement("div", { style: { fontSize: 13, fontWeight: 800, color: c.value } }, item.value)
+                      React.createElement("div", { style: { fontSize: 15, color: c.label, fontWeight: 700, marginBottom: 3 } }, item.label),
+                      React.createElement("div", { style: { fontSize: 15, fontWeight: 800, color: c.value } }, item.value)
                     );
                   })
                 ),
                 (record.mental || record.bprs) && React.createElement("div", { style: { padding: "12px 14px", background: "#faf5ff", borderRadius: 10, border: "1.5px solid #e9d5ff" } },
-                  React.createElement("div", { style: { fontSize: 11, color: "#1e3a5f", fontWeight: 700, marginBottom: 6 } }, "🧩 BPSD (치매 행동·심리 증상)"),
+                  React.createElement("div", { style: { fontSize: 15, color: "#1e3a5f", fontWeight: 700, marginBottom: 6 } }, "🧩 BPSD (치매 행동·심리 증상)"),
                   React.createElement("div", { style: { display: "flex", flexWrap: "wrap", gap: 5 } },
                     (record.bprs || record.mental || "").split("·").map(s => s.trim()).filter(Boolean).map((s, i) =>
-                      React.createElement("span", { key: i, style: { background: "#ede9fe", color: "#5b21b6", borderRadius: 8, fontSize: 12, fontWeight: 600, padding: "4px 10px", border: "1px solid #c4b5fd" } }, s)
+                      React.createElement("span", { key: i, style: { background: "#ede9fe", color: "#5b21b6", borderRadius: 8, fontSize: 15, fontWeight: 600, padding: "4px 10px", border: "1px solid #c4b5fd" } }, s)
                     )
                   )
                 )
@@ -1224,11 +1224,11 @@ function GuardianScreen({ user, onBack }) {
               // 2칸 그리드 섹션 (현재상태, 호전, 치료종료용 - 짧은 문구)
               const GridSection = ({ title, items, headerBg, itemBg, itemColor, itemBorder }) =>
                 items.length > 0 && React.createElement("div", { style: { background: "white", borderRadius: 14, overflow: "hidden", boxShadow: "0 2px 8px rgba(0,0,0,0.07)", display: "flex", flexDirection: "column" } },
-                  React.createElement("div", { style: { background: headerBg, padding: "9px 14px", fontSize: 12, fontWeight: 700, color: "white" } }, title),
+                  React.createElement("div", { style: { background: headerBg, padding: "9px 14px", fontSize: 15, fontWeight: 700, color: "white" } }, title),
                   React.createElement("div", { style: { padding: "10px 10px", display: "grid", gridTemplateColumns: "1fr 1fr", gap: 5 } },
                     items.map((a, i) => React.createElement("div", { key: i, style: {
                       background: itemBg, color: itemColor, borderRadius: 8,
-                      fontSize: 11, fontWeight: 600, padding: "7px 8px",
+                      fontSize: 15, fontWeight: 600, padding: "7px 8px",
                       border: `1px solid ${itemBorder}`, lineHeight: 1.5
                     } }, a))
                   )
@@ -1237,12 +1237,12 @@ function GuardianScreen({ user, onBack }) {
               // 1칸 전체폭 리스트 섹션 (처치·치료 중 - 긴 문구)
               const ListSection = ({ title, items, headerBg, itemBg, itemColor, itemBorder }) =>
                 items.length > 0 && React.createElement("div", { style: { marginBottom: 8, background: "white", borderRadius: 14, overflow: "hidden", boxShadow: "0 2px 8px rgba(0,0,0,0.07)" } },
-                  React.createElement("div", { style: { background: headerBg, padding: "9px 14px", fontSize: 12, fontWeight: 700, color: "white" } }, title),
+                  React.createElement("div", { style: { background: headerBg, padding: "9px 14px", fontSize: 15, fontWeight: 700, color: "white" } }, title),
                   React.createElement("div", { style: { padding: "8px 12px", display: "flex", flexDirection: "column", gap: 5 } },
                     items.map((a, i) => React.createElement("div", { key: i, style: {
                       display: "flex", alignItems: "flex-start", gap: 8,
                       background: itemBg, color: itemColor, borderRadius: 8,
-                      fontSize: 12, fontWeight: 600, padding: "8px 10px",
+                      fontSize: 15, fontWeight: 600, padding: "8px 10px",
                       border: `1px solid ${itemBorder}`, lineHeight: 1.6
                     } },
                       React.createElement("span", { style: { flexShrink: 0, marginTop: 1 } }, "✓"),
@@ -1253,11 +1253,11 @@ function GuardianScreen({ user, onBack }) {
 
               const FullSection = ({ title, items, headerBg, itemBg, itemColor, itemBorder }) =>
                 items.length > 0 && React.createElement("div", { style: { marginBottom: 8, background: "white", borderRadius: 14, overflow: "hidden", boxShadow: "0 2px 8px rgba(0,0,0,0.07)" } },
-                  React.createElement("div", { style: { background: headerBg, padding: "9px 14px", fontSize: 12, fontWeight: 700, color: "white" } }, title),
+                  React.createElement("div", { style: { background: headerBg, padding: "9px 14px", fontSize: 15, fontWeight: 700, color: "white" } }, title),
                   React.createElement("div", { style: { padding: "10px 12px", display: "flex", flexDirection: "column", gap: 5 } },
                     items.map((a, i) => React.createElement("div", { key: i, style: {
                       background: itemBg, color: itemColor, borderRadius: 8,
-                      fontSize: 12, fontWeight: 600, padding: "7px 10px",
+                      fontSize: 15, fontWeight: 600, padding: "7px 10px",
                       border: `1px solid ${itemBorder}`, lineHeight: 1.5
                     } }, a))
                   )
@@ -1300,20 +1300,20 @@ function GuardianScreen({ user, onBack }) {
             // 의사가 검토 완료한 경우에만 보호자에게 표시
             record?.reviewed_at && record?.doctor_comment && React.createElement("div", { style: { marginBottom: 12, background: "white", borderRadius: 14, overflow: "hidden", boxShadow: "0 2px 12px rgba(0,0,0,0.08)" } },
               React.createElement("div", { style: { background: "linear-gradient(135deg,#1e1b4b,#4338ca)", padding: "10px 16px", display: "flex", alignItems: "center", gap: 8 } },
-                React.createElement("div", { style: { fontSize: 13, fontWeight: 700, color: "white" } }, "🩺 주치의가 전하는 오늘안부")
+                React.createElement("div", { style: { fontSize: 15, fontWeight: 700, color: "white" } }, "🩺 주치의가 전하는 오늘안부")
               ),
-              React.createElement("div", { style: { padding: "14px 16px", fontSize: 13, color: "#1e293b", lineHeight: 1.8 } }, record.doctor_comment)
+              React.createElement("div", { style: { padding: "14px 16px", fontSize: 15, color: "#1e293b", lineHeight: 1.8 } }, record.doctor_comment)
             ),
 
             // 따뜻한 한마디 (의사가 선택, 검토 완료 후 표시)
             record?.reviewed_at && record?.warm_msg && React.createElement("div", { style: { marginBottom: 12, background: "white", borderRadius: 14, overflow: "hidden", boxShadow: "0 2px 12px rgba(0,0,0,0.08)" } },
               React.createElement("div", { style: { background: "linear-gradient(135deg,#064e3b,#059669)", padding: "10px 16px", display: "flex", alignItems: "center", gap: 8 } },
-                React.createElement("div", { style: { fontSize: 13, fontWeight: 700, color: "white" } }, "💚 케어팀이 전하는 한마디")
+                React.createElement("div", { style: { fontSize: 15, fontWeight: 700, color: "white" } }, "💚 케어팀이 전하는 한마디")
               ),
               React.createElement("div", { style: { padding: "12px 14px", display: "flex", flexDirection: "column", gap: 8 } },
                 record.warm_msg.split(" / ").map((msg, i) =>
                   React.createElement("div", { key: i, style: {
-                    fontSize: 13, color: "#166534", lineHeight: 1.8,
+                    fontSize: 15, color: "#166534", lineHeight: 1.8,
                     background: "#f0fdf4", borderRadius: 10,
                     padding: "12px 14px 12px 16px", border: "1px solid #bbf7d0",
                     fontWeight: 500, borderLeft: "4px solid #16a34a",
@@ -1327,15 +1327,15 @@ function GuardianScreen({ user, onBack }) {
             ),
             // 아직 의사 검토 전
             !record?.reviewed_at && React.createElement("div", { style: { marginBottom: 12, background: "#f8fafc", borderRadius: 14, padding: "16px", textAlign: "center", border: "1.5px dashed #e2e8f0" } },
-              React.createElement("div", { style: { fontSize: 13, color: "#94a3b8" } }, "🩺 주치의 검토 후 최종 내용이 전달될 예정이에요.")
+              React.createElement("div", { style: { fontSize: 15, color: "#94a3b8" } }, "🩺 주치의 검토 후 최종 내용이 전달될 예정이에요.")
             ),
             // 고정 안내 문구
             React.createElement("div", { style: { marginBottom: 12, background: "#fef2f2", borderRadius: 14, padding: "16px", border: "2px solid #fca5a5" } },
               React.createElement("div", { style: { display: "flex", alignItems: "center", gap: 8, marginBottom: 10 } },
                 React.createElement("div", { style: { fontSize: 20 } }, "📞"),
-                React.createElement("div", { style: { fontSize: 13, fontWeight: 800, color: "#7f1d1d" } }, "급격한 변화 시 즉시 연락드려요")
+                React.createElement("div", { style: { fontSize: 15, fontWeight: 800, color: "#7f1d1d" } }, "급격한 변화 시 즉시 연락드려요")
               ),
-              React.createElement("div", { style: { fontSize: 13, color: "#991b1b", lineHeight: 1.8 } },
+              React.createElement("div", { style: { fontSize: 15, color: "#991b1b", lineHeight: 1.8 } },
                 "어르신 상태에 급격한 변화가 생기면 담당 의료진이 보호자분께 직접 연락드립니다."
               )
             )
@@ -1344,8 +1344,8 @@ function GuardianScreen({ user, onBack }) {
 
       tab === "photos" && React.createElement("div", null,
         React.createElement("div", { style: { background: "white", borderRadius: 14, padding: 16, marginBottom: 14, boxShadow: "0 2px 12px rgba(0,0,0,0.08)" } },
-          React.createElement("div", { style: { fontSize: 13, fontWeight: 800, color: "#1e3a5f", marginBottom: 6 } }, "📷 어르신 사진첩"),
-          React.createElement("div", { style: { fontSize: 12, color: "#94a3b8", marginBottom: 14 } }, "간호팀이 촬영한 어르신 사진을 모아볼 수 있어요")
+          React.createElement("div", { style: { fontSize: 15, fontWeight: 800, color: "#1e3a5f", marginBottom: 6 } }, "📷 어르신 사진첩"),
+          React.createElement("div", { style: { fontSize: 15, color: "#94a3b8", marginBottom: 14 } }, "간호팀이 촬영한 어르신 사진을 모아볼 수 있어요")
         ),
         React.createElement(PhotoBox, { patientId: patient.id })
       ),
@@ -1379,7 +1379,7 @@ function GuardianScreen({ user, onBack }) {
                   border: msgForm.visitTime === t ? "2px solid #1e3a5f" : "1.5px solid #e2e8f0",
                   background: msgForm.visitTime === t ? "#1e3a5f" : "white",
                   color: msgForm.visitTime === t ? "white" : "#374151",
-                  fontSize: 13,
+                  fontSize: 15,
                   fontWeight: 700,
                   cursor: "pointer",
                   fontFamily: "'Noto Sans KR', sans-serif",
@@ -1491,12 +1491,12 @@ function NurseScreen({ user, onBack }) {
   if (noChangePopup) return React.createElement("div", { className: "screen", style: { background: "linear-gradient(160deg,#0f172a,#1e3a5f)", justifyContent: "center", alignItems: "center", padding: 32 } },
     React.createElement("div", { style: { background: "white", borderRadius: 24, padding: "32px 28px", textAlign: "center", boxShadow: "0 8px 40px rgba(0,0,0,0.3)", maxWidth: 380, width: "100%" } },
       React.createElement("div", { style: { fontSize: 56, marginBottom: 16 } }, "💚"),
-      React.createElement("div", { style: { fontSize: 11, fontWeight: 700, color: "#059669", letterSpacing: 1, marginBottom: 8 } }, `${noChangePopup.ward} 케어팀`),
-      React.createElement("div", { style: { fontSize: 15, fontWeight: 800, color: "#1e3a5f", lineHeight: 1.4, marginBottom: 16 } }, noChangePopup.message.title),
+      React.createElement("div", { style: { fontSize: 15, fontWeight: 700, color: "#059669", letterSpacing: 1, marginBottom: 8 } }, `${noChangePopup.ward} 케어팀`),
+      React.createElement("div", { style: { fontSize: 16, fontWeight: 800, color: "#1e3a5f", lineHeight: 1.4, marginBottom: 16 } }, noChangePopup.message.title),
       React.createElement("div", { style: { background: "#f0fdf4", borderRadius: 12, padding: "16px 18px", marginBottom: 20 } },
-        React.createElement("div", { style: { fontSize: 13, color: "#374151", lineHeight: 1.8 } }, noChangePopup.message.body)
+        React.createElement("div", { style: { fontSize: 15, color: "#374151", lineHeight: 1.8 } }, noChangePopup.message.body)
       ),
-      React.createElement("div", { style: { fontSize: 13, color: "#94a3b8", marginBottom: 24 } }, `${noChangePopup.name} 어르신 · ${today()}`),
+      React.createElement("div", { style: { fontSize: 15, color: "#94a3b8", marginBottom: 24 } }, `${noChangePopup.name} 어르신 · ${today()}`),
       React.createElement("button", { className: "btn btn-dark",
         onClick: () => { setNoChangePopup(null); setSelected(null); setSelectMode(null); }
       }, "확인했어요")
@@ -1527,10 +1527,10 @@ function NurseScreen({ user, onBack }) {
         React.createElement("button", { className: "back-btn", onClick: onBack }, "← 역할 선택"),
         React.createElement("button", { className: "logout-btn", onClick: onBack }, "로그아웃 →")
       ),
-      React.createElement("div", { style: { fontSize: 11, color: "rgba(255,255,255,0.5)", marginTop: 8 } }, `오늘안부 · 천안쌍용요양병원 · ${user.ward}`),
+      React.createElement("div", { style: { fontSize: 15, color: "rgba(255,255,255,0.5)", marginTop: 8 } }, `오늘안부 · 천안쌍용요양병원 · ${user.ward}`),
       React.createElement("div", { style: { display: "flex", justifyContent: "space-between", alignItems: "flex-end", marginTop: 4 } },
         React.createElement("div", { style: { fontSize: 18, fontWeight: 800, color: "white" } }, "오늘 상태 입력"),
-        React.createElement("div", { style: { fontSize: 13, color: "rgba(255,255,255,0.7)" } }, `${patients.length}명`)
+        React.createElement("div", { style: { fontSize: 15, color: "rgba(255,255,255,0.7)" } }, `${patients.length}명`)
       ),
       React.createElement("div", { style: { marginTop: 8 } })
     ),
@@ -1547,11 +1547,11 @@ function PatientListItem({ patient, onClick }) {
     style: { background: "white", borderRadius: 12, padding: "12px 14px", boxShadow: "0 1px 6px rgba(0,0,0,0.06)", cursor: "pointer", transition: "all 0.15s", border: "1.5px solid transparent" }
   },
     React.createElement("div", { style: { display: "flex", justifyContent: "space-between", alignItems: "flex-start" } },
-      React.createElement("div", { style: { fontSize: 15, fontWeight: 700, color: "#1e3a5f" } }, patient.name),
-      React.createElement("div", { style: { fontSize: 15, color: "#94a3b8" } }, "›")
+      React.createElement("div", { style: { fontSize: 16, fontWeight: 700, color: "#1e3a5f" } }, patient.name),
+      React.createElement("div", { style: { fontSize: 16, color: "#94a3b8" } }, "›")
     ),
-    React.createElement("div", { style: { fontSize: 12, color: "#64748b", marginTop: 3 } }, `${patient.age}세 · ${patient.gender}`),
-    React.createElement("div", { style: { fontSize: 12, color: "#94a3b8", marginTop: 2 } }, `입원 ${admitDays(patient.admitted_at)}일째`)
+    React.createElement("div", { style: { fontSize: 15, color: "#64748b", marginTop: 3 } }, `${patient.age}세 · ${patient.gender}`),
+    React.createElement("div", { style: { fontSize: 15, color: "#94a3b8", marginTop: 2 } }, `입원 ${admitDays(patient.admitted_at)}일째`)
   );
 }
 
@@ -1613,8 +1613,8 @@ function NurseChooseScreen({ patient, user, onNoChange, onEdit, onBack }) {
   const InfoBox = ({ label, value }) => value ? React.createElement("div", {
     style: { background: "#f8fafc", borderRadius: 8, padding: "8px 10px", border: "1px solid #e2e8f0" }
   },
-    React.createElement("div", { style: { fontSize: 11, color: "#94a3b8", fontWeight: 600 } }, label),
-    React.createElement("div", { style: { fontSize: 13, fontWeight: 700, color: "#1e293b", marginTop: 2 } }, value)
+    React.createElement("div", { style: { fontSize: 15, color: "#94a3b8", fontWeight: 600 } }, label),
+    React.createElement("div", { style: { fontSize: 15, fontWeight: 700, color: "#1e293b", marginTop: 2 } }, value)
   ) : null;
 
   return React.createElement("div", { className: "screen", style: { background: "#f0f4f8" } },
@@ -1624,7 +1624,7 @@ function NurseChooseScreen({ patient, user, onNoChange, onEdit, onBack }) {
         React.createElement("button", { className: "back-btn", onClick: onBack }, "← 목록"),
         React.createElement("div", { style: {
           background: "rgba(255,255,255,0.18)", border: "1px solid rgba(255,255,255,0.35)",
-          borderRadius: 20, padding: "4px 12px", fontSize: 11, fontWeight: 800,
+          borderRadius: 20, padding: "4px 12px", fontSize: 15, fontWeight: 800,
           color: "white", letterSpacing: "0.5px"
         } }, "🩺 간호사 역할")
       ),
@@ -1642,7 +1642,7 @@ function NurseChooseScreen({ patient, user, onNoChange, onEdit, onBack }) {
         ].filter(Boolean).map((txt, i) =>
           React.createElement("div", { key: i, style: {
             background: "rgba(255,255,255,0.15)", border: "1px solid rgba(255,255,255,0.25)",
-            borderRadius: 20, padding: "4px 10px", fontSize: 12, fontWeight: 600, color: "white"
+            borderRadius: 20, padding: "4px 10px", fontSize: 15, fontWeight: 600, color: "white"
           } }, txt)
         )
       )
@@ -1664,12 +1664,12 @@ function NurseChooseScreen({ patient, user, onNoChange, onEdit, onBack }) {
         : history.length === 0
         ? React.createElement("div", { style: { padding: "40px 20px", textAlign: "center" } },
             React.createElement("div", { style: { fontSize: 48, marginBottom: 14 } }, "📅"),
-            React.createElement("div", { style: { fontSize: 15, fontWeight: 800, color: "#1e3a5f", marginBottom: 8 } }, "지난 기록이 없어요"),
-            React.createElement("div", { style: { fontSize: 13, color: "#94a3b8" } }, "기록이 쌓이면 추세 그래프를 볼 수 있어요")
+            React.createElement("div", { style: { fontSize: 16, fontWeight: 800, color: "#1e3a5f", marginBottom: 8 } }, "지난 기록이 없어요"),
+            React.createElement("div", { style: { fontSize: 15, color: "#94a3b8" } }, "기록이 쌓이면 추세 그래프를 볼 수 있어요")
           )
         : React.createElement(React.Fragment, null,
             React.createElement("div", { className: "card", style: { marginBottom: 12 } },
-              React.createElement("div", { style: { fontWeight: 800, color: "#1e3a5f", fontSize: 13, marginBottom: 16 } }, "📈 최근 추세"),
+              React.createElement("div", { style: { fontWeight: 800, color: "#1e3a5f", fontSize: 15, marginBottom: 16 } }, "📈 최근 추세"),
               TrendChart({ records: history.map(r => ({ date: r.date, consciousness: categoryToNum(r.consciousness, CONSCIOUSNESS_MAP) })), label: "🧠 의식수준", field: "consciousness", maxVal: 5, colorFn: goodHighColor }),
               TrendChart({ records: history.map(r => ({ date: r.date, meal: categoryToNum(r.meal_amount, MEAL_MAP) })), label: "🍽 식사량", field: "meal", maxVal: 4, colorFn: goodHighColor }),
               TrendChart({ records: history.map(r => ({ date: r.date, pain: r.pain != null ? r.pain : null })), label: "💊 통증 (낮을수록 좋음)", field: "pain", maxVal: 10, colorFn: (v) => v <= 2 ? "#16a34a" : v <= 4 ? "#65a30d" : v <= 6 ? "#f59e0b" : v <= 8 ? "#ef4444" : "#991b1b" }),
@@ -1677,7 +1677,7 @@ function NurseChooseScreen({ patient, user, onNoChange, onEdit, onBack }) {
               TrendChart({ records: history.map(r => ({ date: r.date, mobility: categoryToNum(r.mobility, MOBILITY_MAP) })), label: "🚶 이동능력", field: "mobility", maxVal: 4, colorFn: goodHighColor }),
             ),
             React.createElement("div", { className: "card" },
-              React.createElement("div", { style: { fontWeight: 800, color: "#1e3a5f", fontSize: 13, marginBottom: 12 } }, "📅 날짜별 상세"),
+              React.createElement("div", { style: { fontWeight: 800, color: "#1e3a5f", fontSize: 15, marginBottom: 12 } }, "📅 날짜별 상세"),
               [...history].reverse().map((r) => {
                 const isExpanded = expandedDate === r.date;
                 const d = new Date(r.date);
@@ -1686,25 +1686,25 @@ function NurseChooseScreen({ patient, user, onNoChange, onEdit, onBack }) {
                   React.createElement("div", { onClick: () => setExpandedDate(isExpanded ? null : r.date),
                     style: { padding: "10px 14px", background: isExpanded ? "#eff6ff" : "#f8fafc", cursor: "pointer", display: "flex", justifyContent: "space-between", alignItems: "center" } },
                     React.createElement("div", null,
-                      React.createElement("div", { style: { fontSize: 13, fontWeight: 800, color: "#1e3a5f" } }, dateStr),
-                      React.createElement("div", { style: { fontSize: 12, color: "#64748b", marginTop: 2 } },
+                      React.createElement("div", { style: { fontSize: 15, fontWeight: 800, color: "#1e3a5f" } }, dateStr),
+                      React.createElement("div", { style: { fontSize: 15, color: "#64748b", marginTop: 2 } },
                         [r.consciousness, r.meal_amount, r.pain != null ? `통증 ${r.pain}점` : null].filter(Boolean).join(" · "))
                     ),
-                    React.createElement("div", { style: { fontSize: 15, color: "#94a3b8" } }, isExpanded ? "▲" : "▽")
+                    React.createElement("div", { style: { fontSize: 16, color: "#94a3b8" } }, isExpanded ? "▲" : "▽")
                   ),
                   isExpanded && React.createElement("div", { style: { padding: "12px 14px", background: "white" } },
                     React.createElement("div", { style: { display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 6, marginBottom: 8 } },
                       [["의식",r.consciousness],["식사량",r.meal_amount],["식사형태",r.meal_type],["수면",r.sleep_hours],["이동",r.mobility],["낙상위험",r.fall_risk],["소변",r.urine],["대변",r.bowel],["통증",r.pain!=null?`${r.pain}점`:null],["투약",r.medication],["욕창",r.bedsore]]
                       .filter(([,v])=>v).map(([k,v]) =>
                         React.createElement("div", { key: k, style: { padding: "6px 8px", background: "#f8fafc", borderRadius: 8, border: "1px solid #e2e8f0" } },
-                          React.createElement("div", { style: { fontSize: 11, color: "#64748b", fontWeight: 700 } }, k),
-                          React.createElement("div", { style: { fontSize: 12, fontWeight: 800, color: "#1e293b", marginTop: 1 } }, v)
+                          React.createElement("div", { style: { fontSize: 15, color: "#64748b", fontWeight: 700 } }, k),
+                          React.createElement("div", { style: { fontSize: 15, fontWeight: 800, color: "#1e293b", marginTop: 1 } }, v)
                         )
                       )
                     ),
-                    r.mental && React.createElement("div", { style: { fontSize: 12, color: "#7c3aed", background: "#faf5ff", borderRadius: 8, padding: "6px 10px", marginBottom: 6 } },
+                    r.mental && React.createElement("div", { style: { fontSize: 15, color: "#7c3aed", background: "#faf5ff", borderRadius: 8, padding: "6px 10px", marginBottom: 6 } },
                       React.createElement("span", { style: { fontWeight: 700 } }, "BPSD: "), r.mental),
-                    r.nurse_note && React.createElement("div", { style: { fontSize: 12, color: "#0c4a6e", background: "#f0f9ff", borderRadius: 8, padding: "6px 10px" } },
+                    r.nurse_note && React.createElement("div", { style: { fontSize: 15, color: "#0c4a6e", background: "#f0f9ff", borderRadius: 8, padding: "6px 10px" } },
                       React.createElement("span", { style: { fontWeight: 700 } }, "코멘트: "), r.nurse_note)
                   )
                 );
@@ -1715,12 +1715,12 @@ function NurseChooseScreen({ patient, user, onNoChange, onEdit, onBack }) {
 
       tab === "today" && React.createElement(React.Fragment, null,
       React.createElement("div", { style: { background: "white", borderRadius: 14, padding: "16px", marginBottom: 16, boxShadow: "0 1px 6px rgba(0,0,0,0.06)" } },
-        React.createElement("div", { style: { fontSize: 13, fontWeight: 700, color: "#1e3a5f", marginBottom: 12, display: "flex", alignItems: "center", gap: 6 } },
+        React.createElement("div", { style: { fontSize: 15, fontWeight: 700, color: "#1e3a5f", marginBottom: 12, display: "flex", alignItems: "center", gap: 6 } },
           "📋 어제 기록",
-          React.createElement("span", { style: { fontSize: 11, color: "#94a3b8", fontWeight: 400 } }, loading ? "불러오는 중..." : !yesterdayRecord ? "기록 없음" : "")
+          React.createElement("span", { style: { fontSize: 15, color: "#94a3b8", fontWeight: 400 } }, loading ? "불러오는 중..." : !yesterdayRecord ? "기록 없음" : "")
         ),
-        loading ? React.createElement("div", { style: { color: "#94a3b8", fontSize: 13 } }, "...")
-        : !yesterdayRecord ? React.createElement("div", { style: { color: "#94a3b8", fontSize: 13, textAlign: "center", padding: "12px 0" } }, "어제 기록이 없어요")
+        loading ? React.createElement("div", { style: { color: "#94a3b8", fontSize: 15 } }, "...")
+        : !yesterdayRecord ? React.createElement("div", { style: { color: "#94a3b8", fontSize: 15, textAlign: "center", padding: "12px 0" } }, "어제 기록이 없어요")
         : React.createElement(React.Fragment, null,
             React.createElement("div", { style: { display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 6, marginBottom: 8 } },
               [
@@ -1739,11 +1739,11 @@ function NurseChooseScreen({ patient, user, onNoChange, onEdit, onBack }) {
                 ["투약", yesterdayRecord.medication],
               ].filter(([,v]) => v).map(([k, v]) => React.createElement(InfoBox, { key: k, label: k, value: v }))
             ),
-            yesterdayRecord.mental && React.createElement("div", { style: { padding: "8px 10px", background: "#faf5ff", borderRadius: 8, marginBottom: 6, fontSize: 12, color: "#7c3aed" } },
+            yesterdayRecord.mental && React.createElement("div", { style: { padding: "8px 10px", background: "#faf5ff", borderRadius: 8, marginBottom: 6, fontSize: 15, color: "#7c3aed" } },
               React.createElement("span", { style: { fontWeight: 700 } }, "BPSD: "),
               yesterdayRecord.mental
             ),
-            yesterdayRecord.nurse_note && React.createElement("div", { style: { padding: "8px 10px", background: "#f0f9ff", borderRadius: 8, fontSize: 12, color: "#0369a1" } },
+            yesterdayRecord.nurse_note && React.createElement("div", { style: { padding: "8px 10px", background: "#f0f9ff", borderRadius: 8, fontSize: 15, color: "#0369a1" } },
               React.createElement("span", { style: { fontWeight: 700 } }, "코멘트: "),
               yesterdayRecord.nurse_note
             )
@@ -1751,23 +1751,23 @@ function NurseChooseScreen({ patient, user, onNoChange, onEdit, onBack }) {
       ),
 
       // 선택 버튼
-      React.createElement("div", { style: { fontSize: 13, fontWeight: 700, color: "#374151", textAlign: "center", marginBottom: 14 } }, "오늘 상태를 선택해 주세요"),
+      React.createElement("div", { style: { fontSize: 15, fontWeight: 700, color: "#374151", textAlign: "center", marginBottom: 14 } }, "오늘 상태를 선택해 주세요"),
       React.createElement("div", { style: { display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12, marginBottom: 20 } },
         React.createElement("div", {
           onClick: onNoChange,
           style: { background: "white", border: "2px solid #059669", borderRadius: 16, padding: "20px 12px", cursor: "pointer", textAlign: "center", boxShadow: "0 2px 12px rgba(5,150,105,0.12)" }
         },
           React.createElement("div", { style: { fontSize: 36, marginBottom: 10 } }, "✅"),
-          React.createElement("div", { style: { fontSize: 15, fontWeight: 800, color: "#059669" } }, "변화 없음"),
-          React.createElement("div", { style: { fontSize: 11, color: "#64748b", marginTop: 6, lineHeight: 1.5 } }, "어제와 동일해요")
+          React.createElement("div", { style: { fontSize: 16, fontWeight: 800, color: "#059669" } }, "변화 없음"),
+          React.createElement("div", { style: { fontSize: 15, color: "#64748b", marginTop: 6, lineHeight: 1.5 } }, "어제와 동일해요")
         ),
         React.createElement("div", {
           onClick: onEdit,
           style: { background: "white", border: "2px solid #3b82f6", borderRadius: 16, padding: "20px 12px", cursor: "pointer", textAlign: "center", boxShadow: "0 2px 12px rgba(59,130,246,0.12)" }
         },
           React.createElement("div", { style: { fontSize: 36, marginBottom: 10 } }, "✏️"),
-          React.createElement("div", { style: { fontSize: 15, fontWeight: 800, color: "#3b82f6" } }, "변화 있음"),
-          React.createElement("div", { style: { fontSize: 11, color: "#64748b", marginTop: 6, lineHeight: 1.5 } }, "수정 입력할게요")
+          React.createElement("div", { style: { fontSize: 16, fontWeight: 800, color: "#3b82f6" } }, "변화 있음"),
+          React.createElement("div", { style: { fontSize: 15, color: "#64748b", marginTop: 6, lineHeight: 1.5 } }, "수정 입력할게요")
         )
       )
       ) // today tab 닫기
@@ -1851,25 +1851,25 @@ function TodaySummaryPicker({ value, onChange }) {
 
   return React.createElement("div", { style: { background: "white", borderRadius: 14, marginBottom: 24, overflow: "hidden", boxShadow: "0 1px 6px rgba(0,0,0,0.06)" } },
     React.createElement("div", { style: { background: "linear-gradient(135deg,#065f46,#0d9488)", padding: "10px 16px", display: "flex", justifyContent: "space-between", alignItems: "center" } },
-      React.createElement("div", { style: { fontSize: 13, fontWeight: 700, color: "white" } }, "💚 간호사가 전하는 오늘안부 (복수 선택 가능)"),
+      React.createElement("div", { style: { fontSize: 15, fontWeight: 700, color: "white" } }, "💚 간호사가 전하는 오늘안부 (복수 선택 가능)"),
       React.createElement("button", { onClick: () => setShowAll(!showAll),
-        style: { fontSize: 11, color: "rgba(255,255,255,0.8)", background: "rgba(255,255,255,0.2)", border: "none", borderRadius: 6, padding: "3px 8px", cursor: "pointer", fontFamily: "'Noto Sans KR',sans-serif" }
+        style: { fontSize: 15, color: "rgba(255,255,255,0.8)", background: "rgba(255,255,255,0.2)", border: "none", borderRadius: 6, padding: "3px 8px", cursor: "pointer", fontFamily: "'Noto Sans KR',sans-serif" }
       }, showAll ? "접기" : "전체보기")
     ),
 
     // 선택된 문장 미리보기
     selected.length > 0 && React.createElement("div", { style: { padding: "10px 14px", background: "#f0fdf4", borderBottom: "1px solid #e2e8f0" } },
-      selected.map((s, i) => React.createElement("div", { key: i, style: { fontSize: 13, color: "#166534", lineHeight: 1.6, display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: 8 } },
+      selected.map((s, i) => React.createElement("div", { key: i, style: { fontSize: 15, color: "#166534", lineHeight: 1.6, display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: 8 } },
         React.createElement("span", null, `• ${s}`),
         React.createElement("button", { onClick: () => toggle(s),
-          style: { fontSize: 11, color: "#dc2626", background: "none", border: "none", cursor: "pointer", flexShrink: 0, fontFamily: "'Noto Sans KR',sans-serif" }
+          style: { fontSize: 15, color: "#dc2626", background: "none", border: "none", cursor: "pointer", flexShrink: 0, fontFamily: "'Noto Sans KR',sans-serif" }
         }, "✕")
       ))
     ),
 
     React.createElement("div", { style: { padding: 14 } },
       CATEGORIES.map(cat => React.createElement("div", { key: cat.label, style: { marginBottom: 12 } },
-        React.createElement("div", { style: { fontSize: 12, fontWeight: 700, color: cat.color, marginBottom: 6 } }, cat.label),
+        React.createElement("div", { style: { fontSize: 15, fontWeight: 700, color: cat.color, marginBottom: 6 } }, cat.label),
         React.createElement("div", { style: { display: "flex", flexDirection: "column", gap: 5 } },
           (showAll ? cat.items : cat.items.slice(0, 3)).map(item =>
             React.createElement("button", { key: item, onClick: () => toggle(item),
@@ -1878,7 +1878,7 @@ function TodaySummaryPicker({ value, onChange }) {
                 border: `1.5px solid ${selected.includes(item) ? cat.color : cat.border}`,
                 background: selected.includes(item) ? cat.bg : "white",
                 color: selected.includes(item) ? cat.color : "#374151",
-                fontSize: 13, fontWeight: selected.includes(item) ? 700 : 400,
+                fontSize: 15, fontWeight: selected.includes(item) ? 700 : 400,
                 cursor: "pointer", fontFamily: "'Noto Sans KR',sans-serif",
                 lineHeight: 1.5
               }
@@ -1970,11 +1970,11 @@ function NurseRecordScreen({ patient, user, onBack, onSaved }) {
   const Sec = ({ title, accent, children }) => React.createElement("div", {
     style: { background: "white", borderRadius: 14, marginBottom: 12, overflow: "hidden", boxShadow: "0 1px 6px rgba(0,0,0,0.06)" }
   },
-    React.createElement("div", { style: { background: accent || "linear-gradient(135deg,#1e3a5f,#2563eb)", padding: "10px 16px", fontSize: 13, fontWeight: 700, color: "white" } }, title),
+    React.createElement("div", { style: { background: accent || "linear-gradient(135deg,#1e3a5f,#2563eb)", padding: "10px 16px", fontSize: 15, fontWeight: 700, color: "white" } }, title),
     React.createElement("div", { style: { padding: "14px 16px" } }, children)
   );
 
-  const Lbl = ({ text }) => React.createElement("div", { style: { fontSize: 13, color: "#475569", fontWeight: 700, marginBottom: 6, marginTop: 10 } }, text);
+  const Lbl = ({ text }) => React.createElement("div", { style: { fontSize: 15, color: "#475569", fontWeight: 700, marginBottom: 6, marginTop: 10 } }, text);
 
   const Btn = ({ label, active, onClick, color, small }) => React.createElement("button", {
     onClick,
@@ -1984,7 +1984,7 @@ function NurseRecordScreen({ patient, user, onBack, onSaved }) {
       borderColor: active ? (color||"#1d4ed8") : "#e2e8f0",
       background: active ? (color||"#1d4ed8") : "white",
       color: active ? "white" : "#374151",
-      fontSize: 13, fontWeight: 600, cursor: "pointer",
+      fontSize: 15, fontWeight: 600, cursor: "pointer",
       fontFamily: "'Noto Sans KR',sans-serif", transition: "all 0.15s",
       whiteSpace: "nowrap"
     }
@@ -1999,19 +1999,19 @@ function NurseRecordScreen({ patient, user, onBack, onSaved }) {
     React.createElement("div", { style: { background: "linear-gradient(135deg,#064e3b,#059669)", padding: "48px 20px 20px" } },
       React.createElement("button", { className: "back-btn", onClick: onBack }, "← 목록"),
       React.createElement("div", { style: { fontSize: 18, fontWeight: 800, color: "white", marginTop: 8 } }, `${patient.name} ${patient.age}세 · ${patient.gender}`),
-      React.createElement("div", { style: { fontSize: 13, color: "rgba(255,255,255,0.7)" } }, `${patient.room} · 입원 ${admitDays(patient.admitted_at)}일째`),
-      React.createElement("div", { style: { fontSize: 12, color: "rgba(255,255,255,0.8)", marginTop: 4, fontWeight: 600 } },
+      React.createElement("div", { style: { fontSize: 15, color: "rgba(255,255,255,0.7)" } }, `${patient.room} · 입원 ${admitDays(patient.admitted_at)}일째`),
+      React.createElement("div", { style: { fontSize: 15, color: "rgba(255,255,255,0.8)", marginTop: 4, fontWeight: 600 } },
         `📅 ${new Date().toLocaleDateString("ko-KR", { year:"numeric", month:"long", day:"numeric", weekday:"short" })} 입력`
       ),
-      patient.dnr === true && React.createElement("span", { style: { fontSize: 11, fontWeight: 800, background: "#dcfce7", color: "#15803d", borderRadius: 4, padding: "2px 6px", marginTop: 6, display: "inline-block" } }, "DNR동의"),
-      patient.dnr === false && React.createElement("span", { style: { fontSize: 11, fontWeight: 800, background: "#fee2e2", color: "#dc2626", borderRadius: 4, padding: "2px 6px", marginTop: 6, display: "inline-block" } }, "DNR비동의"),
+      patient.dnr === true && React.createElement("span", { style: { fontSize: 15, fontWeight: 800, background: "#dcfce7", color: "#15803d", borderRadius: 4, padding: "2px 6px", marginTop: 6, display: "inline-block" } }, "DNR동의"),
+      patient.dnr === false && React.createElement("span", { style: { fontSize: 15, fontWeight: 800, background: "#fee2e2", color: "#dc2626", borderRadius: 4, padding: "2px 6px", marginTop: 6, display: "inline-block" } }, "DNR비동의"),
 
       // 진행률 바
       React.createElement("div", { style: { marginTop: 14 } },
         React.createElement("div", { style: { display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 5 } },
-          React.createElement("div", { style: { fontSize: 11, color: "rgba(255,255,255,0.8)", fontWeight: 600 } },
+          React.createElement("div", { style: { fontSize: 15, color: "rgba(255,255,255,0.8)", fontWeight: 600 } },
             `입력 진행률 · ${progress.done}/${progress.total} 항목`),
-          React.createElement("div", { style: { fontSize: 12, fontWeight: 800, color: progress.pct === 100 ? "#bbf7d0" : "white" } },
+          React.createElement("div", { style: { fontSize: 15, fontWeight: 800, color: progress.pct === 100 ? "#bbf7d0" : "white" } },
             `${progress.pct}%`)
         ),
         React.createElement("div", { style: { height: 6, background: "rgba(255,255,255,0.2)", borderRadius: 99, overflow: "hidden" } },
@@ -2193,7 +2193,7 @@ function NurseRecordScreen({ patient, user, onBack, onSaved }) {
                   borderColor: form.pain===n?"#2563eb":"#e2e8f0",
                   background: form.pain===n?"#2563eb":"white",
                   color: form.pain===n?"white":"#374151",
-                  fontWeight: 800, fontSize: 13, cursor: "pointer", fontFamily: "'Noto Sans KR',sans-serif" }
+                  fontWeight: 800, fontSize: 15, cursor: "pointer", fontFamily: "'Noto Sans KR',sans-serif" }
               }, n)
             )
           ),
@@ -2212,12 +2212,12 @@ function NurseRecordScreen({ patient, user, onBack, onSaved }) {
               {n:10, label:"최고\n통증", color:"#991b1b"},
             ].map(({n, label, color}) =>
               React.createElement("div", { key: n,
-                style: { textAlign: "center", fontSize: 11, fontWeight: 700, color: form.pain===n ? "#2563eb" : color,
+                style: { textAlign: "center", fontSize: 15, fontWeight: 700, color: form.pain===n ? "#2563eb" : color,
                   lineHeight: 1.3, whiteSpace: "pre-line" }
               }, label)
             )
           ),
-          React.createElement("div", { style: { fontSize: 13, color: "#1e3a5f", textAlign: "center", fontWeight: 700, marginTop: 4 } },
+          React.createElement("div", { style: { fontSize: 15, color: "#1e3a5f", textAlign: "center", fontWeight: 700, marginTop: 4 } },
             form.pain === null || form.pain === undefined ? "숫자를 선택하세요" :
             form.pain === 0 ? "✅ 통증 없음" :
             form.pain <= 2 ? "🟡 경미한 통증" :
@@ -2278,10 +2278,10 @@ function DoctorScreen({ user, onBack }) {
         React.createElement("button", { className: "back-btn", onClick: onBack }, "← 역할 선택"),
         React.createElement("button", { className: "logout-btn", onClick: onBack }, "로그아웃 →")
       ),
-      React.createElement("div", { style: { fontSize: 11, color: "rgba(255,255,255,0.5)", marginTop: 8 } }, `오늘안부 · 천안쌍용요양병원 · ${user.name} 원장`),
+      React.createElement("div", { style: { fontSize: 15, color: "rgba(255,255,255,0.5)", marginTop: 8 } }, `오늘안부 · 천안쌍용요양병원 · ${user.name} 원장`),
       React.createElement("div", { style: { display: "flex", justifyContent: "space-between", alignItems: "flex-end", marginTop: 4 } },
         React.createElement("div", { style: { fontSize: 18, fontWeight: 800, color: "white" } }, "환자 현황"),
-        React.createElement("div", { style: { fontSize: 13, color: "rgba(255,255,255,0.7)" } }, `담당 ${patients.length}명`)
+        React.createElement("div", { style: { fontSize: 15, color: "rgba(255,255,255,0.7)" } }, `담당 ${patients.length}명`)
       ),
       React.createElement("div", { style: { marginTop: 8 } })
     ),
@@ -2361,28 +2361,28 @@ function WarmMessagePicker({ value, onChange }) {
   };
 
   return React.createElement("div", { style: { background: "white", borderRadius: 14, marginBottom: 16, overflow: "hidden", boxShadow: "0 1px 6px rgba(0,0,0,0.06)" } },
-    React.createElement("div", { style: { background: "linear-gradient(135deg,#064e3b,#059669)", padding: "10px 16px", fontSize: 13, fontWeight: 700, color: "white" } },
+    React.createElement("div", { style: { background: "linear-gradient(135deg,#064e3b,#059669)", padding: "10px 16px", fontSize: 15, fontWeight: 700, color: "white" } },
       "💚 케어팀이 전하는 한마디 (복수 선택 가능)"
     ),
     React.createElement("div", { style: { padding: 14 } },
       selected.length > 0 && React.createElement("div", { style: { background: "#f0fdf4", borderRadius: 10, padding: "10px 12px", marginBottom: 12, border: "1.5px solid #86efac" } },
-        React.createElement("div", { style: { fontSize: 11, color: "#166534", fontWeight: 700, marginBottom: 6 } }, "선택된 내용"),
+        React.createElement("div", { style: { fontSize: 15, color: "#166534", fontWeight: 700, marginBottom: 6 } }, "선택된 내용"),
         selected.map((msg, i) => React.createElement("div", { key: i, style: { display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: 8, marginBottom: 4 } },
-          React.createElement("div", { style: { fontSize: 13, color: "#166534", lineHeight: 1.6 } }, `• ${msg}`),
+          React.createElement("div", { style: { fontSize: 15, color: "#166534", lineHeight: 1.6 } }, `• ${msg}`),
           React.createElement("button", { onClick: () => toggle(msg),
-            style: { fontSize: 11, color: "#dc2626", background: "none", border: "none", cursor: "pointer", flexShrink: 0 }
+            style: { fontSize: 15, color: "#dc2626", background: "none", border: "none", cursor: "pointer", flexShrink: 0 }
           }, "✕")
         ))
       ),
       MESSAGES.map(cat => React.createElement("div", { key: cat.cat, style: { marginBottom: 12, background: cat.bg, borderRadius: 10, padding: "10px 12px", border: `1.5px solid ${cat.border}` } },
-        React.createElement("div", { style: { fontSize: 12, fontWeight: 700, color: cat.color, marginBottom: 8 } }, cat.cat),
+        React.createElement("div", { style: { fontSize: 15, fontWeight: 700, color: cat.color, marginBottom: 8 } }, cat.cat),
         React.createElement("div", { style: { display: "flex", flexDirection: "column", gap: 5 } },
           cat.items.map(item => React.createElement("button", { key: item, onClick: () => toggle(item),
             style: { textAlign: "left", padding: "7px 10px", borderRadius: 8,
               border: `1.5px solid ${selected.includes(item) ? cat.color : cat.border}`,
               background: selected.includes(item) ? cat.color : "white",
               color: selected.includes(item) ? "white" : "#374151",
-              fontSize: 12, fontWeight: selected.includes(item) ? 700 : 400,
+              fontSize: 15, fontWeight: selected.includes(item) ? 700 : 400,
               cursor: "pointer", fontFamily: "'Noto Sans KR',sans-serif", lineHeight: 1.5 }
           }, item))
         )
@@ -2563,7 +2563,7 @@ function DoctorReviewScreen({ patient, user, onBack }) {
         React.createElement("button", { className: "back-btn", onClick: onBack }, "← 목록"),
         React.createElement("div", { style: {
           background: "rgba(255,255,255,0.18)", border: "1px solid rgba(255,255,255,0.35)",
-          borderRadius: 20, padding: "4px 12px", fontSize: 11, fontWeight: 800,
+          borderRadius: 20, padding: "4px 12px", fontSize: 15, fontWeight: 800,
           color: "white", letterSpacing: "0.5px"
         } }, "👨‍⚕️ 의사 역할")
       ),
@@ -2582,7 +2582,7 @@ function DoctorReviewScreen({ patient, user, onBack }) {
         ].filter(Boolean).map((txt, i) =>
           React.createElement("div", { key: i, style: {
             background: "rgba(255,255,255,0.15)", border: "1px solid rgba(255,255,255,0.25)",
-            borderRadius: 20, padding: "4px 10px", fontSize: 12, fontWeight: 600, color: "white"
+            borderRadius: 20, padding: "4px 10px", fontSize: 15, fontWeight: 600, color: "white"
           } }, txt)
         )
       )
@@ -2604,12 +2604,12 @@ function DoctorReviewScreen({ patient, user, onBack }) {
         : history.length === 0
         ? React.createElement("div", { style: { padding: "40px 20px", textAlign: "center" } },
             React.createElement("div", { style: { fontSize: 48, marginBottom: 14 } }, "📅"),
-            React.createElement("div", { style: { fontSize: 15, fontWeight: 800, color: "#1e3a5f", marginBottom: 8 } }, "지난 기록이 없어요"),
-            React.createElement("div", { style: { fontSize: 13, color: "#94a3b8" } }, "기록이 쌓이면 추세 그래프를 볼 수 있어요")
+            React.createElement("div", { style: { fontSize: 16, fontWeight: 800, color: "#1e3a5f", marginBottom: 8 } }, "지난 기록이 없어요"),
+            React.createElement("div", { style: { fontSize: 15, color: "#94a3b8" } }, "기록이 쌓이면 추세 그래프를 볼 수 있어요")
           )
         : React.createElement(React.Fragment, null,
             React.createElement("div", { className: "card", style: { marginBottom: 12 } },
-              React.createElement("div", { style: { fontWeight: 800, color: "#1e3a5f", fontSize: 13, marginBottom: 16 } }, "📈 최근 추세"),
+              React.createElement("div", { style: { fontWeight: 800, color: "#1e3a5f", fontSize: 15, marginBottom: 16 } }, "📈 최근 추세"),
               TrendChart({ records: history.map(r => ({ date: r.date, consciousness: categoryToNum(r.consciousness, CONSCIOUSNESS_MAP) })), label: "🧠 의식수준", field: "consciousness", maxVal: 5, colorFn: goodHighColor }),
               TrendChart({ records: history.map(r => ({ date: r.date, meal: categoryToNum(r.meal_amount, MEAL_MAP) })), label: "🍽 식사량", field: "meal", maxVal: 4, colorFn: goodHighColor }),
               TrendChart({ records: history.map(r => ({ date: r.date, pain: r.pain != null ? r.pain : null })), label: "💊 통증 (낮을수록 좋음)", field: "pain", maxVal: 10, colorFn: (v) => v <= 2 ? "#16a34a" : v <= 4 ? "#65a30d" : v <= 6 ? "#f59e0b" : v <= 8 ? "#ef4444" : "#991b1b" }),
@@ -2619,7 +2619,7 @@ function DoctorReviewScreen({ patient, user, onBack }) {
               TrendChart({ records: history.map(r => ({ date: r.date, bowel: categoryToNum(r.bowel, ["실금","관장","묽은 변","설사","변비","정상"]) })), label: "🚽 대변", field: "bowel", maxVal: 6, colorFn: goodHighColor }),
             ),
             React.createElement("div", { className: "card" },
-              React.createElement("div", { style: { fontWeight: 800, color: "#1e3a5f", fontSize: 13, marginBottom: 12 } }, "📅 날짜별 상세"),
+              React.createElement("div", { style: { fontWeight: 800, color: "#1e3a5f", fontSize: 15, marginBottom: 12 } }, "📅 날짜별 상세"),
               [...history].reverse().map((r) => {
                 const isExpanded = expandedDate === r.date;
                 const d = new Date(r.date);
@@ -2628,28 +2628,28 @@ function DoctorReviewScreen({ patient, user, onBack }) {
                   React.createElement("div", { onClick: () => setExpandedDate(isExpanded ? null : r.date),
                     style: { padding: "10px 14px", background: isExpanded ? "#eff6ff" : "#f8fafc", cursor: "pointer", display: "flex", justifyContent: "space-between", alignItems: "center" } },
                     React.createElement("div", null,
-                      React.createElement("div", { style: { fontSize: 13, fontWeight: 800, color: "#1e3a5f" } }, dateStr),
-                      React.createElement("div", { style: { fontSize: 12, color: "#64748b", marginTop: 2 } },
+                      React.createElement("div", { style: { fontSize: 15, fontWeight: 800, color: "#1e3a5f" } }, dateStr),
+                      React.createElement("div", { style: { fontSize: 15, color: "#64748b", marginTop: 2 } },
                         [r.consciousness, r.meal_amount, r.pain != null ? `통증 ${r.pain}점` : null, r.urine ? `소변 ${r.urine}` : null].filter(Boolean).join(" · "))
                     ),
-                    React.createElement("div", { style: { fontSize: 15, color: "#94a3b8" } }, isExpanded ? "▲" : "▽")
+                    React.createElement("div", { style: { fontSize: 16, color: "#94a3b8" } }, isExpanded ? "▲" : "▽")
                   ),
                   isExpanded && React.createElement("div", { style: { padding: "12px 14px", background: "white" } },
                     React.createElement("div", { style: { display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 6, marginBottom: 8 } },
                       [["의식",r.consciousness],["식사량",r.meal_amount],["식사형태",r.meal_type],["수면",r.sleep_hours],["이동",r.mobility],["낙상위험",r.fall_risk],["소변",r.urine],["대변",r.bowel],["통증",r.pain!=null?`${r.pain}점`:null],["피부",r.skin],["위생",r.hygiene],["욕창",r.bedsore],["투약",r.medication]]
                       .filter(([,v])=>v).map(([k,v]) =>
                         React.createElement("div", { key: k, style: { padding: "6px 8px", background: "#f8fafc", borderRadius: 8, border: "1px solid #e2e8f0" } },
-                          React.createElement("div", { style: { fontSize: 11, color: "#64748b", fontWeight: 700 } }, k),
-                          React.createElement("div", { style: { fontSize: 12, fontWeight: 800, color: "#1e293b", marginTop: 1 } }, v)
+                          React.createElement("div", { style: { fontSize: 15, color: "#64748b", fontWeight: 700 } }, k),
+                          React.createElement("div", { style: { fontSize: 15, fontWeight: 800, color: "#1e293b", marginTop: 1 } }, v)
                         )
                       )
                     ),
-                    r.mental && React.createElement("div", { style: { fontSize: 12, color: "#7c3aed", background: "#faf5ff", borderRadius: 8, padding: "6px 10px", marginBottom: 6 } },
+                    r.mental && React.createElement("div", { style: { fontSize: 15, color: "#7c3aed", background: "#faf5ff", borderRadius: 8, padding: "6px 10px", marginBottom: 6 } },
                       React.createElement("span", { style: { fontWeight: 700 } }, "BPSD: "), r.mental),
-                    r.special_alerts && React.createElement("div", { style: { fontSize: 12, color: "#dc2626", background: "#fff1f2", borderRadius: 8, padding: "6px 10px", marginBottom: 6 } },
+                    r.special_alerts && React.createElement("div", { style: { fontSize: 15, color: "#dc2626", background: "#fff1f2", borderRadius: 8, padding: "6px 10px", marginBottom: 6 } },
                       React.createElement("span", { style: { fontWeight: 700 } }, "특이사항: "),
                       Array.isArray(r.special_alerts) ? r.special_alerts.join(" · ") : r.special_alerts),
-                    r.doctor_comment && React.createElement("div", { style: { fontSize: 12, color: "#1e3a5f", background: "#eff6ff", borderRadius: 8, padding: "6px 10px" } },
+                    r.doctor_comment && React.createElement("div", { style: { fontSize: 15, color: "#1e3a5f", background: "#eff6ff", borderRadius: 8, padding: "6px 10px" } },
                       React.createElement("span", { style: { fontWeight: 700 } }, "의사 코멘트: "), r.doctor_comment)
                   )
                 );
@@ -2664,7 +2664,7 @@ function DoctorReviewScreen({ patient, user, onBack }) {
         React.createElement("div", { style: {
           display: "flex", alignItems: "center", gap: 6,
           background: "linear-gradient(135deg,#0d9488,#0f766e)",
-          color: "white", fontSize: 12, fontWeight: 800,
+          color: "white", fontSize: 15, fontWeight: 800,
           padding: "7px 18px", borderRadius: 20,
           letterSpacing: "0.5px", whiteSpace: "nowrap",
           boxShadow: "0 2px 8px rgba(13,148,136,0.3)"
@@ -2673,25 +2673,25 @@ function DoctorReviewScreen({ patient, user, onBack }) {
       ),
 
       record ? React.createElement("div", { style: { background: "white", borderRadius: 14, marginBottom: 12, overflow: "hidden", boxShadow: "0 1px 6px rgba(0,0,0,0.06)" } },
-        React.createElement("div", { style: { background: "linear-gradient(135deg,#e0f2fe,#bae6fd)", padding: "10px 16px", fontSize: 13, fontWeight: 800, color: "#0c4a6e", borderBottom: "1px solid #bae6fd" } }, "📋 간호사 입력 요약"),
+        React.createElement("div", { style: { background: "linear-gradient(135deg,#e0f2fe,#bae6fd)", padding: "10px 16px", fontSize: 15, fontWeight: 800, color: "#0c4a6e", borderBottom: "1px solid #bae6fd" } }, "📋 간호사 입력 요약"),
         React.createElement("div", { style: { padding: "12px 12px 8px", display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 8, marginBottom: 4 } },
           [["의식",record.consciousness],["식사량",record.meal_amount],["식사형태",record.meal_type],["수면",record.sleep_hours],["이동",record.mobility],["낙상위험",record.fall_risk],["소변",record.urine],["대변",record.bowel],["통증",record.pain!=null?`${record.pain}점`:null],["피부",record.skin],["위생",record.hygiene],["욕창",record.bedsore],["투약",record.medication],["한방",record.oriental_items||null]].filter(([,v])=>v).map(([k,v]) =>
             React.createElement("div", { key: k, style: { padding: "8px 10px", background: "#f8fafc", borderRadius: 8, border: "1px solid #e2e8f0" } },
-              React.createElement("div", { style: { fontSize: 11, color: "#475569", fontWeight: 800 } }, k),
-              React.createElement("div", { style: { fontSize: 13, fontWeight: 700, color: "#1e293b", marginTop: 2 } }, v)
+              React.createElement("div", { style: { fontSize: 15, color: "#475569", fontWeight: 800 } }, k),
+              React.createElement("div", { style: { fontSize: 15, fontWeight: 700, color: "#1e293b", marginTop: 2 } }, v)
             )
           )
         ),
-        record.nurse_note && React.createElement("div", { style: { margin: "0 12px 12px", padding: "8px 10px", background: "#f0f9ff", borderRadius: 8, fontSize: 13, color: "#0c4a6e", lineHeight: 1.5 } }, React.createElement("span", { style: { fontSize: 11, fontWeight: 700, color: "#0369a1", display: "block", marginBottom: 3 } }, "간호사 일일 코멘트"), record.nurse_note)
+        record.nurse_note && React.createElement("div", { style: { margin: "0 12px 12px", padding: "8px 10px", background: "#f0f9ff", borderRadius: 8, fontSize: 15, color: "#0c4a6e", lineHeight: 1.5 } }, React.createElement("span", { style: { fontSize: 15, fontWeight: 700, color: "#0369a1", display: "block", marginBottom: 3 } }, "간호사 일일 코멘트"), record.nurse_note)
       ) : React.createElement("div", { style: { padding: "40px 20px", textAlign: "center" } },
           React.createElement("div", { style: { fontSize: 48, marginBottom: 14 } }, "📋"),
-          React.createElement("div", { style: { fontSize: 15, fontWeight: 800, color: "#1e3a5f", marginBottom: 8 } }, "아직 오늘 간호 기록이 없어요"),
-          React.createElement("div", { style: { fontSize: 13, color: "#94a3b8" } }, "간호사 기록 후 검토할 수 있어요")
+          React.createElement("div", { style: { fontSize: 16, fontWeight: 800, color: "#1e3a5f", marginBottom: 8 } }, "아직 오늘 간호 기록이 없어요"),
+          React.createElement("div", { style: { fontSize: 15, color: "#94a3b8" } }, "간호사 기록 후 검토할 수 있어요")
         ),
 
       // 간호사 입력 BPSD 표시 (읽기전용 버튼)
       React.createElement("div", { style: { background: "white", borderRadius: 14, marginBottom: 12, overflow: "hidden", boxShadow: "0 1px 6px rgba(0,0,0,0.06)" } },
-        React.createElement("div", { style: { background: "linear-gradient(135deg,#ccfbf1,#99f6e4)", padding: "10px 16px", fontSize: 13, fontWeight: 800, color: "#0f5546", borderBottom: "1px solid #99f6e4" } }, "🧩 BPSD — 간호사 입력 행동·심리 증상"),
+        React.createElement("div", { style: { background: "linear-gradient(135deg,#ccfbf1,#99f6e4)", padding: "10px 16px", fontSize: 15, fontWeight: 800, color: "#0f5546", borderBottom: "1px solid #99f6e4" } }, "🧩 BPSD — 간호사 입력 행동·심리 증상"),
         React.createElement("div", { style: { padding: 14 } },
           record && record.mental && record.mental.length > 0
           ? React.createElement("div", { style: { display: "flex", flexWrap: "wrap", gap: 6 } },
@@ -2704,13 +2704,13 @@ function DoctorReviewScreen({ patient, user, onBack }) {
                   borderColor: v === "이상없음" ? "#166534" : "#ea7c3a",
                   background: v === "이상없음" ? "#166534" : "white",
                   color: v === "이상없음" ? "white" : "#1e293b",
-                  fontSize: 12, fontWeight: 600,
+                  fontSize: 15, fontWeight: 600,
                   whiteSpace: "nowrap",
                   fontFamily: "'Noto Sans KR',sans-serif"
                 }
               }, v))
             )
-          : React.createElement("div", { style: { color: "#94a3b8", fontSize: 13 } }, "간호사 입력 내용이 없습니다.")
+          : React.createElement("div", { style: { color: "#94a3b8", fontSize: 15 } }, "간호사 입력 내용이 없습니다.")
         )
       ),
 
@@ -2723,7 +2723,7 @@ function DoctorReviewScreen({ patient, user, onBack }) {
         React.createElement("div", { style: {
           display: "flex", alignItems: "center", gap: 6,
           background: "linear-gradient(135deg,#1e3a5f,#2563eb)",
-          color: "white", fontSize: 13, fontWeight: 800,
+          color: "white", fontSize: 15, fontWeight: 800,
           padding: "8px 22px", borderRadius: 20,
           letterSpacing: "0.5px", whiteSpace: "nowrap",
           boxShadow: "0 2px 10px rgba(30,58,95,0.3)"
@@ -2733,10 +2733,10 @@ function DoctorReviewScreen({ patient, user, onBack }) {
 
       // 의사 처치·검사·협진
       React.createElement("div", { className: "card", style: { marginBottom: 12 } },
-        React.createElement("div", { style: { fontWeight: 700, color: "#1e3a5f", marginBottom: 14, fontSize: 13 } }, "🩺 오늘의 의료 처치 내역"),
+        React.createElement("div", { style: { fontWeight: 700, color: "#1e3a5f", marginBottom: 14, fontSize: 15 } }, "🩺 오늘의 의료 처치 내역"),
         Object.entries(MEDICAL_ITEMS).map(([cat, {items, bg, border, activeBg}]) =>
           React.createElement("div", { key: cat, style: { marginBottom: 12, background: bg, borderRadius: 12, padding: "12px 12px 10px", border: `1.5px solid ${border}` } },
-            React.createElement("div", { style: { fontSize: 13, color: "#1e293b", fontWeight: 800, marginBottom: 8 } }, cat),
+            React.createElement("div", { style: { fontSize: 15, color: "#1e293b", fontWeight: 800, marginBottom: 8 } }, cat),
             React.createElement("div", { style: { display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 6 } },
               items.map(f => React.createElement("button", {
                 key: f, onClick: () => toggleFinding(f),
@@ -2744,7 +2744,7 @@ function DoctorReviewScreen({ patient, user, onBack }) {
                   borderColor: findings.includes(f) ? activeBg : border,
                   background: findings.includes(f) ? activeBg : "white",
                   color: findings.includes(f) ? "white" : "#374151",
-                  fontSize: 12, fontWeight: 600, cursor: "pointer",
+                  fontSize: 15, fontWeight: 600, cursor: "pointer",
                   fontFamily: "'Noto Sans KR',sans-serif", lineHeight: 1.3 }
               }, f))
             )
@@ -2754,11 +2754,11 @@ function DoctorReviewScreen({ patient, user, onBack }) {
 
       // 보호자 전달 특이사항 (증상+처치 세트)
       React.createElement("div", { style: { background: "white", borderRadius: 14, marginBottom: 12, overflow: "hidden", boxShadow: "0 1px 6px rgba(0,0,0,0.06)" } },
-        React.createElement("div", { style: { background: "linear-gradient(135deg,#1e3a5f,#2c5282)", padding: "10px 16px", fontSize: 13, fontWeight: 700, color: "white" } }, "💬 보호자에게 전달할 상태"),
+        React.createElement("div", { style: { background: "linear-gradient(135deg,#1e3a5f,#2c5282)", padding: "10px 16px", fontSize: 15, fontWeight: 700, color: "white" } }, "💬 보호자에게 전달할 상태"),
         React.createElement("div", { style: { padding: 14 } },
 
           // 증상+처치 세트
-          React.createElement("div", { style: { fontSize: 12, color: "#92400e", fontWeight: 700, marginBottom: 8 } }, "⚠️ 주요 상황 (클릭하면 증상·처치가 함께 전달돼요)"),
+          React.createElement("div", { style: { fontSize: 15, color: "#92400e", fontWeight: 700, marginBottom: 8 } }, "⚠️ 주요 상황 (클릭하면 증상·처치가 함께 전달돼요)"),
           React.createElement("div", { style: { display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 6, marginBottom: 14 } },
             ALERT_SETS.map(s => {
               const isActive = specialAlerts.some(x => x === `[S]${s.bad}`);
@@ -2778,7 +2778,7 @@ function DoctorReviewScreen({ patient, user, onBack }) {
                   borderColor: isActive ? "#d97706" : "#fde68a",
                   background: isActive ? "#d97706" : "#fffbeb",
                   color: isActive ? "white" : "#92400e",
-                  fontSize: 12, fontWeight: 700, cursor: "pointer",
+                  fontSize: 15, fontWeight: 700, cursor: "pointer",
                   fontFamily: "'Noto Sans KR',sans-serif", lineHeight: 1.4,
                   textAlign: "center", transition: "all 0.15s"
                 }
@@ -2789,9 +2789,9 @@ function DoctorReviewScreen({ patient, user, onBack }) {
           // 선택된 세트 미리보기
           specialAlerts.filter(a => !ALERT_RECOVERY.includes(a) && !ALERT_CONSENT.includes(a)).length > 0 &&
           React.createElement("div", { style: { background: "#fffbeb", borderRadius: 10, padding: "10px 12px", marginBottom: 14, border: "1.5px solid #fde68a" } },
-            React.createElement("div", { style: { fontSize: 11, color: "#92400e", fontWeight: 700, marginBottom: 6 } }, "선택된 내용 (보호자에게 전달)"),
+            React.createElement("div", { style: { fontSize: 15, color: "#92400e", fontWeight: 700, marginBottom: 6 } }, "선택된 내용 (보호자에게 전달)"),
             ALERT_SETS.filter(s => specialAlerts.includes(s.bad)).map((s, i) =>
-              React.createElement("div", { key: i, style: { fontSize: 12, color: "#78350f", lineHeight: 1.6, paddingBottom: 4, borderBottom: "1px solid #fef3c7", marginBottom: 4 } },
+              React.createElement("div", { key: i, style: { fontSize: 15, color: "#78350f", lineHeight: 1.6, paddingBottom: 4, borderBottom: "1px solid #fef3c7", marginBottom: 4 } },
                 React.createElement("span", { style: { fontWeight: 700 } }, `${s.label}: `),
                 `${s.bad} → ${s.good}`
               )
@@ -2799,7 +2799,7 @@ function DoctorReviewScreen({ patient, user, onBack }) {
           ),
 
           // 호전 상황
-          React.createElement("div", { style: { fontSize: 12, color: "#166534", fontWeight: 700, marginBottom: 8 } }, "✅ 호전되는 상황"),
+          React.createElement("div", { style: { fontSize: 15, color: "#166534", fontWeight: 700, marginBottom: 8 } }, "✅ 호전되는 상황"),
           React.createElement("div", { style: { display: "grid", gridTemplateColumns: "1fr 1fr", gap: 6, marginBottom: 10 } },
             ALERT_RECOVERY.map(v =>
               React.createElement("button", {
@@ -2808,7 +2808,7 @@ function DoctorReviewScreen({ patient, user, onBack }) {
                   borderColor: isAlertOn(v,"R") ? "#16a34a" : "#bbf7d0",
                   background: isAlertOn(v,"R") ? "#16a34a" : "#f0fdf4",
                   color: isAlertOn(v,"R") ? "white" : "#166534",
-                  fontSize: 12, fontWeight: 600, cursor: "pointer",
+                  fontSize: 15, fontWeight: 600, cursor: "pointer",
                   fontFamily: "'Noto Sans KR',sans-serif", lineHeight: 1.4, textAlign: "left" }
               }, v)
             )
@@ -2822,14 +2822,14 @@ function DoctorReviewScreen({ patient, user, onBack }) {
                   borderColor: isAlertOn(v,"D") ? "#14532d" : "#86efac",
                   background: isAlertOn(v,"D") ? "#14532d" : "#dcfce7",
                   color: isAlertOn(v,"D") ? "white" : "#14532d",
-                  fontSize: 12, fontWeight: 700, cursor: "pointer",
+                  fontSize: 15, fontWeight: 700, cursor: "pointer",
                   fontFamily: "'Noto Sans KR',sans-serif", lineHeight: 1.4, textAlign: "left" }
               }, v)
             )
           ),
 
           // 보호자 동의 필요
-          React.createElement("div", { style: { fontSize: 12, color: "#1e4d8c", fontWeight: 700, marginBottom: 8 } }, "📋 보호자 안내·동의 필요"),
+          React.createElement("div", { style: { fontSize: 15, color: "#1e4d8c", fontWeight: 700, marginBottom: 8 } }, "📋 보호자 안내·동의 필요"),
           React.createElement("div", { style: { display: "flex", flexDirection: "column", gap: 6 } },
             ALERT_CONSENT.map(v =>
               React.createElement("button", {
@@ -2838,7 +2838,7 @@ function DoctorReviewScreen({ patient, user, onBack }) {
                   borderColor: isAlertOn(v,"C") ? "#2563eb" : "#bfdbfe",
                   background: isAlertOn(v,"C") ? "#2563eb" : "#eff6ff",
                   color: isAlertOn(v,"C") ? "white" : "#1e4d8c",
-                  fontSize: 12, fontWeight: 600, cursor: "pointer",
+                  fontSize: 15, fontWeight: 600, cursor: "pointer",
                   fontFamily: "'Noto Sans KR',sans-serif", textAlign: "left" }
               }, v)
             )
@@ -2868,19 +2868,19 @@ function MessagesList({ messages, patients, onMarkRead }) {
         ),
         React.createElement("div", { className: "msg-time" }, fmtDate(m.created_at))
       ),
-      p && React.createElement("div", { style: { fontSize: 12, color: "#64748b", marginBottom: 6 } }, `${p.name} 어르신 · ${p.room}`),
-      m.visit_date && React.createElement("div", { style: { background: "#f0f9ff", borderRadius: 8, padding: "8px 10px", marginBottom: 8, fontSize: 13, color: "#0369a1", fontWeight: 600 } },
+      p && React.createElement("div", { style: { fontSize: 15, color: "#64748b", marginBottom: 6 } }, `${p.name} 어르신 · ${p.room}`),
+      m.visit_date && React.createElement("div", { style: { background: "#f0f9ff", borderRadius: 8, padding: "8px 10px", marginBottom: 8, fontSize: 15, color: "#0369a1", fontWeight: 600 } },
         `📅 면회 예정: ${m.visit_date}${m.visit_time?" "+m.visit_time:""}`
       ),
       m.body && React.createElement("div", { className: "msg-body" }, m.body),
-      p && React.createElement("div", { style: { fontSize: 12, color: "#94a3b8", marginTop: 8 } }, `✓ ${p.name} 어르신께 전달해주세요`)
+      p && React.createElement("div", { style: { fontSize: 15, color: "#94a3b8", marginTop: 8 } }, `✓ ${p.name} 어르신께 전달해주세요`)
     );
   };
 
   if (messages.length === 0) return React.createElement("div", { style: { padding: "40px 20px", textAlign: "center" } },
     React.createElement("div", { style: { fontSize: 48, marginBottom: 14 } }, "💬"),
-    React.createElement("div", { style: { fontSize: 15, fontWeight: 800, color: "#1e3a5f", marginBottom: 8 } }, "아직 메시지가 없어요"),
-    React.createElement("div", { style: { fontSize: 13, color: "#94a3b8" } }, "보호자가 한마디를 남기면 여기에 표시돼요")
+    React.createElement("div", { style: { fontSize: 16, fontWeight: 800, color: "#1e3a5f", marginBottom: 8 } }, "아직 메시지가 없어요"),
+    React.createElement("div", { style: { fontSize: 15, color: "#94a3b8" } }, "보호자가 한마디를 남기면 여기에 표시돼요")
   );
 
   return React.createElement(React.Fragment, null,
@@ -2935,7 +2935,7 @@ function MessagesScreen({ user, onBack }) {
   });
 
   const BtnFilter = ({ label, active, onClick }) => React.createElement("button", { onClick,
-    style: { padding: "5px 12px", borderRadius: 20, border: "none", background: active?"white":"rgba(255,255,255,0.2)", color: active?"#1e3a5f":"white", fontWeight: 600, fontSize: 12, cursor: "pointer", whiteSpace: "nowrap", fontFamily: "'Noto Sans KR',sans-serif" }
+    style: { padding: "5px 12px", borderRadius: 20, border: "none", background: active?"white":"rgba(255,255,255,0.2)", color: active?"#1e3a5f":"white", fontWeight: 600, fontSize: 15, cursor: "pointer", whiteSpace: "nowrap", fontFamily: "'Noto Sans KR',sans-serif" }
   }, label);
 
   return React.createElement("div", { className: "screen", style: { background: "#f0f4f8" } },
@@ -2944,38 +2944,38 @@ function MessagesScreen({ user, onBack }) {
         React.createElement("button", { className: "back-btn", onClick: onBack }, "← 역할 선택"),
         React.createElement("button", { className: "logout-btn", onClick: onBack }, "로그아웃 →")
       ),
-      React.createElement("div", { style: { fontSize: 15, fontWeight: 800, color: "white", marginTop: 8 } }, "💬 가족들의 한마디 확인"),
-      React.createElement("div", { style: { fontSize: 12, color: "rgba(255,255,255,0.7)", marginTop: 3 } },
+      React.createElement("div", { style: { fontSize: 16, fontWeight: 800, color: "white", marginTop: 8 } }, "💬 가족들의 한마디 확인"),
+      React.createElement("div", { style: { fontSize: 15, color: "rgba(255,255,255,0.7)", marginTop: 3 } },
         isNurse ? `${user.ward} 담당` : `${user.name} 원장 담당 환자`
       ),
       React.createElement("div", { style: { display: "flex", gap: 8, marginTop: 12 } },
         React.createElement("div", { style: { background: "rgba(255,255,255,0.15)", borderRadius: 10, padding: "8px 0", textAlign: "center", flex: 1 } },
           React.createElement("div", { style: { fontSize: 18, fontWeight: 800, color: "white" } }, messages.length),
-          React.createElement("div", { style: { fontSize: 11, color: "rgba(255,255,255,0.7)" } }, "전체")
+          React.createElement("div", { style: { fontSize: 15, color: "rgba(255,255,255,0.7)" } }, "전체")
         ),
         React.createElement("div", { style: { background: "rgba(239,68,68,0.35)", borderRadius: 10, padding: "8px 0", textAlign: "center", flex: 1 } },
           React.createElement("div", { style: { fontSize: 18, fontWeight: 800, color: "white" } }, unread),
-          React.createElement("div", { style: { fontSize: 11, color: "rgba(255,255,255,0.7)" } }, "미확인")
+          React.createElement("div", { style: { fontSize: 15, color: "rgba(255,255,255,0.7)" } }, "미확인")
         ),
         React.createElement("div", { style: { background: "rgba(34,197,94,0.35)", borderRadius: 10, padding: "8px 0", textAlign: "center", flex: 1 } },
           React.createElement("div", { style: { fontSize: 18, fontWeight: 800, color: "white" } }, done),
-          React.createElement("div", { style: { fontSize: 11, color: "rgba(255,255,255,0.7)" } }, "확인완료")
+          React.createElement("div", { style: { fontSize: 15, color: "rgba(255,255,255,0.7)" } }, "확인완료")
         ),
         React.createElement("div", { style: { background: "rgba(255,255,255,0.1)", borderRadius: 10, padding: "8px 0", textAlign: "center", flex: 1 } },
           React.createElement("div", { style: { fontSize: 18, fontWeight: 800, color: "white" } }, filtered.length),
-          React.createElement("div", { style: { fontSize: 11, color: "rgba(255,255,255,0.7)" } }, "필터결과")
+          React.createElement("div", { style: { fontSize: 15, color: "rgba(255,255,255,0.7)" } }, "필터결과")
         )
       ),
       // 병동 필터
       React.createElement("div", { style: { marginTop: 10 } },
-        React.createElement("div", { style: { fontSize: 11, color: "rgba(255,255,255,0.6)", marginBottom: 5, fontWeight: 600 } }, "병동별"),
+        React.createElement("div", { style: { fontSize: 15, color: "rgba(255,255,255,0.6)", marginBottom: 5, fontWeight: 600 } }, "병동별"),
         React.createElement("div", { style: { display: "flex", gap: 5, overflowX: "auto", paddingBottom: 2 } },
           WARDS.map(w => React.createElement(BtnFilter, { key: w, label: w, active: filterWard===w, onClick: () => setFilterWard(w) }))
         )
       ),
       // 의사별 필터
       React.createElement("div", { style: { marginTop: 8 } },
-        React.createElement("div", { style: { fontSize: 11, color: "rgba(255,255,255,0.6)", marginBottom: 5, fontWeight: 600 } }, "의사별"),
+        React.createElement("div", { style: { fontSize: 15, color: "rgba(255,255,255,0.6)", marginBottom: 5, fontWeight: 600 } }, "의사별"),
         React.createElement("div", { style: { display: "flex", gap: 5, overflowX: "auto", paddingBottom: 2 } },
           DOCTORS.map(d => React.createElement(BtnFilter, { key: d, label: d==="전체"?"전체":d+" 원장", active: filterDoctor===d, onClick: () => setFilterDoctor(d) }))
         )
@@ -2987,7 +2987,7 @@ function MessagesScreen({ user, onBack }) {
       : filtered.length === 0
         ? React.createElement("div", { style: { textAlign: "center", padding: "60px 20px", color: "#94a3b8" } },
             React.createElement("div", { style: { fontSize: 40, marginBottom: 12 } }, "💬"),
-            React.createElement("div", { style: { fontSize: 13 } }, "해당 조건의 메시지가 없어요")
+            React.createElement("div", { style: { fontSize: 15 } }, "해당 조건의 메시지가 없어요")
           )
         : React.createElement(MessagesList, { messages: filtered, patients: allPatients,
             onMarkRead: async (id) => {
@@ -3037,13 +3037,13 @@ function AdminScreen({ user, onBack }) {
           onBack();
         } }, "로그아웃 →")
       ),
-      React.createElement("div", { style: { fontSize: 11, color: "rgba(255,255,255,0.5)", marginTop: 8 } }, "오늘안부 · 관리자"),
+      React.createElement("div", { style: { fontSize: 15, color: "rgba(255,255,255,0.5)", marginTop: 8 } }, "오늘안부 · 관리자"),
       React.createElement("div", { style: { fontSize: 18, fontWeight: 800, color: "white" } }, `${user.name} 병원장`),
       React.createElement("div", { style: { display: "flex", gap: 6, marginTop: 12, overflowX: "auto" } },
         [["staff","직원 계정"],["patients","환자 현황"],["notices","공지사항"],["requests","가입승인"]].map(([k,v]) =>
           React.createElement("button", {
             key: k, onClick: () => setTab(k),
-            style: { padding: "8px 14px", borderRadius: 8, border: "none", background: tab===k?"white":"rgba(255,255,255,0.15)", color: tab===k?"#1c1917":"white", fontWeight: 700, fontSize: 13, cursor: "pointer", whiteSpace: "nowrap", fontFamily: "'Noto Sans KR',sans-serif", display: "flex", alignItems: "center", gap: 4 }
+            style: { padding: "8px 14px", borderRadius: 8, border: "none", background: tab===k?"white":"rgba(255,255,255,0.15)", color: tab===k?"#1c1917":"white", fontWeight: 700, fontSize: 15, cursor: "pointer", whiteSpace: "nowrap", fontFamily: "'Noto Sans KR',sans-serif", display: "flex", alignItems: "center", gap: 4 }
           }, v, k==="requests" && pendingCount > 0 && React.createElement("span", { className: "badge" }, pendingCount))
         )
       )
@@ -3115,21 +3115,21 @@ function AdminStaffTab({ staff, onRefresh }) {
       ),
       React.createElement("button", { className: "btn btn-dark", onClick: handleAdd, disabled: saving, style: { marginTop: 14 } }, saving ? "등록 중..." : "등록하기")
     ),
-    React.createElement("div", { style: { fontSize: 13, color: "#64748b", marginBottom: 8 } }, `전체 직원 ${staff.length}명`),
+    React.createElement("div", { style: { fontSize: 15, color: "#64748b", marginBottom: 8 } }, `전체 직원 ${staff.length}명`),
     React.createElement("div", { style: { display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8 } },
       staff.map(s => React.createElement("div", { key: s.id, className: "card", style: { marginBottom: 0, display: "flex", flexDirection: "column", gap: 8 } },
         React.createElement("div", null,
           React.createElement("div", { style: { display: "flex", alignItems: "center", gap: 6, flexWrap: "wrap" } },
-            React.createElement("span", { style: { fontWeight: 700, color: "#1e3a5f", fontSize: 13 } }, s.name),
+            React.createElement("span", { style: { fontWeight: 700, color: "#1e3a5f", fontSize: 15 } }, s.name),
             React.createElement("span", { className: `tag ${roleColor[s.role]}` }, roleLabel[s.role])
           ),
-          React.createElement("div", { style: { fontSize: 11, color: s.active ? "#16a34a" : "#94a3b8", marginTop: 3 } },
+          React.createElement("div", { style: { fontSize: 15, color: s.active ? "#16a34a" : "#94a3b8", marginTop: 3 } },
             s.active ? "● 활성" : "● 비활성", s.ward ? ` · ${s.ward}` : ""
           )
         ),
         s.role !== "admin" && React.createElement("button", {
           onClick: () => api("toggle_staff", { userId: s.id, active: !s.active }).then(onRefresh),
-          style: { padding: "5px 0", borderRadius: 8, border: "1.5px solid", borderColor: s.active?"#fee2e2":"#dcfce7", background: s.active?"#fee2e2":"#dcfce7", color: s.active?"#991b1b":"#166534", fontWeight: 600, fontSize: 12, cursor: "pointer", fontFamily: "'Noto Sans KR',sans-serif", width: "100%" }
+          style: { padding: "5px 0", borderRadius: 8, border: "1.5px solid", borderColor: s.active?"#fee2e2":"#dcfce7", background: s.active?"#fee2e2":"#dcfce7", color: s.active?"#991b1b":"#166534", fontWeight: 600, fontSize: 15, cursor: "pointer", fontFamily: "'Noto Sans KR',sans-serif", width: "100%" }
         }, s.active ? "비활성화" : "활성화")
       ))
     )
@@ -3198,13 +3198,13 @@ function AdminPatientsTab({ patients, onRefresh }) {
       ),
       React.createElement("button", { className: "btn btn-dark", onClick: handleAdd, disabled: saving, style: { marginTop: 14 } }, saving ? "등록 중..." : "등록하기")
     ),
-    React.createElement("div", { style: { fontSize: 13, color: "#64748b", marginBottom: 8 } }, `전체 입원 환자 ${patients.length}명`),
+    React.createElement("div", { style: { fontSize: 15, color: "#64748b", marginBottom: 8 } }, `전체 입원 환자 ${patients.length}명`),
     React.createElement("div", { style: { display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8 } },
       patients.map(p => React.createElement("div", { key: p.id, className: "card", style: { marginBottom: 0 } },
-        React.createElement("div", { style: { fontWeight: 700, color: "#1e3a5f", fontSize: 13 } }, p.name),
-        React.createElement("div", { style: { fontSize: 12, color: "#64748b", marginTop: 3 } }, `${p.age}세 · ${p.gender}`),
-        React.createElement("div", { style: { fontSize: 12, color: "#64748b" } }, p.room),
-        React.createElement("div", { style: { fontSize: 12, color: "#94a3b8" } }, `입원 ${admitDays(p.admitted_at)}일째`)
+        React.createElement("div", { style: { fontWeight: 700, color: "#1e3a5f", fontSize: 15 } }, p.name),
+        React.createElement("div", { style: { fontSize: 15, color: "#64748b", marginTop: 3 } }, `${p.age}세 · ${p.gender}`),
+        React.createElement("div", { style: { fontSize: 15, color: "#64748b" } }, p.room),
+        React.createElement("div", { style: { fontSize: 15, color: "#94a3b8" } }, `입원 ${admitDays(p.admitted_at)}일째`)
       ))
     )
   );
@@ -3237,14 +3237,14 @@ function AdminNoticesTab({ notices, onRefresh }) {
       ),
       React.createElement("button", { className: "btn btn-dark", onClick: handleSave, disabled: saving }, saving ? "등록 중..." : "공지 등록")
     ),
-    React.createElement("div", { style: { fontSize: 13, color: "#64748b", marginBottom: 8 } }, `등록된 공지 ${notices.length}건`),
+    React.createElement("div", { style: { fontSize: 15, color: "#64748b", marginBottom: 8 } }, `등록된 공지 ${notices.length}건`),
     notices.map(n => React.createElement("div", { key: n.id, className: "card", style: { marginBottom: 8 } },
       React.createElement("div", { style: { display: "flex", justifyContent: "space-between", alignItems: "flex-start" } },
         React.createElement("div", { style: { fontWeight: 700, color: "#1e3a5f", marginBottom: 6 } }, n.title),
-        React.createElement("button", { onClick: () => api("delete_notice", { id: n.id }).then(onRefresh), style: { background: "#fee2e2", border: "none", color: "#991b1b", borderRadius: 6, padding: "4px 8px", fontSize: 12, cursor: "pointer", fontFamily: "'Noto Sans KR',sans-serif" } }, "삭제")
+        React.createElement("button", { onClick: () => api("delete_notice", { id: n.id }).then(onRefresh), style: { background: "#fee2e2", border: "none", color: "#991b1b", borderRadius: 6, padding: "4px 8px", fontSize: 15, cursor: "pointer", fontFamily: "'Noto Sans KR',sans-serif" } }, "삭제")
       ),
-      React.createElement("div", { style: { fontSize: 13, color: "#374151", lineHeight: 1.5 } }, n.content),
-      React.createElement("div", { style: { fontSize: 12, color: "#94a3b8", marginTop: 8 } }, n.created_at?.slice(0,10))
+      React.createElement("div", { style: { fontSize: 15, color: "#374151", lineHeight: 1.5 } }, n.content),
+      React.createElement("div", { style: { fontSize: 15, color: "#94a3b8", marginTop: 8 } }, n.created_at?.slice(0,10))
     ))
   );
 }
@@ -3253,12 +3253,12 @@ function AdminRequestsTab({ requests, onApprove }) {
   if (requests.length === 0) return React.createElement("div", { className: "empty" }, React.createElement("div", { className: "empty-icon" }, "🎉"), "대기 중인 가입 신청이 없어요");
 
   return React.createElement(React.Fragment, null,
-    React.createElement("div", { style: { fontSize: 13, color: "#64748b", marginBottom: 8 } }, `가입 승인 대기 ${requests.length}건`),
+    React.createElement("div", { style: { fontSize: 15, color: "#64748b", marginBottom: 8 } }, `가입 승인 대기 ${requests.length}건`),
     requests.map(r => React.createElement("div", { key: r.id, className: "card", style: { marginBottom: 12 } },
       React.createElement("div", { style: { fontWeight: 700, color: "#1e3a5f", marginBottom: 6 } }, `${r.name}${r.relation?` (${r.relation})`:""}`),
-      React.createElement("div", { style: { fontSize: 13, color: "#64748b" } }, `📞 ${r.phone}`),
-      React.createElement("div", { style: { fontSize: 13, color: "#64748b" } }, `👴 어르신: ${r.patient_name}`),
-      React.createElement("div", { style: { fontSize: 12, color: "#94a3b8", marginTop: 4 } }, `${r.created_at?.slice(0,10)} 신청`),
+      React.createElement("div", { style: { fontSize: 15, color: "#64748b" } }, `📞 ${r.phone}`),
+      React.createElement("div", { style: { fontSize: 15, color: "#64748b" } }, `👴 어르신: ${r.patient_name}`),
+      React.createElement("div", { style: { fontSize: 15, color: "#94a3b8", marginTop: 4 } }, `${r.created_at?.slice(0,10)} 신청`),
       React.createElement("div", { style: { display: "flex", gap: 8, marginTop: 12 } },
         React.createElement("button", { className: "btn btn-green", onClick: () => onApprove(r.id, true), style: { flex: 1 } }, "✅ 승인"),
         React.createElement("button", { className: "btn btn-red", onClick: () => onApprove(r.id, false), style: { flex: 1 } }, "✕ 거부")
