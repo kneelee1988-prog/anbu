@@ -1234,9 +1234,15 @@ function GuardianScreen({ user, onBack }) {
             })(),
             // 특이사항 (의사 검토 완료 후)
             record?.reviewed_at && record?.special_alerts && record.special_alerts.length > 0 && (() => {
-              const raw = typeof record.special_alerts === "string"
-                ? record.special_alerts.split("·").map(s=>s.trim()).filter(Boolean)
-                : (Array.isArray(record.special_alerts) ? record.special_alerts : []);
+              const raw = (() => {
+                const sa = record.special_alerts;
+                if (Array.isArray(sa)) return sa;
+                if (typeof sa === "string") {
+                  // · 구분 또는 공백 구분으로 split
+                  return sa.split(/\s*·\s*/).map(s => s.trim()).filter(Boolean);
+                }
+                return [];
+              })();
 
               const getTag = (a) => { const m = a.match(/^\[([STRCD])\]/); return m ? m[1] : null; };
               const stripTag = (a) => a.replace(/^\[[STRCD]\]/, "");
@@ -2676,15 +2682,26 @@ function DoctorReviewScreen({ patient, user, onBack }) {
             React.createElement("div", { style: { fontSize: 15, color: "#94a3b8" } }, "기록이 쌓이면 추세 그래프를 볼 수 있어요")
           )
         : React.createElement(React.Fragment, null,
-            React.createElement("div", { className: "card", style: { marginBottom: 12 } },
-              React.createElement("div", { style: { fontWeight: 800, color: "#1e3a5f", fontSize: 15, marginBottom: 16 } }, "📈 최근 추세"),
-              TrendChart({ records: history.map(r => ({ date: r.date, consciousness: categoryToNum(r.consciousness, CONSCIOUSNESS_MAP) })), label: "🧠 의식수준", field: "consciousness", maxVal: 5, colorFn: goodHighColor }),
-              TrendChart({ records: history.map(r => ({ date: r.date, meal: categoryToNum(r.meal_amount, MEAL_MAP) })), label: "🍽 식사량", field: "meal", maxVal: 4, colorFn: goodHighColor }),
-              TrendChart({ records: history.map(r => ({ date: r.date, pain: r.pain != null ? r.pain : null })), label: "💊 통증 (낮을수록 좋음)", field: "pain", maxVal: 10, colorFn: (v) => v <= 2 ? "#16a34a" : v <= 4 ? "#65a30d" : v <= 6 ? "#f59e0b" : v <= 8 ? "#ef4444" : "#991b1b" }),
-              TrendChart({ records: history.map(r => ({ date: r.date, sleep: categoryToNum(r.sleep_hours, SLEEP_MAP) })), label: "😴 수면시간", field: "sleep", maxVal: 4, colorFn: goodHighColor }),
-              TrendChart({ records: history.map(r => ({ date: r.date, mobility: categoryToNum(r.mobility, MOBILITY_MAP) })), label: "🚶 이동능력", field: "mobility", maxVal: 4, colorFn: goodHighColor }),
-              TrendChart({ records: history.map(r => ({ date: r.date, urine: categoryToNum(r.urine, ["실금","농축","감소","정상"]) })), label: "🚿 소변", field: "urine", maxVal: 4, colorFn: goodHighColor }),
-              TrendChart({ records: history.map(r => ({ date: r.date, bowel: categoryToNum(r.bowel, ["실금","관장","묽은 변","설사","변비","정상"]) })), label: "🚽 대변", field: "bowel", maxVal: 6, colorFn: goodHighColor }),
+            React.createElement("div", { style: { marginBottom: 12 } },
+              React.createElement("div", { style: { fontWeight: 800, color: "#1e3a5f", fontSize: 15, marginBottom: 12 } }, "📈 최근 7일 추세"),
+              React.createElement("div", { style: { display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10, marginBottom: 10 } },
+                React.createElement(TrendChart, { records: history.map(r => ({ date: r.date, val: categoryToNum(r.consciousness, CONSCIOUSNESS_MAP) })), label: "🧠 의식수준", field: "val", maxVal: 5, accentColor: "#1d4ed8",
+                  colorFn: CHART_COLOR.consciousness, valueLabelFn: v => ["혼수","반혼수","혼미","졸림","명료"][v-1]||"—" }),
+                React.createElement(TrendChart, { records: history.map(r => ({ date: r.date, val: r.pain != null ? r.pain : null })), label: "💊 통증", field: "val", maxVal: 10, accentColor: "#b91c1c",
+                  colorFn: CHART_COLOR.pain, valueLabelFn: v => v != null ? `${v}점` : "—" })
+              ),
+              React.createElement("div", { style: { display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10, marginBottom: 10 } },
+                React.createElement(TrendChart, { records: history.map(r => ({ date: r.date, val: categoryToNum(r.meal_amount, MEAL_MAP) })), label: "🍽️ 식사량", field: "val", maxVal: 6, accentColor: "#c2410c",
+                  colorFn: CHART_COLOR.goodHigh, valueLabelFn: v => ["거부","소량","1/4","절반","3/4","잘드심"][v-1]||"—" }),
+                React.createElement(TrendChart, { records: history.map(r => ({ date: r.date, val: categoryToNum(r.mobility, MOBILITY_MAP) })), label: "🚶 이동능력", field: "val", maxVal: 5, accentColor: "#0369a1",
+                  colorFn: CHART_COLOR.goodHigh, valueLabelFn: v => ["침상","휠체어","부축","워커","독립"][v-1]||"—" })
+              ),
+              React.createElement("div", { style: { display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10 } },
+                React.createElement(TrendChart, { records: history.map(r => ({ date: r.date, val: categoryToNum(r.urine, ["실금","농축","감소","정상"]) })), label: "🚿 소변", field: "val", maxVal: 4, accentColor: "#0369a1",
+                  colorFn: CHART_COLOR.goodHigh, valueLabelFn: v => ["실금","농축","감소","정상"][v-1]||"—" }),
+                React.createElement(TrendChart, { records: history.map(r => ({ date: r.date, val: categoryToNum(r.bowel, ["실금","관장","묽은변","설사","변비","정상"]) })), label: "🚽 대변", field: "val", maxVal: 6, accentColor: "#0369a1",
+                  colorFn: CHART_COLOR.goodHigh, valueLabelFn: v => ["실금","관장","묽은변","설사","변비","정상"][v-1]||"—" })
+              )
             ),
             React.createElement("div", { className: "card" },
               React.createElement("div", { style: { fontWeight: 800, color: "#1e3a5f", fontSize: 15, marginBottom: 12 } }, "📅 날짜별 상세"),
