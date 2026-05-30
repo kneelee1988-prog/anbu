@@ -972,22 +972,26 @@ function GuardianScreen({ user, onBack }) {
                 ? record.special_alerts.split("·").map(s=>s.trim()).filter(Boolean)
                 : (Array.isArray(record.special_alerts) ? record.special_alerts : []);
 
-              // 세 가지로 분류
-              const needConsent = raw.filter(a => a.includes("보호자 동의") || a.includes("보호자 안내"));
+              // 태그 기반으로 분류 ([S]=증상, [T]=처치, [R]=호전, [C]=동의필요, [D]=치료종료)
+              const getTag = (a) => {
+                const m = a.match(/^\[([STRCD])\]/);
+                return m ? m[1] : null;
+              };
+              const stripTag = (a) => a.replace(/^\[[STRCD]\]/, "");
 
-              // 증상(현재 상태) 키워드 - 치료중 표현이어도 증상인 것
-              const symptomKeywords = ["의심됩니다","관찰됩니다","보입니다","있습니다","호소하십니다","시작했습니다","발생하였습니다","떨어지고","저하를","진행 중입니다","줄었습니다","나타나고"];
-              const treatKeywords = ["처치 중","공급 중","투약 중","조절 중","시행하고","진행하고","보조 중","강화 중","최소화","종료하였","회복되고","좋아지고","나아지고","안정되","또렷해","빠지고","돌아오고","내려가고"];
-
-              const symptoms = raw.filter(a =>
-                !needConsent.includes(a) &&
-                (symptomKeywords.some(k => a.includes(k)) || (!treatKeywords.some(k => a.includes(k)) && !a.includes("중입니다")))
-              );
-              const treating = raw.filter(a =>
-                !needConsent.includes(a) &&
-                !symptoms.includes(a) &&
-                (treatKeywords.some(k => a.includes(k)) || a.includes("중입니다") || a.includes("조금씩"))
-              );
+              const symptoms    = raw.filter(a => getTag(a) === "S").map(stripTag);
+              const treating    = raw.filter(a => getTag(a) === "T").map(stripTag);
+              const recovering  = raw.filter(a => getTag(a) === "R").map(stripTag);
+              const doneTreat   = raw.filter(a => getTag(a) === "D").map(stripTag);
+              const needConsent = raw.filter(a => getTag(a) === "C").map(stripTag);
+              // 태그 없는 구버전 데이터 호환
+              const noTag = raw.filter(a => !getTag(a));
+              noTag.forEach(a => {
+                if (a.includes("보호자 동의") || a.includes("보호자 안내")) needConsent.push(a);
+                else if (a.includes("조금씩") || a.includes("종료") || a.includes("회복")) recovering.push(a);
+                else if (a.includes("중입니다") || a.includes("하였습니다")) treating.push(a);
+                else symptoms.push(a);
+              });
 
               const GridSection = ({ title, items, headerBg, itemBg, itemColor, itemBorder }) =>
                 items.length > 0 && React.createElement("div", { style: { background: "white", borderRadius: 14, overflow: "hidden", boxShadow: "0 2px 8px rgba(0,0,0,0.07)", display: "flex", flexDirection: "column" } },
@@ -1022,6 +1026,15 @@ function GuardianScreen({ user, onBack }) {
                   GridSection({ title: "🩺 처치·치료 중", items: treating,
                     headerBg: "linear-gradient(135deg,#1e3a5f,#2563eb)",
                     itemBg: "#eff6ff", itemColor: "#1d4ed8", itemBorder: "#bfdbfe" })
+                ),
+                // 호전 + 치료종료 나란히 2칸
+                (recovering.length > 0 || doneTreat.length > 0) && React.createElement("div", { style: { display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8, marginBottom: 8 } },
+                  GridSection({ title: "✅ 호전되는 상황", items: recovering,
+                    headerBg: "linear-gradient(135deg,#14532d,#16a34a)",
+                    itemBg: "#f0fdf4", itemColor: "#166534", itemBorder: "#bbf7d0" }),
+                  GridSection({ title: "🟢 치료 종료", items: doneTreat,
+                    headerBg: "linear-gradient(135deg,#064e3b,#059669)",
+                    itemBg: "#dcfce7", itemColor: "#14532d", itemBorder: "#86efac" })
                 ),
                 // 보호자 동의는 전체 폭으로
                 FullSection({ title: "📋 보호자 안내·동의 필요", items: needConsent,
@@ -2185,6 +2198,7 @@ function DoctorReviewScreen({ patient, user, onBack }) {
           setBprs(b ? (Array.isArray(b) ? b : b.split("·").map(s=>s.trim()).filter(Boolean)) : []);
           const sa = d.record.special_alerts;
           setSpecialAlerts(sa ? (Array.isArray(sa) ? sa : sa.split("·").map(s=>s.trim()).filter(Boolean)) : []);
+          // 이미 태그 포함된 데이터면 그대로 사용
         }
       })
       .finally(() => setLoading(false));
@@ -2210,7 +2224,14 @@ function DoctorReviewScreen({ patient, user, onBack }) {
 
   const toggleFinding = (f) => setFindings(fs => fs.includes(f) ? fs.filter(x=>x!==f) : [...fs, f]);
   const toggleBprs = (v) => setBprs(bs => bs.includes(v) ? bs.filter(x=>x!==v) : [...bs, v]);
-  const toggleAlert = (v) => setSpecialAlerts(sa => sa.includes(v) ? sa.filter(x=>x!==v) : [...sa, v]);
+  const toggleAlert = (v, tag) => {
+    const tagged = tag ? `[${tag}]${v}` : v;
+    setSpecialAlerts(sa => sa.some(x => x === tagged) ? sa.filter(x => x !== tagged) : [...sa, tagged]);
+  };
+  const isAlertOn = (v, tag) => {
+    const tagged = tag ? `[${tag}]${v}` : v;
+    return specialAlerts.some(x => x === tagged);
+  };
 
   const handleSave = async () => {
     setSaving(true);
@@ -2427,14 +2448,16 @@ function DoctorReviewScreen({ patient, user, onBack }) {
           React.createElement("div", { style: { fontSize: 12, color: "#92400e", fontWeight: 700, marginBottom: 8 } }, "⚠️ 주요 상황 (클릭하면 증상·처치가 함께 전달돼요)"),
           React.createElement("div", { style: { display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 6, marginBottom: 14 } },
             ALERT_SETS.map(s => {
-              const isActive = specialAlerts.includes(s.bad);
+              const isActive = specialAlerts.some(x => x === `[S]${s.bad}`);
               return React.createElement("button", {
                 key: s.label,
                 onClick: () => {
+                  const taggedBad = `[S]${s.bad}`;
+                  const taggedGood = `[T]${s.good}`;
                   if (isActive) {
-                    setSpecialAlerts(sa => sa.filter(x => x !== s.bad && x !== s.good));
+                    setSpecialAlerts(sa => sa.filter(x => x !== taggedBad && x !== taggedGood));
                   } else {
-                    setSpecialAlerts(sa => [...sa.filter(x => x !== s.bad && x !== s.good), s.bad, s.good]);
+                    setSpecialAlerts(sa => [...sa.filter(x => x !== taggedBad && x !== taggedGood), taggedBad, taggedGood]);
                   }
                 },
                 style: {
@@ -2467,11 +2490,11 @@ function DoctorReviewScreen({ patient, user, onBack }) {
           React.createElement("div", { style: { display: "grid", gridTemplateColumns: "1fr 1fr", gap: 6, marginBottom: 10 } },
             ALERT_RECOVERY.map(v =>
               React.createElement("button", {
-                key: v, onClick: () => toggleAlert(v),
+                key: v, onClick: () => toggleAlert(v, "R"),
                 style: { padding: "8px 10px", borderRadius: 8, border: "1.5px solid",
-                  borderColor: specialAlerts.includes(v) ? "#16a34a" : "#bbf7d0",
-                  background: specialAlerts.includes(v) ? "#16a34a" : "#f0fdf4",
-                  color: specialAlerts.includes(v) ? "white" : "#166534",
+                  borderColor: isAlertOn(v,"R") ? "#16a34a" : "#bbf7d0",
+                  background: isAlertOn(v,"R") ? "#16a34a" : "#f0fdf4",
+                  color: isAlertOn(v,"R") ? "white" : "#166534",
                   fontSize: 12, fontWeight: 600, cursor: "pointer",
                   fontFamily: "'Noto Sans KR',sans-serif", lineHeight: 1.4, textAlign: "left" }
               }, v)
@@ -2481,11 +2504,11 @@ function DoctorReviewScreen({ patient, user, onBack }) {
           React.createElement("div", { style: { display: "grid", gridTemplateColumns: "1fr 1fr", gap: 6, marginBottom: 14 } },
             ALERT_DONE.map(v =>
               React.createElement("button", {
-                key: v, onClick: () => toggleAlert(v),
+                key: v, onClick: () => toggleAlert(v, "D"),
                 style: { padding: "8px 10px", borderRadius: 8, border: "1.5px solid",
-                  borderColor: specialAlerts.includes(v) ? "#14532d" : "#86efac",
-                  background: specialAlerts.includes(v) ? "#14532d" : "#dcfce7",
-                  color: specialAlerts.includes(v) ? "white" : "#14532d",
+                  borderColor: isAlertOn(v,"D") ? "#14532d" : "#86efac",
+                  background: isAlertOn(v,"D") ? "#14532d" : "#dcfce7",
+                  color: isAlertOn(v,"D") ? "white" : "#14532d",
                   fontSize: 12, fontWeight: 700, cursor: "pointer",
                   fontFamily: "'Noto Sans KR',sans-serif", lineHeight: 1.4, textAlign: "left" }
               }, v)
@@ -2497,11 +2520,11 @@ function DoctorReviewScreen({ patient, user, onBack }) {
           React.createElement("div", { style: { display: "flex", flexDirection: "column", gap: 6 } },
             ALERT_CONSENT.map(v =>
               React.createElement("button", {
-                key: v, onClick: () => toggleAlert(v),
+                key: v, onClick: () => toggleAlert(v, "C"),
                 style: { padding: "9px 12px", borderRadius: 8, border: "1.5px solid",
-                  borderColor: specialAlerts.includes(v) ? "#2563eb" : "#bfdbfe",
-                  background: specialAlerts.includes(v) ? "#2563eb" : "#eff6ff",
-                  color: specialAlerts.includes(v) ? "white" : "#1e4d8c",
+                  borderColor: isAlertOn(v,"C") ? "#2563eb" : "#bfdbfe",
+                  background: isAlertOn(v,"C") ? "#2563eb" : "#eff6ff",
+                  color: isAlertOn(v,"C") ? "white" : "#1e4d8c",
                   fontSize: 12, fontWeight: 600, cursor: "pointer",
                   fontFamily: "'Noto Sans KR',sans-serif", textAlign: "left" }
               }, v)
