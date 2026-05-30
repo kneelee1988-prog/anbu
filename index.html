@@ -683,6 +683,87 @@ function categoryToNum(val, map) {
   return idx >= 0 ? idx + 1 : null;
 }
 
+// ── 커스텀 달력 컴포넌트 ─────────────────────────────────────
+function CustomCalendar({ value, onChange }) {
+  const today = new Date();
+  const todayStr = today.toISOString().split("T")[0];
+
+  const [viewYear, setViewYear] = React.useState(today.getFullYear());
+  const [viewMonth, setViewMonth] = React.useState(today.getMonth());
+
+  const DAYS = ["일","월","화","수","목","금","토"];
+  const MONTHS = ["1월","2월","3월","4월","5월","6월","7월","8월","9월","10월","11월","12월"];
+
+  const firstDay = new Date(viewYear, viewMonth, 1).getDay();
+  const daysInMonth = new Date(viewYear, viewMonth + 1, 0).getDate();
+
+  const prevMonth = () => {
+    if (viewMonth === 0) { setViewYear(y => y - 1); setViewMonth(11); }
+    else setViewMonth(m => m - 1);
+  };
+  const nextMonth = () => {
+    if (viewMonth === 11) { setViewYear(y => y + 1); setViewMonth(0); }
+    else setViewMonth(m => m + 1);
+  };
+
+  const cells = [];
+  for (let i = 0; i < firstDay; i++) cells.push(null);
+  for (let d = 1; d <= daysInMonth; d++) cells.push(d);
+  while (cells.length % 7 !== 0) cells.push(null);
+
+  const toStr = (d) => `${viewYear}-${String(viewMonth+1).padStart(2,"0")}-${String(d).padStart(2,"0")}`;
+
+  return React.createElement("div", { style: { background: "white", borderRadius: 16, border: "1.5px solid #e2e8f0", overflow: "hidden", boxShadow: "0 2px 12px rgba(0,0,0,0.06)" } },
+    // 헤더
+    React.createElement("div", { style: { background: "linear-gradient(135deg,#1e3a5f,#2563eb)", padding: "14px 16px", display: "flex", alignItems: "center", justifyContent: "space-between" } },
+      React.createElement("button", { onClick: prevMonth, style: { background: "rgba(255,255,255,0.2)", border: "none", color: "white", borderRadius: 8, width: 32, height: 32, fontSize: 16, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center" } }, "‹"),
+      React.createElement("div", { style: { fontSize: 15, fontWeight: 800, color: "white" } }, `${viewYear}년 ${MONTHS[viewMonth]}`),
+      React.createElement("button", { onClick: nextMonth, style: { background: "rgba(255,255,255,0.2)", border: "none", color: "white", borderRadius: 8, width: 32, height: 32, fontSize: 16, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center" } }, "›")
+    ),
+    // 요일 헤더
+    React.createElement("div", { style: { display: "grid", gridTemplateColumns: "repeat(7, 1fr)", background: "#f8fafc", borderBottom: "1px solid #e2e8f0" } },
+      DAYS.map((d, i) => React.createElement("div", { key: d, style: {
+        textAlign: "center", padding: "8px 0", fontSize: 11, fontWeight: 700,
+        color: i === 0 ? "#ef4444" : i === 6 ? "#3b82f6" : "#64748b"
+      } }, d))
+    ),
+    // 날짜 그리드
+    React.createElement("div", { style: { display: "grid", gridTemplateColumns: "repeat(7, 1fr)", padding: "8px" , gap: 2 } },
+      cells.map((d, i) => {
+        if (!d) return React.createElement("div", { key: i });
+        const dateStr = toStr(d);
+        const isPast = dateStr < todayStr;
+        const isSelected = dateStr === value;
+        const isToday = dateStr === todayStr;
+        const dow = (firstDay + d - 1) % 7;
+        return React.createElement("button", {
+          key: i,
+          onClick: () => !isPast && onChange(dateStr),
+          style: {
+            padding: "8px 4px", borderRadius: 10, border: "none",
+            background: isSelected ? "#1e3a5f" : isToday ? "#eff6ff" : "transparent",
+            color: isSelected ? "white" : isPast ? "#cbd5e1" : dow === 0 ? "#ef4444" : dow === 6 ? "#3b82f6" : "#1e293b",
+            fontSize: 13, fontWeight: isSelected || isToday ? 800 : 400,
+            cursor: isPast ? "default" : "pointer",
+            outline: isToday && !isSelected ? "2px solid #2563eb" : "none",
+            outlineOffset: "-2px",
+            fontFamily: "'Noto Sans KR',sans-serif",
+            transition: "all 0.15s"
+          }
+        }, d);
+      })
+    ),
+    // 선택된 날짜 표시
+    value && React.createElement("div", { style: { padding: "10px 16px", background: "#eff6ff", borderTop: "1px solid #e2e8f0", display: "flex", alignItems: "center", gap: 8 } },
+      React.createElement("span", { style: { fontSize: 16 } }, "📅"),
+      React.createElement("span", { style: { fontSize: 13, fontWeight: 700, color: "#1d4ed8" } },
+        new Date(value + "T00:00:00").toLocaleDateString("ko-KR", { year:"numeric", month:"long", day:"numeric", weekday:"long" })
+      ),
+      React.createElement("button", { onClick: () => onChange(""), style: { marginLeft: "auto", fontSize: 11, color: "#94a3b8", background: "none", border: "none", cursor: "pointer" } }, "✕ 취소")
+    )
+  );
+}
+
 // ── 보호자 화면 ───────────────────────────────────────────────
 function GuardianScreen({ user, onBack }) {
   const [tabStack, setTabStack] = useState(["today"]);
@@ -1273,9 +1354,9 @@ function GuardianScreen({ user, onBack }) {
         ),
         React.createElement("div", { className: "field" },
           React.createElement("label", { className: "label" }, "면회 예정일"),
-          React.createElement("input", { className: "input", type: "date", value: msgForm.visitDate, onChange: e => setMsgForm(f => ({...f, visitDate: e.target.value})),
-            style: { colorScheme: "light" },
-            min: new Date().toISOString().split("T")[0]
+          React.createElement(CustomCalendar, {
+            value: msgForm.visitDate,
+            onChange: v => setMsgForm(f => ({...f, visitDate: v}))
           })
         ),
         React.createElement("div", { className: "field" },
