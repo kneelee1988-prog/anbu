@@ -1352,42 +1352,7 @@ function NurseScreen({ user, onBack }) {
       ),
       React.createElement("div", { style: { marginTop: 8 } })
     ),
-    // 저장 완료 오버레이
-    saved && React.createElement("div", { style: {
-      position: "fixed", top: 0, left: 0, right: 0, bottom: 0,
-      background: "rgba(0,0,0,0.5)", zIndex: 999,
-      display: "flex", alignItems: "center", justifyContent: "center"
-    } },
-      React.createElement("div", { style: {
-        background: "white", borderRadius: 20, padding: "32px 40px",
-        textAlign: "center", boxShadow: "0 8px 32px rgba(0,0,0,0.2)"
-      } },
-        React.createElement("div", { style: { fontSize: 56, marginBottom: 12 } }, "✅"),
-        React.createElement("div", { style: { fontSize: 18, fontWeight: 800, color: "#166534" } }, "저장 완료!"),
-        React.createElement("div", { style: { fontSize: 13, color: "#64748b", marginTop: 6 } }, "목록으로 돌아갑니다")
-      )
-    ),
-
-    // 진행률 바
-    React.createElement("div", { style: { background: "#f0f4f8", padding: "12px 20px 0" } },
-      React.createElement("div", { style: { display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 6 } },
-        React.createElement("div", { style: { fontSize: 12, fontWeight: 700, color: "#64748b" } },
-          `입력 진행률 · ${progress.done}/${progress.total} 항목`),
-        React.createElement("div", { style: { fontSize: 12, fontWeight: 800, color: progress.pct === 100 ? "#16a34a" : "#1d4ed8" } },
-          `${progress.pct}%`)
-      ),
-      React.createElement("div", { style: { height: 6, background: "#e2e8f0", borderRadius: 99, overflow: "hidden", marginBottom: 12 } },
-        React.createElement("div", { style: {
-          height: "100%", borderRadius: 99, transition: "width 0.4s ease",
-          width: `${progress.pct}%`,
-          background: progress.pct === 100
-            ? "linear-gradient(90deg,#16a34a,#22c55e)"
-            : "linear-gradient(90deg,#1d4ed8,#3b82f6)"
-        } })
-      )
-    ),
-
-    React.createElement("div", { className: "scroll-area", style: { paddingTop: 4 } },
+    React.createElement("div", { className: "scroll-area", style: { paddingTop: 16 } },
       loading ? React.createElement("div", { className: "loading" }, "불러오는 중...")
       : React.createElement(PatientGrid, { patients, onSelect: handlePatientClick })
     )
@@ -1507,42 +1472,8 @@ function NurseChooseScreen({ patient, user, onNoChange, onEdit, onBack }) {
         React.createElement("button", { className: `tab ${tab==="history"?"active":""}`, onClick: () => goTab("history") }, "지난 기록")
       )
     ),
-    // 저장 완료 오버레이
-    saved && React.createElement("div", { style: {
-      position: "fixed", top: 0, left: 0, right: 0, bottom: 0,
-      background: "rgba(0,0,0,0.5)", zIndex: 999,
-      display: "flex", alignItems: "center", justifyContent: "center"
-    } },
-      React.createElement("div", { style: {
-        background: "white", borderRadius: 20, padding: "32px 40px",
-        textAlign: "center", boxShadow: "0 8px 32px rgba(0,0,0,0.2)"
-      } },
-        React.createElement("div", { style: { fontSize: 56, marginBottom: 12 } }, "✅"),
-        React.createElement("div", { style: { fontSize: 18, fontWeight: 800, color: "#166534" } }, "저장 완료!"),
-        React.createElement("div", { style: { fontSize: 13, color: "#64748b", marginTop: 6 } }, "목록으로 돌아갑니다")
-      )
-    ),
 
-    // 진행률 바
-    React.createElement("div", { style: { background: "#f0f4f8", padding: "12px 20px 0" } },
-      React.createElement("div", { style: { display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 6 } },
-        React.createElement("div", { style: { fontSize: 12, fontWeight: 700, color: "#64748b" } },
-          `입력 진행률 · ${progress.done}/${progress.total} 항목`),
-        React.createElement("div", { style: { fontSize: 12, fontWeight: 800, color: progress.pct === 100 ? "#16a34a" : "#1d4ed8" } },
-          `${progress.pct}%`)
-      ),
-      React.createElement("div", { style: { height: 6, background: "#e2e8f0", borderRadius: 99, overflow: "hidden", marginBottom: 12 } },
-        React.createElement("div", { style: {
-          height: "100%", borderRadius: 99, transition: "width 0.4s ease",
-          width: `${progress.pct}%`,
-          background: progress.pct === 100
-            ? "linear-gradient(90deg,#16a34a,#22c55e)"
-            : "linear-gradient(90deg,#1d4ed8,#3b82f6)"
-        } })
-      )
-    ),
-
-    React.createElement("div", { className: "scroll-area", style: { paddingTop: 4 } },
+    React.createElement("div", { className: "scroll-area", style: { paddingTop: 16 } },
 
       // ── 지난 기록 탭 ──────────────────────────────────────
       tab === "history" && (
@@ -1793,7 +1724,6 @@ function NurseRecordScreen({ patient, user, onBack, onSaved }) {
   const [form, setForm] = useState(emptyForm);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
-  const [saved, setSaved] = useState(false);
   const set = (k, v) => setForm(f => ({...f, [k]: v}));
   const toggle = (k, v) => setForm(f => ({ ...f, [k]: f[k].includes(v) ? f[k].filter(x=>x!==v) : [...f[k], v] }));
 
@@ -1828,12 +1758,10 @@ function NurseRecordScreen({ patient, user, onBack, onSaved }) {
         updated_at: now()
       };
       await api("save_record", { patientId: patient.id, date: today(), recordData: data });
-      setSaved(true);
-      setTimeout(() => {
-        onSaved();
-        onBack();
-      }, 1000);
-    } catch(e) { alert("저장 실패"); setSaving(false); }
+      onSaved();
+      onBack();
+    } catch(e) { alert("저장 실패"); }
+    finally { setSaving(false); }
   };
 
   // 진행률 계산
@@ -1892,26 +1820,7 @@ function NurseRecordScreen({ patient, user, onBack, onSaved }) {
       patient.dnr === true && React.createElement("span", { style: { fontSize: 11, fontWeight: 800, background: "#dcfce7", color: "#15803d", borderRadius: 4, padding: "2px 6px", marginTop: 6, display: "inline-block" } }, "DNR동의"),
       patient.dnr === false && React.createElement("span", { style: { fontSize: 11, fontWeight: 800, background: "#fee2e2", color: "#dc2626", borderRadius: 4, padding: "2px 6px", marginTop: 6, display: "inline-block" } }, "DNR비동의")
     ),
-    // 진행률 바
-    React.createElement("div", { style: { background: "#f0f4f8", padding: "12px 20px 0" } },
-      React.createElement("div", { style: { display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 6 } },
-        React.createElement("div", { style: { fontSize: 12, fontWeight: 700, color: "#64748b" } },
-          `입력 진행률 · ${progress.done}/${progress.total} 항목`),
-        React.createElement("div", { style: { fontSize: 12, fontWeight: 800, color: progress.pct === 100 ? "#16a34a" : "#1d4ed8" } },
-          `${progress.pct}%`)
-      ),
-      React.createElement("div", { style: { height: 6, background: "#e2e8f0", borderRadius: 99, overflow: "hidden", marginBottom: 12 } },
-        React.createElement("div", { style: {
-          height: "100%", borderRadius: 99, transition: "width 0.4s ease",
-          width: `${progress.pct}%`,
-          background: progress.pct === 100
-            ? "linear-gradient(90deg,#16a34a,#22c55e)"
-            : "linear-gradient(90deg,#1d4ed8,#3b82f6)"
-        } })
-      )
-    ),
-
-    React.createElement("div", { className: "scroll-area", style: { paddingTop: 4 } },
+    React.createElement("div", { className: "scroll-area", style: { paddingTop: 16 } },
 
       // 1. 의식
       Sec({ title: "🧠 의식 수준", accent: "linear-gradient(135deg,#1e3a5f,#1d4ed8)",
@@ -2119,7 +2028,7 @@ function NurseRecordScreen({ patient, user, onBack, onSaved }) {
       React.createElement(NursePhotoBox, { patientId: patient.id }),
 
       React.createElement("button", { className: "btn btn-dark", onClick: handleSave, disabled: saving, style: { marginBottom: 20 } },
-        saving ? "저장 완료! 돌아갑니다..." : "💾 저장하기"
+        saving ? "저장 중..." : "💾 저장하기"
       )
     )
   );
@@ -2173,42 +2082,8 @@ function DoctorScreen({ user, onBack }) {
       ),
       React.createElement("div", { style: { marginTop: 8 } })
     ),
-    // 저장 완료 오버레이
-    saved && React.createElement("div", { style: {
-      position: "fixed", top: 0, left: 0, right: 0, bottom: 0,
-      background: "rgba(0,0,0,0.5)", zIndex: 999,
-      display: "flex", alignItems: "center", justifyContent: "center"
-    } },
-      React.createElement("div", { style: {
-        background: "white", borderRadius: 20, padding: "32px 40px",
-        textAlign: "center", boxShadow: "0 8px 32px rgba(0,0,0,0.2)"
-      } },
-        React.createElement("div", { style: { fontSize: 56, marginBottom: 12 } }, "✅"),
-        React.createElement("div", { style: { fontSize: 18, fontWeight: 800, color: "#166534" } }, "저장 완료!"),
-        React.createElement("div", { style: { fontSize: 13, color: "#64748b", marginTop: 6 } }, "목록으로 돌아갑니다")
-      )
-    ),
 
-    // 진행률 바
-    React.createElement("div", { style: { background: "#f0f4f8", padding: "12px 20px 0" } },
-      React.createElement("div", { style: { display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 6 } },
-        React.createElement("div", { style: { fontSize: 12, fontWeight: 700, color: "#64748b" } },
-          `입력 진행률 · ${progress.done}/${progress.total} 항목`),
-        React.createElement("div", { style: { fontSize: 12, fontWeight: 800, color: progress.pct === 100 ? "#16a34a" : "#1d4ed8" } },
-          `${progress.pct}%`)
-      ),
-      React.createElement("div", { style: { height: 6, background: "#e2e8f0", borderRadius: 99, overflow: "hidden", marginBottom: 12 } },
-        React.createElement("div", { style: {
-          height: "100%", borderRadius: 99, transition: "width 0.4s ease",
-          width: `${progress.pct}%`,
-          background: progress.pct === 100
-            ? "linear-gradient(90deg,#16a34a,#22c55e)"
-            : "linear-gradient(90deg,#1d4ed8,#3b82f6)"
-        } })
-      )
-    ),
-
-    React.createElement("div", { className: "scroll-area", style: { paddingTop: 4 } },
+    React.createElement("div", { className: "scroll-area", style: { paddingTop: 16 } },
       loading ? React.createElement("div", { className: "loading" }, "불러오는 중...")
       : React.createElement(PatientGrid, { patients, onSelect: setSelected })
     )
@@ -2516,42 +2391,8 @@ function DoctorReviewScreen({ patient, user, onBack }) {
         React.createElement("button", { className: `tab ${tab==="history"?"active":""}`, onClick: () => goTab("history") }, "지난 기록")
       )
     ),
-    // 저장 완료 오버레이
-    saved && React.createElement("div", { style: {
-      position: "fixed", top: 0, left: 0, right: 0, bottom: 0,
-      background: "rgba(0,0,0,0.5)", zIndex: 999,
-      display: "flex", alignItems: "center", justifyContent: "center"
-    } },
-      React.createElement("div", { style: {
-        background: "white", borderRadius: 20, padding: "32px 40px",
-        textAlign: "center", boxShadow: "0 8px 32px rgba(0,0,0,0.2)"
-      } },
-        React.createElement("div", { style: { fontSize: 56, marginBottom: 12 } }, "✅"),
-        React.createElement("div", { style: { fontSize: 18, fontWeight: 800, color: "#166534" } }, "저장 완료!"),
-        React.createElement("div", { style: { fontSize: 13, color: "#64748b", marginTop: 6 } }, "목록으로 돌아갑니다")
-      )
-    ),
 
-    // 진행률 바
-    React.createElement("div", { style: { background: "#f0f4f8", padding: "12px 20px 0" } },
-      React.createElement("div", { style: { display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 6 } },
-        React.createElement("div", { style: { fontSize: 12, fontWeight: 700, color: "#64748b" } },
-          `입력 진행률 · ${progress.done}/${progress.total} 항목`),
-        React.createElement("div", { style: { fontSize: 12, fontWeight: 800, color: progress.pct === 100 ? "#16a34a" : "#1d4ed8" } },
-          `${progress.pct}%`)
-      ),
-      React.createElement("div", { style: { height: 6, background: "#e2e8f0", borderRadius: 99, overflow: "hidden", marginBottom: 12 } },
-        React.createElement("div", { style: {
-          height: "100%", borderRadius: 99, transition: "width 0.4s ease",
-          width: `${progress.pct}%`,
-          background: progress.pct === 100
-            ? "linear-gradient(90deg,#16a34a,#22c55e)"
-            : "linear-gradient(90deg,#1d4ed8,#3b82f6)"
-        } })
-      )
-    ),
-
-    React.createElement("div", { className: "scroll-area", style: { paddingTop: 4 } },
+    React.createElement("div", { className: "scroll-area", style: { paddingTop: 16 } },
 
       // ── 지난 기록 탭 ──────────────────────────────────────
       tab === "history" && (
@@ -2925,42 +2766,8 @@ function MessagesScreen({ user, onBack }) {
         )
       )
     ),
-    // 저장 완료 오버레이
-    saved && React.createElement("div", { style: {
-      position: "fixed", top: 0, left: 0, right: 0, bottom: 0,
-      background: "rgba(0,0,0,0.5)", zIndex: 999,
-      display: "flex", alignItems: "center", justifyContent: "center"
-    } },
-      React.createElement("div", { style: {
-        background: "white", borderRadius: 20, padding: "32px 40px",
-        textAlign: "center", boxShadow: "0 8px 32px rgba(0,0,0,0.2)"
-      } },
-        React.createElement("div", { style: { fontSize: 56, marginBottom: 12 } }, "✅"),
-        React.createElement("div", { style: { fontSize: 18, fontWeight: 800, color: "#166534" } }, "저장 완료!"),
-        React.createElement("div", { style: { fontSize: 13, color: "#64748b", marginTop: 6 } }, "목록으로 돌아갑니다")
-      )
-    ),
 
-    // 진행률 바
-    React.createElement("div", { style: { background: "#f0f4f8", padding: "12px 20px 0" } },
-      React.createElement("div", { style: { display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 6 } },
-        React.createElement("div", { style: { fontSize: 12, fontWeight: 700, color: "#64748b" } },
-          `입력 진행률 · ${progress.done}/${progress.total} 항목`),
-        React.createElement("div", { style: { fontSize: 12, fontWeight: 800, color: progress.pct === 100 ? "#16a34a" : "#1d4ed8" } },
-          `${progress.pct}%`)
-      ),
-      React.createElement("div", { style: { height: 6, background: "#e2e8f0", borderRadius: 99, overflow: "hidden", marginBottom: 12 } },
-        React.createElement("div", { style: {
-          height: "100%", borderRadius: 99, transition: "width 0.4s ease",
-          width: `${progress.pct}%`,
-          background: progress.pct === 100
-            ? "linear-gradient(90deg,#16a34a,#22c55e)"
-            : "linear-gradient(90deg,#1d4ed8,#3b82f6)"
-        } })
-      )
-    ),
-
-    React.createElement("div", { className: "scroll-area", style: { paddingTop: 4 } },
+    React.createElement("div", { className: "scroll-area", style: { paddingTop: 16 } },
       loading ? React.createElement("div", { className: "loading" }, "불러오는 중...")
       : filtered.length === 0
         ? React.createElement("div", { style: { textAlign: "center", padding: "60px 20px", color: "#94a3b8" } },
@@ -3026,42 +2833,8 @@ function AdminScreen({ user, onBack }) {
         )
       )
     ),
-    // 저장 완료 오버레이
-    saved && React.createElement("div", { style: {
-      position: "fixed", top: 0, left: 0, right: 0, bottom: 0,
-      background: "rgba(0,0,0,0.5)", zIndex: 999,
-      display: "flex", alignItems: "center", justifyContent: "center"
-    } },
-      React.createElement("div", { style: {
-        background: "white", borderRadius: 20, padding: "32px 40px",
-        textAlign: "center", boxShadow: "0 8px 32px rgba(0,0,0,0.2)"
-      } },
-        React.createElement("div", { style: { fontSize: 56, marginBottom: 12 } }, "✅"),
-        React.createElement("div", { style: { fontSize: 18, fontWeight: 800, color: "#166534" } }, "저장 완료!"),
-        React.createElement("div", { style: { fontSize: 13, color: "#64748b", marginTop: 6 } }, "목록으로 돌아갑니다")
-      )
-    ),
 
-    // 진행률 바
-    React.createElement("div", { style: { background: "#f0f4f8", padding: "12px 20px 0" } },
-      React.createElement("div", { style: { display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 6 } },
-        React.createElement("div", { style: { fontSize: 12, fontWeight: 700, color: "#64748b" } },
-          `입력 진행률 · ${progress.done}/${progress.total} 항목`),
-        React.createElement("div", { style: { fontSize: 12, fontWeight: 800, color: progress.pct === 100 ? "#16a34a" : "#1d4ed8" } },
-          `${progress.pct}%`)
-      ),
-      React.createElement("div", { style: { height: 6, background: "#e2e8f0", borderRadius: 99, overflow: "hidden", marginBottom: 12 } },
-        React.createElement("div", { style: {
-          height: "100%", borderRadius: 99, transition: "width 0.4s ease",
-          width: `${progress.pct}%`,
-          background: progress.pct === 100
-            ? "linear-gradient(90deg,#16a34a,#22c55e)"
-            : "linear-gradient(90deg,#1d4ed8,#3b82f6)"
-        } })
-      )
-    ),
-
-    React.createElement("div", { className: "scroll-area", style: { paddingTop: 4 } },
+    React.createElement("div", { className: "scroll-area", style: { paddingTop: 16 } },
       loading ? React.createElement("div", { className: "loading" }, "불러오는 중...")
       : tab === "staff" ? React.createElement(AdminStaffTab, { staff, onRefresh: loadAll })
       : tab === "patients" ? React.createElement(AdminPatientsTab, { patients, onRefresh: loadAll })
