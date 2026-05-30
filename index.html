@@ -642,6 +642,19 @@ function categoryToNum(val, map) {
 // ── 보호자 화면 ───────────────────────────────────────────────
 function GuardianScreen({ user, onBack }) {
   const [tab, setTab] = useState("today");
+
+  // 탭 변경 시 히스토리에 push
+  const goTab = (t) => {
+    setTab(t);
+    window.history.pushState({ anbu: true, screen: "app", tab: t }, "");
+  };
+
+  // 브라우저 뒤로가기로 탭 복원
+  useEffect(() => {
+    const onTab = (e) => setTab(e.detail);
+    window.addEventListener("anbu-tab", onTab);
+    return () => window.removeEventListener("anbu-tab", onTab);
+  }, []);
   const [record, setRecord] = useState(null);
   const [history, setHistory] = useState([]);
   const [histLoading, setHistLoading] = useState(false);
@@ -765,12 +778,8 @@ function GuardianScreen({ user, onBack }) {
     // 헤더
     React.createElement("div", { style: { background: "linear-gradient(135deg,#064e3b,#059669)", padding: "48px 20px 18px" } },
       React.createElement("div", { style: { display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 10 } },
-        React.createElement("button", { className: "back-btn", onClick: () => {
-          if (window.confirm("로그아웃 하시겠습니까?")) onBack();
-        } }, "← 역할 선택"),
-        React.createElement("button", { className: "logout-btn", onClick: () => {
-          if (window.confirm("로그아웃 하시겠습니까?")) onBack();
-        } }, "로그아웃 →")
+        React.createElement("button", { className: "back-btn", onClick: onBack }, "← 역할 선택"),
+        React.createElement("button", { className: "logout-btn", onClick: onBack }, "로그아웃 →")
       ),
       React.createElement("div", { style: { display: "flex", alignItems: "baseline", gap: 10, flexWrap: "wrap" } },
         React.createElement("div", { style: { fontSize: 26, fontWeight: 900, color: "white" } }, `${patient.name}님`),
@@ -793,10 +802,10 @@ function GuardianScreen({ user, onBack }) {
     // 탭
     React.createElement("div", { style: { padding: "0 20px", marginTop: 16 } },
       React.createElement("div", { className: "tabs" },
-        React.createElement("button", { className: `tab ${tab==="today"?"active":""}`, onClick: () => setTab("today") }, "오늘의 안부"),
-        React.createElement("button", { className: `tab ${tab==="history"?"active":""}`, onClick: () => setTab("history") }, "지난 기록"),
-        React.createElement("button", { className: `tab ${tab==="photos"?"active":""}`, onClick: () => setTab("photos") }, "📷 사진첩"),
-        React.createElement("button", { className: `tab ${tab==="message"?"active":""}`, onClick: () => setTab("message") }, "전하고 싶은 한마디")
+        React.createElement("button", { className: `tab ${tab==="today"?"active":""}`, onClick: () => goTab("today") }, "오늘의 안부"),
+        React.createElement("button", { className: `tab ${tab==="history"?"active":""}`, onClick: () => goTab("history") }, "지난 기록"),
+        React.createElement("button", { className: `tab ${tab==="photos"?"active":""}`, onClick: () => goTab("photos") }, "📷 사진첩"),
+        React.createElement("button", { className: `tab ${tab==="message"?"active":""}`, onClick: () => goTab("message") }, "전하고 싶은 한마디")
       )
     ),
 
@@ -1196,12 +1205,8 @@ function NurseScreen({ user, onBack }) {
   return React.createElement("div", { className: "screen", style: { background: "#f0f4f8" } },
     React.createElement("div", { style: { background: "linear-gradient(135deg,#064e3b,#059669)", padding: "48px 20px 20px" } },
       React.createElement("div", { className: "header-top" },
-        React.createElement("button", { className: "back-btn", onClick: () => {
-          if (window.confirm("로그아웃 하시겠습니까?")) onBack();
-        } }, "← 역할 선택"),
-        React.createElement("button", { className: "logout-btn", onClick: () => {
-          if (window.confirm("로그아웃 하시겠습니까?")) onBack();
-        } }, "로그아웃 →")
+        React.createElement("button", { className: "back-btn", onClick: onBack }, "← 역할 선택"),
+        React.createElement("button", { className: "logout-btn", onClick: onBack }, "로그아웃 →")
       ),
       React.createElement("div", { style: { fontSize: 11, color: "rgba(255,255,255,0.5)", marginTop: 8 } }, `오늘안부 · 천안쌍용요양병원 · ${user.ward}`),
       React.createElement("div", { style: { display: "flex", justifyContent: "space-between", alignItems: "flex-end", marginTop: 4 } },
@@ -1327,7 +1332,7 @@ function NurseChooseScreen({ patient, user, onNoChange, onEdit, onBack }) {
     React.createElement("div", { style: { padding: "0 20px", marginTop: 16 } },
       React.createElement("div", { className: "tabs" },
         React.createElement("button", { className: `tab ${tab==="today"?"active":""}`, onClick: () => setTab("today") }, "오늘 입력"),
-        React.createElement("button", { className: `tab ${tab==="history"?"active":""}`, onClick: () => setTab("history") }, "지난 기록")
+        React.createElement("button", { className: `tab ${tab==="history"?"active":""}`, onClick: () => goTab("history") }, "지난 기록")
       )
     ),
     React.createElement("div", { className: "scroll-area", style: { paddingTop: 16 } },
@@ -1897,12 +1902,8 @@ function DoctorScreen({ user, onBack }) {
   return React.createElement("div", { className: "screen", style: { background: "#f0f4f8" } },
     React.createElement("div", { style: { background: "linear-gradient(135deg,#1e1b4b,#4338ca)", padding: "48px 20px 20px" } },
       React.createElement("div", { className: "header-top" },
-        React.createElement("button", { className: "back-btn", onClick: () => {
-          if (window.confirm("로그아웃 하시겠습니까?")) onBack();
-        } }, "← 역할 선택"),
-        React.createElement("button", { className: "logout-btn", onClick: () => {
-          if (window.confirm("로그아웃 하시겠습니까?")) onBack();
-        } }, "로그아웃 →")
+        React.createElement("button", { className: "back-btn", onClick: onBack }, "← 역할 선택"),
+        React.createElement("button", { className: "logout-btn", onClick: onBack }, "로그아웃 →")
       ),
       React.createElement("div", { style: { fontSize: 11, color: "rgba(255,255,255,0.5)", marginTop: 8 } }, `오늘안부 · 천안쌍용요양병원 · ${user.name} 원장`),
       React.createElement("div", { style: { display: "flex", justifyContent: "space-between", alignItems: "flex-end", marginTop: 4 } },
@@ -2209,7 +2210,7 @@ function DoctorReviewScreen({ patient, user, onBack }) {
     React.createElement("div", { style: { padding: "0 20px", marginTop: 16 } },
       React.createElement("div", { className: "tabs" },
         React.createElement("button", { className: `tab ${tab==="today"?"active":""}`, onClick: () => setTab("today") }, "오늘 검토"),
-        React.createElement("button", { className: `tab ${tab==="history"?"active":""}`, onClick: () => setTab("history") }, "지난 기록")
+        React.createElement("button", { className: `tab ${tab==="history"?"active":""}`, onClick: () => goTab("history") }, "지난 기록")
       )
     ),
     React.createElement("div", { className: "scroll-area", style: { paddingTop: 16 } },
@@ -2544,12 +2545,8 @@ function MessagesScreen({ user, onBack }) {
   return React.createElement("div", { className: "screen", style: { background: "#f0f4f8" } },
     React.createElement("div", { style: { background: "linear-gradient(135deg,#1e3a5f,#0891b2)", padding: "48px 20px 16px" } },
       React.createElement("div", { className: "header-top" },
-        React.createElement("button", { className: "back-btn", onClick: () => {
-          if (window.confirm("로그아웃 하시겠습니까?")) onBack();
-        } }, "← 역할 선택"),
-        React.createElement("button", { className: "logout-btn", onClick: () => {
-          if (window.confirm("로그아웃 하시겠습니까?")) onBack();
-        } }, "로그아웃 →")
+        React.createElement("button", { className: "back-btn", onClick: onBack }, "← 역할 선택"),
+        React.createElement("button", { className: "logout-btn", onClick: onBack }, "로그아웃 →")
       ),
       React.createElement("div", { style: { fontSize: 16, fontWeight: 800, color: "white", marginTop: 8 } }, "💬 가족들의 한마디 확인"),
       React.createElement("div", { style: { fontSize: 12, color: "rgba(255,255,255,0.7)", marginTop: 3 } },
@@ -2883,52 +2880,43 @@ function App() {
     window.history.pushState({ screen: s, ...opts }, "");
   };
 
-  // 로그인 상태 ref (이벤트 핸들러에서 최신값 참조용)
   const isLoggedInRef = React.useRef(false);
-  const screenRef = React.useRef("splash");
+
+  // 히스토리에 상태 push (탭/화면 이동마다 호출)
+  const pushHistory = (state) => {
+    window.history.pushState({ anbu: true, ...state }, "");
+  };
 
   useEffect(() => {
     const seen = localStorage.getItem("anbu_onboarded");
     const initScreen = seen ? "roleSelect" : "onboarding";
     setScreen(initScreen);
-    screenRef.current = initScreen;
-
-    // 더미 히스토리 여러 개 쌓아서 뒤로가기 여러 번 눌러도 앱 안에 머물게
-    window.history.pushState({ anbu: 1 }, "");
-    window.history.pushState({ anbu: 2 }, "");
-    window.history.pushState({ anbu: 3 }, "");
+    window.history.replaceState({ anbu: true, screen: initScreen }, "");
 
     const onPop = (e) => {
-      if (isLoggedInRef.current) {
-        // 로그인 상태 → 로그아웃 확인
-        if (window.confirm("로그아웃 하시겠습니까?")) {
-          isLoggedInRef.current = false;
-          setCurrentUser(null);
-          setRole(null);
-          setScreen("roleSelect");
-          screenRef.current = "roleSelect";
-        }
-        // 항상 더미 히스토리 다시 쌓기
-        window.history.pushState({ anbu: 1 }, "");
-        window.history.pushState({ anbu: 2 }, "");
-        window.history.pushState({ anbu: 3 }, "");
-      } else if (screenRef.current === "login" || screenRef.current === "signup" || screenRef.current === "notices") {
-        // 로그인/회원가입 화면 → 역할선택으로
-        setScreen("roleSelect");
-        setRole(null);
-        screenRef.current = "roleSelect";
-        window.history.pushState({ anbu: 1 }, "");
-        window.history.pushState({ anbu: 2 }, "");
-        window.history.pushState({ anbu: 3 }, "");
-      } else {
-        // 역할선택 화면에서 뒤로가기 → 종료 확인
+      const state = e.state;
+      if (!state || !state.anbu) {
+        // 앱 히스토리 밖으로 나가려는 경우
         if (window.confirm("앱을 종료하시겠습니까?")) {
-          window.history.go(-10); // 완전히 빠져나가기
+          window.history.go(-10);
         } else {
-          window.history.pushState({ anbu: 1 }, "");
-          window.history.pushState({ anbu: 2 }, "");
-          window.history.pushState({ anbu: 3 }, "");
+          window.history.pushState({ anbu: true, screen: "roleSelect" }, "");
         }
+        return;
+      }
+      // 이전 상태로 복원
+      const s = state.screen;
+      const t = state.tab;
+      if (s) setScreen(s);
+      if (t) {
+        // 탭 상태는 GuardianScreen 내부에서 관리하므로
+        // 커스텀 이벤트로 전달
+        window.dispatchEvent(new CustomEvent("anbu-tab", { detail: t }));
+      }
+      if (s === "roleSelect" || s === "onboarding") {
+        isLoggedInRef.current = false;
+        setCurrentUser(null);
+        setRole(null);
       }
     };
 
@@ -2939,29 +2927,30 @@ function App() {
   const handleOnboardDone = () => {
     localStorage.setItem("anbu_onboarded", "1");
     setScreen("roleSelect");
-    screenRef.current = "roleSelect";
+    pushHistory({ screen: "roleSelect" });
   };
 
   const handleRoleSelect = (r) => {
-    if (r === "notices") { setRole("notices"); setScreen("notices"); screenRef.current = "notices"; return; }
+    if (r === "notices") { setRole("notices"); setScreen("notices"); pushHistory({ screen: "notices" }); return; }
     setRole(r);
     setScreen("login");
-    screenRef.current = "login";
+    pushHistory({ screen: "login" });
   };
 
   const handleLogin = (user) => {
     setCurrentUser(user);
     isLoggedInRef.current = true;
-    screenRef.current = "app";
     setScreen("app");
+    pushHistory({ screen: "app" });
   };
 
   const handleLogout = () => {
+    if (!window.confirm("로그아웃 하시겠습니까?")) return;
     isLoggedInRef.current = false;
     setCurrentUser(null);
     setRole(null);
-    screenRef.current = "roleSelect";
     setScreen("roleSelect");
+    pushHistory({ screen: "roleSelect" });
   };
 
   if (screen === "splash") return React.createElement("div", { style: { minHeight: "100vh", background: "linear-gradient(160deg,#0f172a,#1e3a5f)", display: "flex", alignItems: "center", justifyContent: "center" } },
@@ -2975,7 +2964,7 @@ function App() {
     loginType: role,
     onLogin: handleLogin,
     onBack: () => setScreen("roleSelect"),
-    onSignup: () => { setScreen("signup"); screenRef.current = "signup"; }
+    onSignup: () => { setScreen("signup"); pushHistory({ screen: "signup" }); }
   });
   if (screen === "signup") return React.createElement(GuardianSignupScreen, {
     onBack: () => setScreen("login"),
