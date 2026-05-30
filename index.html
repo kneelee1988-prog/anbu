@@ -2735,7 +2735,7 @@ function DoctorReviewScreen({ patient, user, onBack }) {
 
       // 의사 처치·검사·협진
       React.createElement("div", { className: "card", style: { marginBottom: 12 } },
-        React.createElement("div", { style: { fontWeight: 700, color: "#1e3a5f", marginBottom: 14, fontSize: 15 } }, "🩺 오늘의 의료 처치 내역"),
+        React.createElement("div", { style: { fontWeight: 700, color: "#1e3a5f", marginBottom: 14, fontSize: 15 } }, "🩺 오늘의 검사 및 의료 처치 내역"),
         Object.entries(MEDICAL_ITEMS).map(([cat, {items, bg, border, activeBg}]) =>
           React.createElement("div", { key: cat, style: { marginBottom: 12, background: bg, borderRadius: 12, padding: "12px 12px 10px", border: `1.5px solid ${border}` } },
             React.createElement("div", { style: { fontSize: 15, color: "#1e293b", fontWeight: 800, marginBottom: 8 } }, cat),
