@@ -698,6 +698,33 @@ function categoryToNum(val, map) {
   return idx >= 0 ? idx + 1 : null;
 }
 
+// ── 공통 BPSD 표시 컴포넌트 ─────────────────────────────────
+function BpsdDisplay({ value, style }) {
+  if (!value) return null;
+  const items = Array.isArray(value)
+    ? value
+    : value.split("·").map(s => s.trim()).filter(Boolean);
+  if (!items.length) return null;
+  const isNormal = items.length === 1 && items[0] === "이상없음";
+  return React.createElement("div", { style: {
+    background: "#faf5ff", borderRadius: 10, border: "1.5px solid #e9d5ff",
+    overflow: "hidden", ...style
+  } },
+    React.createElement("div", { style: {
+      padding: "8px 14px", borderBottom: "1.5px solid #e9d5ff",
+      fontSize: 13, fontWeight: 800, color: "#6d28d9", background: "#f3e8ff"
+    } }, "🧩 BPSD (치매 행동·심리 증상)"),
+    React.createElement("div", { style: { padding: "10px 14px", display: "flex", flexWrap: "wrap", gap: 6 } },
+      isNormal
+        ? React.createElement("span", { style: { background: "#16a34a", color: "white", borderRadius: 8, fontSize: 13, fontWeight: 700, padding: "4px 12px" } }, "이상없음")
+        : items.map((s, i) => React.createElement("span", { key: i, style: {
+            background: "#ede9fe", color: "#5b21b6", borderRadius: 8,
+            fontSize: 13, fontWeight: 600, padding: "4px 10px", border: "1px solid #c4b5fd"
+          } }, s))
+    )
+  );
+}
+
 // ── 커스텀 달력 컴포넌트 ─────────────────────────────────────
 function CustomCalendar({ value, onChange }) {
   const today = new Date();
@@ -1188,14 +1215,10 @@ function GuardianScreen({ user, onBack }) {
                     );
                   })
                 ),
-                (record.mental || record.bprs) && React.createElement("div", { style: { padding: "12px 14px", background: "#faf5ff", borderRadius: 10, border: "1.5px solid #e9d5ff" } },
-                  React.createElement("div", { style: { fontSize: 15, color: "#1e3a5f", fontWeight: 700, marginBottom: 6 } }, "🧩 BPSD (치매 행동·심리 증상)"),
-                  React.createElement("div", { style: { display: "flex", flexWrap: "wrap", gap: 5 } },
-                    (record.bprs || record.mental || "").split("·").map(s => s.trim()).filter(Boolean).map((s, i) =>
-                      React.createElement("span", { key: i, style: { background: "#ede9fe", color: "#5b21b6", borderRadius: 8, fontSize: 15, fontWeight: 600, padding: "4px 10px", border: "1px solid #c4b5fd" } }, s)
-                    )
-                  )
-                )
+                (record.mental || record.bprs) && React.createElement(BpsdDisplay, {
+                  value: record.bprs || record.mental,
+                  style: { marginBottom: 12 }
+                })
               )
             ),
             record.doctor_findings?.length > 0 && (() => {
@@ -1215,19 +1238,13 @@ function GuardianScreen({ user, onBack }) {
                 ? record.special_alerts.split("·").map(s=>s.trim()).filter(Boolean)
                 : (Array.isArray(record.special_alerts) ? record.special_alerts : []);
 
-              // 태그 기반으로 분류 ([S]=증상, [T]=처치, [R]=호전, [C]=동의필요, [D]=치료종료)
-              const getTag = (a) => {
-                const m = a.match(/^\[([STRCD])\]/);
-                return m ? m[1] : null;
-              };
+              const getTag = (a) => { const m = a.match(/^\[([STRCD])\]/); return m ? m[1] : null; };
               const stripTag = (a) => a.replace(/^\[[STRCD]\]/, "");
-
               const symptoms    = raw.filter(a => getTag(a) === "S").map(stripTag);
               const treating    = raw.filter(a => getTag(a) === "T").map(stripTag);
               const recovering  = raw.filter(a => getTag(a) === "R").map(stripTag);
               const doneTreat   = raw.filter(a => getTag(a) === "D").map(stripTag);
               const needConsent = raw.filter(a => getTag(a) === "C").map(stripTag);
-              // 태그 없는 구버전 데이터 호환
               const noTag = raw.filter(a => !getTag(a));
               noTag.forEach(a => {
                 if (a.includes("보호자 동의") || a.includes("보호자 안내")) needConsent.push(a);
@@ -1742,8 +1759,7 @@ function NurseChooseScreen({ patient, user, onNoChange, onEdit, onBack }) {
                             )
                           )
                         ),
-                        r.mental && React.createElement("div", { style: { fontSize: 14, color: "#7c3aed", background: "#faf5ff", borderRadius: 8, padding: "6px 10px", marginBottom: 6 } },
-                          React.createElement("span", { style: { fontWeight: 700 } }, "BPSD: "), r.mental),
+                        r.mental && React.createElement(BpsdDisplay, { value: r.mental, style: { marginBottom: 6 } }),
                         r.nurse_note && React.createElement("div", { style: { fontSize: 14, color: "#0c4a6e", background: "#f0f9ff", borderRadius: 8, padding: "6px 10px" } },
                           React.createElement("span", { style: { fontWeight: 700 } }, "코멘트: "), r.nurse_note)
                       )
@@ -1780,10 +1796,7 @@ function NurseChooseScreen({ patient, user, onNoChange, onEdit, onBack }) {
                 ["투약", yesterdayRecord.medication],
               ].filter(([,v]) => v).map(([k, v]) => React.createElement(InfoBox, { key: k, label: k, value: v }))
             ),
-            yesterdayRecord.mental && React.createElement("div", { style: { padding: "8px 10px", background: "#faf5ff", borderRadius: 8, marginBottom: 6, fontSize: 15, color: "#7c3aed" } },
-              React.createElement("span", { style: { fontWeight: 700 } }, "BPSD: "),
-              yesterdayRecord.mental
-            ),
+            yesterdayRecord.mental && React.createElement(BpsdDisplay, { value: yesterdayRecord.mental, style: { marginBottom: 6 } }),
             yesterdayRecord.nurse_note && React.createElement("div", { style: { padding: "8px 10px", background: "#f0f9ff", borderRadius: 8, fontSize: 15, color: "#0369a1" } },
               React.createElement("span", { style: { fontWeight: 700 } }, "코멘트: "),
               yesterdayRecord.nurse_note
@@ -2702,8 +2715,7 @@ function DoctorReviewScreen({ patient, user, onBack }) {
                         )
                       )
                     ),
-                    r.mental && React.createElement("div", { style: { fontSize: 15, color: "#7c3aed", background: "#faf5ff", borderRadius: 8, padding: "6px 10px", marginBottom: 6 } },
-                      React.createElement("span", { style: { fontWeight: 700 } }, "BPSD: "), r.mental),
+                    r.mental && React.createElement(BpsdDisplay, { value: r.mental, style: { marginBottom: 6 } }),
                     r.special_alerts && (() => {
                       const raw = Array.isArray(r.special_alerts)
                         ? r.special_alerts
@@ -2776,29 +2788,12 @@ function DoctorReviewScreen({ patient, user, onBack }) {
         ),
 
       // 간호사 입력 BPSD 표시 (읽기전용 버튼)
-      React.createElement("div", { style: { background: "white", borderRadius: 14, marginBottom: 12, overflow: "hidden", boxShadow: "0 1px 6px rgba(0,0,0,0.06)" } },
-        React.createElement("div", { style: { background: "linear-gradient(135deg,#ccfbf1,#99f6e4)", padding: "10px 16px", fontSize: 15, fontWeight: 800, color: "#0f5546", borderBottom: "1px solid #99f6e4" } }, "🧩 BPSD — 간호사 입력 행동·심리 증상"),
-        React.createElement("div", { style: { padding: 14 } },
-          record && record.mental && record.mental.length > 0
-          ? React.createElement("div", { style: { display: "flex", flexWrap: "wrap", gap: 6 } },
-              (Array.isArray(record.mental) ? record.mental : record.mental.split("·").map(s=>s.trim()).filter(Boolean)).map(s=>s.replace("다칠위험있는 반복행동","다칠위험있는 행동반복")).filter((v,i,a)=>a.indexOf(v)===i)
-              .map((v, i) => React.createElement("div", {
-                key: i,
-                style: {
-                  padding: "7px 12px", borderRadius: 8,
-                  border: "1.5px solid",
-                  borderColor: v === "이상없음" ? "#166534" : "#ea7c3a",
-                  background: v === "이상없음" ? "#166534" : "white",
-                  color: v === "이상없음" ? "white" : "#1e293b",
-                  fontSize: 15, fontWeight: 600,
-                  whiteSpace: "nowrap",
-                  fontFamily: "'Noto Sans KR',sans-serif"
-                }
-              }, v))
-            )
-          : React.createElement("div", { style: { color: "#94a3b8", fontSize: 15 } }, "간호사 입력 내용이 없습니다.")
-        )
-      ),
+      record && record.mental
+        ? React.createElement(BpsdDisplay, { value: record.mental, style: { marginBottom: 12 } })
+        : React.createElement("div", { style: { background: "#faf5ff", borderRadius: 10, border: "1.5px solid #e9d5ff", padding: "12px 14px", marginBottom: 12 } },
+            React.createElement("div", { style: { fontSize: 13, fontWeight: 800, color: "#6d28d9", marginBottom: 6, paddingBottom: 6, borderBottom: "1.5px solid #e9d5ff" } }, "🧩 BPSD (치매 행동·심리 증상)"),
+            React.createElement("div", { style: { fontSize: 14, color: "#94a3b8" } }, "간호사 입력 내용이 없습니다.")
+          ),
 
       // 의사 입력 구분선
       React.createElement("div", { style: {
