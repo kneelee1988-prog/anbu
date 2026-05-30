@@ -1654,8 +1654,7 @@ function NurseRecordScreen({ patient, user, onBack, onSaved }) {
   return React.createElement("div", { className: "screen", style: { background: "#f0f4f8" } },
     React.createElement("div", { style: { background: "linear-gradient(135deg,#064e3b,#059669)", padding: "48px 20px 20px" } },
       React.createElement("button", { className: "back-btn", onClick: () => {
-        if (window.confirm("목록으로 돌아가시겠습니까?
-저장하지 않은 내용은 사라집니다.")) onBack();
+        if (window.confirm("목록으로 돌아가시겠습니까? 저장하지 않은 내용은 사라집니다.")) onBack();
       } }, "← 목록"),
       React.createElement("div", { style: { fontSize: 18, fontWeight: 800, color: "white", marginTop: 8 } }, `${patient.name} ${patient.age}세 · ${patient.gender}`),
       React.createElement("div", { style: { fontSize: 13, color: "rgba(255,255,255,0.7)" } }, `${patient.room} · 입원 ${admitDays(patient.admitted_at)}일째`),
@@ -2178,8 +2177,7 @@ function DoctorReviewScreen({ patient, user, onBack }) {
       // 상단 바: 뒤로가기 + 역할 뱃지
       React.createElement("div", { style: { display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 14 } },
         React.createElement("button", { className: "back-btn", onClick: () => {
-          if (window.confirm("목록으로 돌아가시겠습니까?
-저장하지 않은 내용은 사라집니다.")) onBack();
+          if (window.confirm("목록으로 돌아가시겠습니까? 저장하지 않은 내용은 사라집니다.")) onBack();
         } }, "← 목록"),
         React.createElement("div", { style: {
           background: "rgba(255,255,255,0.18)", border: "1px solid rgba(255,255,255,0.35)",
