@@ -643,12 +643,7 @@ function categoryToNum(val, map) {
 function GuardianScreen({ user, onBack }) {
   const [tab, setTab] = useState("today");
 
-  // 탭 변경 시 stateRef 업데이트
-  const goTab = (t) => {
-    setTab(t);
-    // App의 stateRef 업데이트
-    window.dispatchEvent(new CustomEvent("anbu-tab-change", { detail: t }));
-  };
+  const goTab = (t) => setTab(t);
 
   // 브라우저 뒤로가기로 탭 복원
   useEffect(() => {
@@ -2876,125 +2871,27 @@ function App() {
   const [role, setRole] = useState(null);
   const [currentUser, setCurrentUser] = useState(null);
 
-  const goScreen = (s, opts = {}) => {
-    setScreen(s);
-    window.history.pushState({ screen: s, ...opts }, "");
-  };
-
-  const isLoggedInRef = React.useRef(false);
-
-  // 히스토리에 상태 push (탭/화면 이동마다 호출)
-  const pushHistory = (state) => {
-    appStateRef.current = { ...appStateRef.current, ...state };
-    window.history.pushState({ anbu: true, ...state }, "");
-    pushDummy(5);
-  };
-
-  // 현재 앱 상태를 ref로 추적 (popstate에서 최신값 참조)
-  const appStateRef = React.useRef({ screen: "splash", tab: "today" });
-
-  const pushDummy = (n = 5) => {
-    for (let i = 0; i < n; i++) {
-      window.history.pushState({ anbu: true, dummy: true }, "");
-    }
-  };
-
-  useEffect(() => {
-    const seen = localStorage.getItem("anbu_onboarded");
-    const initScreen = seen ? "roleSelect" : "onboarding";
-    setScreen(initScreen);
-    appStateRef.current.screen = initScreen;
-
-    // 시작 시 더미 히스토리 충분히 쌓기 (모바일 대응)
-    window.history.replaceState({ anbu: true, screen: initScreen }, "");
-    pushDummy(10);
-
-    const onPop = (e) => {
-      const cur = appStateRef.current;
-
-      // 로그인된 상태에서 뒤로가기
-      if (isLoggedInRef.current) {
-        const tabs = ["today", "history", "photos", "message"];
-        const curTabIdx = tabs.indexOf(cur.tab || "today");
-
-        if (curTabIdx > 0) {
-          // 탭 이전으로
-          const prevTab = tabs[curTabIdx - 1];
-          appStateRef.current.tab = prevTab;
-          window.dispatchEvent(new CustomEvent("anbu-tab", { detail: prevTab }));
-          pushDummy(5);
-        } else {
-          // 첫 탭 → 로그아웃 확인
-          if (window.confirm("로그아웃 하시겠습니까?")) {
-            isLoggedInRef.current = false;
-            setCurrentUser(null);
-            setRole(null);
-            setScreen("roleSelect");
-            appStateRef.current = { screen: "roleSelect", tab: "today" };
-            pushDummy(10);
-          } else {
-            pushDummy(5);
-          }
-        }
-        return;
-      }
-
-      // 비로그인 상태
-      if (cur.screen === "login" || cur.screen === "signup" || cur.screen === "notices") {
-        setScreen("roleSelect");
-        setRole(null);
-        appStateRef.current.screen = "roleSelect";
-        pushDummy(10);
-      } else if (cur.screen === "roleSelect" || cur.screen === "onboarding") {
-        if (window.confirm("앱을 종료하시겠습니까?")) {
-          window.history.go(-20);
-        } else {
-          pushDummy(10);
-        }
-      } else {
-        pushDummy(5);
-      }
-    };
-
-    window.addEventListener("popstate", onPop);
-    // 탭 변경 이벤트 수신
-    const onTabChange = (e) => { stateRef.current.tab = e.detail; };
-    window.addEventListener("anbu-tab-change", onTabChange);
-    return () => {
-      window.removeEventListener("popstate", onPop);
-      window.removeEventListener("anbu-tab-change", onTabChange);
-    };
-  }, []);
-
   const handleOnboardDone = () => {
     localStorage.setItem("anbu_onboarded", "1");
     setScreen("roleSelect");
-    pushHistory({ screen: "roleSelect" });
   };
 
   const handleRoleSelect = (r) => {
-    if (r === "notices") { setRole("notices"); setScreen("notices"); pushHistory({ screen: "notices" }); return; }
+    if (r === "notices") { setRole("notices"); setScreen("notices"); return; }
     setRole(r);
     setScreen("login");
-    pushHistory({ screen: "login" });
   };
 
   const handleLogin = (user) => {
     setCurrentUser(user);
-    isLoggedInRef.current = true;
-    appStateRef.current = { screen: "app", tab: "today" };
     setScreen("app");
-    pushDummy(10);
   };
 
   const handleLogout = () => {
     if (!window.confirm("로그아웃 하시겠습니까?")) return;
-    isLoggedInRef.current = false;
     setCurrentUser(null);
     setRole(null);
-    appStateRef.current = { screen: "roleSelect", tab: "today" };
     setScreen("roleSelect");
-    pushDummy(10);
   };
 
   if (screen === "splash") return React.createElement("div", { style: { minHeight: "100vh", background: "linear-gradient(160deg,#0f172a,#1e3a5f)", display: "flex", alignItems: "center", justifyContent: "center" } },
@@ -3008,7 +2905,7 @@ function App() {
     loginType: role,
     onLogin: handleLogin,
     onBack: () => setScreen("roleSelect"),
-    onSignup: () => { setScreen("signup"); pushHistory({ screen: "signup" }); }
+    onSignup: () => setScreen("signup")
   });
   if (screen === "signup") return React.createElement(GuardianSignupScreen, {
     onBack: () => setScreen("login"),
