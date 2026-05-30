@@ -641,16 +641,34 @@ function categoryToNum(val, map) {
 
 // ── 보호자 화면 ───────────────────────────────────────────────
 function GuardianScreen({ user, onBack }) {
-  const [tab, setTab] = useState("today");
+  const [tabStack, setTabStack] = useState(["today"]);
+  const tab = tabStack[tabStack.length - 1];
 
-  const goTab = (t) => setTab(t);
+  const goTab = (t) => {
+    setTabStack(prev => {
+      if (prev[prev.length - 1] === t) return prev;
+      return [...prev, t];
+    });
+  };
 
-  // 브라우저 뒤로가기로 탭 복원
+  const handleBack = () => {
+    if (tabStack.length > 1) {
+      setTabStack(prev => prev.slice(0, -1));
+    } else {
+      onBack();
+    }
+  };
+
+  // 브라우저/폰 뒤로가기 → handleBack 연결
   useEffect(() => {
-    const onTab = (e) => setTab(e.detail);
-    window.addEventListener("anbu-tab", onTab);
-    return () => window.removeEventListener("anbu-tab", onTab);
-  }, []);
+    window.history.pushState({ anbu: "guardian" }, "");
+    const onPop = () => {
+      handleBack();
+      window.history.pushState({ anbu: "guardian" }, "");
+    };
+    window.addEventListener("popstate", onPop);
+    return () => window.removeEventListener("popstate", onPop);
+  }, [tabStack]);
   const [record, setRecord] = useState(null);
   const [history, setHistory] = useState([]);
   const [histLoading, setHistLoading] = useState(false);
@@ -774,8 +792,8 @@ function GuardianScreen({ user, onBack }) {
     // 헤더
     React.createElement("div", { style: { background: "linear-gradient(135deg,#064e3b,#059669)", padding: "48px 20px 18px" } },
       React.createElement("div", { style: { display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 10 } },
-        React.createElement("button", { className: "back-btn", onClick: onBack }, "← 역할 선택"),
-        React.createElement("button", { className: "logout-btn", onClick: onBack }, "로그아웃 →")
+        React.createElement("button", { className: "back-btn", onClick: handleBack }, "← 역할 선택"),
+        React.createElement("button", { className: "logout-btn", onClick: handleBack }, "로그아웃 →")
       ),
       React.createElement("div", { style: { display: "flex", alignItems: "baseline", gap: 10, flexWrap: "wrap" } },
         React.createElement("div", { style: { fontSize: 26, fontWeight: 900, color: "white" } }, `${patient.name}님`),
@@ -1104,8 +1122,8 @@ function NurseScreen({ user, onBack }) {
   const [patients, setPatients] = useState([]);
   const [loading, setLoading] = useState(true);
   const [selected, setSelected] = useState(null);
-  const [selectMode, setSelectMode] = useState(null); // null | 'choose' | 'edit'
-  const [noChangePopup, setNoChangePopup] = useState(null); // { name, message, ward }
+  const [selectMode, setSelectMode] = useState(null);
+  const [noChangePopup, setNoChangePopup] = useState(null);
 
   useEffect(() => {
     api("get_patients", { ward: user.ward })
@@ -1113,9 +1131,36 @@ function NurseScreen({ user, onBack }) {
       .finally(() => setLoading(false));
   }, []);
 
+  // 뒤로가기 처리
+  useEffect(() => {
+    window.history.pushState({ anbu: "nurse" }, "");
+    const onPop = () => {
+      if (noChangePopup) {
+        setNoChangePopup(null);
+        window.history.pushState({ anbu: "nurse" }, "");
+      } else if (selectMode === "edit") {
+        setSelectMode("choose");
+        window.history.pushState({ anbu: "nurse" }, "");
+      } else if (selectMode === "choose") {
+        setSelected(null);
+        setSelectMode(null);
+        window.history.pushState({ anbu: "nurse" }, "");
+      } else {
+        if (window.confirm("로그아웃 하시겠습니까?")) {
+          onBack();
+        } else {
+          window.history.pushState({ anbu: "nurse" }, "");
+        }
+      }
+    };
+    window.addEventListener("popstate", onPop);
+    return () => window.removeEventListener("popstate", onPop);
+  }, [selectMode, noChangePopup]);
+
   const handlePatientClick = (p) => {
     setSelected(p);
     setSelectMode("choose");
+    window.history.pushState({ anbu: "nurse" }, "");
   };
 
   const handleNoChange = async () => {
@@ -1654,9 +1699,7 @@ function NurseRecordScreen({ patient, user, onBack, onSaved }) {
 
   return React.createElement("div", { className: "screen", style: { background: "#f0f4f8" } },
     React.createElement("div", { style: { background: "linear-gradient(135deg,#064e3b,#059669)", padding: "48px 20px 20px" } },
-      React.createElement("button", { className: "back-btn", onClick: () => {
-        if (window.confirm("목록으로 돌아가시겠습니까? 저장하지 않은 내용은 사라집니다.")) onBack();
-      } }, "← 목록"),
+      React.createElement("button", { className: "back-btn", onClick: onBack }, "← 목록"),
       React.createElement("div", { style: { fontSize: 18, fontWeight: 800, color: "white", marginTop: 8 } }, `${patient.name} ${patient.age}세 · ${patient.gender}`),
       React.createElement("div", { style: { fontSize: 13, color: "rgba(255,255,255,0.7)" } }, `${patient.room} · 입원 ${admitDays(patient.admitted_at)}일째`),
       React.createElement("div", { style: { fontSize: 12, color: "rgba(255,255,255,0.8)", marginTop: 4, fontWeight: 600 } },
@@ -1890,6 +1933,25 @@ function DoctorScreen({ user, onBack }) {
       .then(d => setPatients(d.patients || []))
       .finally(() => setLoading(false));
   }, []);
+
+  // 뒤로가기 처리
+  useEffect(() => {
+    window.history.pushState({ anbu: "doctor" }, "");
+    const onPop = () => {
+      if (selected) {
+        setSelected(null);
+        window.history.pushState({ anbu: "doctor" }, "");
+      } else {
+        if (window.confirm("로그아웃 하시겠습니까?")) {
+          onBack();
+        } else {
+          window.history.pushState({ anbu: "doctor" }, "");
+        }
+      }
+    };
+    window.addEventListener("popstate", onPop);
+    return () => window.removeEventListener("popstate", onPop);
+  }, [selected]);
 
   if (selected) return React.createElement(DoctorReviewScreen, {
     patient: selected, user, onBack: () => setSelected(null)
@@ -2173,9 +2235,7 @@ function DoctorReviewScreen({ patient, user, onBack }) {
     React.createElement("div", { style: { background: "linear-gradient(135deg,#1e1b4b,#4338ca)", padding: "44px 20px 18px", position: "relative" } },
       // 상단 바: 뒤로가기 + 역할 뱃지
       React.createElement("div", { style: { display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 14 } },
-        React.createElement("button", { className: "back-btn", onClick: () => {
-          if (window.confirm("목록으로 돌아가시겠습니까? 저장하지 않은 내용은 사라집니다.")) onBack();
-        } }, "← 목록"),
+        React.createElement("button", { className: "back-btn", onClick: onBack }, "← 목록"),
         React.createElement("div", { style: {
           background: "rgba(255,255,255,0.18)", border: "1px solid rgba(255,255,255,0.35)",
           borderRadius: 20, padding: "4px 12px", fontSize: 11, fontWeight: 800,
