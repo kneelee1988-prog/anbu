@@ -605,23 +605,93 @@ function PhotoBox({ patientId }) {
               p.isVideo && React.createElement("div", { style: { position: "absolute", top: "50%", left: "50%", transform: "translate(-50%,-50%)", fontSize: 22 } }, "▶️")
             ))
           ),
-    preview && React.createElement("div", {
-        style: { position: "fixed", top: 0, left: 0, right: 0, bottom: 0, background: "rgba(0,0,0,0.92)", zIndex: 999,
-          display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center" } },
-      React.createElement("div", { style: { position: "absolute", top: 16, right: 16, zIndex: 1000 } },
-        React.createElement("button", { onClick: () => setPreview(null),
-          style: { background: "rgba(255,255,255,0.2)", border: "none", color: "white", borderRadius: "50%",
-            width: 44, height: 44, fontSize: 22, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center" }
-        }, "✕")
-      ),
-      React.createElement("div", { style: { fontSize: 12, color: "rgba(255,255,255,0.6)", marginBottom: 12 } }, "👆 두 손가락으로 확대/축소"),
-      React.createElement("img", { src: preview.url, style: {
-        maxWidth: "100%", maxHeight: "80vh", borderRadius: 8,
-        touchAction: "pinch-zoom", userSelect: "none",
-        objectFit: "contain"
-      } }),
-      React.createElement("div", { style: { fontSize: 13, color: "rgba(255,255,255,0.7)", marginTop: 12, fontWeight: 600 } }, preview.date)
-    )
+    preview && React.createElement(PhotoViewer, { photo: preview, onClose: () => setPreview(null) })
+  );
+}
+
+// 핀치줌 사진 뷰어
+function PhotoViewer({ photo, onClose }) {
+  const imgRef = React.useRef();
+  const scale = React.useRef(1);
+  const lastDist = React.useRef(0);
+  const origin = React.useRef({ x: 0, y: 0 });
+  const translate = React.useRef({ x: 0, y: 0 });
+
+  const getDistance = (t) => {
+    const dx = t[0].clientX - t[1].clientX;
+    const dy = t[0].clientY - t[1].clientY;
+    return Math.sqrt(dx*dx + dy*dy);
+  };
+
+  const applyTransform = () => {
+    if (imgRef.current) {
+      imgRef.current.style.transform = `translate(${translate.current.x}px, ${translate.current.y}px) scale(${scale.current})`;
+    }
+  };
+
+  const onTouchStart = (e) => {
+    if (e.touches.length === 2) {
+      lastDist.current = getDistance(e.touches);
+      origin.current = {
+        x: (e.touches[0].clientX + e.touches[1].clientX) / 2,
+        y: (e.touches[0].clientY + e.touches[1].clientY) / 2,
+      };
+    }
+  };
+
+  const onTouchMove = (e) => {
+    if (e.touches.length === 2) {
+      e.preventDefault();
+      const dist = getDistance(e.touches);
+      const delta = dist / lastDist.current;
+      scale.current = Math.min(Math.max(scale.current * delta, 0.5), 5);
+      lastDist.current = dist;
+      applyTransform();
+    }
+  };
+
+  const onDoubleTap = (() => {
+    let last = 0;
+    return () => {
+      const now = Date.now();
+      if (now - last < 300) {
+        scale.current = scale.current > 1.5 ? 1 : 2.5;
+        translate.current = { x: 0, y: 0 };
+        applyTransform();
+      }
+      last = now;
+    };
+  })();
+
+  return React.createElement("div", {
+    style: { position: "fixed", top: 0, left: 0, right: 0, bottom: 0,
+      background: "rgba(0,0,0,0.95)", zIndex: 999,
+      display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center",
+      overflow: "hidden" },
+    onTouchStart: onTouchStart,
+    onTouchMove: onTouchMove,
+    onClick: onDoubleTap,
+  },
+    React.createElement("div", { style: { position: "absolute", top: 16, right: 16, zIndex: 1000 } },
+      React.createElement("button", { onClick: (e) => { e.stopPropagation(); onClose(); },
+        style: { background: "rgba(255,255,255,0.25)", border: "none", color: "white",
+          borderRadius: "50%", width: 44, height: 44, fontSize: 22, cursor: "pointer",
+          display: "flex", alignItems: "center", justifyContent: "center" } }, "✕")
+    ),
+    React.createElement("div", { style: { fontSize: 12, color: "rgba(255,255,255,0.5)", marginBottom: 10 } },
+      "👆 두 손가락 확대 · 두 번 탭 2.5배 확대"
+    ),
+    React.createElement("img", {
+      ref: imgRef,
+      src: photo.url,
+      style: {
+        maxWidth: "100%", maxHeight: "78vh", borderRadius: 8,
+        objectFit: "contain", transformOrigin: "center center",
+        transition: "transform 0.05s", userSelect: "none", pointerEvents: "none"
+      }
+    }),
+    React.createElement("div", { style: { fontSize: 13, color: "rgba(255,255,255,0.6)", marginTop: 10, fontWeight: 600 } },
+      photo.date)
   );
 }
 
@@ -698,23 +768,7 @@ function NursePhotoBox({ patientId }) {
               ))
             )
     ),
-    preview && React.createElement("div", {
-        style: { position: "fixed", top: 0, left: 0, right: 0, bottom: 0, background: "rgba(0,0,0,0.92)", zIndex: 999,
-          display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center" } },
-      React.createElement("div", { style: { position: "absolute", top: 16, right: 16, zIndex: 1000 } },
-        React.createElement("button", { onClick: () => setPreview(null),
-          style: { background: "rgba(255,255,255,0.2)", border: "none", color: "white", borderRadius: "50%",
-            width: 44, height: 44, fontSize: 22, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center" }
-        }, "✕")
-      ),
-      React.createElement("div", { style: { fontSize: 12, color: "rgba(255,255,255,0.6)", marginBottom: 12 } }, "👆 두 손가락으로 확대/축소"),
-      React.createElement("img", { src: preview.url, style: {
-        maxWidth: "100%", maxHeight: "80vh", borderRadius: 8,
-        touchAction: "pinch-zoom", userSelect: "none",
-        objectFit: "contain"
-      } }),
-      React.createElement("div", { style: { fontSize: 13, color: "rgba(255,255,255,0.7)", marginTop: 12, fontWeight: 600 } }, preview.date)
-    )
+    preview && React.createElement(PhotoViewer, { photo: preview, onClose: () => setPreview(null) })
   );
 }
 
