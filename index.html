@@ -1028,7 +1028,7 @@ function GuardianScreen({ user, onBack }) {
 
   const summaryItems = record ? [
     { label: "의식", value: record.consciousness },
-    { label: "활동", value: record.mobility, sub: record.fall_risk ? `낙상 ${record.fall_risk}` : null },
+    { label: "활동", value: record.mobility, sub: record.fall_risk ? `낙상위험 ${record.fall_risk}` : null },
     { label: "식사", value: record.meal_amount, sub: record.meal_type || null },
     { label: "특이사항", value: (record.special_alerts && record.special_alerts.length > 0) ? "있음" : "없음", highlight: !!(record.special_alerts && record.special_alerts.length > 0) },
   ] : [];
@@ -1213,9 +1213,40 @@ function GuardianScreen({ user, onBack }) {
                         )
                       )
                     ),
-                    r.special_alerts && React.createElement("div", { style: { fontSize: 15, color: "#dc2626", fontWeight: 600, marginBottom: 6 } },
-                      "⚠️ " + (Array.isArray(r.special_alerts) ? r.special_alerts.join(" · ") : r.special_alerts)
-                    ),
+                    r.special_alerts && (() => {
+                      const raw = (() => {
+                        const sa = r.special_alerts;
+                        if (Array.isArray(sa)) return sa;
+                        if (typeof sa === "string") return sa.split(/\s*·\s*/).map(s => s.trim()).filter(Boolean);
+                        return [];
+                      })();
+                      const getTag = (a) => { const m = a.match(/^\[([STRCD])\]/); return m ? m[1] : null; };
+                      const strip = (a) => a.replace(/^\[[STRCD]\]/, "");
+                      const symptoms   = raw.filter(a => getTag(a) === "S").map(strip);
+                      const treating   = raw.filter(a => getTag(a) === "T").map(strip);
+                      const recovering = raw.filter(a => getTag(a) === "R").map(strip);
+                      const doneTreat  = raw.filter(a => getTag(a) === "D").map(strip);
+                      const consent    = raw.filter(a => getTag(a) === "C").map(strip);
+                      const noTag      = raw.filter(a => !getTag(a));
+
+                      const MiniSection = ({ emoji, items, color, bg, border }) =>
+                        items.length > 0 && React.createElement("div", { style: { marginBottom: 6, borderRadius: 8, overflow: "hidden", border: `1px solid ${border}` } },
+                          React.createElement("div", { style: { background: bg, padding: "5px 10px", display: "flex", flexDirection: "column", gap: 3 } },
+                            items.map((a, i) => React.createElement("div", { key: i, style: { fontSize: 13, color, fontWeight: 600, lineHeight: 1.5 } },
+                              `${emoji} ${a}`
+                            ))
+                          )
+                        );
+
+                      return React.createElement("div", { style: { marginBottom: 6 } },
+                        symptoms.length > 0 && MiniSection({ emoji: "⚠️", items: symptoms, color: "#be123c", bg: "#fff1f2", border: "#fecdd3" }),
+                        treating.length > 0 && MiniSection({ emoji: "🩺", items: treating, color: "#1d4ed8", bg: "#eff6ff", border: "#bfdbfe" }),
+                        recovering.length > 0 && MiniSection({ emoji: "✅", items: recovering, color: "#166534", bg: "#f0fdf4", border: "#bbf7d0" }),
+                        doneTreat.length > 0 && MiniSection({ emoji: "🟢", items: doneTreat, color: "#14532d", bg: "#dcfce7", border: "#86efac" }),
+                        consent.length > 0 && MiniSection({ emoji: "📋", items: consent, color: "#92400e", bg: "#fffbeb", border: "#fde68a" }),
+                        noTag.length > 0 && MiniSection({ emoji: "•", items: noTag, color: "#be123c", bg: "#fff1f2", border: "#fecdd3" })
+                      );
+                    })(),
                     r.nurse_note && React.createElement("div", { style: { fontSize: 15, color: "#0c4a6e", background: "#f0f9ff", borderRadius: 8, padding: "8px 10px" } },
                       React.createElement("span", { style: { fontWeight: 700 } }, "간호사 코멘트: "), r.nurse_note
                     )
