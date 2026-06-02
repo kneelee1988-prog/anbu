@@ -1277,6 +1277,8 @@ function GuardianScreen({ user, onBack }) {
             )
           )
         : React.createElement(React.Fragment, null,
+            // ── 오늘 사진
+            React.createElement(PhotoBox, { patientId: patient.id, todayOnly: true }),
             // ── 한줄 요약 카드
             todaySummary && React.createElement("div", { style: {
               background: todaySummary.bg, borderRadius: 16, padding: "18px 20px",
@@ -1501,10 +1503,6 @@ function GuardianScreen({ user, onBack }) {
       ),
 
       tab === "photos" && React.createElement("div", null,
-        React.createElement("div", { style: { background: "white", borderRadius: 14, padding: 16, marginBottom: 14, boxShadow: "0 2px 12px rgba(0,0,0,0.08)" } },
-          React.createElement("div", { style: { fontSize: 15, fontWeight: 800, color: "#1e3a5f", marginBottom: 6 } }, "📷 어르신 사진첩"),
-          React.createElement("div", { style: { fontSize: 15, color: "#94a3b8", marginBottom: 14 } }, "간호팀이 촬영한 어르신 사진을 모아볼 수 있어요")
-        ),
         React.createElement(PhotoBox, { patientId: patient.id })
       ),
 
