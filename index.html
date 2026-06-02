@@ -53,7 +53,7 @@
 
     /* 탭 */
     .tabs { display: flex; background: #f1f5f9; border-radius: 10px; padding: 4px; margin-bottom: 20px; overflow-x: auto; flex-wrap: nowrap; -webkit-overflow-scrolling: touch; scrollbar-width: none; } .tabs::-webkit-scrollbar { display: none; }
-    .tab { flex: 1; padding: 8px 4px; text-align: center; font-size: 13px; font-weight: 700; color: #64748b; border-radius: 8px; cursor: pointer; transition: all 0.2s; border: none; background: none; font-family: 'Noto Sans KR', sans-serif; white-space: nowrap; }
+    .tab { flex-shrink: 0; padding: 8px 14px; text-align: center; font-size: 13px; font-weight: 700; color: #64748b; border-radius: 8px; cursor: pointer; transition: all 0.2s; border: none; background: none; font-family: 'Noto Sans KR', sans-serif; white-space: nowrap; }
     .tab.active { background: white; color: #1e3a5f; box-shadow: 0 1px 4px rgba(0,0,0,0.1); }
 
     /* 헤더 */
@@ -504,8 +504,8 @@ const CHART_COLOR = {
 };
 
 // 사진 박스 컴포넌트
-// 사진 로드 공통 훅
-function usePatientPhotos(patientId) {
+// 사진 로드 공통 훅 (limit 옵션 추가)
+function usePatientPhotos(patientId, limit = 20) {
   const [photos, setPhotos] = React.useState([]);
   const [loading, setLoading] = React.useState(true);
 
@@ -514,14 +514,17 @@ function usePatientPhotos(patientId) {
     fetch(`${SUPABASE_URL}/storage/v1/object/list/patient-photos`, {
       method: "POST",
       headers: { apikey: ANON_KEY, Authorization: "Bearer " + ANON_KEY, "Content-Type": "application/json" },
-      body: JSON.stringify({ prefix: `${patientId}/`, limit: 20, sortBy: { column: "created_at", order: "desc" } })
+      body: JSON.stringify({ prefix: `${patientId}/`, limit: limit, sortBy: { column: "created_at", order: "desc" } })
     }).then(r => r.json())
       .then(data => {
         if (Array.isArray(data)) {
-          setPhotos(data.filter(f => f.name && f.name !== ".emptyFolderPlaceholder").slice(0, 12).map(f => ({
+          const today = new Date().toLocaleDateString("ko-KR", { month:"long", day:"numeric" });
+          setPhotos(data.filter(f => f.name && f.name !== ".emptyFolderPlaceholder").map(f => ({
             id: f.id, name: f.name,
             url: `${SUPABASE_URL}/storage/v1/object/public/patient-photos/${patientId}/${f.name}`,
             date: new Date(f.created_at).toLocaleDateString("ko-KR", { month:"long", day:"numeric" }),
+            dateStr: new Date(f.created_at).toISOString().slice(0, 10),
+            isToday: new Date(f.created_at).toLocaleDateString("ko-KR", { month:"long", day:"numeric" }) === today,
             isVideo: /\.(mp4|mov|avi)$/i.test(f.name)
           })));
         }
@@ -578,27 +581,32 @@ function GuardianNoticesTab() {
 }
 
 // 보호자용 - 보기 전용
-function PhotoBox({ patientId }) {
-  const { photos, loading, reload } = usePatientPhotos(patientId);
+function PhotoBox({ patientId, todayOnly = false }) {
+  const { photos, loading, reload } = usePatientPhotos(patientId, todayOnly ? 20 : 50);
   const [preview, setPreview] = React.useState(null);
+  const filtered = todayOnly ? photos.filter(p => p.isToday) : photos;
 
   return React.createElement("div", { style: { background: "white", borderRadius: 14, padding: 14, marginBottom: 14, boxShadow: "0 2px 12px rgba(0,0,0,0.08)" } },
     React.createElement("div", { style: { display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 12 } },
-      React.createElement("div", { style: { fontSize: 15, fontWeight: 800, color: "#1e3a5f" } }, "📷 어르신 사진"),
+      React.createElement("div", { style: { fontSize: 15, fontWeight: 800, color: "#1e3a5f" } },
+        todayOnly ? "📷 오늘 어르신 사진" : "📷 어르신 사진첩"
+      ),
       React.createElement("button", { onClick: reload,
         style: { fontSize: 15, color: "#64748b", background: "#f1f5f9", border: "none", borderRadius: 6, padding: "4px 10px", cursor: "pointer", fontFamily: "'Noto Sans KR',sans-serif", fontWeight: 600 }
       }, "🔄 새로고침")
     ),
     loading
       ? React.createElement("div", { style: { textAlign: "center", padding: "20px 0", color: "#94a3b8", fontSize: 15 } }, "불러오는 중...")
-      : photos.length === 0
+      : filtered.length === 0
         ? React.createElement("div", { style: { border: "2px dashed #e2e8f0", borderRadius: 14, padding: "32px 20px", textAlign: "center", background: "#f8fafc" } },
             React.createElement("div", { style: { fontSize: 48, marginBottom: 12 } }, "📷"),
-            React.createElement("div", { style: { fontSize: 16, fontWeight: 800, color: "#1e3a5f", marginBottom: 8 } }, "아직 등록된 사진이 없어요"),
+            React.createElement("div", { style: { fontSize: 16, fontWeight: 800, color: "#1e3a5f", marginBottom: 8 } },
+              todayOnly ? "오늘 등록된 사진이 없어요" : "아직 등록된 사진이 없어요"
+            ),
             React.createElement("div", { style: { fontSize: 15, color: "#94a3b8", lineHeight: 1.7 } }, "간호팀이 주 1~2회", React.createElement("br", null), "어르신 사진을 올려드려요")
           )
         : React.createElement("div", { style: { display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 6 } },
-            photos.map(p => React.createElement("div", { key: p.id, style: { position: "relative", borderRadius: 8, overflow: "hidden", aspectRatio: "1", background: "#f1f5f9" } },
+            filtered.map(p => React.createElement("div", { key: p.id, style: { position: "relative", borderRadius: 8, overflow: "hidden", aspectRatio: "1", background: "#f1f5f9" } },
               p.isVideo
                 ? React.createElement("video", { src: p.url, style: { width: "100%", height: "100%", objectFit: "cover" } })
                 : React.createElement("img", { src: p.url, style: { width: "100%", height: "100%", objectFit: "cover", cursor: "pointer" }, onClick: () => setPreview(p) }),
