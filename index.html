@@ -384,6 +384,7 @@ function GuardianSignupScreen({ onBack, onDone }) {
   const [form, setForm] = useState({ name: "", phone: "", patientName: "", patientBirthdate: "", relation: "" });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [agree, setAgree] = useState({ all: false, personal: false, health: false, terms: false });
   const set = (k, v) => setForm(f => ({ ...f, [k]: v }));
   const RELATIONS = ["자녀", "배우자", "형제", "부모", "조부모", "사위", "며느리", "사촌", "행정담당직원", "지인"];
   const handleKeyDown = (e) => { if (e.key === "Enter") handleSubmit(); };
@@ -407,8 +408,6 @@ function GuardianSignupScreen({ onBack, onDone }) {
       React.createElement("div", { style: { fontSize: 15, color: "#64748b", marginTop: 4 } }, "가입 신청 후 관리자 승인이 완료되면 로그인하실 수 있어요.")
     ),
     React.createElement("div", { className: "scroll-area", style: { paddingTop: 0 } },
-      error && React.createElement("div", { className: "error-msg" }, error),
-
       React.createElement("div", { className: "card", style: { marginBottom: 12 } },
         React.createElement("div", { style: { fontWeight: 700, color: "#1e3a5f", marginBottom: 16 } }, "보호자 정보"),
         React.createElement("div", { className: "field" },
@@ -443,7 +442,80 @@ function GuardianSignupScreen({ onBack, onDone }) {
         )
       ),
 
-      React.createElement("button", { className: "btn btn-dark", onClick: handleSubmit, disabled: loading }, loading ? "신청 중..." : "가입 신청하기")
+      // 개인정보 동의
+      React.createElement("div", { className: "card", style: { marginBottom: 20 } },
+        React.createElement("div", { style: { fontWeight: 700, color: "#1e3a5f", marginBottom: 14 } }, "📋 개인정보 수집·이용 동의"),
+
+        // 전체 동의
+        React.createElement("div", {
+          onClick: () => {
+            const all = !agree.all;
+            setAgree({ all, personal: all, health: all, terms: all });
+          },
+          style: { display: "flex", alignItems: "center", gap: 10, padding: "12px 14px",
+            background: agree.all ? "#eff6ff" : "#f8fafc", borderRadius: 10,
+            border: `2px solid ${agree.all ? "#2563eb" : "#e2e8f0"}`,
+            cursor: "pointer", marginBottom: 10 }
+        },
+          React.createElement("div", { style: {
+            width: 22, height: 22, borderRadius: 6, border: `2px solid ${agree.all ? "#2563eb" : "#94a3b8"}`,
+            background: agree.all ? "#2563eb" : "white", display: "flex", alignItems: "center", justifyContent: "center",
+            flexShrink: 0
+          } }, agree.all && React.createElement("span", { style: { color: "white", fontSize: 14, fontWeight: 800 } }, "✓")),
+          React.createElement("div", { style: { fontSize: 15, fontWeight: 800, color: agree.all ? "#1d4ed8" : "#1e293b" } }, "전체 동의합니다")
+        ),
+
+        // 개별 동의 항목
+        ...[
+          { key: "personal", label: "개인정보 수집·이용 동의", required: true, detail: "성명, 연락처, 환자와의 관계 — 보호자 본인 확인 및 서비스 제공 목적\n보존기간: 서비스 이용 종료 시까지" },
+          { key: "health", label: "민감정보(건강정보) 수집·이용 동의", required: true, detail: "입원 환자의 건강상태, 투약, 처치 내역 등 — 환자 상태 안내 목적\n보존기간: 서비스 이용 종료 시까지" },
+          { key: "terms", label: "서비스 이용약관 동의", required: true, detail: "오늘안부 서비스의 이용 조건 및 책임 범위에 동의합니다.\n본 서비스는 의료 정보를 참고용으로 제공하며 진료를 대체하지 않습니다." },
+        ].map(item =>
+          React.createElement("div", { key: item.key, style: { marginBottom: 8 } },
+            React.createElement("div", {
+              onClick: () => {
+                const val = !agree[item.key];
+                const newAgree = { ...agree, [item.key]: val };
+                newAgree.all = newAgree.personal && newAgree.health && newAgree.terms;
+                setAgree(newAgree);
+              },
+              style: { display: "flex", alignItems: "center", gap: 10, padding: "10px 14px",
+                background: agree[item.key] ? "#f0fdf4" : "#f8fafc",
+                borderRadius: 8, border: `1.5px solid ${agree[item.key] ? "#16a34a" : "#e2e8f0"}`,
+                cursor: "pointer" }
+            },
+              React.createElement("div", { style: {
+                width: 20, height: 20, borderRadius: 5, border: `2px solid ${agree[item.key] ? "#16a34a" : "#94a3b8"}`,
+                background: agree[item.key] ? "#16a34a" : "white", display: "flex", alignItems: "center", justifyContent: "center",
+                flexShrink: 0
+              } }, agree[item.key] && React.createElement("span", { style: { color: "white", fontSize: 12, fontWeight: 800 } }, "✓")),
+              React.createElement("div", null,
+                React.createElement("div", { style: { fontSize: 14, fontWeight: 700, color: "#1e293b" } },
+                  React.createElement("span", { style: { color: "#dc2626", fontSize: 13, marginRight: 4 } }, "[필수]"),
+                  item.label
+                )
+              )
+            ),
+            React.createElement("div", { style: { fontSize: 13, color: "#64748b", padding: "8px 14px", background: "#f8fafc", borderRadius: "0 0 8px 8px", borderLeft: "1.5px solid #e2e8f0", borderRight: "1.5px solid #e2e8f0", borderBottom: "1.5px solid #e2e8f0", lineHeight: 1.7, whiteSpace: "pre-line" } },
+              item.detail
+            )
+          )
+        ),
+
+        // 개인정보처리방침 링크
+        React.createElement("div", { style: { marginTop: 10, padding: "10px 14px", background: "#f8fafc", borderRadius: 8, border: "1px solid #e2e8f0" } },
+          React.createElement("div", { style: { fontSize: 13, color: "#64748b", lineHeight: 1.7 } },
+            "수집된 개인정보는 천안쌍용요양병원이 관리하며 법령에 따른 경우를 제외하고 제3자에게 제공되지 않습니다.",
+            React.createElement("br", null),
+            "문의: 천안쌍용요양병원 원무과 041-574-1777"
+          )
+        )
+      ),
+
+      error && React.createElement("div", { className: "error-msg", style: { marginBottom: 12 } }, error),
+      React.createElement("button", { className: "btn btn-dark", onClick: handleSubmit, disabled: loading || !agree.all },
+        loading ? "신청 중..." : agree.all ? "가입 신청하기" : "위 항목에 모두 동의해주세요"
+      )
     )
   );
 }
@@ -500,11 +572,11 @@ const CHART_COLOR = {
          : p >= 0.25 ? "#f59e0b"  // 주의 - 주황
          : "#ef4444";              // 나쁨 - 빨강
   },
-  // 통증: 낮을수록 좋음 (0~1점=파랑)
-  pain: (v) => v <= 1  ? "#2563eb"  // 최고 - 파랑
-             : v <= 3  ? "#16a34a"  // 좋음 - 초록
-             : v <= 5  ? "#65a30d"  // 보통 - 연두
-             : v <= 7  ? "#f59e0b"  // 주의 - 주황
+  // 통증: 낮을수록 좋음 (0~3점=파랑)
+  pain: (v) => v <= 3  ? "#2563eb"  // 최고 - 파랑
+             : v <= 5  ? "#16a34a"  // 좋음 - 초록
+             : v <= 7  ? "#65a30d"  // 보통 - 연두
+             : v <= 8  ? "#f59e0b"  // 주의 - 주황
              : "#ef4444",           // 나쁨 - 빨강
   // 섬망: 낮을수록 좋음 (없음=파랑)
   delirium: (v, max) => {
