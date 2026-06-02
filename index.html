@@ -386,6 +386,7 @@ function GuardianSignupScreen({ onBack, onDone }) {
   const [error, setError] = useState("");
   const set = (k, v) => setForm(f => ({ ...f, [k]: v }));
   const RELATIONS = ["자녀", "배우자", "형제", "부모", "조부모", "사위", "며느리", "사촌", "행정담당직원", "지인"];
+  const handleKeyDown = (e) => { if (e.key === "Enter") handleSubmit(); };
 
   const handleSubmit = async () => {
     if (!form.name || !form.phone || !form.patientName || !form.patientBirthdate) { setError("필수 항목을 모두 입력해주세요."); return; }
