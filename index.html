@@ -886,14 +886,35 @@ function BpsdDisplay({ value, style }) {
     : value.split("·").map(s => s.trim()).filter(Boolean);
   if (!items.length) return null;
   const isNormal = items.length === 1 && items[0] === "이상없음";
+
+  // 섬망 정도 판단
+  const deliriumItems = items.filter(s =>
+    ["섬망","야간혼돈","수면장애","반복소리","혼잣말","다칠위험"].some(k => s.includes(k))
+  );
+  const getDeliriumLevel = () => {
+    if (items.some(s => s.includes("심한 섬망") || s.includes("매우심함"))) return { label: "매우심함", color: "#dc2626", bg: "#fee2e2" };
+    if (items.some(s => s.includes("섬망"))) return { label: "심함", color: "#ef4444", bg: "#fee2e2" };
+    if (items.some(s => s.includes("야간혼돈") || s.includes("다칠위험"))) return { label: "중간", color: "#f59e0b", bg: "#fffbeb" };
+    if (deliriumItems.length > 0) return { label: "경함", color: "#65a30d", bg: "#f7fee7" };
+    return null;
+  };
+  const deliriumLevel = getDeliriumLevel();
+
   return React.createElement("div", { style: {
     background: "#faf5ff", borderRadius: 10, border: "1.5px solid #e9d5ff",
     overflow: "hidden", ...style
   } },
     React.createElement("div", { style: {
       padding: "8px 14px", borderBottom: "1.5px solid #e9d5ff",
-      fontSize: 13, fontWeight: 800, color: "#6d28d9", background: "#f3e8ff"
-    } }, "🧩 BPSD (치매 행동·심리 증상)"),
+      fontSize: 13, fontWeight: 800, color: "#6d28d9", background: "#f3e8ff",
+      display: "flex", justifyContent: "space-between", alignItems: "center"
+    } },
+      React.createElement("span", null, "🧩 BPSD (치매 행동·심리 증상)"),
+      deliriumLevel && React.createElement("span", { style: {
+        fontSize: 12, fontWeight: 800, background: deliriumLevel.bg,
+        color: deliriumLevel.color, borderRadius: 20, padding: "2px 10px"
+      } }, `섬망 ${deliriumLevel.label}`)
+    ),
     React.createElement("div", { style: { padding: "10px 14px", display: "flex", flexWrap: "wrap", gap: 6 } },
       isNormal
         ? React.createElement("span", { style: { background: "#16a34a", color: "white", borderRadius: 8, fontSize: 13, fontWeight: 700, padding: "4px 12px" } }, "이상없음")
@@ -1090,7 +1111,7 @@ function GuardianScreen({ user, onBack }) {
   const CONSCIOUSNESS_MAP = ["혼수","반혼수","혼미","졸림","명료"];
   const MEAL_MAP = ["안 드심","거의 안 드심","절반","잘 드심"];
   const SLEEP_MAP = ["4시간 미만","4~6시간","6~8시간","8시간 이상"];
-  const MOBILITY_MAP = ["침상 안정","침상 위 활동","보조 보행","독립 보행"];
+  const MOBILITY_MAP = ["침상 안정","휠체어","부축 보행","워커","독립 보행"];
 
   const painColor = (v) => v <= 2 ? "#16a34a" : v <= 4 ? "#65a30d" : v <= 6 ? "#f59e0b" : v <= 8 ? "#ef4444" : "#991b1b";
   const goodHighColor = (v, max) => {
@@ -1226,7 +1247,7 @@ function GuardianScreen({ user, onBack }) {
             React.createElement("div", { style: { fontSize: 15, color: "rgba(255,255,255,0.8)", fontWeight: 700, marginBottom: 2 } }, item.label),
             React.createElement("div", { style: { fontSize: 15, fontWeight: 900, color: isAlert ? "#fbbf24" : "white", lineHeight: 1.2 } },
               item.value || "—",
-              isClickable ? React.createElement("span", { style: { fontSize: 11, display: "block", color: "rgba(255,255,255,0.7)", marginTop: 2 } }, "탭해서 확인 ↓") : null
+              isClickable ? React.createElement("span", { style: { fontSize: 11, display: "block", color: "rgba(255,255,255,0.7)", marginTop: 2 } }, "오늘의 안부 확인 ↓") : null
             ),
             item.sub && React.createElement("div", { style: { fontSize: 15, color: "rgba(255,255,255,0.75)", fontWeight: 600, marginTop: 2 } }, item.sub)
           );
@@ -1468,12 +1489,7 @@ function GuardianScreen({ user, onBack }) {
                 (record.mental || record.bprs) && React.createElement(BpsdDisplay, {
                   value: record.bprs || record.mental,
                   style: { marginBottom: 8 }
-                }),
-                // 간호사 코멘트
-                record.nurse_note && React.createElement("div", { style: { background: "#f0f9ff", borderRadius: 10, padding: "10px 14px", border: "1.5px solid #bae6fd" } },
-                  React.createElement("div", { style: { fontSize: 13, fontWeight: 800, color: "#0369a1", marginBottom: 4, paddingBottom: 4, borderBottom: "1px solid #bae6fd" } }, "💬 간호사 코멘트"),
-                  React.createElement("div", { style: { fontSize: 15, color: "#0c4a6e", lineHeight: 1.7 } }, record.nurse_note)
-                )
+                })
               )
             ),
             record.doctor_findings?.length > 0 && (() => {
@@ -1863,7 +1879,7 @@ function NurseChooseScreen({ patient, user, onNoChange, onEdit, onBack }) {
   const CONSCIOUSNESS_MAP = ["혼수","반혼수","혼미","졸림","명료"];
   const MEAL_MAP = ["안 드심","거의 안 드심","절반","잘 드심"];
   const SLEEP_MAP = ["4시간 미만","4~6시간","6~8시간","8시간 이상"];
-  const MOBILITY_MAP = ["침상 안정","침상 위 활동","보조 보행","독립 보행"];
+  const MOBILITY_MAP = ["침상 안정","휠체어","부축 보행","워커","독립 보행"];
   const goodHighColor = (v, max) => {
     const pct = v / max;
     return pct >= 0.75 ? "#16a34a" : pct >= 0.5 ? "#65a30d" : pct >= 0.25 ? "#f59e0b" : "#ef4444";
@@ -1982,7 +1998,7 @@ function NurseChooseScreen({ patient, user, onNoChange, onEdit, onBack }) {
               ),
               React.createElement("div", { style: { display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10 } },
                 React.createElement(TrendChart, { records: history.map(r => ({ date: r.date, val: categoryToNum(r.mobility, MOBILITY_MAP) })), label: "🚶 이동능력", field: "val", maxVal: 5, accentColor: "#0369a1",
-                  colorFn: CHART_COLOR.goodHigh, valueLabelFn: v => ["침상","휠체어","부축","워커","독립"][v-1]||"—" }),
+                  colorFn: CHART_COLOR.goodHigh, valueLabelFn: v => ["침상 안정","휠체어","부축","워커","독립"][v-1]||"—" }),
                 React.createElement(TrendChart, { records: history.map(r => ({ date: r.date, val: r.mental && r.mental.includes("섬망") ? 5 : r.mental && r.mental.includes("야간혼돈") ? 3 : r.mental && r.mental.includes("혼잣말") ? 2 : (r.mental && r.mental !== "이상없음") ? 1 : 0 })), label: "🧩 섬망증상", field: "val", maxVal: 5, accentColor: "#7c3aed",
                   colorFn: CHART_COLOR.delirium, valueLabelFn: v => ["없음","경미","경미","보통","보통","심함"][v]||"없음" })
               )
@@ -2799,7 +2815,7 @@ function DoctorReviewScreen({ patient, user, onBack }) {
   const CONSCIOUSNESS_MAP = ["혼수","반혼수","혼미","졸림","명료"];
   const MEAL_MAP = ["안 드심","거의 안 드심","절반","잘 드심"];
   const SLEEP_MAP = ["4시간 미만","4~6시간","6~8시간","8시간 이상"];
-  const MOBILITY_MAP = ["침상 안정","침상 위 활동","보조 보행","독립 보행"];
+  const MOBILITY_MAP = ["침상 안정","휠체어","부축 보행","워커","독립 보행"];
   const goodHighColor = (v, max) => {
     const pct = v / max;
     return pct >= 0.75 ? "#16a34a" : pct >= 0.5 ? "#65a30d" : pct >= 0.25 ? "#f59e0b" : "#ef4444";
@@ -2945,7 +2961,7 @@ function DoctorReviewScreen({ patient, user, onBack }) {
                 React.createElement(TrendChart, { records: history.map(r => ({ date: r.date, val: categoryToNum(r.meal_amount, MEAL_MAP) })), label: "🍽️ 식사량", field: "val", maxVal: 6, accentColor: "#c2410c",
                   colorFn: CHART_COLOR.goodHigh, valueLabelFn: v => ["거부","소량","1/4","절반","3/4","잘드심"][v-1]||"—" }),
                 React.createElement(TrendChart, { records: history.map(r => ({ date: r.date, val: categoryToNum(r.mobility, MOBILITY_MAP) })), label: "🚶 이동능력", field: "val", maxVal: 5, accentColor: "#0369a1",
-                  colorFn: CHART_COLOR.goodHigh, valueLabelFn: v => ["침상","휠체어","부축","워커","독립"][v-1]||"—" })
+                  colorFn: CHART_COLOR.goodHigh, valueLabelFn: v => ["침상 안정","휠체어","부축","워커","독립"][v-1]||"—" })
               ),
               React.createElement("div", { style: { display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10 } },
                 React.createElement(TrendChart, { records: history.map(r => ({ date: r.date, val: categoryToNum(r.urine, ["실금","농축","감소","정상"]) })), label: "🚿 소변", field: "val", maxVal: 4, accentColor: "#0369a1",
