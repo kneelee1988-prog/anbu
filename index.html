@@ -1137,20 +1137,30 @@ function GuardianScreen({ user, onBack }) {
   const getTodaySummary = (rec) => {
     if (!rec) return null;
     const alerts = rec.special_alerts;
-    const hasAlert = alerts && alerts.length > 0;
+    // 태그 있는 S(증상) 항목만 카운트
+    const hasAlert = alerts && (Array.isArray(alerts)
+      ? alerts.some(a => a.includes("[S]") || (!a.match(/^\[[STRCD]\]/) && a.length > 0))
+      : alerts.length > 0);
     const c = rec.consciousness;
     const pain = rec.pain;
     const meal = rec.meal_amount;
+    const fallRisk = rec.fall_risk;
+    const bprs = rec.bprs || rec.mental;
+    const hasBpsd = bprs && bprs !== "이상없음" && bprs.length > 0;
 
-    // 의식 수준 판단
     const badConsciousness = ["혼수","반혼수","혼미"].includes(c);
     const highPain = pain != null && pain >= 5;
     const poorMeal = ["거부","소량"].includes(meal);
+    const highFall = ["높음","매우 높음"].includes(fallRisk);
 
+    // 심각도 순서
     if (hasAlert && badConsciousness) return { emoji: "😔", text: "오늘 어르신 상태가 다소 걱정됩니다", color: "#dc2626", bg: "#fff1f2", border: "#fecdd3" };
     if (hasAlert) return { emoji: "🤔", text: "오늘 챙겨봐야 할 사항이 있어요", color: "#d97706", bg: "#fffbeb", border: "#fde68a" };
-    if (badConsciousness || highPain) return { emoji: "😐", text: "오늘 어르신이 다소 힘드신 것 같아요", color: "#d97706", bg: "#fffbeb", border: "#fde68a" };
+    if (badConsciousness || (highPain && hasBpsd)) return { emoji: "😐", text: "오늘 어르신이 다소 힘드신 것 같아요", color: "#d97706", bg: "#fffbeb", border: "#fde68a" };
+    if (highPain) return { emoji: "😐", text: `통증이 있으시고 (${pain}점) 불편하실 수 있어요`, color: "#d97706", bg: "#fffbeb", border: "#fde68a" };
     if (poorMeal) return { emoji: "😕", text: "오늘 식사를 잘 못하셨어요", color: "#d97706", bg: "#fffbeb", border: "#fde68a" };
+    if (hasBpsd) return { emoji: "🧩", text: "행동·심리 증상이 있어 주의 깊게 돌보고 있어요", color: "#7c3aed", bg: "#faf5ff", border: "#e9d5ff" };
+    if (highFall) return { emoji: "⚠️", text: "낙상 위험이 높아 더욱 주의를 기울이고 있어요", color: "#d97706", bg: "#fffbeb", border: "#fde68a" };
     return { emoji: "😊", text: "오늘 어르신은 비교적 안정적이에요", color: "#16a34a", bg: "#f0fdf4", border: "#bbf7d0" };
   };
 
@@ -1199,14 +1209,22 @@ function GuardianScreen({ user, onBack }) {
         summaryItems.map((item, i) => {
           const icons = ["🧠","🚶","🍽️","⚠️"];
           const isAlert = item.highlight;
-          return React.createElement("div", { key: i, style: {
-            background: isAlert ? "rgba(251,191,36,0.25)" : "rgba(255,255,255,0.15)",
-            borderRadius: 10, padding: "10px 4px", textAlign: "center",
-            border: isAlert ? "1.5px solid rgba(251,191,36,0.6)" : "1px solid rgba(255,255,255,0.15)"
-          } },
+          const isClickable = isAlert && i === 3; // 특이사항 박스만 클릭 가능
+          return React.createElement("div", { key: i,
+            onClick: isClickable ? () => goTab("today") : undefined,
+            style: {
+              background: isAlert ? "rgba(251,191,36,0.25)" : "rgba(255,255,255,0.15)",
+              borderRadius: 10, padding: "10px 4px", textAlign: "center",
+              border: isAlert ? "1.5px solid rgba(251,191,36,0.6)" : "1px solid rgba(255,255,255,0.15)",
+              cursor: isClickable ? "pointer" : "default"
+            }
+          },
             React.createElement("div", { style: { fontSize: 16, marginBottom: 3 } }, icons[i]),
             React.createElement("div", { style: { fontSize: 15, color: "rgba(255,255,255,0.8)", fontWeight: 700, marginBottom: 2 } }, item.label),
-            React.createElement("div", { style: { fontSize: 15, fontWeight: 900, color: isAlert ? "#fbbf24" : "white", lineHeight: 1.2 } }, item.value || "—"),
+            React.createElement("div", { style: { fontSize: 15, fontWeight: 900, color: isAlert ? "#fbbf24" : "white", lineHeight: 1.2 } },
+              item.value || "—",
+              isClickable ? React.createElement("span", { style: { fontSize: 11, display: "block", color: "rgba(255,255,255,0.7)", marginTop: 2 } }, "탭해서 확인 ↓") : null
+            ),
             item.sub && React.createElement("div", { style: { fontSize: 15, color: "rgba(255,255,255,0.75)", fontWeight: 600, marginTop: 2 } }, item.sub)
           );
         })
