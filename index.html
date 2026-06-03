@@ -280,7 +280,7 @@ function LoginScreen({ loginType, onLogin, onBack, onSignup }) {
       let result;
       if (loginType === "guardian") {
         if (!form.patientName || !form.birthdate || !form.phone) { setError("모든 항목을 입력해주세요."); return; }
-        result = await api("guardian_login", { patientName: form.patientName, birthdate: form.birthdate, phone: form.phone });
+        result = await api("guardian_login", { patientName: form.patientName.trim(), birthdate: form.birthdate.trim(), phone: form.phone.trim() });
         if (result.error) { setError(result.error); return; }
         onLogin({ role: "guardian", patient: result.patient, guardianRole: result.guardianRole, phone: form.phone });
       } else {
@@ -310,7 +310,7 @@ function LoginScreen({ loginType, onLogin, onBack, onSignup }) {
       loginType === "guardian" && React.createElement(React.Fragment, null,
         React.createElement("div", { className: "field" },
           React.createElement("label", { className: "label", style: { color: "rgba(255,255,255,0.8)" } }, "어르신 성함"),
-          React.createElement("input", { className: "input", placeholder: "예) 김순자", value: form.patientName, onChange: e => set("patientName", e.target.value), onKeyDown: handleKeyDown })
+          React.createElement("input", { className: "input", placeholder: "예) 김순자", value: form.patientName, onChange: e => set("patientName", e.target.value.trim()), onKeyDown: handleKeyDown })
         ),
         React.createElement("div", { className: "field" },
           React.createElement("label", { className: "label", style: { color: "rgba(255,255,255,0.8)" } }, "어르신 생년월일"),
@@ -424,7 +424,7 @@ function GuardianSignupScreen({ onBack, onDone }) {
         React.createElement("div", { style: { fontWeight: 700, color: "#1e3a5f", marginBottom: 16 } }, "어르신 정보"),
         React.createElement("div", { className: "field" },
           React.createElement("label", { className: "label" }, "성함 *"),
-          React.createElement("input", { className: "input", placeholder: "예) 김순자", value: form.patientName, onChange: e => set("patientName", e.target.value), onKeyDown: handleKeyDown })
+          React.createElement("input", { className: "input", placeholder: "예) 김순자", value: form.patientName, onChange: e => set("patientName", e.target.value.trim()), onKeyDown: handleKeyDown })
         ),
         React.createElement("div", { className: "field" },
           React.createElement("label", { className: "label" }, "생년월일 *"),
@@ -1042,9 +1042,12 @@ function GuardianScreen({ user, onBack }) {
       }).then(r => r.json())
     ])
     .then(([todayData, histData]) => {
-      setRecord(todayData.record);
+      const todayRecord = todayData.record;
+      setRecord(todayRecord);
       const records = Array.isArray(histData) ? histData : [];
       const filled = frames.map(date => {
+        // 오늘 날짜는 get_today_record 결과 우선 사용
+        if (todayRecord && date === todayRecord.date) return todayRecord;
         const found = records.find(r => r.date === date);
         return found || { date, _empty: true };
       });
@@ -1429,8 +1432,23 @@ function GuardianScreen({ user, onBack }) {
 
               // 펼쳐지는 상세
               showDetail && React.createElement("div", { style: { marginTop: 12 } },
+                // 낙상위험 강조 표시 (있을 때)
+                record.fall_risk && ["높음","매우 높음"].includes(record.fall_risk) &&
+                  React.createElement("div", { style: { background: "#fff7ed", borderRadius: 10, padding: "10px 14px", marginBottom: 8, border: "1.5px solid #fed7aa", display: "flex", alignItems: "center", gap: 8 } },
+                    React.createElement("span", { style: { fontSize: 18 } }, "⚠️"),
+                    React.createElement("span", { style: { fontSize: 15, fontWeight: 800, color: "#c2410c" } }, `낙상위험 ${record.fall_risk}`)
+                  ),
+                // 상세 항목 그리드
                 React.createElement("div", { style: { display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 6, marginBottom: 10 } },
-                  infoItems.filter(i => !["의식수준","식사량","식사형태","이동","통증"].includes(i.label)).map((item, i) => {
+                  [
+                    ["수면", record.sleep_hours],
+                    ["낙상위험", record.fall_risk],
+                    ["소변", record.urine],
+                    ["대변", record.bowel],
+                    ["투약", record.medication],
+                    ["욕창", record.bedsore],
+                    ["위생", record.hygiene],
+                  ].filter(([,v]) => v).map(([k, v], i) => {
                     const colors = [
                       { bg: "#eff6ff", border: "#bfdbfe", label: "#1d4ed8", value: "#1e3a5f" },
                       { bg: "#f0fdf4", border: "#bbf7d0", label: "#15803d", value: "#14532d" },
@@ -1440,16 +1458,22 @@ function GuardianScreen({ user, onBack }) {
                       { bg: "#fef2f2", border: "#fecaca", label: "#b91c1c", value: "#7f1d1d" },
                     ];
                     const c = colors[i % colors.length];
-                    return React.createElement("div", { key: i, style: { padding: "8px 10px", background: c.bg, borderRadius: 10, border: `1.5px solid ${c.border}` } },
-                      React.createElement("div", { style: { fontSize: 15, color: c.label, fontWeight: 700, marginBottom: 3 } }, item.label),
-                      React.createElement("div", { style: { fontSize: 15, fontWeight: 800, color: c.value } }, item.value)
+                    return React.createElement("div", { key: k, style: { padding: "8px 10px", background: c.bg, borderRadius: 10, border: `1.5px solid ${c.border}` } },
+                      React.createElement("div", { style: { fontSize: 13, color: c.label, fontWeight: 700, marginBottom: 3 } }, k),
+                      React.createElement("div", { style: { fontSize: 15, fontWeight: 800, color: c.value } }, v)
                     );
                   })
                 ),
+                // BPSD
                 (record.mental || record.bprs) && React.createElement(BpsdDisplay, {
                   value: record.bprs || record.mental,
-                  style: { marginBottom: 12 }
-                })
+                  style: { marginBottom: 8 }
+                }),
+                // 간호사 코멘트
+                record.nurse_note && React.createElement("div", { style: { background: "#f0f9ff", borderRadius: 10, padding: "10px 14px", border: "1.5px solid #bae6fd" } },
+                  React.createElement("div", { style: { fontSize: 13, fontWeight: 800, color: "#0369a1", marginBottom: 4, paddingBottom: 4, borderBottom: "1px solid #bae6fd" } }, "💬 간호사 코멘트"),
+                  React.createElement("div", { style: { fontSize: 15, color: "#0c4a6e", lineHeight: 1.7 } }, record.nurse_note)
+                )
               )
             ),
             record.doctor_findings?.length > 0 && (() => {
