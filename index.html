@@ -2807,6 +2807,7 @@ function DoctorReviewScreen({ patient, user, onBack }) {
   const [warmMsg, setWarmMsg] = useState("");
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [noChange, setNoChange] = useState(null); // null=미선택, true=변화없음, false=변화있음
   const [tab, setTab] = useState("today");
   const [history, setHistory] = useState([]);
   const [histLoading, setHistLoading] = useState(false);
@@ -2884,12 +2885,13 @@ function DoctorReviewScreen({ patient, user, onBack }) {
       await api("save_record", { patientId: patient.id, date: today(), recordData: {
         doctor_findings: findings,
         bprs: bprs.join(" · "),
-        special_alerts: specialAlerts.join(" · "),
+        special_alerts: noChange ? "" : specialAlerts.join(" · "),
         doctor_id: user.doctor_id,
         warm_msg: warmMsg,
-        reviewed_at: now()
+        reviewed_at: now(),
+        no_change: noChange
       }});
-      alert("저장됐어요!");
+      alert(noChange ? "변화없음으로 저장됐어요!" : "저장됐어요!");
       onBack();
     } catch(e) { alert("저장 실패"); }
     finally { setSaving(false); }
@@ -3117,8 +3119,8 @@ function DoctorReviewScreen({ patient, user, onBack }) {
         )
       ),
 
-      // 보호자 전달 특이사항 (증상+처치 세트)
-      React.createElement("div", { style: { background: "white", borderRadius: 14, marginBottom: 12, overflow: "hidden", boxShadow: "0 1px 6px rgba(0,0,0,0.06)" } },
+      // 변화있음 선택시만 입력 섹션 표시
+      noChange === false && React.createElement("div", { style: { background: "white", borderRadius: 14, marginBottom: 12, overflow: "hidden", boxShadow: "0 1px 6px rgba(0,0,0,0.06)" } },
         React.createElement("div", { style: { background: "linear-gradient(135deg,#1e3a5f,#2c5282)", padding: "10px 16px", fontSize: 15, fontWeight: 700, color: "white" } }, "💬 보호자에게 전달할 상태"),
         React.createElement("div", { style: { padding: 14 } },
 
@@ -3212,6 +3214,53 @@ function DoctorReviewScreen({ patient, user, onBack }) {
       ),
 
       React.createElement(WarmMessagePicker, { value: warmMsg, onChange: setWarmMsg }),
+
+      // 변화없음 / 변화있음 선택
+      React.createElement("div", { style: { marginBottom: 12, background: "white", borderRadius: 14, padding: 16, boxShadow: "0 1px 6px rgba(0,0,0,0.06)" } },
+        React.createElement("div", { style: { fontSize: 15, fontWeight: 800, color: "#1e3a5f", marginBottom: 12 } }, "오늘 어르신 상태"),
+        React.createElement("div", { style: { display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10 } },
+          // 변화없음
+          React.createElement("button", {
+            onClick: () => { setNoChange(true); setSpecialAlerts([]); },
+            style: {
+              padding: "14px 10px", borderRadius: 12, border: "2px solid",
+              borderColor: noChange === true ? "#059669" : "#e2e8f0",
+              background: noChange === true ? "linear-gradient(135deg,#059669,#10b981)" : "#f8fafc",
+              color: noChange === true ? "white" : "#475569",
+              fontSize: 15, fontWeight: 800, cursor: "pointer",
+              fontFamily: "'Noto Sans KR',sans-serif",
+              display: "flex", flexDirection: "column", alignItems: "center", gap: 6,
+              transition: "all 0.2s"
+            }
+          },
+            React.createElement("span", { style: { fontSize: 24 } }, "😊"),
+            React.createElement("span", null, "변화없음"),
+            React.createElement("span", { style: { fontSize: 13, fontWeight: 400, opacity: 0.85 } }, "어제와 비슷해요")
+          ),
+          // 변화있음
+          React.createElement("button", {
+            onClick: () => setNoChange(false),
+            style: {
+              padding: "14px 10px", borderRadius: 12, border: "2px solid",
+              borderColor: noChange === false ? "#2563eb" : "#e2e8f0",
+              background: noChange === false ? "linear-gradient(135deg,#1e3a5f,#2563eb)" : "#f8fafc",
+              color: noChange === false ? "white" : "#475569",
+              fontSize: 15, fontWeight: 800, cursor: "pointer",
+              fontFamily: "'Noto Sans KR',sans-serif",
+              display: "flex", flexDirection: "column", alignItems: "center", gap: 6,
+              transition: "all 0.2s"
+            }
+          },
+            React.createElement("span", { style: { fontSize: 24 } }, "📋"),
+            React.createElement("span", null, "변화있음"),
+            React.createElement("span", { style: { fontSize: 13, fontWeight: 400, opacity: 0.85 } }, "내용을 입력해요")
+          )
+        ),
+        noChange === true && React.createElement("div", { style: { marginTop: 10, padding: "8px 12px", background: "#f0fdf4", borderRadius: 8, fontSize: 13, color: "#166534" } },
+          "✅ 특이사항 없이 저장됩니다. 케어팀 한마디는 아래에서 선택 가능해요."
+        )
+      ),
+
       React.createElement("button", { className: "btn btn-dark", onClick: handleSave, disabled: saving }, saving ? "저장 중..." : "💾 저장 및 전달")
       ) // today tab 닫기
     )
