@@ -2303,7 +2303,7 @@ function NurseRecordScreen({ patient, user, onBack, onSaved }) {
 
   const Lbl = ({ text }) => React.createElement("div", { style: { fontSize: 15, color: "#475569", fontWeight: 700, marginBottom: 6, marginTop: 10 } }, text);
 
-  const Btn = ({ label, active, onClick, color, small }) => React.createElement("button", {
+  const Btn = ({ label, active, onClick, color, small, style: extraStyle }) => React.createElement("button", {
     onClick,
     style: {
       padding: small ? "6px 11px" : "8px 14px",
@@ -2313,7 +2313,8 @@ function NurseRecordScreen({ patient, user, onBack, onSaved }) {
       color: active ? "white" : "#374151",
       fontSize: 15, fontWeight: 600, cursor: "pointer",
       fontFamily: "'Noto Sans KR',sans-serif", transition: "all 0.15s",
-      whiteSpace: "nowrap"
+      whiteSpace: "nowrap",
+      ...extraStyle
     }
   }, label);
 
