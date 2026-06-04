@@ -1453,17 +1453,16 @@ function GuardianScreen({ user, onBack }) {
 
               // 펼쳐지는 상세
               showDetail && React.createElement("div", { style: { marginTop: 12 } },
-                // 낙상위험 강조 표시 (있을 때)
+                // 낙상위험 강조 (높음/매우높음만, 중복 없이 여기서만 표시)
                 record.fall_risk && ["높음","매우 높음"].includes(record.fall_risk) &&
                   React.createElement("div", { style: { background: "#fff7ed", borderRadius: 10, padding: "10px 14px", marginBottom: 8, border: "1.5px solid #fed7aa", display: "flex", alignItems: "center", gap: 8 } },
                     React.createElement("span", { style: { fontSize: 18 } }, "⚠️"),
-                    React.createElement("span", { style: { fontSize: 15, fontWeight: 800, color: "#c2410c" } }, `낙상위험 ${record.fall_risk}`)
+                    React.createElement("span", { style: { fontSize: 15, fontWeight: 800, color: "#c2410c" } }, `낙상위험 ${record.fall_risk} — 이동 시 반드시 부축이 필요해요`)
                   ),
-                // 상세 항목 그리드
+                // 상세 항목 그리드 (낙상위험 제외 — 위에서 강조 표시)
                 React.createElement("div", { style: { display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 6, marginBottom: 10 } },
                   [
                     ["수면", record.sleep_hours],
-                    ["낙상위험", record.fall_risk],
                     ["소변", record.urine],
                     ["대변", record.bowel],
                     ["투약", record.medication],
@@ -1489,20 +1488,50 @@ function GuardianScreen({ user, onBack }) {
                 (record.mental || record.bprs) && React.createElement(BpsdDisplay, {
                   value: record.bprs || record.mental,
                   style: { marginBottom: 8 }
-                })
+                }),
+                // 의사 입력 — 임상검사
+                record.doctor_findings?.length > 0 && (() => {
+                  const examKeywords = ["검사","엑스레이","혈액","소변검사","심전도","CT","MRI","초음파","배양","조직"];
+                  const exams = record.doctor_findings.filter(f => examKeywords.some(k => f.includes(k)));
+                  return exams.length > 0 && React.createElement("div", { style: { background: "#f0f9ff", borderRadius: 10, padding: "10px 14px", marginBottom: 8, border: "1.5px solid #bae6fd" } },
+                    React.createElement("div", { style: { fontSize: 13, fontWeight: 800, color: "#0369a1", marginBottom: 6, paddingBottom: 4, borderBottom: "1px solid #bae6fd" } }, "🔬 임상 검사"),
+                    React.createElement("div", { style: { display: "flex", flexWrap: "wrap", gap: 6 } },
+                      exams.map((f, i) => React.createElement("span", { key: i, style: { background: "#e0f2fe", color: "#0369a1", borderRadius: 8, fontSize: 13, fontWeight: 600, padding: "3px 10px", border: "1px solid #bae6fd" } }, f))
+                    )
+                  );
+                })(),
+                // 의사 입력 — 특이사항 (태그별 색상)
+                record?.reviewed_at && record?.special_alerts && record.special_alerts.length > 0 && (() => {
+                  const raw = (() => {
+                    const sa = record.special_alerts;
+                    if (Array.isArray(sa)) return sa;
+                    if (typeof sa === "string") return sa.split(/\s*·\s*/).map(s => s.trim()).filter(Boolean);
+                    return [];
+                  })();
+                  const getTag = (a) => { const m = a.match(/^\[([STRCD])\]/); return m ? m[1] : null; };
+                  const strip = (a) => a.replace(/^\[[STRCD]\]/, "");
+                  const sections = [
+                    { tag: "S", label: "⚠️ 현재 상태", bg: "#fff1f2", color: "#be123c", border: "#fecdd3" },
+                    { tag: "T", label: "🩺 처치·치료 중", bg: "#eff6ff", color: "#1d4ed8", border: "#bfdbfe" },
+                    { tag: "R", label: "✅ 호전되는 상황", bg: "#f0fdf4", color: "#166534", border: "#bbf7d0" },
+                    { tag: "D", label: "🟢 치료 종료", bg: "#dcfce7", color: "#14532d", border: "#86efac" },
+                    { tag: "C", label: "📋 보호자 동의 필요", bg: "#fffbeb", color: "#92400e", border: "#fde68a" },
+                  ];
+                  const hasAny = sections.some(s => raw.some(a => getTag(a) === s.tag));
+                  if (!hasAny) return null;
+                  return React.createElement("div", { style: { marginBottom: 6 } },
+                    sections.map(sec => {
+                      const items = raw.filter(a => getTag(a) === sec.tag).map(strip);
+                      if (!items.length) return null;
+                      return React.createElement("div", { key: sec.tag, style: { background: sec.bg, borderRadius: 8, padding: "7px 10px", marginBottom: 5, border: `1px solid ${sec.border}` } },
+                        React.createElement("div", { style: { fontSize: 13, fontWeight: 800, color: sec.color, marginBottom: 3 } }, sec.label),
+                        items.map((item, i) => React.createElement("div", { key: i, style: { fontSize: 14, color: sec.color, lineHeight: 1.6 } }, `• ${item}`))
+                      );
+                    })
+                  );
+                })()
               )
             ),
-            record.doctor_findings?.length > 0 && (() => {
-              // 검사항목만 필터링
-              const examKeywords = ["검사","엑스레이","혈액","소변","심전도","CT","MRI","초음파","배양","조직"];
-              const exams = record.doctor_findings.filter(f => examKeywords.some(k => f.includes(k)));
-              return exams.length > 0 && React.createElement("div", { className: "card", style: { marginBottom: 12 } },
-                React.createElement("div", { style: { fontWeight: 700, color: "#1e3a5f", marginBottom: 10 } }, "🔬 임상 검사"),
-                React.createElement("div", { style: { display: "flex", flexWrap: "wrap", gap: 6 } },
-                  exams.map((f, i) => React.createElement("span", { key: i, className: "tag tag-blue" }, f))
-                )
-              );
-            })(),
             // 특이사항 (의사 검토 완료 후)
             record?.reviewed_at && record?.special_alerts && record.special_alerts.length > 0 && (() => {
               const raw = (() => {
