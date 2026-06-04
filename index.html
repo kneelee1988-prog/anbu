@@ -2318,7 +2318,7 @@ function NurseRecordScreen({ patient, user, onBack, onSaved }) {
   }, label);
 
   const BtnRow = ({ children }) => React.createElement("div", { style: { display: "flex", flexWrap: "wrap", gap: 6, marginBottom: 4 } }, children);
-  const BtnGrid = ({ children }) => React.createElement("div", { style: { display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 6 } }, children);
+  const BtnGrid = ({ children }) => React.createElement("div", { style: { display: "grid", gridTemplateColumns: "repeat(3, minmax(0, 1fr))", gap: 6 } }, children);
 
   if (loading) return React.createElement("div", { className: "loading", style: { paddingTop: 80 } }, "불러오는 중...");
 
@@ -2493,9 +2493,11 @@ function NurseRecordScreen({ patient, user, onBack, onSaved }) {
            "망상","혼잣말","고집스러움","배회",
            "판단력저하","다칠위험있는 행동반복"
           ].map(v =>
-            React.createElement(Btn, { key: v, label: v, small: true,
+            React.createElement(Btn, { key: v,
+              label: v === "다칠위험있는 행동반복" ? "다칠위험있는\n행동반복" : v,
+              small: true,
               active: form.mental.includes(v),
-              style: { wordBreak: "keep-all", whiteSpace: "normal", lineHeight: 1.3 },
+              style: { wordBreak: "keep-all", whiteSpace: "pre-line", lineHeight: 1.3, overflow: "hidden", minWidth: 0 },
               onClick: () => {
                 if (v === "이상없음") {
                   setForm(f => ({ ...f, mental: f.mental.includes("이상없음") ? [] : ["이상없음"] }));
