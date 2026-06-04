@@ -1425,22 +1425,42 @@ function GuardianScreen({ user, onBack }) {
                   record.reviewed_at && React.createElement("div", { style: { fontSize: 15, color: "#94a3b8", marginTop: 4 } }, `${fmtDate(record.reviewed_at)} 주치의 검토`)
                 )
               ),
-              // 핵심 4가지만 항상 표시
+              // 핵심 4가지 — 의사 입력 기반
               React.createElement("div", { style: { display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8, marginBottom: 12 } },
-                [
-                  { label: "🧠 의식", value: record.consciousness },
-                  { label: "🍽️ 식사", value: record.meal_amount ? `${record.meal_amount}${record.meal_type ? ` (${record.meal_type})` : ""}` : null },
-                  { label: "🚶 활동", value: record.mobility },
-                  { label: "💊 통증", value: record.pain != null ? `${record.pain}점` : null },
-                ].filter(i => i.value).map((item, i) =>
-                  React.createElement("div", { key: i, style: {
-                    background: "white", borderRadius: 10, padding: "10px 14px",
-                    border: "1.5px solid rgba(0,0,0,0.07)"
-                  } },
-                    React.createElement("div", { style: { fontSize: 15, color: "#64748b", fontWeight: 700, marginBottom: 3 } }, item.label),
-                    React.createElement("div", { style: { fontSize: 16, fontWeight: 800, color: "#1e293b" } }, item.value)
-                  )
-                )
+                (() => {
+                  const sa = record.special_alerts;
+                  const raw = sa ? (Array.isArray(sa) ? sa : sa.split(/\s*·\s*/).map(s=>s.trim()).filter(Boolean)) : [];
+                  const getTag = (a) => { const m = a.match(/^\[([STRCD])\]/); return m ? m[1] : null; };
+                  const strip = (a) => a.replace(/^\[[STRCD]\]/, "");
+                  const symptoms = raw.filter(a => getTag(a) === "S").map(strip);
+                  const treating = raw.filter(a => getTag(a) === "T").map(strip);
+                  const consent  = raw.filter(a => getTag(a) === "C").map(strip);
+
+                  return [
+                    // ① 현재 상태 ([S]) — 없으면 의식/식사로 대체
+                    symptoms.length > 0
+                      ? { label: "⚠️ 현재 상태", value: symptoms[0] + (symptoms.length > 1 ? ` 외 ${symptoms.length-1}건` : ""), bg: "#fff1f2", border: "#fecdd3", color: "#be123c" }
+                      : { label: "🧠 의식", value: record.consciousness, bg: "white", border: "rgba(0,0,0,0.07)", color: "#1e293b" },
+                    // ② 처치·치료 중 ([T]) — 없으면 식사로 대체
+                    treating.length > 0
+                      ? { label: "🩺 처치 중", value: treating[0] + (treating.length > 1 ? ` 외 ${treating.length-1}건` : ""), bg: "#eff6ff", border: "#bfdbfe", color: "#1d4ed8" }
+                      : { label: "🍽️ 식사", value: record.meal_amount ? `${record.meal_amount}${record.meal_type?` (${record.meal_type})`:""}` : null, bg: "white", border: "rgba(0,0,0,0.07)", color: "#1e293b" },
+                    // ③ 수면 + 이동
+                    { label: "😴 수면 · 🚶 이동", value: [record.sleep_hours, record.mobility].filter(Boolean).join(" / ") || null, bg: "white", border: "rgba(0,0,0,0.07)", color: "#1e293b" },
+                    // ④ 보호자 동의 필요 ([C]) — 없으면 통증으로 대체
+                    consent.length > 0
+                      ? { label: "📋 동의 필요", value: `${consent.length}건 확인 필요`, bg: "#fffbeb", border: "#fde68a", color: "#92400e" }
+                      : { label: "💊 통증", value: record.pain != null ? `${record.pain}점` : null, bg: "white", border: "rgba(0,0,0,0.07)", color: "#1e293b" },
+                  ].filter(i => i.value).map((item, i) =>
+                    React.createElement("div", { key: i, style: {
+                      background: item.bg, borderRadius: 10, padding: "10px 14px",
+                      border: `1.5px solid ${item.border}`
+                    } },
+                      React.createElement("div", { style: { fontSize: 13, color: "#64748b", fontWeight: 700, marginBottom: 3 } }, item.label),
+                      React.createElement("div", { style: { fontSize: 14, fontWeight: 800, color: item.color, lineHeight: 1.4 } }, item.value)
+                    )
+                  );
+                })()
               ),
               // 펼치기 버튼
               React.createElement("button", {
