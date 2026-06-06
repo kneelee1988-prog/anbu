@@ -1687,6 +1687,60 @@ function GuardianScreen({ user, onBack }) {
             !record?.reviewed_at && React.createElement("div", { style: { marginBottom: 12, background: "#f8fafc", borderRadius: 14, padding: "16px", textAlign: "center", border: "1.5px dashed #e2e8f0" } },
               React.createElement("div", { style: { fontSize: 15, color: "#94a3b8" } }, "🩺 주치의 검토 후 최종 내용이 전달될 예정이에요.")
             ),
+
+            // 주치의 하루 소감 (daily_story) - 보호자에게 표시
+            record?.reviewed_at && (
+              record?.daily_story
+              ? React.createElement("div", { style: {
+                  marginBottom: 12, borderRadius: 16, overflow: "hidden",
+                  boxShadow: "0 6px 28px rgba(10,20,60,0.28)"
+                } },
+                // 헤더
+                React.createElement("div", { style: {
+                  background: "linear-gradient(135deg,#0a1628,#0f2a50)",
+                  padding: "12px 16px",
+                  display: "flex", alignItems: "center", gap: 10,
+                  borderBottom: "1px solid rgba(255,255,255,0.07)"
+                } },
+                  React.createElement("div", { style: { fontSize: 18 } }, "✍️"),
+                  React.createElement("div", { style: { fontSize: 15, fontWeight: 800, color: "white", letterSpacing: "0.3px" } }, "주치의 하루 소감")
+                ),
+                // 액자 본문
+                React.createElement("div", { style: {
+                  background: "linear-gradient(160deg,#0d1f3c,#122040)",
+                  padding: "20px 18px 18px", position: "relative"
+                } },
+                  React.createElement("div", { style: { position: "absolute", inset: 7, border: "1px solid rgba(255,255,255,0.07)", borderRadius: 10, pointerEvents: "none" } }),
+                  React.createElement("div", { style: { position: "absolute", inset: 12, border: "1px solid rgba(255,255,255,0.04)", borderRadius: 8, pointerEvents: "none" } }),
+                  React.createElement("div", { style: {
+                    fontSize: 15, color: "rgba(255,255,255,0.88)",
+                    lineHeight: 1.9, whiteSpace: "pre-wrap",
+                    position: "relative", zIndex: 1, fontWeight: 400
+                  } }, record.daily_story),
+                  React.createElement("div", { style: {
+                    marginTop: 14, textAlign: "right",
+                    fontSize: 13, color: "rgba(255,255,255,0.4)",
+                    fontStyle: "italic", position: "relative", zIndex: 1
+                  } }, `— 주치의 ${record.doctor_name || ""} 드림`)
+                )
+              )
+              : record?.story_skipped
+              ? React.createElement("div", { style: { marginBottom: 12, borderRadius: 14, overflow: "hidden", boxShadow: "0 2px 10px rgba(10,20,60,0.15)" } },
+                  React.createElement("div", { style: { background: "linear-gradient(135deg,#1e293b,#334155)", padding: "10px 16px", display: "flex", alignItems: "center", gap: 8 } },
+                    React.createElement("div", { style: { fontSize: 14 } }, "🌙"),
+                    React.createElement("div", { style: { fontSize: 14, fontWeight: 700, color: "rgba(255,255,255,0.7)" } }, "주치의 하루 소감")
+                  ),
+                  React.createElement("div", { style: { background: "#1e293b", padding: "14px 16px", textAlign: "center" } },
+                    React.createElement("div", { style: { fontSize: 14, color: "rgba(255,255,255,0.4)", lineHeight: 1.7 } },
+                      "오늘은 케어에 집중하느라 소감을 남기지 못하셨어요.",
+                      React.createElement("br"),
+                      "내일도 어르신 곁에서 최선을 다해 돌봐드릴 거예요. 🙏"
+                    )
+                  )
+                )
+              : null
+            ),
+
             // 고정 안내 문구
             React.createElement("div", { style: { marginBottom: 12, background: "#fef2f2", borderRadius: 14, padding: "16px", border: "2px solid #fca5a5" } },
               React.createElement("div", { style: { display: "flex", alignItems: "center", gap: 8, marginBottom: 10 } },
@@ -2857,6 +2911,8 @@ function DoctorReviewScreen({ patient, user, onBack }) {
   const [bprs, setBprs] = useState([]);
   const [specialAlerts, setSpecialAlerts] = useState([]);
   const [warmMsg, setWarmMsg] = useState("");
+  const [dailyStory, setDailyStory] = useState("");
+  const [storySkipped, setStorySkipped] = useState(false);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [noChange, setNoChange] = useState(null); // null=미선택, true=변화없음, false=변화있음
@@ -2881,6 +2937,8 @@ function DoctorReviewScreen({ patient, user, onBack }) {
           setRecord(d.record);
           setFindings(d.record.doctor_findings || []);
           setWarmMsg(d.record.warm_msg || "");
+          setDailyStory(d.record.daily_story || "");
+          setStorySkipped(d.record.story_skipped || false);
           const b = d.record.bprs;
           setBprs(b ? (Array.isArray(b) ? b : b.split("·").map(s=>s.trim()).filter(Boolean)) : []);
           const sa = d.record.special_alerts;
@@ -2940,6 +2998,8 @@ function DoctorReviewScreen({ patient, user, onBack }) {
         special_alerts: noChange ? "" : specialAlerts.join(" · "),
         doctor_id: user.doctor_id,
         warm_msg: warmMsg,
+        daily_story: storySkipped ? "" : dailyStory,
+        story_skipped: storySkipped,
         reviewed_at: now(),
         no_change: noChange
       }});
@@ -3311,6 +3371,92 @@ function DoctorReviewScreen({ patient, user, onBack }) {
       ),
 
       React.createElement(WarmMessagePicker, { value: warmMsg, onChange: setWarmMsg }),
+
+      // ── 주치의 하루 소감 (Daily Story) ──────────────────────
+      React.createElement("div", { style: { marginBottom: 16, borderRadius: 16, overflow: "hidden", boxShadow: "0 4px 20px rgba(10,20,60,0.22)" } },
+        // 헤더
+        React.createElement("div", { style: {
+          background: "linear-gradient(135deg,#0a1628,#0f2a50)",
+          padding: "12px 16px",
+          display: "flex", alignItems: "center", gap: 10,
+          borderBottom: "1px solid rgba(255,255,255,0.08)"
+        } },
+          React.createElement("div", { style: { fontSize: 18 } }, "✍️"),
+          React.createElement("div", null,
+            React.createElement("div", { style: { fontSize: 15, fontWeight: 800, color: "white", letterSpacing: "0.3px" } }, "주치의 하루 소감"),
+            React.createElement("div", { style: { fontSize: 12, color: "rgba(255,255,255,0.5)", marginTop: 1 } }, "보호자·간호사에게 전달됩니다")
+          ),
+          React.createElement("div", { style: { marginLeft: "auto" } },
+            storySkipped
+              ? React.createElement("span", { style: { background: "#64748b", color: "white", borderRadius: 8, fontSize: 12, fontWeight: 700, padding: "3px 10px" } }, "SKIP")
+              : dailyStory
+                ? React.createElement("span", { style: { background: "#22c55e", color: "white", borderRadius: 8, fontSize: 12, fontWeight: 700, padding: "3px 10px" } }, "작성 중")
+                : null
+          )
+        ),
+        // 액자 안쪽 영역
+        React.createElement("div", { style: {
+          background: "linear-gradient(160deg,#0d1f3c,#122040)",
+          padding: "18px 16px 16px",
+          position: "relative"
+        } },
+          // 액자 장식선
+          React.createElement("div", { style: {
+            position: "absolute", inset: 6,
+            border: "1px solid rgba(255,255,255,0.07)",
+            borderRadius: 10, pointerEvents: "none"
+          } }),
+          React.createElement("div", { style: {
+            position: "absolute", inset: 10,
+            border: "1px solid rgba(255,255,255,0.04)",
+            borderRadius: 8, pointerEvents: "none"
+          } }),
+
+          storySkipped
+          ? React.createElement("div", { style: { textAlign: "center", padding: "20px 0" } },
+              React.createElement("div", { style: { fontSize: 32, marginBottom: 10 } }, "🌙"),
+              React.createElement("div", { style: { fontSize: 14, color: "rgba(255,255,255,0.45)", lineHeight: 1.7 } },
+                "오늘은 소감을 남기지 않으셨어요.",
+                React.createElement("br"),
+                "보호자분께는 케어팀이 함께하고 있음을 전달해 드려요."
+              ),
+              React.createElement("button", {
+                onClick: () => { setStorySkipped(false); setDailyStory(""); },
+                style: { marginTop: 14, background: "rgba(255,255,255,0.12)", border: "1px solid rgba(255,255,255,0.2)", color: "rgba(255,255,255,0.7)", borderRadius: 8, padding: "7px 18px", fontSize: 13, fontWeight: 600, cursor: "pointer", fontFamily: "'Noto Sans KR',sans-serif" }
+              }, "다시 작성하기")
+            )
+          : React.createElement(React.Fragment, null,
+              React.createElement("textarea", {
+                value: dailyStory,
+                onChange: e => setDailyStory(e.target.value),
+                placeholder: `오늘 ${patient.name} 어르신을 진료하며 느낀 점, 관찰하신 삶의 모습을 자유롭게 적어주세요.\n\n보호자분들께 큰 위로와 감사가 됩니다. 🙏`,
+                style: {
+                  width: "100%", minHeight: 140,
+                  background: "rgba(255,255,255,0.05)",
+                  border: "1px solid rgba(255,255,255,0.12)",
+                  borderRadius: 10, padding: "12px 14px",
+                  fontSize: 14, color: "rgba(255,255,255,0.9)",
+                  lineHeight: 1.8, fontFamily: "'Noto Sans KR',sans-serif",
+                  resize: "vertical", outline: "none",
+                  position: "relative", zIndex: 1
+                }
+              }),
+              // 서명 미리보기
+              dailyStory && React.createElement("div", { style: {
+                marginTop: 10, textAlign: "right",
+                fontSize: 13, color: "rgba(255,255,255,0.45)",
+                fontStyle: "italic", paddingRight: 4, position: "relative", zIndex: 1
+              } }, `— 주치의 ${user.name} 드림`),
+              // SKIP 버튼
+              React.createElement("div", { style: { display: "flex", justifyContent: "flex-end", marginTop: 12, position: "relative", zIndex: 1 } },
+                React.createElement("button", {
+                  onClick: () => { setStorySkipped(true); setDailyStory(""); },
+                  style: { background: "rgba(100,116,139,0.35)", border: "1px solid rgba(100,116,139,0.4)", color: "rgba(255,255,255,0.55)", borderRadius: 8, padding: "7px 18px", fontSize: 13, fontWeight: 600, cursor: "pointer", fontFamily: "'Noto Sans KR',sans-serif", letterSpacing: "0.5px" }
+                }, "SKIP")
+              )
+            )
+        )
+      ),
 
       React.createElement("button", { className: "btn btn-dark", onClick: handleSave, disabled: saving }, saving ? "저장 중..." : "💾 저장 및 전달")
       ) // today tab 닫기
