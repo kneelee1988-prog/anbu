@@ -3498,13 +3498,6 @@ function DoctorReviewScreen({ patient, user, onBack }) {
         )
       ),
 
-      // 저장 후 의사 자신도 볼 수 있도록 — 저장된 소감 미리보기
-      record?.daily_story && React.createElement(DoctorStoryCard, {
-        dailyStory: record.daily_story,
-        storySkipped: record.story_skipped,
-        doctorName: user.name
-      }),
-
       React.createElement("button", { className: "btn btn-dark", onClick: handleSave, disabled: saving }, saving ? "저장 중..." : "💾 저장 및 전달")
       ) // today tab 닫기
     )
