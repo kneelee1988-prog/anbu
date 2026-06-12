@@ -2863,23 +2863,23 @@ function DoctorReviewScreen({ patient, user, onBack }) {
   // 증상+처치 세트 (클릭 한 번에 쌍으로 전달)
   const ALERT_SETS = [
     { label: "🌡️ 발열", bad: "열이 나고 있습니다", good: "해열제를 투약하며 관찰 중입니다" },
-    { label: "🫁 폐렴", bad: "폐렴 소견이 있습니다", good: "폐렴 치료를 시작하였습니다" },
-    { label: "🦠 패혈증", bad: "패혈증 소견이 있습니다", good: "패혈증 치료를 시작하였습니다" },
-    { label: "💧 요로감염", bad: "요로감염 소견이 있습니다", good: "항생제를 투약 중입니다" },
-    { label: "😮‍💨 산소포화도 저하", bad: "산소포화도가 낮습니다", good: "산소를 공급하며 관찰 중입니다" },
+    { label: "🫁 폐렴", bad: "폐렴 소견이 관찰됩니다", good: "폐렴 치료를 시작하였습니다" },
+    { label: "🦠 패혈증", bad: "패혈증 소견이 관찰됩니다", good: "패혈증 치료를 시작하였습니다" },
+    { label: "💧 요로감염", bad: "요로감염 소견이 관찰됩니다", good: "항생제를 투약 중입니다" },
+    { label: "😮‍💨 산소포화도 저하", bad: "산소포화도가 불안정합니다", good: "산소를 공급하며 관찰 중입니다" },
     { label: "💨 호흡곤란", bad: "호흡이 불편해 보입니다", good: "산소 공급 및 호흡 보조 중입니다" },
-    { label: "🫀 혈압불안정", bad: "혈압이 불안정합니다", good: "혈압을 자주 확인하며 조절 중입니다" },
-    { label: "😴 의식저하", bad: "의식이 저하되어 있습니다", good: "의식저하 유발 약물을 최소화하였습니다" },
-    { label: "🍽️ 식욕저하", bad: "식욕이 저하되어 있습니다", good: "식이 권유 하고 있습니다. 계속 식이 저하시 식욕촉진제가 필요할 수 있으며, 기간이 길어질 경우 L-tube 삽입이 필요할 수도 있습니다 (보호자 동의)" },
-    { label: "🌊 흡인위험", bad: "삼키는 것이 불편해 보입니다", good: "연하곤란에 대해 집중 관찰 중이며 식이 보조 중입니다. 연하곤란 지속시 L-tube 삽입이 필요할 수 있습니다 (보호자 동의)" },
-    { label: "🩹 욕창", bad: "욕창이 있습니다", good: "욕창 처치를 하고 있습니다" },
-    { label: "💊 통증", bad: "통증을 호소하고 있습니다", good: "통증을 조절하고 있습니다" },
-    { label: "💉 혈당불안정", bad: "혈당이 불안정합니다", good: "계속 관찰 및 식이조절 중이며, 인슐린 주사가 필요할 경우 적용합니다" },
-    { label: "🫧 부종", bad: "부종이 있습니다", good: "부종 원인을 파악하며 처치 중입니다" },
-    { label: "🔋 기력저하", bad: "전반적으로 기력이 저하되어 있습니다", good: "약물을 조절하며 관찰 중입니다. 영양제 주사가 필요할 수 있습니다 (보호자 동의)" },
-    { label: "🩸 저알부민", bad: "영양 상태가 저하되어 있습니다", good: "알부민 주사가 필요합니다 (보호자 동의 필요)" },
-    { label: "💧 탈수", bad: "수분이 부족한 상태입니다", good: "수액을 공급하고 있습니다" },
-    { label: "🧬 전해질이상", bad: "전해질 균형이 맞지 않습니다", good: "전해질을 보충하고 있습니다" },
+    { label: "🫀 혈압불안정", bad: "혈압이 불안정하게 관찰됩니다", good: "혈압을 자주 확인하며 조절 중입니다" },
+    { label: "😴 의식저하", bad: "의식 저하가 관찰됩니다", good: "의식저하 유발 약물을 최소화하였습니다" },
+    { label: "🍽️ 식욕저하", bad: "식욕 저하가 관찰됩니다", good: "식이 권유 하고 있습니다. 계속 식이 저하시 식욕촉진제가 필요할 수 있으며, 기간이 길어질 경우 L-tube 삽입이 필요할 수도 있습니다 (보호자 동의)" },
+    { label: "🌊 흡인위험", bad: "연하 곤란이 관찰됩니다", good: "연하곤란에 대해 집중 관찰 중이며 식이 보조 중입니다. 연하곤란 지속시 L-tube 삽입이 필요할 수 있습니다 (보호자 동의)" },
+    { label: "🩹 욕창", bad: "욕창이 관찰됩니다", good: "욕창 처치를 하고 있습니다" },
+    { label: "💊 통증", bad: "통증이 관찰됩니다", good: "통증을 조절하고 있습니다" },
+    { label: "💉 혈당불안정", bad: "혈당이 불안정하게 관찰됩니다", good: "계속 관찰 및 식이조절 중이며, 인슐린 주사가 필요할 경우 적용합니다" },
+    { label: "🫧 부종", bad: "부종이 관찰됩니다", good: "부종 원인을 파악하며 처치 중입니다" },
+    { label: "🔋 기력저하", bad: "전반적 기력 저하가 관찰됩니다", good: "약물을 조절하며 관찰 중입니다. 영양제 주사가 필요할 수 있습니다 (보호자 동의)" },
+    { label: "🩸 저알부민", bad: "영양 상태 저하가 관찰됩니다", good: "알부민 주사가 필요합니다 (보호자 동의 필요)" },
+    { label: "💧 탈수", bad: "수분 부족이 관찰됩니다", good: "수액을 공급하고 있습니다" },
+    { label: "🧬 전해질이상", bad: "전해질 불균형이 관찰됩니다", good: "전해질을 보충하고 있습니다" },
     { label: "🛁 피부질환", bad: "피부 이상이 관찰됩니다", good: "피부 위생강화, 보습, 가려움증 감소를 위한 약물 투약 진행합니다. 옴 유사증상시 옴검사 시행(본원 1차 검사) 및 옴치료(오메크린 도포 및 경구약 투약 포함) 시행" },
   ];
 
@@ -3310,12 +3310,13 @@ function DoctorReviewScreen({ patient, user, onBack }) {
                   },
                   style: {
                     padding: "10px 6px", borderRadius: 10, border: "1.5px solid",
-                    borderColor: isActive ? "#2563eb" : "#bfdbfe",
-                    background: isActive ? "#2563eb" : "#eff6ff",
-                    color: isActive ? "white" : "#1d4ed8",
-                    fontSize: 15, fontWeight: 700, cursor: "pointer",
-                    fontFamily: "'Noto Sans KR',sans-serif", lineHeight: 1.4,
-                    textAlign: "center", transition: "all 0.15s"
+                    borderColor: isActive ? "#3b82f6" : "#dbeafe",
+                    background: isActive ? "#3b82f6" : "#f0f7ff",
+                    color: isActive ? "white" : "#1e40af",
+                    fontSize: 13, fontWeight: 600, cursor: "pointer",
+                    fontFamily: "'Noto Sans KR',sans-serif", lineHeight: 1.2,
+                    textAlign: "center", transition: "all 0.15s", whiteSpace: "nowrap",
+                    overflow: "hidden", textOverflow: "ellipsis"
                   }
                 }, s.label)
               })
