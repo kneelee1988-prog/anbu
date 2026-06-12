@@ -2854,7 +2854,7 @@ function DoctorReviewScreen({ patient, user, onBack }) {
       bg:"#f0f9ff", border:"#7dd3fc", activeBg:"#0369a1"
     },
     "💉 처치·투약": {
-      items: ["대증요법","항생제투여","진통제투여","수액공급","산소공급","석션시행","영양제투여","TPN","알부민투여","수혈시행","욕창치료","상처처치","L-Tube삽입","도뇨관삽입"],
+      items: ["해열제투여","대증요법","항생제투여","진통제투여","수액공급","산소공급","석션시행","영양제투여","TPN","알부민투여","수혈시행","욕창치료","상처처치","L-Tube삽입","도뇨관삽입"],
       bg:"#fff7ed", border:"#fdba74", activeBg:"#c2410c"
     },
 
@@ -2866,7 +2866,7 @@ function DoctorReviewScreen({ patient, user, onBack }) {
     { label: "🫁 폐렴", bad: "폐렴 소견이 있습니다", good: "폐렴 치료를 시작하였습니다" },
     { label: "🦠 패혈증", bad: "패혈증 소견이 있습니다", good: "패혈증 치료를 시작하였습니다" },
     { label: "💧 요로감염", bad: "요로감염 소견이 있습니다", good: "항생제를 투약 중입니다" },
-    { label: "😮‍💨 산소저하", bad: "산소포화도가 낮습니다", good: "산소를 공급하며 관찰 중입니다" },
+    { label: "😮‍💨 산소포화도 저하", bad: "산소포화도가 낮습니다", good: "산소를 공급하며 관찰 중입니다" },
     { label: "💨 호흡곤란", bad: "호흡이 불편해 보입니다", good: "산소 공급 및 호흡 보조 중입니다" },
     { label: "🫀 혈압불안정", bad: "혈압이 불안정합니다", good: "혈압을 자주 확인하며 조절 중입니다" },
     { label: "😴 의식저하", bad: "의식이 저하되어 있습니다", good: "의식저하 유발 약물을 최소화하였습니다" },
@@ -2875,7 +2875,6 @@ function DoctorReviewScreen({ patient, user, onBack }) {
     { label: "🩹 욕창", bad: "욕창이 있습니다", good: "욕창 처치를 하고 있습니다" },
     { label: "💊 통증", bad: "통증을 호소하고 있습니다", good: "통증을 조절하고 있습니다" },
     { label: "💉 혈당불안정", bad: "혈당이 불안정합니다", good: "계속 관찰 및 식이조절 중이며, 인슐린 주사가 필요할 경우 적용합니다" },
-    { label: "🧪 검사이상", bad: "검사에서 이상 소견이 있습니다", good: "검사 결과를 확인하며 처치 중입니다" },
     { label: "🫧 부종", bad: "부종이 있습니다", good: "부종 원인을 파악하며 처치 중입니다" },
     { label: "🔋 기력저하", bad: "전반적으로 기력이 저하되어 있습니다", good: "약물을 조절하며 관찰 중입니다. 영양제 주사가 필요할 수 있습니다 (보호자 동의)" },
     { label: "🩸 저알부민", bad: "영양 상태가 저하되어 있습니다", good: "알부민 주사가 필요합니다 (보호자 동의 필요)" },
@@ -3292,7 +3291,7 @@ function DoctorReviewScreen({ patient, user, onBack }) {
 
         // ① 관찰되는 증상
         React.createElement("div", { style: { background: "white", borderRadius: 14, marginBottom: 12, overflow: "hidden", boxShadow: "0 1px 6px rgba(0,0,0,0.06)" } },
-          React.createElement("div", { style: { background: "linear-gradient(135deg,#7f1d1d,#dc2626)", padding: "10px 16px", fontSize: 15, fontWeight: 700, color: "white" } }, "🔍 관찰되는 증상"),
+          React.createElement("div", { style: { background: "linear-gradient(135deg,#1e3a5f,#2563eb)", padding: "10px 16px", fontSize: 15, fontWeight: 700, color: "white" } }, "🔍 관찰되는 증상"),
           React.createElement("div", { style: { padding: 14 } },
             React.createElement("div", { style: { fontSize: 13, color: "#64748b", marginBottom: 10 } }, "클릭하면 증상·처치가 함께 보호자에게 전달돼요"),
             React.createElement("div", { style: { display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 6, marginBottom: 14 } },
@@ -3311,9 +3310,9 @@ function DoctorReviewScreen({ patient, user, onBack }) {
                   },
                   style: {
                     padding: "10px 6px", borderRadius: 10, border: "1.5px solid",
-                    borderColor: isActive ? "#dc2626" : "#fecdd3",
-                    background: isActive ? "#dc2626" : "#fff1f2",
-                    color: isActive ? "white" : "#be123c",
+                    borderColor: isActive ? "#2563eb" : "#bfdbfe",
+                    background: isActive ? "#2563eb" : "#eff6ff",
+                    color: isActive ? "white" : "#1d4ed8",
                     fontSize: 15, fontWeight: 700, cursor: "pointer",
                     fontFamily: "'Noto Sans KR',sans-serif", lineHeight: 1.4,
                     textAlign: "center", transition: "all 0.15s"
@@ -3323,10 +3322,10 @@ function DoctorReviewScreen({ patient, user, onBack }) {
             ),
             // 선택된 증상 미리보기
             specialAlerts.some(x => x.startsWith("[S]")) &&
-            React.createElement("div", { style: { background: "#fff1f2", borderRadius: 10, padding: "10px 12px", border: "1.5px solid #fecdd3" } },
-              React.createElement("div", { style: { fontSize: 13, color: "#be123c", fontWeight: 700, marginBottom: 6 } }, "선택된 증상 (보호자에게 전달)"),
+            React.createElement("div", { style: { background: "#eff6ff", borderRadius: 10, padding: "10px 12px", border: "1.5px solid #bfdbfe" } },
+              React.createElement("div", { style: { fontSize: 13, color: "#1d4ed8", fontWeight: 700, marginBottom: 6 } }, "선택된 증상 (보호자에게 전달)"),
               ALERT_SETS.filter(s => specialAlerts.some(x => x === `[S]${s.bad}`)).map((s, i) =>
-                React.createElement("div", { key: i, style: { fontSize: 13, color: "#7f1d1d", lineHeight: 1.6, paddingBottom: 3, borderBottom: "1px solid #fecdd3", marginBottom: 3 } },
+                React.createElement("div", { key: i, style: { fontSize: 13, color: "#1e3a5f", lineHeight: 1.6, paddingBottom: 3, borderBottom: "1px solid #fecdd3", marginBottom: 3 } },
                   React.createElement("span", { style: { fontWeight: 700 } }, `${s.label}: `), s.bad
                 )
               )
@@ -3336,7 +3335,7 @@ function DoctorReviewScreen({ patient, user, onBack }) {
 
         // ② 검사·대증요법
         React.createElement("div", { className: "card", style: { marginBottom: 12 } },
-          React.createElement("div", { style: { fontWeight: 700, color: "#1e3a5f", marginBottom: 14, fontSize: 15 } }, "🔬 검사 및 대증요법"),
+          React.createElement("div", { style: { fontWeight: 700, color: "#1e3a5f", marginBottom: 14, fontSize: 15 } }, "🔬 검사 및 처치·투약"),
           React.createElement("div", { style: { marginBottom: 12, background: "#f0f9ff", borderRadius: 12, padding: "12px 12px 10px", border: "1.5px solid #7dd3fc" } },
             React.createElement("div", { style: { fontSize: 15, color: "#1e293b", fontWeight: 800, marginBottom: 8 } }, "🔬 검사"),
             React.createElement("div", { style: { display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 6 } },
