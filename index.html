@@ -3045,9 +3045,12 @@ function DoctorReviewScreen({ patient, user, onBack }) {
       const existing = await api("get_today_record", { patientId: patient.id, phone: "staff" });
       const existingRecord = existing.record || {};
 
+      // DB 내부 필드 제거 (id, patient_id, created_at 등은 보내면 안 됨)
+      const { id, patient_id, created_at, updated_at, ...nurseData } = existingRecord;
+
       // 간호사 입력 보존 + 의사 입력 덮어쓰기
-      await api("save_record", { patientId: patient.id, date: today(), recordData: {
-        ...existingRecord,
+      const result = await api("save_record", { patientId: patient.id, date: today(), recordData: {
+        ...nurseData,
         doctor_findings: findings,
         bprs: bprs.join(" · "),
         special_alerts: noChange ? "" : specialAlerts.join(" · "),
@@ -3058,6 +3061,8 @@ function DoctorReviewScreen({ patient, user, onBack }) {
         reviewed_at: now(),
         no_change: noChange
       }});
+
+      if (result.error) throw new Error(result.error);
       alert(noChange ? "변화없음으로 저장됐어요!" : "저장됐어요!");
       onBack();
     } catch(e) {
