@@ -3041,7 +3041,13 @@ function DoctorReviewScreen({ patient, user, onBack }) {
   const handleSave = async () => {
     setSaving(true);
     try {
+      // 기존 기록 먼저 조회 (간호사 입력 보존)
+      const existing = await api("get_today_record", { patientId: patient.id, phone: "staff" });
+      const existingRecord = existing.record || {};
+
+      // 간호사 입력 전체 보존 + 의사 입력만 덮어쓰기
       await api("save_record", { patientId: patient.id, date: today(), recordData: {
+        ...existingRecord,
         doctor_findings: findings,
         bprs: bprs.join(" · "),
         special_alerts: noChange ? "" : specialAlerts.join(" · "),
