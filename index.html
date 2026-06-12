@@ -3041,12 +3041,13 @@ function DoctorReviewScreen({ patient, user, onBack }) {
   const handleSave = async () => {
     setSaving(true);
     try {
-      // 1. 기존 기록 조회
+      // 기존 기록 조회해서 간호사 데이터 보존
       const existing = await api("get_today_record", { patientId: patient.id, phone: "staff" });
       const existingRecord = existing.record || {};
 
-      // 2. 의사 입력 필드만 업데이트 (Supabase REST PATCH — 기존 필드 보존)
-      const doctorData = {
+      // 간호사 입력 보존 + 의사 입력 덮어쓰기
+      await api("save_record", { patientId: patient.id, date: today(), recordData: {
+        ...existingRecord,
         doctor_findings: findings,
         bprs: bprs.join(" · "),
         special_alerts: noChange ? "" : specialAlerts.join(" · "),
@@ -3056,36 +3057,13 @@ function DoctorReviewScreen({ patient, user, onBack }) {
         story_skipped: storySkipped,
         reviewed_at: now(),
         no_change: noChange
-      };
-
-      if (existingRecord.id) {
-        // 기존 기록이 있으면 PATCH (의사 필드만 업데이트)
-        const patchRes = await fetch(
-          `${SUPABASE_URL}/rest/v1/records?id=eq.${existingRecord.id}`,
-          {
-            method: "PATCH",
-            headers: {
-              apikey: ANON_KEY,
-              Authorization: "Bearer " + ANON_KEY,
-              "Content-Type": "application/json",
-              Prefer: "return=minimal"
-            },
-            body: JSON.stringify(doctorData)
-          }
-        );
-        if (!patchRes.ok) throw new Error("PATCH 실패");
-      } else {
-        // 기존 기록 없으면 Edge Function으로 새로 생성
-        await api("save_record", { patientId: patient.id, date: today(), recordData: {
-          ...doctorData,
-          patient_id: patient.id,
-          date: today()
-        }});
-      }
-
+      }});
       alert(noChange ? "변화없음으로 저장됐어요!" : "저장됐어요!");
       onBack();
-    } catch(e) { alert("저장 실패: " + e.message); }
+    } catch(e) {
+      console.error("저장 오류:", e);
+      alert("저장 실패: " + (e?.message || JSON.stringify(e)));
+    }
     finally { setSaving(false); }
   };
 
