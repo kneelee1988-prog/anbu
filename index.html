@@ -1138,16 +1138,20 @@ function GuardianScreen({ user, onBack }) {
 
     Promise.all([
       api("get_today_record", { patientId: patient.id, phone: user.phone }),
-      fetch(`${SUPABASE_URL}/rest/v1/records?patient_id=eq.${patient.id}&order=date.asc&limit=30`, {
+      fetch(`${SUPABASE_URL}/rest/v1/records?patient_id=eq.${patient.id}&order=date.desc&limit=30`, {
         headers: { apikey: ANON_KEY, Authorization: "Bearer " + ANON_KEY }
       }).then(r => r.json())
     ])
     .then(([todayData, histData]) => {
-      const todayRecord = todayData.record;
-      setRecord(todayRecord);
       const records = Array.isArray(histData) ? histData : [];
+      const todayStr = today();
+      // 보호자용 get_today_record 응답은 일부 필드(간호사 임상 입력)가 누락될 수 있어
+      // records 테이블 원본 행을 우선 사용해 모든 필드를 확보한다.
+      // 원본에 오늘 행이 없을 때만 Edge Function 결과로 폴백.
+      const rawToday = records.find(r => r.date === todayStr);
+      const todayRecord = rawToday || todayData.record || null;
+      setRecord(todayRecord);
       const filled = frames.map(date => {
-        // 오늘 날짜는 get_today_record 결과 우선 사용
         if (todayRecord && date === todayRecord.date) return todayRecord;
         const found = records.find(r => r.date === date);
         return found || { date, _empty: true };
@@ -1171,7 +1175,7 @@ function GuardianScreen({ user, onBack }) {
         const kst = new Date(d.getTime() + 9 * 60 * 60 * 1000);
         frames.push(kst.toISOString().slice(0, 10));
       }
-      fetch(`${SUPABASE_URL}/rest/v1/records?patient_id=eq.${patient.id}&order=date.asc&limit=30`, {
+      fetch(`${SUPABASE_URL}/rest/v1/records?patient_id=eq.${patient.id}&order=date.desc&limit=30`, {
         headers: { apikey: ANON_KEY, Authorization: "Bearer " + ANON_KEY }
       })
       .then(r => r.json())
@@ -2022,7 +2026,7 @@ function NurseChooseScreen({ patient, user, onNoChange, onEdit, onBack }) {
         const kst = new Date(d.getTime() + 9 * 60 * 60 * 1000);
         frames.push(kst.toISOString().slice(0, 10));
       }
-      fetch(`${SUPABASE_URL}/rest/v1/records?patient_id=eq.${patient.id}&order=date.asc&limit=30`, {
+      fetch(`${SUPABASE_URL}/rest/v1/records?patient_id=eq.${patient.id}&order=date.desc&limit=30`, {
         headers: { apikey: ANON_KEY, Authorization: "Bearer " + ANON_KEY }
       })
       .then(r => r.json())
@@ -2979,7 +2983,7 @@ function DoctorReviewScreen({ patient, user, onBack }) {
         const kst = new Date(d.getTime() + 9 * 60 * 60 * 1000);
         frames.push(kst.toISOString().slice(0, 10));
       }
-      fetch(`${SUPABASE_URL}/rest/v1/records?patient_id=eq.${patient.id}&order=date.asc&limit=30`, {
+      fetch(`${SUPABASE_URL}/rest/v1/records?patient_id=eq.${patient.id}&order=date.desc&limit=30`, {
         headers: { apikey: ANON_KEY, Authorization: "Bearer " + ANON_KEY }
       })
       .then(r => r.json())
