@@ -1,1 +1,23 @@
-.github/workflows/keep-supabase-alive.yml
+name: Keep Supabase Alive
+
+on:
+  schedule:
+    - cron: "0 3 * * 1,4"
+  workflow_dispatch: {}
+
+jobs:
+  ping-supabase:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Ping notices table (real DB query)
+        run: |
+          RESPONSE=$(curl -s -o /tmp/body.json -w "%{http_code}" \
+            "https://imulqwqpwjpjgublmhxb.supabase.co/rest/v1/notices?select=id&limit=1" \
+            -H "apikey: ${{ secrets.SUPABASE_ANON_KEY }}" \
+            -H "Authorization: Bearer ${{ secrets.SUPABASE_ANON_KEY }}")
+          echo "HTTP status: $RESPONSE"
+          cat /tmp/body.json
+          if [ "$RESPONSE" -ge 400 ]; then
+            echo "::error::Supabase ping failed with status $RESPONSE"
+            exit 1
+          fi
