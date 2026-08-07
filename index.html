@@ -1193,7 +1193,7 @@ function GuardianScreen({ user, onBack }) {
   }, [tab]);
 
   const CONSCIOUSNESS_MAP = ["혼수","반혼수","혼미","졸림","명료"];
-  const MEAL_MAP = ["안 드심","거의 안 드심","절반","잘 드심"];
+  const MEAL_MAP = ["거부","소량","1/4","절반","3/4","잘 드심"];
   const SLEEP_MAP = ["4시간 미만","4~6시간","6~8시간","8시간 이상"];
   const MOBILITY_MAP = ["침상 안정","휠체어","부축 보행","워커","독립 보행"];
 
@@ -1989,7 +1989,7 @@ function NurseChooseScreen({ patient, user, onNoChange, onEdit, onBack }) {
   const [expandedDate, setExpandedDate] = useState(null);
 
   const CONSCIOUSNESS_MAP = ["혼수","반혼수","혼미","졸림","명료"];
-  const MEAL_MAP = ["안 드심","거의 안 드심","절반","잘 드심"];
+  const MEAL_MAP = ["거부","소량","1/4","절반","3/4","잘 드심"];
   const SLEEP_MAP = ["4시간 미만","4~6시간","6~8시간","8시간 이상"];
   const MOBILITY_MAP = ["침상 안정","휠체어","부축 보행","워커","독립 보행"];
   const goodHighColor = (v, max) => {
@@ -2537,9 +2537,9 @@ function NurseRecordScreen({ patient, user, onBack, onSaved }) {
         children: React.createElement(React.Fragment, null,
           React.createElement(Lbl, { text: "이동 방법" }),
           React.createElement(BtnRow, null,
-            ["독립 보행","부축 보행","워커","휠체어","침상 안정"].map(v =>
+            ["독립 보행","워커","부축 보행","휠체어","침상 안정"].map(v =>
               React.createElement(Btn, { key: v, label: v, small: true, active: form.mobility===v, onClick: () => set("mobility", v),
-                color: v==="독립 보행"?"#166534":v==="부축 보행"?"#166534":"#713f12" })
+                color: (v==="독립 보행"||v==="워커")?"#166534":"#713f12" })
             )
           ),
           form.mobility && form.mobility !== "침상 안정" && React.createElement(React.Fragment, null,
@@ -2944,7 +2944,7 @@ function DoctorReviewScreen({ patient, user, onBack }) {
   const [expandedDate, setExpandedDate] = useState(null);
 
   const CONSCIOUSNESS_MAP = ["혼수","반혼수","혼미","졸림","명료"];
-  const MEAL_MAP = ["안 드심","거의 안 드심","절반","잘 드심"];
+  const MEAL_MAP = ["거부","소량","1/4","절반","3/4","잘 드심"];
   const SLEEP_MAP = ["4시간 미만","4~6시간","6~8시간","8시간 이상"];
   const MOBILITY_MAP = ["침상 안정","휠체어","부축 보행","워커","독립 보행"];
   const goodHighColor = (v, max) => {
