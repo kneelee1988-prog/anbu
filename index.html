@@ -1245,10 +1245,12 @@ function GuardianScreen({ user, onBack }) {
   const getTodaySummary = (rec) => {
     if (!rec) return null;
     const alerts = rec.special_alerts;
-    // 태그 있는 S(증상) 항목만 카운트
+    // 태그 있는 S(증상) 항목만 카운트 (증상별 인덱스 태그 [S1][S2]... 포함)
     const hasAlert = alerts && (Array.isArray(alerts)
-      ? alerts.some(a => a.includes("[S]") || (!a.match(/^\[[STRCD]\]/) && a.length > 0))
+      ? alerts.some(a => /^\[S\d*\]/.test(a) || (!/^\[[STRCDUW]\d*\]/.test(a) && a.length > 0))
       : alerts.length > 0);
+    // 악화(W) 태그가 있으면 가장 우선적으로 안내
+    const hasWorsening = alerts && Array.isArray(alerts) && alerts.some(a => /^\[W\d*\]/.test(a));
     const c = rec.consciousness;
     const pain = rec.pain;
     const meal = rec.meal_amount;
@@ -1262,6 +1264,7 @@ function GuardianScreen({ user, onBack }) {
     const highFall = ["높음","매우 높음"].includes(fallRisk);
 
     // 심각도 순서
+    if (hasWorsening) return { emoji: "😟", text: "오늘 상태가 악화되는 양상이 있어 세심히 관찰하고 있어요", color: "#dc2626", bg: "#fff1f2", border: "#fecdd3" };
     if (hasAlert && badConsciousness) return { emoji: "😔", text: "오늘 어르신 상태가 다소 걱정됩니다", color: "#dc2626", bg: "#fff1f2", border: "#fecdd3" };
     if (hasAlert) return { emoji: "🤔", text: "오늘 챙겨봐야 할 사항이 있어요", color: "#d97706", bg: "#fffbeb", border: "#fde68a" };
     if (badConsciousness || (highPain && hasBpsd)) return { emoji: "😐", text: "오늘 어르신이 다소 힘드신 것 같아요", color: "#d97706", bg: "#fffbeb", border: "#fde68a" };
@@ -1446,13 +1449,15 @@ function GuardianScreen({ user, onBack }) {
                         if (typeof sa === "string") return sa.split(/\s*·\s*/).map(s => s.trim()).filter(Boolean);
                         return [];
                       })();
-                      const getTag = (a) => { const m = a.match(/^\[([STRCD])\]/); return m ? m[1] : null; };
-                      const strip = (a) => a.replace(/^\[[STRCD]\]/, "");
+                      const getTag = (a) => { const m = a.match(/^\[([STRCDUW])\d*\]/); return m ? m[1] : null; };
+                      const strip = (a) => a.replace(/^\[[STRCDUW]\d*\]/, "");
                       const symptoms   = raw.filter(a => getTag(a) === "S").map(strip);
                       const treating   = raw.filter(a => getTag(a) === "T").map(strip);
                       const recovering = raw.filter(a => getTag(a) === "R").map(strip);
                       const doneTreat  = raw.filter(a => getTag(a) === "D").map(strip);
                       const consent    = raw.filter(a => getTag(a) === "C").map(strip);
+                      const unchanged  = raw.filter(a => getTag(a) === "U").map(strip);
+                      const worsening  = raw.filter(a => getTag(a) === "W").map(strip);
                       const noTag      = raw.filter(a => !getTag(a));
 
                       const MiniSection = ({ emoji, items, color, bg, border }) =>
@@ -1467,6 +1472,8 @@ function GuardianScreen({ user, onBack }) {
                       return React.createElement("div", { style: { marginBottom: 6 } },
                         symptoms.length > 0 && MiniSection({ emoji: "⚠️", items: symptoms, color: "#be123c", bg: "#fff1f2", border: "#fecdd3" }),
                         treating.length > 0 && MiniSection({ emoji: "🩺", items: treating, color: "#1d4ed8", bg: "#eff6ff", border: "#bfdbfe" }),
+                        worsening.length > 0 && MiniSection({ emoji: "🔶", items: worsening, color: "#991b1b", bg: "#fef2f2", border: "#fecaca" }),
+                        unchanged.length > 0 && MiniSection({ emoji: "➖", items: unchanged, color: "#92400e", bg: "#fffbeb", border: "#fde68a" }),
                         recovering.length > 0 && MiniSection({ emoji: "✅", items: recovering, color: "#166534", bg: "#f0fdf4", border: "#bbf7d0" }),
                         doneTreat.length > 0 && MiniSection({ emoji: "🟢", items: doneTreat, color: "#14532d", bg: "#dcfce7", border: "#86efac" }),
                         consent.length > 0 && MiniSection({ emoji: "📋", items: consent, color: "#92400e", bg: "#fffbeb", border: "#fde68a" }),
@@ -1514,8 +1521,8 @@ function GuardianScreen({ user, onBack }) {
                 (() => {
                   const sa = record.special_alerts;
                   const raw = sa ? (Array.isArray(sa) ? sa : sa.split(/\s*·\s*/).map(s=>s.trim()).filter(Boolean)) : [];
-                  const getTag = (a) => { const m = a.match(/^\[([STRCD])\]/); return m ? m[1] : null; };
-                  const strip = (a) => a.replace(/^\[[STRCD]\]/, "");
+                  const getTag = (a) => { const m = a.match(/^\[([STRCDUW])\d*\]/); return m ? m[1] : null; };
+                  const strip = (a) => a.replace(/^\[[STRCDUW]\d*\]/, "");
                   const symptoms = raw.filter(a => getTag(a) === "S").map(strip);
                   const treating = raw.filter(a => getTag(a) === "T").map(strip);
                   const consent  = raw.filter(a => getTag(a) === "C").map(strip);
@@ -1618,13 +1625,15 @@ function GuardianScreen({ user, onBack }) {
                 return [];
               })();
 
-              const getTag = (a) => { const m = a.match(/^\[([STRCD])\]/); return m ? m[1] : null; };
-              const stripTag = (a) => a.replace(/^\[[STRCD]\]/, "");
+              const getTag = (a) => { const m = a.match(/^\[([STRCDUW])\d*\]/); return m ? m[1] : null; };
+              const stripTag = (a) => a.replace(/^\[[STRCDUW]\d*\]/, "");
               const symptoms    = raw.filter(a => getTag(a) === "S").map(stripTag);
               const treating    = raw.filter(a => getTag(a) === "T").map(stripTag);
               const recovering  = raw.filter(a => getTag(a) === "R").map(stripTag);
               const doneTreat   = raw.filter(a => getTag(a) === "D").map(stripTag);
               const needConsent = raw.filter(a => getTag(a) === "C").map(stripTag);
+              const unchanged   = raw.filter(a => getTag(a) === "U").map(stripTag);
+              const worsening   = raw.filter(a => getTag(a) === "W").map(stripTag);
               const noTag = raw.filter(a => !getTag(a));
               noTag.forEach(a => {
                 if (a.includes("보호자 동의") || a.includes("보호자 안내")) needConsent.push(a);
@@ -1687,6 +1696,19 @@ function GuardianScreen({ user, onBack }) {
                     ListSection({ title: "🩺 처치·치료 중", items: treating,
                       headerBg: "linear-gradient(135deg,#1e3a5f,#2563eb)",
                       itemBg: "#eff6ff", itemColor: "#1d4ed8", itemBorder: "#bfdbfe" })
+                  )
+                ),
+                // 악화 + 동일 지속 나란히 2칸
+                (worsening.length > 0 || unchanged.length > 0) && React.createElement("div", { style: { display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8, marginBottom: 8 } },
+                  React.createElement("div", null,
+                    ListSection({ title: "🔶 악화 소견", items: worsening,
+                      headerBg: "linear-gradient(135deg,#7f1d1d,#b91c1c)",
+                      itemBg: "#fef2f2", itemColor: "#991b1b", itemBorder: "#fecaca" })
+                  ),
+                  React.createElement("div", null,
+                    ListSection({ title: "➖ 동일하게 지속", items: unchanged,
+                      headerBg: "linear-gradient(135deg,#78350f,#b45309)",
+                      itemBg: "#fffbeb", itemColor: "#92400e", itemBorder: "#fde68a" })
                   )
                 ),
                 // 호전 + 보호자 동의 나란히 2칸
@@ -2928,6 +2950,15 @@ function DoctorReviewScreen({ patient, user, onBack }) {
     "야간 혼돈","섬망","충동적 행동","이상 없음",
   ];
 
+  // 간호사 BPSD 입력값과 의사 확인 목록을 매칭 (공백 차이·표현 차이 보정)
+  const normalizeBpsd = (s) => (s || "").replace(/\s+/g, "");
+  const BPSD_ALIAS = { "충동행동": "충동적행동", "이상없음": "이상없음" };
+  const matchBpsdFromNurse = (mentalArr) => {
+    if (!mentalArr || !mentalArr.length) return [];
+    const nurseNorm = mentalArr.map(v => BPSD_ALIAS[normalizeBpsd(v)] || normalizeBpsd(v));
+    return BPSD_ITEMS.filter(item => nurseNorm.includes(normalizeBpsd(item)));
+  };
+
   const [record, setRecord] = useState(null);
   const [findings, setFindings] = useState([]);
   const [bprs, setBprs] = useState([]);
@@ -2962,11 +2993,19 @@ function DoctorReviewScreen({ patient, user, onBack }) {
           setDailyStory(d.record.daily_story || "");
           setStorySkipped(d.record.story_skipped || false);
           const b = d.record.bprs;
-          setBprs(b ? (Array.isArray(b) ? b : b.split("·").map(s=>s.trim()).filter(Boolean)) : []);
+          const bArr = b ? (Array.isArray(b) ? b : b.split("·").map(s=>s.trim()).filter(Boolean)) : [];
+          if (bArr.length > 0) {
+            // 의사가 오늘 이미 저장한 확인값이 있으면 그대로 사용
+            setBprs(bArr);
+          } else {
+            // 처음 검토하는 경우: 간호사가 입력한 BPSD와 겹치는 항목을 미리 체크해서 시작
+            const mentalArr = Array.isArray(d.record.mental) ? d.record.mental : (d.record.mental ? d.record.mental.split("·").map(s=>s.trim()).filter(Boolean) : []);
+            setBprs(matchBpsdFromNurse(mentalArr));
+          }
           const sa = d.record.special_alerts;
           const saArr = sa ? (Array.isArray(sa) ? sa : sa.split("·").map(s=>s.trim()).filter(Boolean)) : [];
-          // 태그 없는 구버전 데이터 제거하고 태그 있는 것만 로드
-          setSpecialAlerts(saArr.filter(a => /^\[[STRCD]\]/.test(a)));
+          // 태그 있는 것만 로드 (구버전 무태그 데이터 제외, 증상별 인덱스 태그 포함)
+          setSpecialAlerts(saArr.filter(a => /^\[[STRCDUW]\d*\]/.test(a)));
         }
       })
       .finally(() => setLoading(false));
@@ -3002,13 +3041,36 @@ function DoctorReviewScreen({ patient, user, onBack }) {
 
   const toggleFinding = (f) => setFindings(fs => fs.includes(f) ? fs.filter(x=>x!==f) : [...fs, f]);
   const toggleBprs = (v) => setBprs(bs => bs.includes(v) ? bs.filter(x=>x!==v) : [...bs, v]);
-  const toggleAlert = (v, tag) => {
-    const tagged = tag ? `[${tag}]${v}` : v;
+
+  // 증상별(인덱스) 태그 헬퍼 — 증상·초기처치·경과·동의가 같은 증상끼리 묶이도록
+  const toggleAlertIdx = (v, tag, idx) => {
+    const tagged = `[${tag}${idx}]${v}`;
     setSpecialAlerts(sa => sa.some(x => x === tagged) ? sa.filter(x => x !== tagged) : [...sa, tagged]);
   };
-  const isAlertOn = (v, tag) => {
-    const tagged = tag ? `[${tag}]${v}` : v;
-    return specialAlerts.some(x => x === tagged);
+  const isAlertOnIdx = (v, tag, idx) => specialAlerts.some(x => x === `[${tag}${idx}]${v}`);
+  const idxTagRe = (tag, idx) => new RegExp(`^\\[${tag}${idx}\\]`);
+  const getProgress = (idx) => {
+    if (specialAlerts.some(x => idxTagRe("U", idx).test(x))) return "동일지속";
+    if (specialAlerts.some(x => idxTagRe("W", idx).test(x))) return "악화";
+    if (specialAlerts.some(x => idxTagRe("R", idx).test(x))) return "호전";
+    return null;
+  };
+  const setProgress = (idx, kind) => {
+    const cur = getProgress(idx);
+    setSpecialAlerts(sa => {
+      const next = sa.filter(x => !idxTagRe("R", idx).test(x) && !idxTagRe("U", idx).test(x) && !idxTagRe("W", idx).test(x));
+      if (cur === kind) return next; // 같은 걸 다시 누르면 해제
+      if (kind === "동일지속") return [...next, `[U${idx}]증상이 비슷한 상태로 유지되고 있어 계속 관찰 중입니다`];
+      if (kind === "악화") return [...next, `[W${idx}]증상이 악화되는 양상을 보이고 있어 추가 처치를 고려하고 있습니다`];
+      return next; // "호전"은 태그를 자동으로 추가하지 않고 아래 목록에서 개별 선택
+    });
+  };
+  // 치료종료 문구(ALERT_DONE)를 대응되는 증상(ALERT_SETS)에 연결
+  const DONE_MAP = {
+    "🫁 폐렴": "폐렴 치료 종료하였습니다",
+    "🦠 패혈증": "패혈증 치료 종료하였습니다",
+    "💧 요로감염": "요로감염증 치료 종료하였습니다",
+    "🛁 피부질환": "옴 치료 종료하였습니다",
   };
 
   const handleSave = async () => {
@@ -3154,11 +3216,13 @@ function DoctorReviewScreen({ patient, user, onBack }) {
                       const raw = Array.isArray(r.special_alerts)
                         ? r.special_alerts
                         : (typeof r.special_alerts === "string" ? r.special_alerts.split("·").map(s=>s.trim()).filter(Boolean) : []);
-                      const getTag = (a) => { const m = a.match(/^\[([STRCD])\]/); return m ? m[1] : null; };
-                      const strip = (a) => a.replace(/^\[[STRCD]\]/, "");
+                      const getTag = (a) => { const m = a.match(/^\[([STRCDUW])\d*\]/); return m ? m[1] : null; };
+                      const strip = (a) => a.replace(/^\[[STRCDUW]\d*\]/, "");
                       const sections = [
                         { tag: "S", label: "⚠️ 현재 상태", bg: "#fff1f2", color: "#be123c", border: "#fecdd3" },
                         { tag: "T", label: "🩺 처치·치료", bg: "#eff6ff", color: "#1d4ed8", border: "#bfdbfe" },
+                        { tag: "W", label: "🔶 악화 소견", bg: "#fef2f2", color: "#991b1b", border: "#fecaca" },
+                        { tag: "U", label: "➖ 동일하게 지속", bg: "#fffbeb", color: "#92400e", border: "#fde68a" },
                         { tag: "R", label: "✅ 호전", bg: "#f0fdf4", color: "#166534", border: "#bbf7d0" },
                         { tag: "D", label: "🟢 치료 종료", bg: "#dcfce7", color: "#14532d", border: "#86efac" },
                         { tag: "C", label: "📋 보호자 동의", bg: "#fffbeb", color: "#92400e", border: "#fde68a" },
@@ -3293,48 +3357,122 @@ function DoctorReviewScreen({ patient, user, onBack }) {
       // 변화있음 선택시만 입력 섹션 표시
       noChange === false && React.createElement(React.Fragment, null,
 
-        // ① 관찰되는 증상
+        // ① 관찰되는 증상 → 초기처치 → 경과(호전/동일지속/악화) → 필요시 심화동의·치료종료
         React.createElement("div", { style: { background: "white", borderRadius: 14, marginBottom: 12, overflow: "hidden", boxShadow: "0 1px 6px rgba(0,0,0,0.06)" } },
           React.createElement("div", { style: { background: "linear-gradient(135deg,#1e3a5f,#2563eb)", padding: "10px 16px", fontSize: 15, fontWeight: 700, color: "white" } }, "🔍 관찰되는 증상"),
           React.createElement("div", { style: { padding: 14 } },
-            React.createElement("div", { style: { fontSize: 13, color: "#64748b", marginBottom: 10 } }, "클릭하면 증상·처치가 함께 보호자에게 전달돼요"),
-            React.createElement("div", { style: { display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 6, marginBottom: 14 } },
+            React.createElement("div", { style: { fontSize: 13, color: "#64748b", marginBottom: 10 } }, "증상을 선택하면 초기처치·경과를 이어서 입력할 수 있어요"),
+            React.createElement("div", { style: { display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 6, marginBottom: 10 } },
               ALERT_SETS.map(s => {
-                const isActive = specialAlerts.some(x => x === `[S]${s.bad}`);
+                const idx = ALERT_SETS.indexOf(s) + 1;
+                const sActive = isAlertOnIdx(s.bad, "S", idx);
                 return React.createElement("button", {
                   key: s.label,
                   onClick: () => {
-                    const taggedBad = `[S]${s.bad}`;
-                    const taggedGood = `[T]${s.good}`;
-                    if (isActive) {
-                      setSpecialAlerts(sa => sa.filter(x => x !== taggedBad && x !== taggedGood));
+                    if (sActive) {
+                      // 증상 해제시 연결된 초기처치·경과·동의·종료 태그 전부 제거
+                      setSpecialAlerts(sa => sa.filter(x => !new RegExp(`^\\[[STRCDUW]${idx}\\]`).test(x)));
                     } else {
-                      setSpecialAlerts(sa => [...sa.filter(x => x !== taggedBad && x !== taggedGood), taggedBad, taggedGood]);
+                      toggleAlertIdx(s.bad, "S", idx);
                     }
                   },
                   style: {
                     padding: "10px 6px", borderRadius: 10, border: "1.5px solid",
-                    borderColor: isActive ? "#3b82f6" : "#dbeafe",
-                    background: isActive ? "#3b82f6" : "#f0f7ff",
-                    color: isActive ? "white" : "#1e40af",
+                    borderColor: sActive ? "#3b82f6" : "#dbeafe",
+                    background: sActive ? "#3b82f6" : "#f0f7ff",
+                    color: sActive ? "white" : "#1e40af",
                     fontSize: 13, fontWeight: 600, cursor: "pointer",
                     fontFamily: "'Noto Sans KR',sans-serif", lineHeight: 1.2,
                     textAlign: "center", transition: "all 0.15s", whiteSpace: "nowrap",
                     overflow: "hidden", textOverflow: "ellipsis"
                   }
-                }, s.label)
+                }, s.label);
               })
             ),
-            // 선택된 증상 미리보기
-            specialAlerts.some(x => x.startsWith("[S]")) &&
-            React.createElement("div", { style: { background: "#eff6ff", borderRadius: 10, padding: "10px 12px", border: "1.5px solid #bfdbfe" } },
-              React.createElement("div", { style: { fontSize: 13, color: "#1d4ed8", fontWeight: 700, marginBottom: 6 } }, "선택된 증상 (보호자에게 전달)"),
-              ALERT_SETS.filter(s => specialAlerts.some(x => x === `[S]${s.bad}`)).map((s, i) =>
-                React.createElement("div", { key: i, style: { fontSize: 13, color: "#1e3a5f", lineHeight: 1.6, paddingBottom: 3, borderBottom: "1px solid #fecdd3", marginBottom: 3 } },
-                  React.createElement("span", { style: { fontWeight: 700 } }, `${s.label}: `), s.bad
-                )
-              )
-            )
+            // 선택된 증상별 상세 카드
+            ALERT_SETS.filter(s => isAlertOnIdx(s.bad, "S", ALERT_SETS.indexOf(s) + 1)).map(s => {
+              const idx = ALERT_SETS.indexOf(s) + 1;
+              const tActive = isAlertOnIdx(s.good, "T", idx);
+              const progress = getProgress(idx);
+              const doneText = DONE_MAP[s.label];
+              const doneActive = doneText && isAlertOnIdx(doneText, "D", idx);
+              return React.createElement("div", { key: s.label, style: { background: "#eff6ff", borderRadius: 12, padding: 12, marginBottom: 8, border: "1.5px solid #bfdbfe" } },
+                React.createElement("div", { style: { fontSize: 13, fontWeight: 800, color: "#1d4ed8", marginBottom: 8 } }, `${s.label}: ${s.bad}`),
+                // 초기 처치
+                React.createElement("div", { style: { fontSize: 12, color: "#64748b", fontWeight: 700, marginBottom: 5 } }, "① 초기 처치"),
+                React.createElement("button", {
+                  onClick: () => toggleAlertIdx(s.good, "T", idx),
+                  style: {
+                    display: "block", width: "100%", textAlign: "left", padding: "8px 10px", borderRadius: 8, border: "1.5px solid",
+                    borderColor: tActive ? "#2563eb" : "#bfdbfe",
+                    background: tActive ? "#2563eb" : "white",
+                    color: tActive ? "white" : "#1e3a5f",
+                    fontSize: 13, fontWeight: 600, cursor: "pointer",
+                    fontFamily: "'Noto Sans KR',sans-serif", lineHeight: 1.4, marginBottom: 10
+                  }
+                }, s.good),
+                // 경과
+                React.createElement("div", { style: { fontSize: 12, color: "#64748b", fontWeight: 700, marginBottom: 5 } }, "② 경과"),
+                React.createElement("div", { style: { display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 6, marginBottom: progress ? 8 : 0 } },
+                  [["호전","#16a34a"],["동일 지속","#d97706"],["악화","#dc2626"]].map(([label, color]) => {
+                    const key = label === "동일 지속" ? "동일지속" : label;
+                    const active = progress === key;
+                    return React.createElement("button", {
+                      key: label, onClick: () => setProgress(idx, key),
+                      style: {
+                        padding: "7px 4px", borderRadius: 8, border: "1.5px solid",
+                        borderColor: active ? color : "#e2e8f0",
+                        background: active ? color : "white",
+                        color: active ? "white" : "#475569",
+                        fontSize: 12, fontWeight: 700, cursor: "pointer", fontFamily: "'Noto Sans KR',sans-serif"
+                      }
+                    }, label);
+                  })
+                ),
+                // 호전 선택시 — 구체적 호전 문구 선택 (기존 문구 그대로)
+                progress === "호전" && React.createElement("div", { style: { display: "flex", flexDirection: "column", gap: 5, marginBottom: 8 } },
+                  ALERT_RECOVERY.map(v => {
+                    const active = isAlertOnIdx(v, "R", idx);
+                    return React.createElement("button", {
+                      key: v, onClick: () => toggleAlertIdx(v, "R", idx),
+                      style: { textAlign: "left", padding: "6px 10px", borderRadius: 8, border: "1.5px solid",
+                        borderColor: active ? "#16a34a" : "#bbf7d0",
+                        background: active ? "#16a34a" : "#f0fdf4",
+                        color: active ? "white" : "#166534",
+                        fontSize: 12, fontWeight: 600, cursor: "pointer", fontFamily: "'Noto Sans KR',sans-serif", lineHeight: 1.4 }
+                    }, v);
+                  })
+                ),
+                // 악화·동일지속 선택시 — 심화 처치·보호자 동의 필요 항목 (기존 문구 그대로)
+                (progress === "악화" || progress === "동일지속") && React.createElement("div", { style: { marginBottom: 8 } },
+                  React.createElement("div", { style: { fontSize: 12, color: "#92400e", fontWeight: 700, marginBottom: 5 } }, "③ 심화 처치 · 보호자 동의 필요 (해당시)"),
+                  React.createElement("div", { style: { display: "flex", flexDirection: "column", gap: 5 } },
+                    ALERT_CONSENT.map(v => {
+                      const active = isAlertOnIdx(v, "C", idx);
+                      return React.createElement("button", {
+                        key: v, onClick: () => toggleAlertIdx(v, "C", idx),
+                        style: { textAlign: "left", padding: "6px 10px", borderRadius: 8, border: "1.5px solid",
+                          borderColor: active ? "#c2410c" : "#fdba74",
+                          background: active ? "#c2410c" : "#fff7ed",
+                          color: active ? "white" : "#9a3412",
+                          fontSize: 12, fontWeight: 600, cursor: "pointer", fontFamily: "'Noto Sans KR',sans-serif", lineHeight: 1.4 }
+                      }, v);
+                    })
+                  )
+                ),
+                // 치료 종료 (대응되는 증상에만 노출, 기존 문구 그대로)
+                doneText && React.createElement("button", {
+                  onClick: () => toggleAlertIdx(doneText, "D", idx),
+                  style: {
+                    display: "block", width: "100%", textAlign: "center", padding: "7px 10px", borderRadius: 8, border: "1.5px solid",
+                    borderColor: doneActive ? "#14532d" : "#86efac",
+                    background: doneActive ? "#14532d" : "#dcfce7",
+                    color: doneActive ? "white" : "#14532d",
+                    fontSize: 12, fontWeight: 700, cursor: "pointer", fontFamily: "'Noto Sans KR',sans-serif"
+                  }
+                }, `🟢 ${doneText}`)
+              );
+            })
           )
         ),
 
@@ -3375,56 +3513,29 @@ function DoctorReviewScreen({ patient, user, onBack }) {
           )
         ),
 
-        // ④ 호전 및 처치 반응
-        React.createElement("div", { style: { background: "white", borderRadius: 14, marginBottom: 12, overflow: "hidden", boxShadow: "0 1px 6px rgba(0,0,0,0.06)" } },
-          React.createElement("div", { style: { background: "linear-gradient(135deg,#14532d,#16a34a)", padding: "10px 16px", fontSize: 15, fontWeight: 700, color: "white" } }, "✅ 호전 및 처치 반응"),
-          React.createElement("div", { style: { padding: 14 } },
-            React.createElement("div", { style: { display: "grid", gridTemplateColumns: "1fr 1fr", gap: 6, marginBottom: 10 } },
-              ALERT_RECOVERY.map(v =>
-                React.createElement("button", {
-                  key: v, onClick: () => toggleAlert(v, "R"),
-                  style: { padding: "8px 10px", borderRadius: 8, border: "1.5px solid",
-                    borderColor: isAlertOn(v,"R") ? "#16a34a" : "#bbf7d0",
-                    background: isAlertOn(v,"R") ? "#16a34a" : "#f0fdf4",
-                    color: isAlertOn(v,"R") ? "white" : "#166534",
-                    fontSize: 15, fontWeight: 600, cursor: "pointer",
-                    fontFamily: "'Noto Sans KR',sans-serif", lineHeight: 1.4, textAlign: "left" }
-                }, v)
-              )
-            ),
-            // 치료 종료
-            React.createElement("div", { style: { fontSize: 13, color: "#14532d", fontWeight: 700, marginBottom: 8 } }, "🟢 치료 종료"),
-            React.createElement("div", { style: { display: "grid", gridTemplateColumns: "1fr 1fr", gap: 6, marginBottom: 14 } },
-              ALERT_DONE.map(v =>
-                React.createElement("button", {
-                  key: v, onClick: () => toggleAlert(v, "D"),
-                  style: { padding: "8px 10px", borderRadius: 8, border: "1.5px solid",
-                    borderColor: isAlertOn(v,"D") ? "#14532d" : "#86efac",
-                    background: isAlertOn(v,"D") ? "#14532d" : "#dcfce7",
-                    color: isAlertOn(v,"D") ? "white" : "#14532d",
-                    fontSize: 15, fontWeight: 700, cursor: "pointer",
-                    fontFamily: "'Noto Sans KR',sans-serif", lineHeight: 1.4, textAlign: "left" }
-                }, v)
-              )
-            ),
-            // 보호자 동의 필요
-            React.createElement("div", { style: { fontSize: 13, color: "#1e4d8c", fontWeight: 700, marginBottom: 8 } }, "📋 보호자 안내·동의 필요"),
-            React.createElement("div", { style: { display: "flex", flexDirection: "column", gap: 6 } },
-              ALERT_CONSENT.map(v =>
-                React.createElement("button", {
-                  key: v, onClick: () => toggleAlert(v, "C"),
-                  style: { padding: "9px 12px", borderRadius: 8, border: "1.5px solid",
-                    borderColor: isAlertOn(v,"C") ? "#2563eb" : "#bfdbfe",
-                    background: isAlertOn(v,"C") ? "#2563eb" : "#eff6ff",
-                    color: isAlertOn(v,"C") ? "white" : "#1e4d8c",
-                    fontSize: 15, fontWeight: 600, cursor: "pointer",
-                    fontFamily: "'Noto Sans KR',sans-serif", textAlign: "left" }
-                }, v)
-              )
-            )
+      ), // noChange === false 닫기
+
+      // ── BPSD 확인 (간호사 야간 관찰 기반, 겹치는 항목은 미리 체크됨) ──
+      React.createElement("div", { style: { background: "white", borderRadius: 14, marginBottom: 12, overflow: "hidden", boxShadow: "0 1px 6px rgba(0,0,0,0.06)" } },
+        React.createElement("div", { style: { background: "linear-gradient(135deg,#6d28d9,#8b5cf6)", padding: "10px 16px", fontSize: 15, fontWeight: 700, color: "white" } }, "🧩 BPSD 확인 (치매 행동·심리 증상)"),
+        React.createElement("div", { style: { padding: 14 } },
+          React.createElement("div", { style: { fontSize: 13, color: "#64748b", marginBottom: 10 } }, "간호사가 관찰한 내용과 겹치는 항목은 미리 체크되어 있어요. 보호자에게는 이 화면에서 확인한 항목만 전달됩니다."),
+          React.createElement("div", { style: { display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 6 } },
+            BPSD_ITEMS.map(v => {
+              const active = bprs.includes(v);
+              return React.createElement("button", {
+                key: v, onClick: () => toggleBprs(v),
+                style: { padding: "8px 6px", borderRadius: 8, border: "1.5px solid",
+                  borderColor: active ? "#6d28d9" : "#e9d5ff",
+                  background: active ? "#6d28d9" : "#faf5ff",
+                  color: active ? "white" : "#6d28d9",
+                  fontSize: 12, fontWeight: 600, cursor: "pointer",
+                  fontFamily: "'Noto Sans KR',sans-serif", lineHeight: 1.3 }
+              }, v);
+            })
           )
         )
-      ), // noChange === false 닫기
+      ),
 
       React.createElement(WarmMessagePicker, { value: warmMsg, onChange: setWarmMsg }),
 
