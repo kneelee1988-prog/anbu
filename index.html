@@ -1642,6 +1642,59 @@ function GuardianScreen({ user, onBack }) {
                 else symptoms.push(a);
               });
 
+              // ── 문제별 의사의 대처 (증상 번호 태그로 묶음, 순서는 왼쪽 '현재 상태'와 동일) ──
+              const parsedAlerts = raw.map(a => { const m = a.match(/^\[([STRCDUW])(\d*)\]/); return m ? { tag: m[1], idx: m[2], text: stripTag(a) } : null; }).filter(Boolean);
+              const idxS = parsedAlerts.filter(p => p.tag === "S" && p.idx);
+              const legacyT = treating.filter(t => !parsedAlerts.some(p => p.tag === "T" && p.idx && p.text === t));
+              const usedIdx = new Set();
+              let legacyPos = 0;
+              const problemRows = symptoms.map(t => {
+                const p = idxS.find(q => q.text === t && !usedIdx.has(q.idx));
+                if (p) {
+                  usedIdx.add(p.idx);
+                  const sp = ALERT_SETS[Number(p.idx) - 1];
+                  return { label: sp ? sp.label : null, resp: parsedAlerts.filter(q => q.idx === p.idx && q.tag !== "S") };
+                }
+                const lt = legacyT[legacyPos++];
+                return { label: null, resp: lt ? [{ tag: "T", text: lt }] : [] };
+              });
+              const orphanT = [
+                ...parsedAlerts.filter(p => p.tag === "T" && p.idx && !usedIdx.has(p.idx)).map(p => p.text),
+                ...legacyT.slice(legacyPos),
+              ];
+              const PROG = {
+                W: ["🔶 악화", "#991b1b", "#fef2f2", "#fecaca"],
+                U: ["➖ 동일 지속", "#92400e", "#fffbeb", "#fde68a"],
+                R: ["✅ 호전", "#166534", "#f0fdf4", "#bbf7d0"],
+              };
+              const ResponseBox = () => React.createElement("div", { style: { marginBottom: 8, background: "white", borderRadius: 14, overflow: "hidden", boxShadow: "0 2px 8px rgba(0,0,0,0.07)" } },
+                React.createElement("div", { style: { background: "linear-gradient(135deg,#1e3a5f,#2563eb)", padding: "9px 14px", fontSize: 15, fontWeight: 700, color: "white" } }, "🩺 의사의 대처"),
+                React.createElement("div", { style: { padding: "8px 12px", display: "flex", flexDirection: "column", gap: 5 } },
+                  problemRows.map((r, i) => {
+                    const tLines = r.resp.filter(q => q.tag === "T").map(q => q.text);
+                    const pk = ["W", "U", "R"].find(k => r.resp.some(q => q.tag === k));
+                    const pg = pk ? PROG[pk] : null;
+                    return React.createElement("div", { key: i, style: {
+                      background: "#eff6ff", color: "#1d4ed8", borderRadius: 8,
+                      fontSize: 15, fontWeight: 600, padding: "8px 10px",
+                      border: "1px solid #bfdbfe", lineHeight: 1.6,
+                      display: "flex", flexDirection: "column", gap: 3
+                    } },
+                      r.label && React.createElement("span", { style: { color: "#1e3a5f", fontWeight: 800 } }, r.label),
+                      tLines.length > 0
+                        ? tLines.map((t, k) => React.createElement("span", { key: k }, t))
+                        : React.createElement("span", { style: { color: "#94a3b8", fontWeight: 500 } }, "대처 내용 등록 전"),
+                      pg && React.createElement("span", { style: { alignSelf: "flex-start", background: pg[2], color: pg[1], border: `1px solid ${pg[3]}`, borderRadius: 6, padding: "1px 8px", fontSize: 15, fontWeight: 700 } }, pg[0])
+                    );
+                  }),
+                  orphanT.map((t, i) => React.createElement("div", { key: "o" + i, style: {
+                    background: "#eff6ff", color: "#1d4ed8", borderRadius: 8,
+                    fontSize: 15, fontWeight: 600, padding: "8px 10px",
+                    border: "1px solid #bfdbfe", lineHeight: 1.6
+                  } }, t))
+                )
+              );
+
               // 2칸 그리드 섹션 (현재상태, 호전, 치료종료용 - 짧은 문구)
               const GridSection = ({ title, items, headerBg, itemBg, itemColor, itemBorder }) =>
                 items.length > 0 && React.createElement("div", { style: { background: "white", borderRadius: 14, overflow: "hidden", boxShadow: "0 2px 8px rgba(0,0,0,0.07)", display: "flex", flexDirection: "column" } },
@@ -1693,9 +1746,11 @@ function GuardianScreen({ user, onBack }) {
                       itemBg: "#fff1f2", itemColor: "#be123c", itemBorder: "#fecdd3" })
                   ),
                   React.createElement("div", null,
-                    ListSection({ title: "🩺 처치·치료 중", items: treating,
-                      headerBg: "linear-gradient(135deg,#1e3a5f,#2563eb)",
-                      itemBg: "#eff6ff", itemColor: "#1d4ed8", itemBorder: "#bfdbfe" })
+                    problemRows.length > 0
+                      ? ResponseBox()
+                      : ListSection({ title: "🩺 처치·치료 중", items: treating,
+                          headerBg: "linear-gradient(135deg,#1e3a5f,#2563eb)",
+                          itemBg: "#eff6ff", itemColor: "#1d4ed8", itemBorder: "#bfdbfe" })
                   )
                 ),
                 // 악화 + 동일 지속 나란히 2칸
@@ -2366,6 +2421,38 @@ function TodaySummaryPicker({ value, onChange }) {
 }
 
 // ── 간호사 기록 입력 화면 (압축 버전) ───────────────────────────
+// ── 보호자 면회 예약 박스 (간호사·의사 환자 화면 공용) ───────────
+function VisitReservationBox({ patient, user }) {
+  const [items, setItems] = useState(null);
+  useEffect(() => {
+    let alive = true;
+    const params = user.role === "nurse" ? { ward: user.ward } : { doctorId: user.doctor_id };
+    api("get_messages", params).then(d => {
+      if (!alive) return;
+      const now = new Date();
+      const today = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,"0")}-${String(now.getDate()).padStart(2,"0")}`;
+      const list = (d.messages || [])
+        .filter(m => m.patient_id === patient.id && m.visit_date && m.visit_date >= today)
+        .sort((a, b) => (a.visit_date + (a.visit_time || "")).localeCompare(b.visit_date + (b.visit_time || "")));
+      setItems(list);
+    }).catch(() => alive && setItems([]));
+    return () => { alive = false; };
+  }, [patient.id]);
+
+  if (items === null) return null;
+  return React.createElement("div", { style: { background: "white", borderRadius: 14, marginBottom: 12, overflow: "hidden", boxShadow: "0 1px 6px rgba(0,0,0,0.06)" } },
+    React.createElement("div", { style: { background: "linear-gradient(135deg,#0c4a6e,#0891b2)", padding: "10px 16px", fontSize: 15, fontWeight: 700, color: "white" } }, "📅 보호자 면회 예약"),
+    React.createElement("div", { style: { padding: "12px 14px", display: "flex", flexDirection: "column", gap: 6 } },
+      items.length === 0
+        ? React.createElement("div", { style: { fontSize: 15, color: "#94a3b8" } }, "예정된 면회 예약이 없어요")
+        : items.map(m => React.createElement("div", { key: m.id, style: { background: "#f0f9ff", border: "1px solid #bae6fd", borderRadius: 8, padding: "8px 10px", fontSize: 15, color: "#0369a1", fontWeight: 600, lineHeight: 1.5 } },
+            `${m.visit_date}${m.visit_time ? " " + m.visit_time : ""}`,
+            React.createElement("span", { style: { color: "#64748b", fontWeight: 500 } }, ` · ${m.sender_name || "보호자"}${m.relation ? `(${m.relation})` : ""}`)
+          ))
+    )
+  );
+}
+
 function NurseRecordScreen({ patient, user, onBack, onSaved }) {
   const emptyForm = {
     consciousness:"", meal_amount:"", meal_type:"",
@@ -2500,6 +2587,8 @@ function NurseRecordScreen({ patient, user, onBack, onSaved }) {
       )
     ),
     React.createElement("div", { className: "scroll-area", style: { paddingTop: 16 } },
+
+      React.createElement(VisitReservationBox, { patient, user }),
 
       // 1. 의식
       Sec({ title: "🧠 의식 수준", accent: "linear-gradient(135deg,#1e3a5f,#1d4ed8)",
@@ -2872,6 +2961,29 @@ function WarmMessagePicker({ value, onChange }) {
 
 
 // ── 의사 검토 화면 ────────────────────────────────────────────
+// 증상+처치 세트 (의사 입력·보호자 표시 공용)
+const ALERT_SETS = [
+  { label: "🌡️ 발열", bad: "열이 나고 있습니다", good: "해열제를 투약하며 관찰 중입니다" },
+  { label: "🫁 폐렴", bad: "폐렴 소견이 관찰됩니다", good: "폐렴 치료를 시작하였습니다" },
+  { label: "🦠 패혈증", bad: "패혈증 소견이 관찰됩니다", good: "패혈증 치료를 시작하였습니다" },
+  { label: "💧 요로감염", bad: "요로감염 소견이 관찰됩니다", good: "항생제를 투약 중입니다" },
+  { label: "😮‍💨 산소포화도 저하", bad: "산소포화도가 불안정합니다", good: "산소를 공급하며 관찰 중입니다" },
+  { label: "💨 호흡곤란", bad: "호흡이 불편해 보입니다", good: "산소 공급 및 호흡 보조 중입니다" },
+  { label: "🫀 혈압불안정", bad: "혈압이 불안정하게 관찰됩니다", good: "혈압을 자주 확인하며 조절 중입니다" },
+  { label: "😴 의식저하", bad: "의식 저하가 관찰됩니다", good: "의식저하 유발 약물을 최소화하였습니다" },
+  { label: "🍽️ 식욕저하", bad: "식욕 저하가 관찰됩니다", good: "식이 권유 하고 있습니다. 계속 식이 저하시 식욕촉진제가 필요할 수 있으며, 기간이 길어질 경우 L-tube 삽입이 필요할 수도 있습니다 (보호자 동의)" },
+  { label: "🌊 흡인위험", bad: "연하 곤란이 관찰됩니다", good: "연하곤란에 대해 집중 관찰 중이며 식이 보조 중입니다. 연하곤란 지속시 L-tube 삽입이 필요할 수 있습니다 (보호자 동의)" },
+  { label: "🩹 욕창", bad: "욕창이 관찰됩니다", good: "욕창 처치를 하고 있습니다" },
+  { label: "💊 통증", bad: "통증이 관찰됩니다", good: "통증을 조절하고 있습니다" },
+  { label: "💉 혈당불안정", bad: "혈당이 불안정하게 관찰됩니다", good: "계속 관찰 및 식이조절 중이며, 인슐린 주사가 필요할 경우 적용합니다" },
+  { label: "🫧 부종", bad: "부종이 관찰됩니다", good: "부종 원인을 파악하며 처치 중입니다" },
+  { label: "🔋 기력저하", bad: "전반적 기력 저하가 관찰됩니다", good: "약물을 조절하며 관찰 중입니다. 영양제 주사가 필요할 수 있습니다 (보호자 동의)" },
+  { label: "🩸 저알부민", bad: "영양 상태 저하가 관찰됩니다", good: "알부민 주사가 필요합니다 (보호자 동의 필요)" },
+  { label: "💧 탈수", bad: "수분 부족이 관찰됩니다", good: "수액을 공급하고 있습니다" },
+  { label: "🧬 전해질이상", bad: "전해질 불균형이 관찰됩니다", good: "전해질을 보충하고 있습니다" },
+  { label: "🛁 피부질환", bad: "피부 이상이 관찰됩니다", good: "피부 위생강화, 보습, 가려움증 감소를 위한 약물 투약 진행합니다. 옴 유사증상시 옴검사 시행(본원 1차 검사) 및 옴치료(오메크린 도포 및 경구약 투약 포함) 시행" },
+];
+
 function DoctorReviewScreen({ patient, user, onBack }) {
 
   const MEDICAL_ITEMS = {
@@ -2886,28 +2998,6 @@ function DoctorReviewScreen({ patient, user, onBack }) {
 
   };
 
-  // 증상+처치 세트 (클릭 한 번에 쌍으로 전달)
-  const ALERT_SETS = [
-    { label: "🌡️ 발열", bad: "열이 나고 있습니다", good: "해열제를 투약하며 관찰 중입니다" },
-    { label: "🫁 폐렴", bad: "폐렴 소견이 관찰됩니다", good: "폐렴 치료를 시작하였습니다" },
-    { label: "🦠 패혈증", bad: "패혈증 소견이 관찰됩니다", good: "패혈증 치료를 시작하였습니다" },
-    { label: "💧 요로감염", bad: "요로감염 소견이 관찰됩니다", good: "항생제를 투약 중입니다" },
-    { label: "😮‍💨 산소포화도 저하", bad: "산소포화도가 불안정합니다", good: "산소를 공급하며 관찰 중입니다" },
-    { label: "💨 호흡곤란", bad: "호흡이 불편해 보입니다", good: "산소 공급 및 호흡 보조 중입니다" },
-    { label: "🫀 혈압불안정", bad: "혈압이 불안정하게 관찰됩니다", good: "혈압을 자주 확인하며 조절 중입니다" },
-    { label: "😴 의식저하", bad: "의식 저하가 관찰됩니다", good: "의식저하 유발 약물을 최소화하였습니다" },
-    { label: "🍽️ 식욕저하", bad: "식욕 저하가 관찰됩니다", good: "식이 권유 하고 있습니다. 계속 식이 저하시 식욕촉진제가 필요할 수 있으며, 기간이 길어질 경우 L-tube 삽입이 필요할 수도 있습니다 (보호자 동의)" },
-    { label: "🌊 흡인위험", bad: "연하 곤란이 관찰됩니다", good: "연하곤란에 대해 집중 관찰 중이며 식이 보조 중입니다. 연하곤란 지속시 L-tube 삽입이 필요할 수 있습니다 (보호자 동의)" },
-    { label: "🩹 욕창", bad: "욕창이 관찰됩니다", good: "욕창 처치를 하고 있습니다" },
-    { label: "💊 통증", bad: "통증이 관찰됩니다", good: "통증을 조절하고 있습니다" },
-    { label: "💉 혈당불안정", bad: "혈당이 불안정하게 관찰됩니다", good: "계속 관찰 및 식이조절 중이며, 인슐린 주사가 필요할 경우 적용합니다" },
-    { label: "🫧 부종", bad: "부종이 관찰됩니다", good: "부종 원인을 파악하며 처치 중입니다" },
-    { label: "🔋 기력저하", bad: "전반적 기력 저하가 관찰됩니다", good: "약물을 조절하며 관찰 중입니다. 영양제 주사가 필요할 수 있습니다 (보호자 동의)" },
-    { label: "🩸 저알부민", bad: "영양 상태 저하가 관찰됩니다", good: "알부민 주사가 필요합니다 (보호자 동의 필요)" },
-    { label: "💧 탈수", bad: "수분 부족이 관찰됩니다", good: "수액을 공급하고 있습니다" },
-    { label: "🧬 전해질이상", bad: "전해질 불균형이 관찰됩니다", good: "전해질을 보충하고 있습니다" },
-    { label: "🛁 피부질환", bad: "피부 이상이 관찰됩니다", good: "피부 위생강화, 보습, 가려움증 감소를 위한 약물 투약 진행합니다. 옴 유사증상시 옴검사 시행(본원 1차 검사) 및 옴치료(오메크린 도포 및 경구약 투약 포함) 시행" },
-  ];
 
   const ALERT_RECOVERY = [
     "열이 조금씩 내려가고 있습니다",
@@ -3255,6 +3345,7 @@ function DoctorReviewScreen({ patient, user, onBack }) {
       ),
 
       tab === "today" && React.createElement(React.Fragment, null,
+      React.createElement(VisitReservationBox, { patient, user }),
       React.createElement("div", { style: { display: "flex", alignItems: "center", gap: 10, margin: "0 0 12px" } },
         React.createElement("div", { style: { flex: 1, height: 1, background: "linear-gradient(to right, transparent, #94a3b8)" } }),
         React.createElement("div", { style: {
