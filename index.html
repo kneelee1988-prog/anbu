@@ -1610,6 +1610,16 @@ function GuardianScreen({ user, onBack }) {
                       exams.map((f, i) => React.createElement("span", { key: i, style: { background: "#e0f2fe", color: "#0369a1", borderRadius: 8, fontSize: 13, fontWeight: 600, padding: "3px 10px", border: "1px solid #bae6fd" } }, f))
                     )
                   );
+                })(),
+                // 의사 입력 — 처치·투약 (문제별 대처 박스가 나오지 않을 때만 여기서 표시)
+                record.doctor_findings?.length > 0 && !(record?.reviewed_at && record?.special_alerts && record.special_alerts.length > 0) && (() => {
+                  const tx = record.doctor_findings.filter(f => TREATMENT_ITEMS.includes(f));
+                  return tx.length > 0 && React.createElement("div", { style: { background: "#fff7ed", borderRadius: 10, padding: "10px 14px", marginBottom: 8, border: "1.5px solid #fed7aa" } },
+                    React.createElement("div", { style: { fontSize: 13, fontWeight: 800, color: "#c2410c", marginBottom: 6, paddingBottom: 4, borderBottom: "1px solid #fed7aa" } }, "💊 처치·투약"),
+                    React.createElement("div", { style: { display: "flex", flexWrap: "wrap", gap: 6 } },
+                      tx.map((f, i) => React.createElement("span", { key: i, style: { background: "#ffedd5", color: "#c2410c", borderRadius: 8, fontSize: 13, fontWeight: 600, padding: "3px 10px", border: "1px solid #fed7aa" } }, f))
+                    )
+                  );
                 })()
               )
             ),
@@ -1642,6 +1652,7 @@ function GuardianScreen({ user, onBack }) {
                 else symptoms.push(a);
               });
 
+              const globalTx = (Array.isArray(record.doctor_findings) ? record.doctor_findings : []).filter(f => TREATMENT_ITEMS.includes(f));
               // ── 문제별 의사의 대처 (증상 번호 태그로 묶음, 순서는 왼쪽 '현재 상태'와 동일) ──
               const parsedAlerts = raw.map(a => { const m = a.match(/^\[([STRCDUW])(\d*)\]/); return m ? { tag: m[1], idx: m[2], text: stripTag(a) } : null; }).filter(Boolean);
               const idxS = parsedAlerts.filter(p => p.tag === "S" && p.idx);
@@ -1696,7 +1707,16 @@ function GuardianScreen({ user, onBack }) {
                     background: "#eff6ff", color: "#1d4ed8", borderRadius: 8,
                     fontSize: 15, fontWeight: 600, padding: "8px 10px",
                     border: "1px solid #bfdbfe", lineHeight: 1.6
-                  } }, t))
+                  } }, t)),
+                  globalTx.length > 0 && React.createElement("div", { style: {
+                    background: "#fff7ed", color: "#9a3412", borderRadius: 8,
+                    fontSize: 15, fontWeight: 600, padding: "8px 10px",
+                    border: "1px solid #fed7aa", lineHeight: 1.6,
+                    display: "flex", flexDirection: "column", gap: 3
+                  } },
+                    React.createElement("span", { style: { fontWeight: 800 } }, "💊 처치·투약"),
+                    React.createElement("span", null, globalTx.join(" · "))
+                  )
                 )
               );
 
@@ -1744,7 +1764,7 @@ function GuardianScreen({ user, onBack }) {
 
               return React.createElement(React.Fragment, null,
                 // 현재상태 + 처치치료 나란히 2칸
-                (symptoms.length > 0 || treating.length > 0) && React.createElement("div", { style: { display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8, marginBottom: 8 } },
+                (symptoms.length > 0 || treating.length > 0 || globalTx.length > 0) && React.createElement("div", { style: { display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8, marginBottom: 8 } },
                   React.createElement("div", null,
                     ListSection({ title: "⚠️ 현재 상태", items: symptoms,
                       headerBg: "linear-gradient(135deg,#7f1d1d,#dc2626)",
@@ -1753,7 +1773,7 @@ function GuardianScreen({ user, onBack }) {
                   React.createElement("div", null,
                     problemRows.length > 0
                       ? ResponseBox()
-                      : ListSection({ title: "🩺 처치·치료 중", items: treating,
+                      : ListSection({ title: "🩺 처치·치료 중", items: [...treating, ...globalTx],
                           headerBg: "linear-gradient(135deg,#1e3a5f,#2563eb)",
                           itemBg: "#eff6ff", itemColor: "#1d4ed8", itemBorder: "#bfdbfe" })
                   )
