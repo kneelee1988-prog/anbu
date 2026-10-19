@@ -1671,7 +1671,9 @@ function GuardianScreen({ user, onBack }) {
                 React.createElement("div", { style: { background: "linear-gradient(135deg,#1e3a5f,#2563eb)", padding: "9px 14px", fontSize: 15, fontWeight: 700, color: "white" } }, "🩺 의사의 대처"),
                 React.createElement("div", { style: { padding: "8px 12px", display: "flex", flexDirection: "column", gap: 5 } },
                   problemRows.map((r, i) => {
-                    const tLines = r.resp.filter(q => q.tag === "T").map(q => q.text);
+                    const tAll = r.resp.filter(q => q.tag === "T").map(q => q.text);
+                    const tLines = tAll.filter(t => !TREATMENT_ITEMS.includes(t));
+                    const tChips = tAll.filter(t => TREATMENT_ITEMS.includes(t));
                     const pk = ["W", "U", "R"].find(k => r.resp.some(q => q.tag === k));
                     const pg = pk ? PROG[pk] : null;
                     return React.createElement("div", { key: i, style: {
@@ -1681,8 +1683,11 @@ function GuardianScreen({ user, onBack }) {
                       display: "flex", flexDirection: "column", gap: 3
                     } },
                       r.label && React.createElement("span", { style: { color: "#1e3a5f", fontWeight: 800 } }, r.label),
-                      tLines.length > 0
-                        ? tLines.map((t, k) => React.createElement("span", { key: k }, t))
+                      tAll.length > 0
+                        ? React.createElement(React.Fragment, null,
+                            tLines.map((t, k) => React.createElement("span", { key: k }, t)),
+                            tChips.length > 0 && React.createElement("span", { style: { color: "#9a3412" } }, `💊 ${tChips.join(" · ")}`)
+                          )
                         : React.createElement("span", { style: { color: "#94a3b8", fontWeight: 500 } }, "대처 내용 등록 전"),
                       pg && React.createElement("span", { style: { alignSelf: "flex-start", background: pg[2], color: pg[1], border: `1px solid ${pg[3]}`, borderRadius: 6, padding: "1px 8px", fontSize: 15, fontWeight: 700 } }, pg[0])
                     );
@@ -2961,6 +2966,9 @@ function WarmMessagePicker({ value, onChange }) {
 
 
 // ── 의사 검토 화면 ────────────────────────────────────────────
+// 처치·투약 항목 (의사 입력·문제별 처치·보호자 표시 공용)
+const TREATMENT_ITEMS = ["해열제투여","대증요법","항생제투여","진통제투여","수액공급","산소공급","석션시행","영양제투여","TPN","알부민투여","수혈시행","욕창치료","상처처치","L-Tube삽입","도뇨관삽입"];
+
 // 증상+처치 세트 (의사 입력·보호자 표시 공용)
 const ALERT_SETS = [
   { label: "🌡️ 발열", bad: "열이 나고 있습니다", good: "해열제를 투약하며 관찰 중입니다" },
@@ -2992,7 +3000,7 @@ function DoctorReviewScreen({ patient, user, onBack }) {
       bg:"#f0f9ff", border:"#7dd3fc", activeBg:"#0369a1"
     },
     "💉 처치·투약": {
-      items: ["해열제투여","대증요법","항생제투여","진통제투여","수액공급","산소공급","석션시행","영양제투여","TPN","알부민투여","수혈시행","욕창치료","상처처치","L-Tube삽입","도뇨관삽입"],
+      items: TREATMENT_ITEMS,
       bg:"#fff7ed", border:"#fdba74", activeBg:"#c2410c"
     },
 
@@ -3502,6 +3510,21 @@ function DoctorReviewScreen({ patient, user, onBack }) {
                     fontFamily: "'Noto Sans KR',sans-serif", lineHeight: 1.4, marginBottom: 10
                   }
                 }, s.good),
+                // 추가 처치·처방 (문제별, 해당시 선택)
+                React.createElement("div", { style: { fontSize: 12, color: "#64748b", fontWeight: 700, marginBottom: 5 } }, "추가 처치·처방 (해당시 선택)"),
+                React.createElement("div", { style: { display: "flex", flexWrap: "wrap", gap: 5, marginBottom: 10 } },
+                  TREATMENT_ITEMS.map(v => {
+                    const on = isAlertOnIdx(v, "T", idx);
+                    return React.createElement("button", {
+                      key: v, onClick: () => toggleAlertIdx(v, "T", idx),
+                      style: { padding: "5px 9px", borderRadius: 8, border: "1.5px solid",
+                        borderColor: on ? "#c2410c" : "#fdba74",
+                        background: on ? "#c2410c" : "#fff7ed",
+                        color: on ? "white" : "#9a3412",
+                        fontSize: 12, fontWeight: 600, cursor: "pointer", fontFamily: "'Noto Sans KR',sans-serif" }
+                    }, v);
+                  })
+                ),
                 // 경과
                 React.createElement("div", { style: { fontSize: 12, color: "#64748b", fontWeight: 700, marginBottom: 5 } }, "② 경과"),
                 React.createElement("div", { style: { display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 6, marginBottom: progress ? 8 : 0 } },
